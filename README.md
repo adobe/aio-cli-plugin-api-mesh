@@ -1,10 +1,21 @@
 # Installation
 Prerequisites: [node.js](https://nodejs.org/en/), [aio-cli](https://github.com/adobe/aio-cli).
-```sh-session
-$ aio plugins:install -g @adobe/aio-cli-plugin-PLUGINNAME
-$ # OR
+To install a revision from this repository:
+
+```
+$ aio plugins:install adobe/aio-cli-plugin-schema-management
+```
+
+To install globally from a released npm package:
+
+```
+$ aio plugins:install -g @adobe/aio-cli-plugin-schema-management
+```
+
+To discover available aio packages:
+
+```
 $ aio discover -i
-$ aio PLUGINNAME --help
 ```
 ### Local Development
 
