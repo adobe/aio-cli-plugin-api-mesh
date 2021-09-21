@@ -1,10 +1,3 @@
-`PLUGINNAME` commands for the Adobe I/O CLI
-
-<!-- toc -->
-* [Usage](#usage)
-* [Commands](#commands)
-<!-- tocstop -->
-
 # Usage
 ```sh-session
 $ aio plugins:install -g @adobe/aio-cli-plugin-PLUGINNAME
