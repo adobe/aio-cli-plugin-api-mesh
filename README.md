@@ -1,4 +1,5 @@
-# Usage
+# Installation
+Prerequisites: [node.js](https://nodejs.org/en/), [aio-cli](https://github.com/adobe/aio-cli).
 ```sh-session
 $ aio plugins:install -g @adobe/aio-cli-plugin-PLUGINNAME
 $ # OR
