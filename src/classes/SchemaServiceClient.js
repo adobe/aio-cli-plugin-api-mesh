@@ -7,7 +7,7 @@ class SchemaServiceClient {
         this.timeout = parseInt(process.env.EXTERNAL_API_TIMEOUT || '1000', 10)
         this.retryCount = parseInt(process.env.EXTERNAL_API_RETRY || '2', 10)
     }
-    getTenantsForUpdate = async () => {
+    getTenants = async () => {
         try {
             const response = await got(`${this.schemaManagementServiceUrl}/tenants`, {
 				method: 'GET',

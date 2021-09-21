@@ -5,7 +5,7 @@ class ListCommand extends Command {
   async run() {
     const {flags} = this.parse(ListCommand)
     let schemaServiceClient = new SchemaServiceClient()
-    const tenants = await schemaServiceClient.getTenantsForUpdate()
+    const tenants = await schemaServiceClient.getTenants()
     this.log(tenants)
   }
 }

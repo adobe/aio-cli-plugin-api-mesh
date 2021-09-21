@@ -83,11 +83,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/adobe/aio-cli-plugin-boilerplate.git"
+    "url": "https://git.corp.adobe.com/Commerce-Gateway/aio-cli-plugin-schema-management"
   },
   "author": "",
   "bugs": {
-    "url": "https://github.com/adobe/aio-cli-plugin-boilerplate/issues"
+    "url": "https://git.corp.adobe.com/Commerce-Gateway/aio-cli-plugin-schema-management/issues"
   },
-  "homepage": "https://github.com/adobe/aio-cli-plugin-boilerplate#readme"
+  "homepage": "https://git.corp.adobe.com/Commerce-Gateway/aio-cli-plugin-schema-management#readme"
 }
