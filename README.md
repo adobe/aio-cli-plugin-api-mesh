@@ -6,13 +6,13 @@ $ aio discover -i
 $ aio PLUGINNAME --help
 ```
 Local Development
-```aio plugins:link schema-management/tenant/list
-aio schema-management:tenant:list
+```
+aio plugins:link schema-management/tenant/list
 ```
 
 # Commands
 <!-- commands -->
-
+aio schema-management:tenant:list
 <!-- commandsstop -->
 
 ## Contributing
