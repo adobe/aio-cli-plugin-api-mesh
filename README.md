@@ -29,10 +29,17 @@ aio plugins:link schema-management/tenant/list
 ```aio schema-management:tenant:list```
 <!-- commandsstop -->
 
-## Contributing
+# Env variables
+For local development, the project is configured to look for a .env file at the project root for environment variables. Git is configured to ignore .env and it should not be checked into the repo.
 
-Contributions are welcomed! Read the [Contributing Guide](CONTRIBUTING.md) for more information.
+SCHEMA_MANAGEMENT_SERVICE_URL
 
-## Licensing
+http://localhost:8080 default local address
+https://schema-management-service-qa.corp.ethos01-stage-va6.ethos.adobe.net qa endpoint (must be on VPN)
+LOG_LEVEL
 
-This project is licensed under the Apache V2 License. See [LICENSE](LICENSE) for more information.
+default 500
+EXTERNAL_API_TIMEOUT - Timeout for async calls to external APIs (ms)
+
+default 1000
+EXTERNAL_API_RETRY - Number of retries for async calls to external APIs
