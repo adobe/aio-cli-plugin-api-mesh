@@ -7,12 +7,14 @@ $ aio PLUGINNAME --help
 ```
 Local Development
 ```
-aio plugins:link schema-management/tenant/list
+aio plugins:link commerce-gateway/tenant
 ```
 
 # Commands
 <!-- commands -->
-aio schema-management:tenant:list
+aio commerce-gateway:tenant:create BODYJSONFILE
+aio commerce-gateway:tenant:update tenantid BODYJSONFILE
+aio commerce-gateway:tenant:get tenantid
 <!-- commandsstop -->
 
 ## Contributing
