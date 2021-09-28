@@ -21,13 +21,21 @@ $ aio discover -i
 
 Install project dependencies. ```npm install```
 ```
-aio plugins:link schema-management/tenant/list
+aio plugins:link commerce-gateway/tenant
 ```
 
 # Commands
+<<<<<<< HEAD
 <!-- commands -->
 ```aio schema-management:tenant:list```
 <!-- commandsstop -->
+=======
+```
+aio commerce-gateway:tenant:create BODYJSONFILE
+aio commerce-gateway:tenant:update tenantid BODYJSONFILE
+aio commerce-gateway:tenant:get tenantid
+```
+>>>>>>> b2855df869ff4ef2dfd327844f0fa5c7253c8184
 
 # Env variables
 For local development, the project is configured to look for a .env file at the project root for environment variables. Git is configured to ignore .env and it should not be checked into the repo.
