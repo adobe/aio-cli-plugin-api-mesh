@@ -7,9 +7,9 @@ class SchemaServiceClient {
         this.timeout = parseInt(process.env.EXTERNAL_API_TIMEOUT || '1000', 10)
         this.retryCount = parseInt(process.env.EXTERNAL_API_RETRY || '2', 10)
     }
-    getTenants = async () => {
+    getTenant = async (tenantId) => {
         try {
-            const response = await got(`${this.schemaManagementServiceUrl}/tenants`, {
+            const response = await got(`${this.schemaManagementServiceUrl}/tenants/${tenantId}`, {
 				method: 'GET',
 				responseType: 'json',
 				searchParams: {
@@ -18,11 +18,51 @@ class SchemaServiceClient {
 				timeout: this.timeout,
 				retry: this.retryCount,
             })
-            if (response) 
-            console.log(response.body);
+            return response && response.body ?
+            response.body : null
             
         } catch (error) {
-            console.log(error.response.body);
+            return null
+        }
+    }
+
+    createTenant = async (data) => {
+        try {
+            const response = await got(`${this.schemaManagementServiceUrl}/tenants`, {
+				method: 'POST',
+                responseType: 'json',
+                headers: { 
+                    'Content-Type': 'application/json'
+                },
+				body: JSON.stringify(data),
+				timeout: this.timeout,
+				retry: this.retryCount,
+            })
+            return response && response.body ?
+            response.body : null
+            
+        } catch (error) {
+            return null
+        }
+    }
+
+    updateTenant = async (tenantId, data) => {
+        try {
+            const response = await got(`${this.schemaManagementServiceUrl}/tenants/${tenantId}`, {
+				method: 'PUT',
+                responseType: 'json',
+                headers: { 
+                    'Content-Type': 'application/json'
+                },
+				body: JSON.stringify(data),
+				timeout: this.timeout,
+				retry: this.retryCount,
+            })
+            return response && response.body ?
+            response.body : null
+            
+        } catch (error) {
+            return null
         }
     }
 }
