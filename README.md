@@ -11,11 +11,11 @@ aio plugins:link commerce-gateway/tenant
 ```
 
 # Commands
-<!-- commands -->
+```
 aio commerce-gateway:tenant:create BODYJSONFILE
 aio commerce-gateway:tenant:update tenantid BODYJSONFILE
 aio commerce-gateway:tenant:get tenantid
-<!-- commandsstop -->
+```
 
 ## Contributing
 
