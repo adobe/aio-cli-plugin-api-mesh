@@ -12,9 +12,9 @@ class CreateCommand extends Command {
     let schemaServiceClient = new SchemaServiceClient()
     let data
     try {
-        data = JSON.parse(await readFile(args.file, "utf8"))
-        const tenant = await schemaServiceClient.createTenant(data)
-    console.log(`Successfully created a tenant with the id: ${data.tenantId}`)
+      data = JSON.parse(await readFile(args.file, "utf8"))
+      const tenant = await schemaServiceClient.createTenant(data)
+      console.log(`Successfully created a tenant with the id: ${data.tenantId}`)
     } catch (error) {
         console.log(error)
     } 
