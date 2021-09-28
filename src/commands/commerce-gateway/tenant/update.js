@@ -13,12 +13,13 @@ class UpdateCommand extends Command {
     let schemaServiceClient = new SchemaServiceClient()
     let data
     try {
-        data = JSON.parse(await readFile(args.file, "utf8"));
+      data = JSON.parse(await readFile(args.file, "utf8"))
+      const tenant = await schemaServiceClient.updateTenant(args.tenantId, data)
+      console.log(`Successfully updated the tenant with the id: ${data.tenantId}`)
     } catch (error) {
         console.log(error)
     } 
-    const tenant = await schemaServiceClient.updateTenant(args.tenantId, data)
-    console.log(`Successfully updated the tenant with the id: ${data.tenantId}`)
+    
   }
 }
 
