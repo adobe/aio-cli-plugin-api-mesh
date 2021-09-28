@@ -10,7 +10,7 @@ class UpdateCommand extends Command {
   ]
   async run() {
     const { args } = this.parse(UpdateCommand)
-    let schemaServiceClient = new SchemaServiceClient()
+    const schemaServiceClient = new SchemaServiceClient()
     let data
     try {
       data = JSON.parse(await readFile(args.file, "utf8"))

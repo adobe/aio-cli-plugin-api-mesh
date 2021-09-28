@@ -7,7 +7,7 @@ class GetCommand extends Command {
   ]
   async run() {
     const { args } = this.parse(GetCommand)
-    let schemaServiceClient = new SchemaServiceClient()
+    const schemaServiceClient = new SchemaServiceClient()
     const tenant = await schemaServiceClient.getTenant(args.tenantId)
     tenant ? console.log(JSON.stringify(tenant)):
     console.log(`Unable to retrieve the tenant config for ${args.tenantId}`)

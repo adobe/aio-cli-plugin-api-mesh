@@ -9,7 +9,7 @@ class CreateCommand extends Command {
   ]
   async run() {
     const { args } = this.parse(CreateCommand)
-    let schemaServiceClient = new SchemaServiceClient()
+    const schemaServiceClient = new SchemaServiceClient()
     let data
     try {
       data = JSON.parse(await readFile(args.file, "utf8"))
