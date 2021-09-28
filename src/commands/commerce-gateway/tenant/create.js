@@ -14,9 +14,9 @@ class CreateCommand extends Command {
     try {
       data = JSON.parse(await readFile(args.file, "utf8"))
       const tenant = await schemaServiceClient.createTenant(data)
-      console.log(`Successfully created a tenant with the id: ${data.tenantId}`)
+      this.log(`Successfully created a tenant with the id: ${data.tenantId}`)
     } catch (error) {
-        console.log(error)
+        this.log(error)
     } 
   }
 }

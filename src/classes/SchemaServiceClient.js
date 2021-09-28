@@ -22,7 +22,6 @@ class SchemaServiceClient {
             response.body : null
             
         } catch (error) {
-            console.error(error)
             return null
         }
     }
@@ -43,7 +42,6 @@ class SchemaServiceClient {
             response.body : null
             
         } catch (error) {
-            console.error(error)
             return null
         }
     }
@@ -64,7 +62,6 @@ class SchemaServiceClient {
             response.body : null
             
         } catch (error) {
-            console.error(error)
             return null
         }
     }
