@@ -3,13 +3,13 @@ Prerequisites: [node.js](https://nodejs.org/en/), [aio-cli](https://github.com/a
 To install a revision from this repository:
 
 ```
-$ aio plugins:install @adobe/aio-cli-plugin-schema-management
+$ aio plugins:install @adobe/aio-cli-plugin-commerce-admin
 ```
 
 To install globally from a released npm package:
 
 ```
-$ aio plugins:install -g @adobe/aio-cli-plugin-schema-management
+$ aio plugins:install -g @adobe/aio-cli-plugin-commerce-admin
 ```
 
 To discover available aio packages:
