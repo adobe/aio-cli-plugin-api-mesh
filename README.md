@@ -23,6 +23,19 @@ Install project dependencies. ```npm install```
 ```
 aio plugins:link commerce-gateway/tenant
 ```
+### Configuration
+
+create a config.json file with the following parameters
+```{
+    "baseUrl": "<base_url>",
+    "authorizationToken": "<authorization_token>",
+    "apiKey": "<api_key>"
+}
+```
+Perform the following command to update the configuration
+```
+aio config:set aio-cli-plugin-commerce-admin <path_to_json_file>
+```
 
 # Commands
 ```
@@ -30,17 +43,3 @@ aio commerce-gateway:tenant:create BODYJSONFILE
 aio commerce-gateway:tenant:update tenantid BODYJSONFILE
 aio commerce-gateway:tenant:get tenantid
 ```
-# Env variables
-For local development, the project is configured to look for a .env file at the project root for environment variables. Git is configured to ignore .env and it should not be checked into the repo.
-
-SCHEMA_MANAGEMENT_SERVICE_URL
-
-http://localhost:8080 default local address
-https://schema-management-service-qa.corp.ethos01-stage-va6.ethos.adobe.net qa endpoint (must be on VPN)
-LOG_LEVEL
-
-default 500
-EXTERNAL_API_TIMEOUT - Timeout for async calls to external APIs (ms)
-
-default 1000
-EXTERNAL_API_RETRY - Number of retries for async calls to external APIs
