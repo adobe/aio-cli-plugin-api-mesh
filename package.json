@@ -7,7 +7,6 @@
     "@oclif/command": "^1.6.1",
     "@oclif/config": "^1.15.1",
     "@oclif/errors": "^1.1.2",
-    "fs": "0.0.1-security",
     "got": "^11.8.2"
   },
   "devDependencies": {
