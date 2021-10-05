@@ -1,5 +1,5 @@
 {
-  "name": "@adobe/aio-cli-plugin-schema-management",
+  "name": "@adobe/aio-cli-plugin-commerce-admin",
   "version": "0.0.0",
   "dependencies": {
     "@adobe/aio-lib-core-config": "^2.0.0",
@@ -84,11 +84,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://git.corp.adobe.com/Commerce-Gateway/aio-cli-plugin-schema-management"
+    "url": "https://git.corp.adobe.com/Commerce-Gateway/aio-cli-plugin-commerce-admin"
   },
   "author": "",
   "bugs": {
-    "url": "https://git.corp.adobe.com/Commerce-Gateway/aio-cli-plugin-schema-management/issues"
+    "url": "https://git.corp.adobe.com/Commerce-Gateway/aio-cli-plugin-commerce-admin/issues"
   },
-  "homepage": "https://git.corp.adobe.com/Commerce-Gateway/aio-cli-plugin-schema-management#readme"
+  "homepage": "https://git.corp.adobe.com/Commerce-Gateway/aio-cli-plugin-commerce-admin#readme"
 }
