@@ -1,93 +1,93 @@
 {
-  "name": "@adobe/aio-cli-plugin-commerce-admin",
-  "version": "0.0.0",
-  "dependencies": {
-    "@adobe/aio-lib-core-config": "^2.0.0",
-    "@adobe/aio-lib-core-logging": "^1.1.0",
-    "@oclif/command": "^1.6.1",
-    "@oclif/config": "^1.15.1",
-    "@oclif/errors": "^1.1.2",
-    "got": "^11.8.2"
-  },
-  "devDependencies": {
-    "@adobe/eslint-config-aio-lib-config": "^1.2.0",
-    "@oclif/dev-cli": "^1",
-    "@oclif/plugin-help": "^2",
-    "acorn": "^7",
-    "chalk": "^4",
-    "eslint": "^6.2.2",
-    "eslint-config-oclif": "^3.1.0",
-    "eslint-config-standard": "^14.1.1",
-    "eslint-plugin-import": "^2.21.2",
-    "eslint-plugin-jest": "^23.13.2",
-    "eslint-plugin-jsdoc": "^21.0.0",
-    "eslint-plugin-node": "^10.0.0",
-    "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-standard": "^4.0.1",
-    "execa": "^4",
-    "jest": "^24",
-    "jest-haste-map": "^24.5.0",
-    "jest-junit": "^6.0.0",
-    "jest-resolve": "^24.5.0",
-    "stdout-stderr": "^0.1.9"
-  },
-  "engines": {
-    "node": ">=8.0.0"
-  },
-  "files": [
-    "/oclif.manifest.json",
-    "/src"
-  ],
-  "keywords": [
-    "oclif-plugin"
-  ],
-  "license": "Apache-2.0",
-  "oclif": {
-    "commands": "./src/commands",
-    "bin": "aio",
-    "devPlugins": [
-      "@oclif/plugin-help"
+    "name": "@magento/aio-cli-plugin-commerce-admin",
+    "version": "0.0.2",
+    "dependencies": {
+        "@adobe/aio-lib-core-config": "^2.0.0",
+        "@adobe/aio-lib-core-logging": "^1.1.0",
+        "@oclif/command": "^1.6.1",
+        "@oclif/config": "^1.15.1",
+        "@oclif/errors": "^1.1.2",
+        "got": "^11.8.2"
+    },
+    "devDependencies": {
+        "@adobe/eslint-config-aio-lib-config": "^1.2.0",
+        "@oclif/dev-cli": "^1",
+        "@oclif/plugin-help": "^2",
+        "acorn": "^7",
+        "chalk": "^4",
+        "eslint": "^6.2.2",
+        "eslint-config-oclif": "^3.1.0",
+        "eslint-config-standard": "^14.1.1",
+        "eslint-plugin-import": "^2.21.2",
+        "eslint-plugin-jest": "^23.13.2",
+        "eslint-plugin-jsdoc": "^21.0.0",
+        "eslint-plugin-node": "^10.0.0",
+        "eslint-plugin-promise": "^4.2.1",
+        "eslint-plugin-standard": "^4.0.1",
+        "execa": "^4",
+        "jest": "^24",
+        "jest-haste-map": "^24.5.0",
+        "jest-junit": "^6.0.0",
+        "jest-resolve": "^24.5.0",
+        "stdout-stderr": "^0.1.9"
+    },
+    "engines": {
+        "node": ">=8.0.0"
+    },
+    "files": [
+        "/oclif.manifest.json",
+        "/src"
     ],
-    "repositoryPrefix": "<%- repo %>/blob/<%- version %>/<%- commandPath %>"
-  },
-  "main": "src/index.js",
-  "scripts": {
-    "pretest": "eslint src test e2e",
-    "test": "npm run unit-tests",
-    "unit-tests": "jest --ci",
-    "prepack": "oclif-dev manifest && oclif-dev readme",
-    "postpack": "rm -f oclif.manifest.json",
-    "version": "oclif-dev readme && git add README.md",
-    "e2e": "jest --collectCoverage=false --testRegex './e2e/e2e.js'"
-  },
-  "jest": {
-    "collectCoverage": true,
-    "testPathIgnorePatterns": [
-      "<rootDir>/tests/fixtures/"
+    "keywords": [
+        "oclif-plugin"
     ],
-    "coveragePathIgnorePatterns": [
-      "<rootDir>/tests/fixtures/"
-    ],
-    "reporters": [
-      "default",
-      "jest-junit"
-    ],
-    "testEnvironment": "node",
-    "setupFilesAfterEnv": [
-      "./jest.setup.js"
-    ]
-  },
-  "description": "Basic working repo structure for Adobe teams to use as a starting point for their own plugins, and available as a github template to the @adobe github org.",
-  "directories": {
-    "test": "test"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://git.corp.adobe.com/Commerce-Gateway/aio-cli-plugin-commerce-admin"
-  },
-  "author": "",
-  "bugs": {
-    "url": "https://git.corp.adobe.com/Commerce-Gateway/aio-cli-plugin-commerce-admin/issues"
-  },
-  "homepage": "https://git.corp.adobe.com/Commerce-Gateway/aio-cli-plugin-commerce-admin#readme"
+    "license": "Apache-2.0",
+    "oclif": {
+        "commands": "./src/commands",
+        "bin": "aio",
+        "devPlugins": [
+            "@oclif/plugin-help"
+        ],
+        "repositoryPrefix": "<%- repo %>/blob/<%- version %>/<%- commandPath %>"
+    },
+    "main": "src/index.js",
+    "scripts": {
+        "pretest": "eslint src test e2e",
+        "test": "npm run unit-tests",
+        "unit-tests": "jest --ci",
+        "prepack": "oclif-dev manifest && oclif-dev readme",
+        "postpack": "rm -f oclif.manifest.json",
+        "version": "oclif-dev readme && git add README.md",
+        "e2e": "jest --collectCoverage=false --testRegex './e2e/e2e.js'"
+    },
+    "jest": {
+        "collectCoverage": true,
+        "testPathIgnorePatterns": [
+            "<rootDir>/tests/fixtures/"
+        ],
+        "coveragePathIgnorePatterns": [
+            "<rootDir>/tests/fixtures/"
+        ],
+        "reporters": [
+            "default",
+            "jest-junit"
+        ],
+        "testEnvironment": "node",
+        "setupFilesAfterEnv": [
+            "./jest.setup.js"
+        ]
+    },
+    "description": "Basic working repo structure for Adobe teams to use as a starting point for their own plugins, and available as a github template to the @adobe github org.",
+    "directories": {
+        "test": "test"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://git.corp.adobe.com/Commerce-Gateway/aio-cli-plugin-commerce-admin"
+    },
+    "author": "",
+    "bugs": {
+        "url": "https://git.corp.adobe.com/Commerce-Gateway/aio-cli-plugin-commerce-admin/issues"
+    },
+    "homepage": "https://git.corp.adobe.com/Commerce-Gateway/aio-cli-plugin-commerce-admin#readme"
 }
