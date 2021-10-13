@@ -1,6 +1,6 @@
 {
-  "name": "@adobe/aio-cli-plugin-commerce-admin",
-  "version": "0.0.0",
+  "name": "@magento/aio-cli-plugin-commerce-admin",
+  "version": "0.0.2",
   "dependencies": {
     "@adobe/aio-lib-core-config": "^2.0.0",
     "@adobe/aio-lib-core-logging": "^1.1.0",
