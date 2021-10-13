@@ -15,29 +15,27 @@ const { SchemaServiceClient } = require('../../../../src/classes/SchemaServiceCl
 const mockUpdateTenant = require('../../../data/sample_mesh.json')
 
 describe('update command tests', () => {
-
-    beforeAll(() => {
-        response = mockUpdateTenant
-        jest.spyOn(SchemaServiceClient.prototype, 'updateTenant').mockImplementation((data) => response);
-    });
-    
-    afterAll(() => {
-        jest.restoreAllMocks();
-    });
-
-    test('update-tenant-missing-tenantId-file', async () => {
-        expect.assertions(2)
-        const runResult = UpdateCommand.run([])
-        await expect(runResult instanceof Promise).toBeTruthy()
-        await expect(runResult).rejects.toEqual(
-            new Error('Unable to update the tenant with the given configuration')
-        )
-    })
-    test('update-tenant-with-configuration', async () => {
-        expect.assertions(2)
-        const runResult = UpdateCommand.run(['sample_merchant', 'test/data/sample_mesh.json'])
-        await expect(runResult instanceof Promise).toBeTruthy()
-        await expect(runResult).resolves.toEqual(mockUpdateTenant)
-    })
-    
+  beforeAll(() => {
+    const response = mockUpdateTenant
+    jest.spyOn(SchemaServiceClient.prototype, 'updateTenant').mockImplementation((data) => response)
   })
+
+  afterAll(() => {
+    jest.restoreAllMocks()
+  })
+
+  test('update-tenant-missing-tenantId-file', async () => {
+    expect.assertions(2)
+    const runResult = UpdateCommand.run([])
+    await expect(runResult instanceof Promise).toBeTruthy()
+    await expect(runResult).rejects.toEqual(
+      new Error('Unable to update the tenant with the given configuration')
+    )
+  })
+  test('update-tenant-with-configuration', async () => {
+    expect.assertions(2)
+    const runResult = UpdateCommand.run(['sample_merchant', 'test/data/sample_mesh.json'])
+    await expect(runResult instanceof Promise).toBeTruthy()
+    await expect(runResult).resolves.toEqual(mockUpdateTenant)
+  })
+})

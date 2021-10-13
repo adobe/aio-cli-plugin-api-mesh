@@ -15,29 +15,27 @@ const { SchemaServiceClient } = require('../../../../src/classes/SchemaServiceCl
 const mockCreateTenant = require('../../../data/sample_mesh.json')
 
 describe('create command tests', () => {
-
-    beforeAll(() => {
-        response = mockCreateTenant
-        jest.spyOn(SchemaServiceClient.prototype, 'createTenant').mockImplementation((data) => response);
-    });
-    
-    afterAll(() => {
-        jest.restoreAllMocks();
-    });
-
-    test('create-tenant-missing-file', async () => {
-        expect.assertions(2)
-        const runResult = CreateCommand.run([])
-        await expect(runResult instanceof Promise).toBeTruthy()
-        await expect(runResult).rejects.toEqual(
-            new Error('Unable to create a tenant with the given configuration')
-        )
-    })
-    test('create-tenant-with-configuration', async () => {
-        expect.assertions(2)
-        const runResult = CreateCommand.run(['test/data/sample_mesh.json'])
-        await expect(runResult instanceof Promise).toBeTruthy()
-        await expect(runResult).resolves.toEqual(mockCreateTenant)
-    })
-    
+  beforeAll(() => {
+    const response = mockCreateTenant
+    jest.spyOn(SchemaServiceClient.prototype, 'createTenant').mockImplementation((data) => response)
   })
+
+  afterAll(() => {
+    jest.restoreAllMocks()
+  })
+
+  test('create-tenant-missing-file', async () => {
+    expect.assertions(2)
+    const runResult = CreateCommand.run([])
+    await expect(runResult instanceof Promise).toBeTruthy()
+    await expect(runResult).rejects.toEqual(
+      new Error('Unable to create a tenant with the given configuration')
+    )
+  })
+  test('create-tenant-with-configuration', async () => {
+    expect.assertions(2)
+    const runResult = CreateCommand.run(['test/data/sample_mesh.json'])
+    await expect(runResult instanceof Promise).toBeTruthy()
+    await expect(runResult).resolves.toEqual(mockCreateTenant)
+  })
+})

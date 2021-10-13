@@ -16,24 +16,25 @@ const { SchemaServiceClient } = require('../../../classes/SchemaServiceClient')
 
 class CreateCommand extends Command {
   static args = [
-    {name: 'file'}
+    { name: 'file' }
   ]
-  async run() {
+
+  async run () {
     const { args } = this.parse(CreateCommand)
     const schemaServiceClient = new SchemaServiceClient()
     let data
     try {
-      data = JSON.parse(await readFile(args.file, "utf8"))
+      data = JSON.parse(await readFile(args.file, 'utf8'))
       const tenant = await schemaServiceClient.createTenant(data)
-      tenant ? this.log(`Successfully created a tenant with the id: ${data.tenantId}`) :
-      this.error(`Unable to create a tenant with the id ${data.tenantId}`) 
+      tenant ? this.log(`Successfully created a tenant with the id: ${data.tenantId}`)
+        : this.error(`Unable to create a tenant with the id ${data.tenantId}`)
       return tenant
     } catch (error) {
-        this.error(`Unable to create a tenant with the given configuration`)
-    } 
+      this.error('Unable to create a tenant with the given configuration')
+    }
   }
 }
 
-CreateCommand.description = `Create a tenant with the given config.`
+CreateCommand.description = 'Create a tenant with the given config.'
 
 module.exports = CreateCommand

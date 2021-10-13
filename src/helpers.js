@@ -12,21 +12,24 @@ governing permissions and limitations under the License.
 const Config = require('@adobe/aio-lib-core-config')
 const fs = require('fs')
 
-function getCommerceAdminConfig() {
-    configFile = Config.get('aio-cli-plugin-commerce-admin')
-    try {
-        const data = JSON.parse((fs.readFileSync(configFile,
-            {encoding:'utf8', flag:'r'})))
-        return {
-            "baseUrl": data.baseUrl || 'https://commerce.adobe.io',
-            "authorizationToken": data.authorizationToken,
-            "apiKey": data.apiKey
-        }
-    } catch(error) {
-        return null
+/**
+ * @returns {any} Returns a config object or null
+ */
+function getCommerceAdminConfig () {
+  const configFile = Config.get('aio-cli-plugin-commerce-admin')
+  try {
+    const data = JSON.parse((fs.readFileSync(configFile,
+      { encoding: 'utf8', flag: 'r' })))
+    return {
+      baseUrl: data.baseUrl || 'https://commerce.adobe.io',
+      authorizationToken: data.authorizationToken,
+      apiKey: data.apiKey
     }
+  } catch (error) {
+    return null
+  }
 }
 
 module.exports = {
-    getCommerceAdminConfig
+  getCommerceAdminConfig
 }
