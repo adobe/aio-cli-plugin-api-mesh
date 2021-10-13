@@ -28,8 +28,9 @@ class UpdateCommand extends Command {
       const tenant = await schemaServiceClient.updateTenant(args.tenantId, data)
       tenant ? this.log(`Successfully updated the tenant with the id: ${data.tenantId}`)
       : this.log(`Unable to update the tenant with the id: ${data.tenantId}`)
+      return tenant
     } catch (error) {
-        this.log(error)
+      this.error(`Unable to update the tenant with the given configuration`)
     } 
     
   }

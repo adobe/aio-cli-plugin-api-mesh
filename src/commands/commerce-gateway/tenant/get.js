@@ -21,7 +21,8 @@ class GetCommand extends Command {
     const schemaServiceClient = new SchemaServiceClient()
     const tenant = await schemaServiceClient.getTenant(args.tenantId)
     tenant ? this.log(JSON.stringify(tenant)):
-    this.log(`Unable to retrieve the tenant config for ${args.tenantId}`)
+    this.error(`Unable to retrieve the tenant config for ${args.tenantId}`)
+    return tenant
   }
 }
 

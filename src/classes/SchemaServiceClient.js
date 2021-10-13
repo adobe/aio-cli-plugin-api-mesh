@@ -21,7 +21,7 @@ class SchemaServiceClient {
         this.timeout = parseInt('1000', 10)
         this.retryCount = parseInt('2', 10)
     }
-    getTenant = async (tenantId) => {
+    async getTenant(tenantId) {
         try {
             const response = await got(`${this.schemaManagementServiceUrl}/api-admin/tenants/${tenantId}?api_key=${this.apiKey}`, {
                 method: 'GET',
@@ -39,7 +39,7 @@ class SchemaServiceClient {
         }
     }
 
-    createTenant = async (data) => {
+    async createTenant(data) {
         try {
             const response = await got(`${this.schemaManagementServiceUrl}/api-admin/tenants?api_key=${this.apiKey}`, {
 				method: 'POST',
@@ -60,7 +60,7 @@ class SchemaServiceClient {
         }
     }
 
-    updateTenant = async (tenantId, data) => {
+    async updateTenant(tenantId, data) {
         try {
             const response = await got(`${this.schemaManagementServiceUrl}/api-admin/tenants/${tenantId}?api_key=${this.apiKey}`, {
 				method: 'PUT',
