@@ -90,5 +90,5 @@
   "bugs": {
     "url": "https://git.corp.adobe.com/Commerce-Gateway/aio-cli-plugin-commerce-admin/issues"
   },
-  "homepage": "https://git.corp.adobe.com/Commerce-Gateway/aio-cli-plugin-commerce-admin#readme"
+  "homepage": "https://www.npmjs.com/package/@magento/aio-cli-plugin-commerce-admin"
 }
