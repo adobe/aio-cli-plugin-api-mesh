@@ -1,5 +1,5 @@
 /*
-Copyright 2019 Adobe. All rights reserved.
+Copyright 2021 Adobe. All rights reserved.
 This file is licensed to you under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License. You may obtain a copy
 of the License at http://www.apache.org/licenses/LICENSE-2.0
@@ -14,17 +14,19 @@ const { SchemaServiceClient } = require('../../../classes/SchemaServiceClient')
 
 class GetCommand extends Command {
   static args = [
-    {name: 'tenantId'}
+    { name: 'tenantId' }
   ]
-  async run() {
+
+  async run () {
     const { args } = this.parse(GetCommand)
     const schemaServiceClient = new SchemaServiceClient()
     const tenant = await schemaServiceClient.getTenant(args.tenantId)
-    tenant ? this.log(JSON.stringify(tenant)):
-    this.log(`Unable to retrieve the tenant config for ${args.tenantId}`)
+    tenant ? this.log(JSON.stringify(tenant))
+      : this.error(`Unable to retrieve the tenant config for ${args.tenantId}`)
+    return tenant
   }
 }
 
-GetCommand.description = `Get the config of a given tenant`
+GetCommand.description = 'Get the config of a given tenant'
 
 module.exports = GetCommand

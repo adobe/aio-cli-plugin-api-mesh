@@ -1,5 +1,5 @@
 /*
-Copyright 2019 Adobe. All rights reserved.
+Copyright 2021 Adobe. All rights reserved.
 This file is licensed to you under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License. You may obtain a copy
 of the License at http://www.apache.org/licenses/LICENSE-2.0
@@ -16,23 +16,25 @@ const { SchemaServiceClient } = require('../../../classes/SchemaServiceClient')
 
 class CreateCommand extends Command {
   static args = [
-    {name: 'file'}
+    { name: 'file' }
   ]
-  async run() {
+
+  async run () {
     const { args } = this.parse(CreateCommand)
     const schemaServiceClient = new SchemaServiceClient()
     let data
     try {
-      data = JSON.parse(await readFile(args.file, "utf8"))
+      data = JSON.parse(await readFile(args.file, 'utf8'))
       const tenant = await schemaServiceClient.createTenant(data)
-      tenant ? this.log(`Successfully created a tenant with the id: ${data.tenantId}`) :
-      this.log(`Unable to create a tenant with the id ${data.tenantId}`) 
+      tenant ? this.log(`Successfully created a tenant with the id: ${data.tenantId}`)
+        : this.error(`Unable to create a tenant with the id ${data.tenantId}`)
+      return tenant
     } catch (error) {
-        this.log(error)
-    } 
+      this.error('Unable to create a tenant with the given configuration')
+    }
   }
 }
 
-CreateCommand.description = `Create a tenant with the given config.`
+CreateCommand.description = 'Create a tenant with the given config.'
 
 module.exports = CreateCommand

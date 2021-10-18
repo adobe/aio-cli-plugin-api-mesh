@@ -1,5 +1,5 @@
 /*
-Copyright 2019 Adobe. All rights reserved.
+Copyright 2021 Adobe. All rights reserved.
 This file is licensed to you under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License. You may obtain a copy
 of the License at http://www.apache.org/licenses/LICENSE-2.0
@@ -16,25 +16,26 @@ const { SchemaServiceClient } = require('../../../classes/SchemaServiceClient')
 
 class UpdateCommand extends Command {
   static args = [
-    {name: 'tenantId'},
-    {name: 'file'},
+    { name: 'tenantId' },
+    { name: 'file' }
   ]
-  async run() {
+
+  async run () {
     const { args } = this.parse(UpdateCommand)
     const schemaServiceClient = new SchemaServiceClient()
     let data
     try {
-      data = JSON.parse(await readFile(args.file, "utf8"))
+      data = JSON.parse(await readFile(args.file, 'utf8'))
       const tenant = await schemaServiceClient.updateTenant(args.tenantId, data)
       tenant ? this.log(`Successfully updated the tenant with the id: ${data.tenantId}`)
-      : this.log(`Unable to update the tenant with the id: ${data.tenantId}`)
+        : this.log(`Unable to update the tenant with the id: ${data.tenantId}`)
+      return tenant
     } catch (error) {
-        this.log(error)
-    } 
-    
+      this.error('Unable to update the tenant with the given configuration')
+    }
   }
 }
 
-UpdateCommand.description = `Update a tenant with the given config.`
+UpdateCommand.description = 'Update a tenant with the given config.'
 
 module.exports = UpdateCommand
