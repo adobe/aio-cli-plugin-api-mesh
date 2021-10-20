@@ -9,74 +9,75 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const got = require('got')
-const { getCommerceAdminConfig } = require('../helpers')
+const axios = require('axios')
 
+/**
+ * This class provides methods to call Schema Management Service APIs.
+ * Before calling any method initialize the instance by calling the `init` method on it
+ * with valid values for baseUrl, apiKey and authorizationToken
+ */
 class SchemaServiceClient {
-  constructor () {
-    const config = getCommerceAdminConfig()
-    this.schemaManagementServiceUrl = config.baseUrl
-    this.authorizationToken = config.authorizationToken
-    this.apiKey = config.apiKey
-    this.timeout = parseInt('1000', 10)
-    this.retryCount = parseInt('2', 10)
+  init (baseUrl, authorizationToken, apiKey) {
+    this.schemaManagementServiceUrl = baseUrl
+    this.authorizationToken = authorizationToken
+    this.apiKey = apiKey
   }
 
   async getTenant (tenantId) {
+    const config = {
+      method: 'get',
+      url: `${this.schemaManagementServiceUrl}/api-admin/tenants/${tenantId}?api_key=${this.apiKey}`,
+      headers: {
+        Authorization: `Bearer ${this.authorizationToken}`
+      }
+    }
     try {
-      const response = await got(`${this.schemaManagementServiceUrl}/api-admin/tenants/${tenantId}?api_key=${this.apiKey}`, {
-        method: 'GET',
-        headers: {
-          authorization: `Bearer ${this.authorizationToken}`
-        },
-        timeout: this.timeout,
-        retry: this.retryCount
-      })
-      return response && response.body &&
-            response.statusCode === 200
-        ? response.body : null
+      const response = await axios(config)
+      return response && response.data &&
+      response.status === 200
+        ? response.data : null
     } catch (error) {
-      return null
+      throw new Error(JSON.stringify(error.response.data))
     }
   }
 
   async createTenant (data) {
+    const config = {
+      method: 'post',
+      url: `${this.schemaManagementServiceUrl}/api-admin/tenants?api_key=${this.apiKey}`,
+      headers: {
+        Authorization: `Bearer ${this.authorizationToken}`,
+        'Content-Type': 'application/json'
+      },
+      data: JSON.stringify(data)
+    }
     try {
-      const response = await got(`${this.schemaManagementServiceUrl}/api-admin/tenants?api_key=${this.apiKey}`, {
-        method: 'POST',
-        responseType: 'json',
-        headers: {
-          'Content-Type': 'application/json',
-          authorization: `Bearer ${this.authorizationToken}`
-        },
-        body: JSON.stringify(data),
-        timeout: this.timeout,
-        retry: this.retryCount
-      })
-      return response && response.statusCode === 201
+      console.log('here')
+      const response = await axios(config)
+      return response && response.status === 201
         ? response : null
     } catch (error) {
-      return null
+      throw new Error(JSON.stringify(error.response.data))
     }
   }
 
   async updateTenant (tenantId, data) {
+    const config = {
+      method: 'put',
+      url: `${this.schemaManagementServiceUrl}/api-admin/tenants/${tenantId}?api_key=${this.apiKey}`,
+      headers: {
+        Authorization: `Bearer ${this.authorizationToken}`,
+        'Content-Type': 'application/json'
+      },
+      data: JSON.stringify(data)
+    }
     try {
-      const response = await got(`${this.schemaManagementServiceUrl}/api-admin/tenants/${tenantId}?api_key=${this.apiKey}`, {
-        method: 'PUT',
-        responseType: 'json',
-        headers: {
-          'Content-Type': 'application/json',
-          authorization: `Bearer ${this.authorizationToken}`
-        },
-        body: JSON.stringify(data),
-        timeout: this.timeout,
-        retry: this.retryCount
-      })
-      return response && response.statusCode === 204
+      const response = await axios(config)
+      console.log(response.status)
+      return response && response.status === 204
         ? response : null
     } catch (error) {
-      return null
+      throw new Error(JSON.stringify(error.response.data))
     }
   }
 }

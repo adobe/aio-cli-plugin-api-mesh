@@ -10,12 +10,15 @@ governing permissions and limitations under the License.
 */
 
 const Config = require('@adobe/aio-lib-core-config')
+const { getToken, Ims } = require('@adobe/aio-lib-ims')
+const { CLI } = require('@adobe/aio-lib-ims/src/context')
 const fs = require('fs')
+const { SchemaServiceClient } = require('./classes/SchemaServiceClient')
 
 /**
  * @returns {any} Returns a config object or null
  */
-function getCommerceAdminConfig () {
+async function getCommerceAdminConfig () {
   const configFile = Config.get('aio-cli-plugin-commerce-admin')
   try {
     const data = JSON.parse((fs.readFileSync(configFile,
@@ -30,6 +33,53 @@ function getCommerceAdminConfig () {
   }
 }
 
+/**
+ * Returns and validates imsOrgId
+ *
+ * @returns {string}
+ */
+async function getCliOrgId () {
+  const organizationId = Config.get('console.org.code')
+  return validateImsOrg(organizationId)
+}
+
+/**
+ * @param organizationId
+ * @returns {string}
+ */
+async function validateImsOrg (organizationId) {
+  const contextName = CLI
+  const accessToken = await getToken(contextName)
+  const ims = await Ims.fromToken(accessToken)
+  const allOrganizations = await ims.ims.getOrganizations(accessToken)
+  return allOrganizations.find(org => {
+    return organizationId === getFullOrgIdentity(org)
+  }) ? organizationId : null
+}
+
+/**
+ * @param org
+ * @returns {string}
+ */
+function getFullOrgIdentity (org) {
+  return `${org.orgRef.ident}@${org.orgRef.authSrc}`
+}
+
+/**
+ * @returns {any} Returns an object with properties ready for consumption
+ */
+async function initSdk () {
+  const { baseUrl, authorizationToken, apiKey } = await getCommerceAdminConfig()
+  const schemaServiceClient = new SchemaServiceClient()
+  schemaServiceClient.init(baseUrl, authorizationToken, apiKey)
+  return {
+    schemaServiceClient: schemaServiceClient,
+    imsOrgId: await getCliOrgId()
+  }
+}
+
 module.exports = {
-  getCommerceAdminConfig
+  getCommerceAdminConfig,
+  getCliOrgId,
+  initSdk
 }

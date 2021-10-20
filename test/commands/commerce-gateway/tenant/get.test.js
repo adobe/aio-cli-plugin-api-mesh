@@ -24,7 +24,7 @@ describe('get command tests', () => {
     const runResult = GetCommand.run([])
     await expect(runResult instanceof Promise).toBeTruthy()
     await expect(runResult).rejects.toEqual(
-      new Error('Unable to retrieve the tenant config for undefined')
+      new Error('{"message":"There was an error fetching undefined"}')
     )
   })
   test('get-tenant-with-tenantId', async () => {

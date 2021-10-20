@@ -1,13 +1,15 @@
 {
   "name": "@magento/aio-cli-plugin-commerce-admin",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "dependencies": {
     "@adobe/aio-lib-core-config": "^2.0.0",
     "@adobe/aio-lib-core-logging": "^1.1.0",
+    "@adobe/aio-lib-env": "^1.1.0",
+    "@adobe/aio-lib-ims": "^5.0.1",
     "@oclif/command": "^1.6.1",
     "@oclif/config": "^1.15.1",
     "@oclif/errors": "^1.1.2",
-    "got": "^11.8.2"
+    "axios": "^0.23.0"
   },
   "devDependencies": {
     "@adobe/eslint-config-aio-lib-config": "^1.2.0",
