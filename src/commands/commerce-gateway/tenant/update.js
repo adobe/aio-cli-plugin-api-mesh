@@ -11,8 +11,7 @@ governing permissions and limitations under the License.
 
 const { Command } = require('@oclif/command')
 const { readFile } = require('fs/promises')
-
-const { SchemaServiceClient } = require('../../../classes/SchemaServiceClient')
+const { initSdk } = require('../../../helpers')
 
 class UpdateCommand extends Command {
   static args = [
@@ -22,17 +21,18 @@ class UpdateCommand extends Command {
 
   async run () {
     const { args } = this.parse(UpdateCommand)
-    const schemaServiceClient = new SchemaServiceClient()
+    const { schemaServiceClient, imsOrgId } = await initSdk()
     let data
     try {
       data = JSON.parse(await readFile(args.file, 'utf8'))
-      const tenant = await schemaServiceClient.updateTenant(args.tenantId, data)
-      tenant ? this.log(`Successfully updated the tenant with the id: ${data.tenantId}`)
-        : this.log(`Unable to update the tenant with the id: ${data.tenantId}`)
-      return tenant
     } catch (error) {
       this.error('Unable to update the tenant with the given configuration')
     }
+    data.imsOrgId = imsOrgId
+    const tenant = await schemaServiceClient.updateTenant(args.tenantId, data)
+    tenant ? this.log(`Successfully updated the tenant with the id: ${data.tenantId}`)
+      : this.log(`Unable to update the tenant with the id: ${data.tenantId}`)
+    return tenant
   }
 }
 

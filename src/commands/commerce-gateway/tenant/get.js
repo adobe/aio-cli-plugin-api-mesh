@@ -10,7 +10,7 @@ governing permissions and limitations under the License.
 */
 
 const { Command } = require('@oclif/command')
-const { SchemaServiceClient } = require('../../../classes/SchemaServiceClient')
+const { initSdk } = require('../../../helpers')
 
 class GetCommand extends Command {
   static args = [
@@ -19,7 +19,7 @@ class GetCommand extends Command {
 
   async run () {
     const { args } = this.parse(GetCommand)
-    const schemaServiceClient = new SchemaServiceClient()
+    const { schemaServiceClient } = await initSdk()
     const tenant = await schemaServiceClient.getTenant(args.tenantId)
     tenant ? this.log(JSON.stringify(tenant))
       : this.error(`Unable to retrieve the tenant config for ${args.tenantId}`)

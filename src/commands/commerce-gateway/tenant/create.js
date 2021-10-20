@@ -11,8 +11,7 @@ governing permissions and limitations under the License.
 
 const { Command } = require('@oclif/command')
 const { readFile } = require('fs/promises')
-
-const { SchemaServiceClient } = require('../../../classes/SchemaServiceClient')
+const { initSdk } = require('../../../helpers')
 
 class CreateCommand extends Command {
   static args = [
@@ -21,17 +20,18 @@ class CreateCommand extends Command {
 
   async run () {
     const { args } = this.parse(CreateCommand)
-    const schemaServiceClient = new SchemaServiceClient()
+    const { schemaServiceClient, imsOrgId } = await initSdk()
     let data
     try {
       data = JSON.parse(await readFile(args.file, 'utf8'))
-      const tenant = await schemaServiceClient.createTenant(data)
-      tenant ? this.log(`Successfully created a tenant with the id: ${data.tenantId}`)
-        : this.error(`Unable to create a tenant with the id ${data.tenantId}`)
-      return tenant
     } catch (error) {
       this.error('Unable to create a tenant with the given configuration')
     }
+    data.imsOrgId = imsOrgId
+    const tenant = await schemaServiceClient.createTenant(data)
+    tenant ? this.log(`Successfully created a tenant with the id: ${data.tenantId}`)
+      : this.error(`Unable to create a tenant with the id ${data.tenantId}`)
+    return tenant
   }
 }
 
