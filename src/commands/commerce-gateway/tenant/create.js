@@ -19,6 +19,7 @@ class CreateCommand extends Command {
   ]
 
   async run () {
+    console.log('Start create tenant')
     const { args } = this.parse(CreateCommand)
     const { schemaServiceClient, imsOrgId } = await initSdk()
     let data
@@ -29,7 +30,8 @@ class CreateCommand extends Command {
     }
     data.imsOrgId = imsOrgId
     const tenant = await schemaServiceClient.createTenant(data)
-    tenant ? this.log(`Successfully created a tenant with the id: ${data.tenantId}`)
+    tenant
+      ? this.log(`Successfully created a tenant with the id: ${data.tenantId} and imsOrgId: ${data.imsOrgId}`)
       : this.error(`Unable to create a tenant with the id ${data.tenantId}`)
     return tenant
   }

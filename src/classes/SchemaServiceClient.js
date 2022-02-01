@@ -23,7 +23,8 @@ class SchemaServiceClient {
     this.apiKey = apiKey
   }
 
-  async getTenant (tenantId) {
+  async getTenant (tenantId, organizationId) {
+    console.log(`OrgId - getTenant: ${organizationId}`)
     const config = {
       method: 'get',
       url: `${this.schemaManagementServiceUrl}/api-admin/tenants/${tenantId}?api_key=${this.apiKey}`,
@@ -35,13 +36,16 @@ class SchemaServiceClient {
       const response = await axios(config)
       return response && response.data &&
       response.status === 200
-        ? response.data : null
+        ? response.data
+        : null
     } catch (error) {
       throw new Error(JSON.stringify(error.response.data))
     }
   }
 
   async createTenant (data) {
+    const organizationId = data.imsOrgId
+    console.log(`OrgId - createTenant: ${organizationId}`)
     const config = {
       method: 'post',
       url: `${this.schemaManagementServiceUrl}/api-admin/tenants?api_key=${this.apiKey}`,
@@ -55,13 +59,16 @@ class SchemaServiceClient {
       console.log('here')
       const response = await axios(config)
       return response && response.status === 201
-        ? response : null
+        ? response
+        : null
     } catch (error) {
       throw new Error(JSON.stringify(error.response.data))
     }
   }
 
   async updateTenant (tenantId, data) {
+    const organizationId = data.imsOrgId
+    console.log(`OrgId - updateTenant: ${organizationId}`)
     const config = {
       method: 'put',
       url: `${this.schemaManagementServiceUrl}/api-admin/tenants/${tenantId}?api_key=${this.apiKey}`,
@@ -75,7 +82,8 @@ class SchemaServiceClient {
       const response = await axios(config)
       console.log(response.status)
       return response && response.status === 204
-        ? response : null
+        ? response
+        : null
     } catch (error) {
       throw new Error(JSON.stringify(error.response.data))
     }
