@@ -10,17 +10,39 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
+const mockConsoleCLIInstance = {}
+jest.mock('@adobe/aio-lib-env')
+jest.mock('@adobe/aio-cli-lib-console')
+const orgs = [
+  { id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' }
+]
+const selectedOrg = { id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' }
+/**
+ *
+ */
+function setDefaultMockConsoleCLI () {
+  mockConsoleCLIInstance.getToken = jest.fn().mockReturnValue('test_token')
+  mockConsoleCLIInstance.getCliEnv = jest.fn().mockReturnValue('prod')
+  mockConsoleCLIInstance.getOrganizations = jest.fn().mockResolvedValue(orgs)
+  mockConsoleCLIInstance.promptForSelectOrganization = jest.fn().mockResolvedValue(selectedOrg)
+}
+jest.mock('@adobe/aio-cli-lib-console', () => ({
+  init: jest.fn().mockResolvedValue(mockConsoleCLIInstance),
+  cleanStdOut: jest.fn()
+}))
+jest.mock('@adobe/aio-lib-ims')
 const UpdateCommand = require('../../../../src/commands/commerce-gateway/tenant/update')
 const { SchemaServiceClient } = require('../../../../src/classes/SchemaServiceClient')
 const mockUpdateTenant = require('../../../data/sample_mesh.json')
 
 describe('update command tests', () => {
-  beforeAll(() => {
+  beforeEach(() => {
+    setDefaultMockConsoleCLI()
     const response = mockUpdateTenant
     jest.spyOn(SchemaServiceClient.prototype, 'updateTenant').mockImplementation((data) => response)
   })
 
-  afterAll(() => {
+  afterEach(() => {
     jest.restoreAllMocks()
   })
 
