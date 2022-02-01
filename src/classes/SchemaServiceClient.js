@@ -27,7 +27,7 @@ class SchemaServiceClient {
     console.log(`OrgId - getTenant: ${organizationId}`)
     const config = {
       method: 'get',
-      url: `${this.schemaManagementServiceUrl}/api-admin/tenants/${tenantId}?api_key=${this.apiKey}`,
+      url: `${this.schemaManagementServiceUrl}/api-admin/organizations/${organizationId}/tenants/${tenantId}?api_key=${this.apiKey}`,
       headers: {
         Authorization: `Bearer ${this.authorizationToken}`
       }
@@ -48,7 +48,7 @@ class SchemaServiceClient {
     console.log(`OrgId - createTenant: ${organizationId}`)
     const config = {
       method: 'post',
-      url: `${this.schemaManagementServiceUrl}/api-admin/tenants?api_key=${this.apiKey}`,
+      url: `${this.schemaManagementServiceUrl}/api-admin/organizations/${organizationId}tenants?api_key=${this.apiKey}`,
       headers: {
         Authorization: `Bearer ${this.authorizationToken}`,
         'Content-Type': 'application/json'
@@ -71,7 +71,7 @@ class SchemaServiceClient {
     console.log(`OrgId - updateTenant: ${organizationId}`)
     const config = {
       method: 'put',
-      url: `${this.schemaManagementServiceUrl}/api-admin/tenants/${tenantId}?api_key=${this.apiKey}`,
+      url: `${this.schemaManagementServiceUrl}/api-admin/organizations/${organizationId}tenants/${tenantId}?api_key=${this.apiKey}`,
       headers: {
         Authorization: `Bearer ${this.authorizationToken}`,
         'Content-Type': 'application/json'
