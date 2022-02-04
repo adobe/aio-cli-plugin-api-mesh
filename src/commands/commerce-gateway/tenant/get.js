@@ -19,8 +19,8 @@ class GetCommand extends Command {
 
   async run () {
     const { args } = this.parse(GetCommand)
-    const { schemaServiceClient, imsOrgId } = await initSdk()
-    const tenant = await schemaServiceClient.getTenant(args.tenantId, imsOrgId)
+    const { schemaServiceClient, imsOrgCode } = await initSdk()
+    const tenant = await schemaServiceClient.getTenant(args.tenantId, imsOrgCode)
     tenant ? this.log(JSON.stringify(tenant))
       : this.error(`Unable to retrieve the tenant config for ${args.tenantId}`)
     return tenant

@@ -12,7 +12,6 @@ governing permissions and limitations under the License.
 
 const mockConsoleCLIInstance = {}
 jest.mock('@adobe/aio-lib-env')
-jest.mock('@adobe/aio-cli-lib-console')
 const orgs = [
   { id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' }
 ]

@@ -36,7 +36,7 @@ async function getCommerceAdminConfig () {
       { encoding: 'utf8', flag: 'r' })))
     return {
       baseUrl: data.baseUrl || 'https://commerce.adobe.io',
-      authorizationToken: data.authorizationToken,
+      authorizationToken: (await getLibConsoleCLI()).accessToken,
       apiKey: data.apiKey
     }
   } catch (error) {
@@ -49,14 +49,15 @@ async function getCommerceAdminConfig () {
  */
 async function initWithLoginAndOrg () {
   console.log('Waiting for LibConsoleCLI')
-  const consoleCLI = await getLibConsoleCLI()
+  const { consoleCLI, accessToken } = await getLibConsoleCLI()
   const organizations = await consoleCLI.getOrganizations()
   aioConsoleLogger.debug('Get the selected organization')
   const selectedOrg = await consoleCLI.promptForSelectOrganization(organizations)
   aioConsoleLogger.debug('Set console config')
   const key = CONSOLE_CONFIG_KEYS.ORG
   Config.set(`${CONSOLE_CONFIG_KEYS.CONSOLE}.${key}`, { id: selectedOrg.id, code: selectedOrg.code, name: selectedOrg.name })
-  return selectedOrg.code
+  this.imsOrgCode = selectedOrg.code
+  return { imsOrgCode: this.imsOrgCode, accessToken }
 }
 /**
  * @private
@@ -66,27 +67,27 @@ async function getLibConsoleCLI () {
     console.log(this.consoleCLI)
     console.log('CLI needs to be set and initiate auth login')
     await context.setCli({ 'cli.bare-output': true }, false)
+
     const clientEnv = getCliEnv()
-    console.log('Retrieve CLI token')
     this.accessToken = await getToken(CLI)
     this.consoleCLI = await libConsoleCLI.init({ accessToken: this.accessToken, apiKey: CONSOLE_API_KEYS[clientEnv], env: clientEnv })
   }
   console.log('Already logged in and CLI has been initialized')
-  return this.consoleCLI
+  return { consoleCLI: this.consoleCLI, accessToken: this.accessToken }
 }
 
 /**
  * @returns {any} Returns an object with properties ready for consumption
  */
 async function initSdk () {
-  const imsOrgId = await initWithLoginAndOrg()
+  const { imsOrgCode } = await initWithLoginAndOrg()
   console.log('initialized user login and selected Org')
   const { baseUrl, authorizationToken, apiKey } = await getCommerceAdminConfig()
   const schemaServiceClient = new SchemaServiceClient()
   schemaServiceClient.init(baseUrl, authorizationToken, apiKey)
   return {
     schemaServiceClient: schemaServiceClient,
-    imsOrgId: imsOrgId
+    imsOrgCode: imsOrgCode
   }
 }
 
