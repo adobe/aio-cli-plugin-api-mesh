@@ -48,7 +48,6 @@ async function getCommerceAdminConfig () {
  * @returns {string}
  */
 async function initWithLoginAndOrg () {
-  console.log('Waiting for LibConsoleCLI')
   const { consoleCLI, accessToken } = await getLibConsoleCLI()
   const organizations = await consoleCLI.getOrganizations()
   aioConsoleLogger.debug('Get the selected organization')
@@ -64,15 +63,11 @@ async function initWithLoginAndOrg () {
  */
 async function getLibConsoleCLI () {
   if (!this.consoleCLI) {
-    console.log(this.consoleCLI)
-    console.log('CLI needs to be set and initiate auth login')
     await context.setCli({ 'cli.bare-output': true }, false)
-
     const clientEnv = getCliEnv()
     this.accessToken = await getToken(CLI)
     this.consoleCLI = await libConsoleCLI.init({ accessToken: this.accessToken, apiKey: CONSOLE_API_KEYS[clientEnv], env: clientEnv })
   }
-  console.log('Already logged in and CLI has been initialized')
   return { consoleCLI: this.consoleCLI, accessToken: this.accessToken }
 }
 
