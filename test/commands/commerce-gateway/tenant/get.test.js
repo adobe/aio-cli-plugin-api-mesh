@@ -44,6 +44,7 @@ describe('get command tests', () => {
   })
 
   test('get-tenant-missing-tenantId', async () => {
+    jest.spyOn(SchemaServiceClient.prototype, 'getTenant').mockImplementation(() => { throw new Error('{"message":"There was an error fetching undefined"}') })
     expect.assertions(2)
     const runResult = GetCommand.run([])
     await expect(runResult instanceof Promise).toBeTruthy()
