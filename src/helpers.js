@@ -51,23 +51,27 @@ async function initWithLoginAndOrg () {
   const { consoleCLI, accessToken } = await getLibConsoleCLI()
   const organizations = await consoleCLI.getOrganizations()
   aioConsoleLogger.debug('Get the selected organization')
-  const selectedOrg = await consoleCLI.promptForSelectOrganization(organizations)
-  aioConsoleLogger.debug('Set console config')
   const key = CONSOLE_CONFIG_KEYS.ORG
-  Config.set(`${CONSOLE_CONFIG_KEYS.CONSOLE}.${key}`, { id: selectedOrg.id, code: selectedOrg.code, name: selectedOrg.name })
-  this.imsOrgCode = selectedOrg.code
-  return { imsOrgCode: this.imsOrgCode, accessToken }
+  this.configOrgCode = Config.get(`${CONSOLE_CONFIG_KEYS.CONSOLE}.${key}`)
+  if (!this.configOrgCode) {
+    const selectedOrg = await consoleCLI.promptForSelectOrganization(organizations)
+    aioConsoleLogger.debug('Set the console config')
+    Config.set(`${CONSOLE_CONFIG_KEYS.CONSOLE}.${key}`, { id: selectedOrg.id, code: selectedOrg.code, name: selectedOrg.name })
+    this.imsOrgCode = selectedOrg.code
+    return { imsOrgCode: this.imsOrgCode, accessToken }
+  } else {
+    console.log(`Selecting your organization as: ${this.configOrgCode.name}`)
+    return { imsOrgCode: this.configOrgCode.code, accessToken }
+  }
 }
 /**
  * @private
  */
 async function getLibConsoleCLI () {
-  if (!this.consoleCLI) {
-    await context.setCli({ 'cli.bare-output': true }, false)
-    const clientEnv = getCliEnv()
-    this.accessToken = await getToken(CLI)
-    this.consoleCLI = await libConsoleCLI.init({ accessToken: this.accessToken, apiKey: CONSOLE_API_KEYS[clientEnv], env: clientEnv })
-  }
+  await context.setCli({ 'cli.bare-output': true }, false)
+  const clientEnv = getCliEnv()
+  this.accessToken = await getToken(CLI)
+  this.consoleCLI = await libConsoleCLI.init({ accessToken: this.accessToken, apiKey: CONSOLE_API_KEYS[clientEnv], env: clientEnv })
   return { consoleCLI: this.consoleCLI, accessToken: this.accessToken }
 }
 
@@ -76,7 +80,7 @@ async function getLibConsoleCLI () {
  */
 async function initSdk () {
   const { imsOrgCode } = await initWithLoginAndOrg()
-  console.log('initialized user login and selected Org')
+  console.log('Initialized user login and the selected organization')
   const { baseUrl, authorizationToken, apiKey } = await getCommerceAdminConfig()
   const schemaServiceClient = new SchemaServiceClient()
   schemaServiceClient.init(baseUrl, authorizationToken, apiKey)

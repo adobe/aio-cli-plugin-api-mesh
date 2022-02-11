@@ -31,8 +31,8 @@ class CreateCommand extends Command {
     data.imsOrgId = imsOrgCode
     const tenant = await schemaServiceClient.createTenant(data)
     tenant
-      ? this.log(`Successfully created a tenant with the id: ${data.tenantId} and imsOrgCode: ${data.imsOrgId}`)
-      : this.error(`Unable to create a tenant with the id ${data.tenantId}`)
+      ? this.log(`Successfully created a tenant with the ID: ${data.tenantId} and imsOrgCode: ${data.imsOrgId}`)
+      : this.error(`Unable to create a tenant with the ID ${data.tenantId}`)
     return tenant
   }
 }

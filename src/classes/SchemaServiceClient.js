@@ -23,18 +23,18 @@ class SchemaServiceClient {
     this.apiKey = apiKey
   }
 
-  async getTenant (tenantId, organizationId) {
-    console.log(`OrgId - getTenant: ${organizationId}`)
+  async getTenant (tenantId, organizationCode) {
+    console.log(`OrgCode - getTenant: ${organizationCode}`)
     const config = {
       method: 'get',
-      url: `${this.schemaManagementServiceUrl}/api-admin/organizations/${organizationId}/tenants/${tenantId}?api_key=${this.apiKey}`,
-      //  url: `${this.schemaManagementServiceUrl}/api-admin/tenants/${tenantId}?api_key=${this.apiKey}`,
+      url: `${this.schemaManagementServiceUrl}/api-admin/organizations/${organizationCode}/tenants/${tenantId}?api_key=${this.apiKey}`,
       headers: {
         Authorization: `Bearer ${this.authorizationToken}`
       }
     }
     try {
       const response = await axios(config)
+        console.log(`Config : ${config}`)
       return response && response.data &&
       response.status === 200
         ? response.data
@@ -45,12 +45,11 @@ class SchemaServiceClient {
   }
 
   async createTenant (data) {
-    const organizationId = data.imsOrgId
-    console.log(`OrgId - createTenant: ${organizationId}`)
+    const organizationCode = data.imsOrgId
+    console.log(`OrgCode - createTenant: ${organizationCode}`)
     const config = {
       method: 'post',
-      url: `${this.schemaManagementServiceUrl}/api-admin/organizations/${organizationId}/tenants?api_key=${this.apiKey}`,
-      // url: `${this.schemaManagementServiceUrl}/api-admin/tenants?api_key=${this.apiKey}`,
+      url: `${this.schemaManagementServiceUrl}/api-admin/organizations/${organizationCode}/tenants?api_key=${this.apiKey}`,
       headers: {
         Authorization: `Bearer ${this.authorizationToken}`,
         'Content-Type': 'application/json'
@@ -69,12 +68,11 @@ class SchemaServiceClient {
   }
 
   async updateTenant (tenantId, data) {
-    const organizationId = data.imsOrgId
-    console.log(`OrgId - updateTenant: ${organizationId}`)
+    const organizationCode = data.imsOrgId
+    console.log(`OrgCode - updateTenant: ${organizationCode}`)
     const config = {
       method: 'put',
-      url: `${this.schemaManagementServiceUrl}/api-admin/organizations/${organizationId}/tenants/${tenantId}?api_key=${this.apiKey}`,
-      // url: `${this.schemaManagementServiceUrl}/api-admin/tenants/${tenantId}?api_key=${this.apiKey}`,
+      url: `${this.schemaManagementServiceUrl}/api-admin/organizations/${organizationCode}/tenants/${tenantId}?api_key=${this.apiKey}`,
       headers: {
         Authorization: `Bearer ${this.authorizationToken}`,
         'Content-Type': 'application/json'
