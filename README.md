@@ -34,7 +34,6 @@ create a config.json file with the following parameters
 ```
 {
     "baseUrl": "<base_url>",
-    "authorizationToken": "<authorization_token>",
     "apiKey": "<api_key>"
 }
 ```

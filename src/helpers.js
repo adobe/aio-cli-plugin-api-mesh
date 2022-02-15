@@ -36,7 +36,7 @@ async function getCommerceAdminConfig () {
       { encoding: 'utf8', flag: 'r' })))
     return {
       baseUrl: data.baseUrl || 'https://commerce.adobe.io',
-      authorizationToken: (await getLibConsoleCLI()).accessToken,
+      accessToken: (await getLibConsoleCLI()).accessToken,
       apiKey: data.apiKey
     }
   } catch (error) {
@@ -48,20 +48,20 @@ async function getCommerceAdminConfig () {
  * @returns {string}
  */
 async function initWithLoginAndOrg () {
-  const { consoleCLI, accessToken } = await getLibConsoleCLI()
-  const organizations = await consoleCLI.getOrganizations()
+  const { consoleCLI } = await getLibConsoleCLI()
   aioConsoleLogger.debug('Get the selected organization')
   const key = CONSOLE_CONFIG_KEYS.ORG
   this.configOrgCode = Config.get(`${CONSOLE_CONFIG_KEYS.CONSOLE}.${key}`)
   if (!this.configOrgCode) {
+    const organizations = await consoleCLI.getOrganizations()
     const selectedOrg = await consoleCLI.promptForSelectOrganization(organizations)
     aioConsoleLogger.debug('Set the console config')
     Config.set(`${CONSOLE_CONFIG_KEYS.CONSOLE}.${key}`, { id: selectedOrg.id, code: selectedOrg.code, name: selectedOrg.name })
     this.imsOrgCode = selectedOrg.code
-    return { imsOrgCode: this.imsOrgCode, accessToken }
+    return { imsOrgCode: this.imsOrgCode }
   } else {
     console.log(`Selecting your organization as: ${this.configOrgCode.name}`)
-    return { imsOrgCode: this.configOrgCode.code, accessToken }
+    return { imsOrgCode: this.configOrgCode.code }
   }
 }
 /**
@@ -81,9 +81,9 @@ async function getLibConsoleCLI () {
 async function initSdk () {
   const { imsOrgCode } = await initWithLoginAndOrg()
   console.log('Initialized user login and the selected organization')
-  const { baseUrl, authorizationToken, apiKey } = await getCommerceAdminConfig()
+  const { baseUrl, accessToken, apiKey } = await getCommerceAdminConfig()
   const schemaServiceClient = new SchemaServiceClient()
-  schemaServiceClient.init(baseUrl, authorizationToken, apiKey)
+  schemaServiceClient.init(baseUrl, accessToken, apiKey)
   return {
     schemaServiceClient: schemaServiceClient,
     imsOrgCode: imsOrgCode

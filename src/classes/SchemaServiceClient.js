@@ -14,12 +14,12 @@ const axios = require('axios')
 /**
  * This class provides methods to call Schema Management Service APIs.
  * Before calling any method initialize the instance by calling the `init` method on it
- * with valid values for baseUrl, apiKey and authorizationToken
+ * with valid values for baseUrl, apiKey and accessToken
  */
 class SchemaServiceClient {
-  init (baseUrl, authorizationToken, apiKey) {
+  init (baseUrl, accessToken, apiKey) {
     this.schemaManagementServiceUrl = baseUrl
-    this.authorizationToken = authorizationToken
+    this.accessToken = accessToken
     this.apiKey = apiKey
   }
 
@@ -29,7 +29,7 @@ class SchemaServiceClient {
       method: 'get',
       url: `${this.schemaManagementServiceUrl}/api-admin/organizations/${organizationCode}/tenants/${tenantId}?api_key=${this.apiKey}`,
       headers: {
-        Authorization: `Bearer ${this.authorizationToken}`
+        Authorization: `Bearer ${this.accessToken}`
       }
     }
     try {
@@ -51,7 +51,7 @@ class SchemaServiceClient {
       method: 'post',
       url: `${this.schemaManagementServiceUrl}/api-admin/organizations/${organizationCode}/tenants?api_key=${this.apiKey}`,
       headers: {
-        Authorization: `Bearer ${this.authorizationToken}`,
+        Authorization: `Bearer ${this.accessToken}`,
         'Content-Type': 'application/json'
       },
       data: JSON.stringify(data)
@@ -74,7 +74,7 @@ class SchemaServiceClient {
       method: 'put',
       url: `${this.schemaManagementServiceUrl}/api-admin/organizations/${organizationCode}/tenants/${tenantId}?api_key=${this.apiKey}`,
       headers: {
-        Authorization: `Bearer ${this.authorizationToken}`,
+        Authorization: `Bearer ${this.accessToken}`,
         'Content-Type': 'application/json'
       },
       data: JSON.stringify(data)
