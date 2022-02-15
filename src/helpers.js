@@ -45,9 +45,9 @@ async function getCommerceAdminConfig () {
 }
 
 /**
- * @returns {string}
+ * @returns {string} Returns organizations the user belongs to
  */
-async function initWithLoginAndOrg () {
+async function getAuthorizedOrganizations () {
   const { consoleCLI } = await getLibConsoleCLI()
   aioConsoleLogger.debug('Get the selected organization')
   const key = CONSOLE_CONFIG_KEYS.ORG
@@ -79,7 +79,7 @@ async function getLibConsoleCLI () {
  * @returns {any} Returns an object with properties ready for consumption
  */
 async function initSdk () {
-  const { imsOrgCode } = await initWithLoginAndOrg()
+  const { imsOrgCode } = await getAuthorizedOrganizations()
   console.log('Initialized user login and the selected organization')
   const { baseUrl, accessToken, apiKey } = await getCommerceAdminConfig()
   const schemaServiceClient = new SchemaServiceClient()
