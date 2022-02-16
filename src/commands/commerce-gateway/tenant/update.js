@@ -21,14 +21,14 @@ class UpdateCommand extends Command {
 
   async run () {
     const { args } = this.parse(UpdateCommand)
-    const { schemaServiceClient, imsOrgId } = await initSdk()
+    const { schemaServiceClient, imsOrgCode } = await initSdk()
     let data
     try {
       data = JSON.parse(await readFile(args.file, 'utf8'))
     } catch (error) {
       this.error('Unable to update the tenant with the given configuration')
     }
-    data.imsOrgId = imsOrgId
+    data.imsOrgId = imsOrgCode
     const tenant = await schemaServiceClient.updateTenant(args.tenantId, data)
     tenant ? this.log(`Successfully updated the tenant with the id: ${data.tenantId}`)
       : this.log(`Unable to update the tenant with the id: ${data.tenantId}`)

@@ -19,18 +19,20 @@ class CreateCommand extends Command {
   ]
 
   async run () {
+    console.log('Start create tenant')
     const { args } = this.parse(CreateCommand)
-    const { schemaServiceClient, imsOrgId } = await initSdk()
+    const { schemaServiceClient, imsOrgCode } = await initSdk()
     let data
     try {
       data = JSON.parse(await readFile(args.file, 'utf8'))
     } catch (error) {
       this.error('Unable to create a tenant with the given configuration')
     }
-    data.imsOrgId = imsOrgId
+    data.imsOrgId = imsOrgCode
     const tenant = await schemaServiceClient.createTenant(data)
-    tenant ? this.log(`Successfully created a tenant with the id: ${data.tenantId}`)
-      : this.error(`Unable to create a tenant with the id ${data.tenantId}`)
+    tenant
+      ? this.log(`Successfully created a tenant with the ID: ${data.tenantId} and imsOrgCode: ${data.imsOrgId}`)
+      : this.error(`Unable to create a tenant with the ID ${data.tenantId}`)
     return tenant
   }
 }
