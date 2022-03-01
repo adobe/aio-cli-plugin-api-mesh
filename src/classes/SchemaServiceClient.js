@@ -34,7 +34,7 @@ class SchemaServiceClient {
     }
     try {
       const response = await axios(config)
-        console.log(`Config : ${config}`)
+      console.log(`Config : ${config}`)
       return response && response.data &&
       response.status === 200
         ? response.data
