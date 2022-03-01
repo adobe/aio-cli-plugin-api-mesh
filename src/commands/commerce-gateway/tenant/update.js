@@ -30,7 +30,8 @@ class UpdateCommand extends Command {
     }
     data.imsOrgId = imsOrgCode
     const tenant = await schemaServiceClient.updateTenant(args.tenantId, data)
-    tenant ? this.log(`Successfully updated the tenant with the id: ${data.tenantId}`)
+    tenant
+      ? this.log(`Successfully updated the tenant with the id: ${data.tenantId}`)
       : this.log(`Unable to update the tenant with the id: ${data.tenantId}`)
     return tenant
   }
