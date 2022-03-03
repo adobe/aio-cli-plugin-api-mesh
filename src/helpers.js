@@ -40,8 +40,7 @@ async function getCommerceAdminConfig () {
       apiKey: data.apiKey
     }
   } catch (error) {
-    // return null
-      throw new Error('Please set the config.json before you continue')
+    return null
   }
 }
 
