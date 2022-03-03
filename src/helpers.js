@@ -16,7 +16,7 @@ const fs = require('fs')
 const libConsoleCLI = require('@adobe/aio-cli-lib-console')
 const { SchemaServiceClient } = require('./classes/SchemaServiceClient')
 const { getCliEnv } = require('@adobe/aio-lib-env')
-const aioConsoleLogger = require('@adobe/aio-lib-core-logging')('@magento/aio-cli-plugin-commerce-admin', { provider: 'debug' })
+const aioConsoleLogger = require('@adobe/aio-lib-core-logging')('@adobe/aio-cli-plugin-commerce-admin', { provider: 'debug' })
 const CONSOLE_CONFIG_KEYS = {
   CONSOLE: 'console',
   ORG: 'org'
