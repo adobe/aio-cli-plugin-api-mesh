@@ -21,9 +21,9 @@ pipeline{
         stage("Build Application"){
             agent {
                 docker {
-                    image 'node-aws:16-01'
+                    image 'node-aws-magento-cli:14-01'
                     args  '-v /etc/passwd:/etc/passwd'
-                    registryUrl 'http://docker-docker-cgateway-jenkins-node-dev.dr-uw2.adobeitc.com'
+                    registryUrl 'http://docker-data-solution-jenkins-node-aws-dev.dr-uw2.adobeitc.com'
                     registryCredentialsId 'artifactory-cgateway'
                     reuseNode true
                 }
