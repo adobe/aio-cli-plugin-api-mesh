@@ -32,7 +32,7 @@ pipeline{
                 stage('Install') {
                     steps {
                         script {
-                            sh 'npm install -g @adobe/aio-cli'
+                            sh 'sudo npm install -g @adobe/aio-cli'
                             sh 'npm config set registry https://registry.npmjs.org/'
                             sh 'npm install'
                             withVaultSecrets(
