@@ -61,11 +61,11 @@ pipeline{
         always{
             cleanWs()
         }
-        // success {
-        //     slackSend channel: "#graphql-gw-devops-qa", color: "good", message: "Job: ${env.JOB_NAME} with buildnumber ${env.BUILD_NUMBER} was successful."
-        // }
-        // failure {
-        //     slackSend channel: "#graphql-gw-devops-qa", color: "danger", message: "Job: ${env.JOB_NAME} with buildnumber ${env.BUILD_NUMBER} failed."
-        // }
+        success {
+            slackSend channel: "#graphql-gw-devops-qa", color: "good", message: "Job: ${env.JOB_NAME} with buildnumber ${env.BUILD_NUMBER} was successful."
+        }
+        failure {
+            slackSend channel: "#graphql-gw-devops-qa", color: "danger", message: "Job: ${env.JOB_NAME} with buildnumber ${env.BUILD_NUMBER} failed."
+        }
     }
 }
