@@ -10,6 +10,8 @@ pipeline{
         text(name: 'GIT_BRANCH', defaultValue: 'develop', description: 'What is the branch you want to run against?')
     }
     environment {
+        HOME = "$WORKSPACE"
+        TMPDIR = "$WORKSPACE"
         DEVELOP_BRANCH = 'develop'
         GIT_REPO = 'git@github.com:adobe/aio-cli-plugin-commerce-admin.git'
         CHECKOUTBRANCH = "${env.BRANCH_NAME == 'master' ? env.DEVELOP_BRANCH : params.GIT_BRANCH}"
@@ -28,10 +30,8 @@ pipeline{
             stages {
                 stage('Install') {
                     steps {
-                        withCredentials([string(credentialsId: 'posyniak-npm-token', variable: 'ARTIFACTORY_NPM_TOKEN')]) {
-                            sh 'npm config set registry https://registry.npmjs.org/'
-                            sh 'npm install'
-                        }
+                        sh 'npm config set registry https://registry.npmjs.org/'
+                        sh 'npm install'
                     }
                 }
                 stage('Test') {
