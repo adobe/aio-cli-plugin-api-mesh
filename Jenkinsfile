@@ -43,9 +43,9 @@ pipeline{
         }
     }
     post{
-        // always{
-        //     cleanWs()
-        // }
+        always{
+            cleanWs()
+        }
         // success {
         //     slackSend channel: "#graphql-gw-devops-qa", color: "good", message: "Job: ${env.JOB_NAME} with buildnumber ${env.BUILD_NUMBER} was successful."
         // }
