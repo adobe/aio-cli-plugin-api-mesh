@@ -7,7 +7,7 @@ pipeline{
         label "worker"
     }
     parameters {
-        text(name: 'GIT_BRANCH', defaultValue: 'dev1', description: 'What is the SMS deploy branch that you want to update? (This is always going to be dev1,dev2,dev3 etc)')
+        text(name: 'GIT_BRANCH', defaultValue: 'develop', description: 'What is the branch you want to run against?')
     }
     environment {
         DEVELOP_BRANCH = 'develop'
@@ -28,8 +28,10 @@ pipeline{
             stages {
                 stage('Install') {
                     steps {
-                        sh 'npm config set registry http://registry.npmjs.org/'
-                        sh 'npm install'
+                        withCredentials([string(credentialsId: 'posyniak-npm-token', variable: 'ARTIFACTORY_NPM_TOKEN')]) {
+                            sh 'npm config set registry https://registry.npmjs.org/'
+                            sh 'npm install'
+                        }
                     }
                 }
                 stage('Test') {
@@ -41,14 +43,14 @@ pipeline{
         }
     }
     post{
-        always{
-            cleanWs()
-        }
-        success {
-            slackSend channel: "#graphql-gw-devops-qa", color: "good", message: "Job: ${env.JOB_NAME} with buildnumber ${env.BUILD_NUMBER} was successful."
-        }
-        failure {
-            slackSend channel: "#graphql-gw-devops-qa", color: "danger", message: "Job: ${env.JOB_NAME} with buildnumber ${env.BUILD_NUMBER} failed."
-        }
+        // always{
+        //     cleanWs()
+        // }
+        // success {
+        //     slackSend channel: "#graphql-gw-devops-qa", color: "good", message: "Job: ${env.JOB_NAME} with buildnumber ${env.BUILD_NUMBER} was successful."
+        // }
+        // failure {
+        //     slackSend channel: "#graphql-gw-devops-qa", color: "danger", message: "Job: ${env.JOB_NAME} with buildnumber ${env.BUILD_NUMBER} failed."
+        // }
     }
 }
