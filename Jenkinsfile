@@ -43,7 +43,6 @@ pipeline{
                                             ]
                                     ]) {
                                 writeFile file: 'config.json', text: "${env.AIO_CONFIG}"
-                                sh 'cat config.json'
                             }
                             sh 'aio config:set aio-cli-plugin-commerce-admin config.json'
                         }
