@@ -21,9 +21,9 @@ pipeline{
         stage("Build Application"){
             agent {
                 docker {
-                    image 'node-aws-magento-cli:14-01'
+                    image 'node-aws-adobe-aio-cli:14-0'
                     args  '-v /etc/passwd:/etc/passwd'
-                    registryUrl 'http://docker-data-solution-jenkins-node-aws-dev.dr-uw2.adobeitc.com'
+                    registryUrl 'http://docker-docker-cgateway-jenkins-node-dev.dr-uw2.adobeitc.com'
                     registryCredentialsId 'artifactory-cgateway'
                     reuseNode true
                 }
@@ -32,7 +32,6 @@ pipeline{
                 stage('Install') {
                     steps {
                         script {
-                            sh 'sudo npm install -g @adobe/aio-cli'
                             sh 'npm config set registry https://registry.npmjs.org/'
                             sh 'npm install'
                             withVaultSecrets(
