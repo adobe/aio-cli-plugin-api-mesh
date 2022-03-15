@@ -38,7 +38,7 @@ pipeline{
                                     'https://vault-amer.adobe.net',
                                     env.VAULT_CREDENTIALS,
                                     [
-                                            "dx_adobe_commerce_gateway/jenkins/global/": [
+                                            "dx_adobe_commerce_gateway/jenkins/global": [
                                                     'AIO_CONFIG': 'aio_config',
                                             ]
                                     ]) {
