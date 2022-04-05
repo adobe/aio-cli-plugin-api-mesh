@@ -1,5 +1,4 @@
 const { default: pino } = require('pino');
-const requestContext = require('request-context');
 
 const logger = pino({
 	level: process.env.LOG_LEVEL || 'info',
@@ -7,7 +6,7 @@ const logger = pino({
 	prettyPrint: !process.env.ENVIRONMENT_NAME,
 	mixin() {
 		return {
-			requestId: requestContext.get('requestId'),
+			requestId: global.requestId
 		};
 	},
 	transport: {

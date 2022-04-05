@@ -11,7 +11,7 @@ governing permissions and limitations under the License.
 
 const { Command } = require('@oclif/command');
 const { readFile } = require('fs/promises');
-const { initSdk } = require('../../../helpers');
+const { initSdk, initRequestId } = require('../../../helpers');
 const logger = require('../../../classes/logger');
 
 class CreateCommand extends Command {
@@ -21,6 +21,8 @@ class CreateCommand extends Command {
 		logger.info('Start create tenant');
 		const { args } = this.parse(CreateCommand);
 		const { schemaServiceClient, imsOrgCode } = await initSdk();
+		await initRequestId();
+		logger.info(`RequestId: ${global.requestId}`);
 		
 		let data;
 		try {

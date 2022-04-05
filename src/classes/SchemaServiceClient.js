@@ -11,7 +11,7 @@ governing permissions and limitations under the License.
 
 const axios = require('axios');
 const logger = require('../classes/logger');
-const { UUID } = require('./UUID');
+const { getRequestId } = require('../helpers');
 
 /**
  * This class provides methods to call Schema Management Service APIs.
@@ -23,7 +23,6 @@ class SchemaServiceClient {
 		this.schemaManagementServiceUrl = baseUrl;
 		this.accessToken = accessToken;
 		this.apiKey = apiKey;
-		this.requestId = UUID.newUuid().toString();
 	}
 
 	async getTenant(tenantId, organizationCode) {
@@ -33,7 +32,7 @@ class SchemaServiceClient {
 			url: `${this.schemaManagementServiceUrl}/api-admin/organizations/${organizationCode}/tenants/${tenantId}?api_key=${this.apiKey}`,
 			headers: {
 				'Authorization': `Bearer ${this.accessToken}`,
-				'x-request-id': this.requestId,
+				'x-request-id': getRequestId(),
 			},
 		};
 		try {
@@ -54,7 +53,7 @@ class SchemaServiceClient {
 			headers: {
 				'Authorization': `Bearer ${this.accessToken}`,
 				'Content-Type': 'application/json',
-				'x-request-id': this.requestId,
+				'x-request-id': getRequestId(),
 			},
 			data: JSON.stringify(data),
 		};
@@ -76,7 +75,7 @@ class SchemaServiceClient {
 			headers: {
 				'Authorization': `Bearer ${this.accessToken}`,
 				'Content-Type': 'application/json',
-				'x-request-id': this.requestId,
+				'x-request-id': getRequestId(),
 			},
 			data: JSON.stringify(data),
 		};

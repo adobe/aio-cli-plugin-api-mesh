@@ -17,6 +17,7 @@ const libConsoleCLI = require('@adobe/aio-cli-lib-console');
 const { SchemaServiceClient } = require('./classes/SchemaServiceClient');
 const { getCliEnv } = require('@adobe/aio-lib-env');
 const logger = require('../src/classes/logger');
+const { UUID } = require('./classes/UUID');
 const aioConsoleLogger = require('@adobe/aio-lib-core-logging')(
 	'@adobe/aio-cli-plugin-commerce-admin',
 	{ provider: 'debug' },
@@ -101,7 +102,24 @@ async function initSdk() {
 	};
 }
 
+/**
+ * Generates a static global requestid for the lifecycle of this command request
+ */
+async function initRequestId() {
+	global.requestId = UUID.newUuid().toString();
+}
+
+/**
+ * 
+ * @returns Returns a requestId created for this particular command
+ */
+async function getRequestId() {
+	return global.requestId;
+}
+
 module.exports = {
 	getCommerceAdminConfig,
 	initSdk,
+	initRequestId,
+	getRequestId,
 };
