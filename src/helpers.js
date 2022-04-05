@@ -16,6 +16,7 @@ const fs = require('fs');
 const libConsoleCLI = require('@adobe/aio-cli-lib-console');
 const { SchemaServiceClient } = require('./classes/SchemaServiceClient');
 const { getCliEnv } = require('@adobe/aio-lib-env');
+const logger = require('../src/classes/logger');
 const aioConsoleLogger = require('@adobe/aio-lib-core-logging')(
 	'@adobe/aio-cli-plugin-commerce-admin',
 	{ provider: 'debug' },
@@ -66,7 +67,7 @@ async function getAuthorizedOrganizations() {
 		this.imsOrgCode = selectedOrg.code;
 		return { imsOrgCode: this.imsOrgCode };
 	} else {
-		console.log(`Selecting your organization as: ${this.configOrgCode.name}`);
+		logger.info(`Selecting your organization as: ${this.configOrgCode.name}`);
 		return { imsOrgCode: this.configOrgCode.code };
 	}
 }
@@ -90,7 +91,7 @@ async function getLibConsoleCLI() {
  */
 async function initSdk() {
 	const { imsOrgCode } = await getAuthorizedOrganizations();
-	console.log('Initialized user login and the selected organization');
+	logger.info('Initialized user login and the selected organization');
 	const { baseUrl, accessToken, apiKey } = await getCommerceAdminConfig();
 	const schemaServiceClient = new SchemaServiceClient();
 	schemaServiceClient.init(baseUrl, accessToken, apiKey);

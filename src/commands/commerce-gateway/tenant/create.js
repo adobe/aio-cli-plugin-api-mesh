@@ -11,10 +11,8 @@ governing permissions and limitations under the License.
 
 const { Command } = require('@oclif/command');
 const { readFile } = require('fs/promises');
-const { UUID } = require('../../../classes/UUID');
 const { initSdk } = require('../../../helpers');
-const logger = require('pino');
-const requestContext = require('request-context');
+const logger = require('../../../classes/logger');
 
 class CreateCommand extends Command {
 	static args = [{ name: 'file' }];
@@ -23,9 +21,7 @@ class CreateCommand extends Command {
 		logger.info('Start create tenant');
 		const { args } = this.parse(CreateCommand);
 		const { schemaServiceClient, imsOrgCode } = await initSdk();
-		//let's generate a requestid
-		const requestId = UUID.newUuid();
-		requestContext.set('requestId', requestId);
+		
 		let data;
 		try {
 			data = JSON.parse(await readFile(args.file, 'utf8'));

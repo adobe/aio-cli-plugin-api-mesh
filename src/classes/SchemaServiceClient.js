@@ -10,8 +10,8 @@ governing permissions and limitations under the License.
 */
 
 const axios = require('axios');
-const logger = require('pino');
-const requestContext = require('request-context');
+const logger = require('../classes/logger');
+const { UUID } = require('./UUID');
 
 /**
  * This class provides methods to call Schema Management Service APIs.
@@ -23,6 +23,7 @@ class SchemaServiceClient {
 		this.schemaManagementServiceUrl = baseUrl;
 		this.accessToken = accessToken;
 		this.apiKey = apiKey;
+		this.requestId = UUID.newUuid().toString();
 	}
 
 	async getTenant(tenantId, organizationCode) {
@@ -32,7 +33,7 @@ class SchemaServiceClient {
 			url: `${this.schemaManagementServiceUrl}/api-admin/organizations/${organizationCode}/tenants/${tenantId}?api_key=${this.apiKey}`,
 			headers: {
 				'Authorization': `Bearer ${this.accessToken}`,
-				'x-request-id': requestContext.get('requestId'),
+				'x-request-id': this.requestId,
 			},
 		};
 		try {
@@ -46,18 +47,19 @@ class SchemaServiceClient {
 
 	async createTenant(data) {
 		const organizationCode = data.imsOrgId;
-		console.log(`OrgCode - createTenant: ${organizationCode}`);
+		logger.info(`OrgCode - createTenant: ${organizationCode}`);
 		const config = {
 			method: 'post',
 			url: `${this.schemaManagementServiceUrl}/api-admin/organizations/${organizationCode}/tenants?api_key=${this.apiKey}`,
 			headers: {
 				'Authorization': `Bearer ${this.accessToken}`,
 				'Content-Type': 'application/json',
+				'x-request-id': this.requestId,
 			},
 			data: JSON.stringify(data),
 		};
 		try {
-			console.log('here');
+			logger.info('here');
 			const response = await axios(config);
 			return response && response.status === 201 ? response : null;
 		} catch (error) {
@@ -67,19 +69,20 @@ class SchemaServiceClient {
 
 	async updateTenant(tenantId, data) {
 		const organizationCode = data.imsOrgId;
-		console.log(`OrgCode - updateTenant: ${organizationCode}`);
+		logger.info(`OrgCode - updateTenant: ${organizationCode}`);
 		const config = {
 			method: 'put',
 			url: `${this.schemaManagementServiceUrl}/api-admin/organizations/${organizationCode}/tenants/${tenantId}?api_key=${this.apiKey}`,
 			headers: {
 				'Authorization': `Bearer ${this.accessToken}`,
 				'Content-Type': 'application/json',
+				'x-request-id': this.requestId,
 			},
 			data: JSON.stringify(data),
 		};
 		try {
 			const response = await axios(config);
-			console.log(response.status);
+			logger.info(response.status);
 			return response && response.status === 204 ? response : null;
 		} catch (error) {
 			throw new Error(JSON.stringify(error.response.data));
