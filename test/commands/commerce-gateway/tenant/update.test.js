@@ -10,53 +10,51 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const mockConsoleCLIInstance = {}
-jest.mock('@adobe/aio-lib-env')
-const orgs = [
-  { id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' }
-]
-const selectedOrg = { id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' }
+const mockConsoleCLIInstance = {};
+jest.mock('@adobe/aio-lib-env');
+const orgs = [{ id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' }];
+const selectedOrg = { id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' };
 /**
  *
  */
-function setDefaultMockConsoleCLI () {
-  mockConsoleCLIInstance.getToken = jest.fn().mockReturnValue('test_token')
-  mockConsoleCLIInstance.getCliEnv = jest.fn().mockReturnValue('prod')
-  mockConsoleCLIInstance.getOrganizations = jest.fn().mockResolvedValue(orgs)
-  mockConsoleCLIInstance.promptForSelectOrganization = jest.fn().mockResolvedValue(selectedOrg)
+function setDefaultMockConsoleCLI() {
+	mockConsoleCLIInstance.getToken = jest.fn().mockReturnValue('test_token');
+	mockConsoleCLIInstance.getCliEnv = jest.fn().mockReturnValue('prod');
+	mockConsoleCLIInstance.getOrganizations = jest.fn().mockResolvedValue(orgs);
+	mockConsoleCLIInstance.promptForSelectOrganization = jest.fn().mockResolvedValue(selectedOrg);
 }
 jest.mock('@adobe/aio-cli-lib-console', () => ({
-  init: jest.fn().mockResolvedValue(mockConsoleCLIInstance),
-  cleanStdOut: jest.fn()
-}))
-jest.mock('@adobe/aio-lib-ims')
-const UpdateCommand = require('../../../../src/commands/commerce-gateway/tenant/update')
-const { SchemaServiceClient } = require('../../../../src/classes/SchemaServiceClient')
-const mockUpdateTenant = require('../../../data/sample_mesh.json')
+	init: jest.fn().mockResolvedValue(mockConsoleCLIInstance),
+	cleanStdOut: jest.fn(),
+}));
+jest.mock('@adobe/aio-lib-ims');
+const UpdateCommand = require('../../../../src/commands/commerce-gateway/tenant/update');
+const { SchemaServiceClient } = require('../../../../src/classes/SchemaServiceClient');
+const mockUpdateTenant = require('../../../data/sample_mesh.json');
 
 describe('update command tests', () => {
-  beforeEach(() => {
-    setDefaultMockConsoleCLI()
-    const response = mockUpdateTenant
-    jest.spyOn(SchemaServiceClient.prototype, 'updateTenant').mockImplementation((data) => response)
-  })
+	beforeEach(() => {
+		setDefaultMockConsoleCLI();
+		const response = mockUpdateTenant;
+		jest.spyOn(SchemaServiceClient.prototype, 'updateTenant').mockImplementation(data => response);
+	});
 
-  afterEach(() => {
-    jest.restoreAllMocks()
-  })
+	afterEach(() => {
+		jest.restoreAllMocks();
+	});
 
-  test('update-tenant-missing-tenantId-file', async () => {
-    expect.assertions(2)
-    const runResult = UpdateCommand.run([])
-    await expect(runResult instanceof Promise).toBeTruthy()
-    await expect(runResult).rejects.toEqual(
-      new Error('Unable to update the tenant with the given configuration')
-    )
-  })
-  test('update-tenant-with-configuration', async () => {
-    expect.assertions(2)
-    const runResult = UpdateCommand.run(['sample_merchant', 'test/data/sample_mesh.json'])
-    await expect(runResult instanceof Promise).toBeTruthy()
-    await expect(runResult).resolves.toEqual(mockUpdateTenant)
-  })
-})
+	test('update-tenant-missing-tenantId-file', async () => {
+		expect.assertions(2);
+		const runResult = UpdateCommand.run([]);
+		await expect(runResult instanceof Promise).toBeTruthy();
+		await expect(runResult).rejects.toEqual(
+			new Error('Unable to update the tenant with the given configuration'),
+		);
+	});
+	test('update-tenant-with-configuration', async () => {
+		expect.assertions(2);
+		const runResult = UpdateCommand.run(['sample_merchant', 'test/data/sample_mesh.json']);
+		await expect(runResult instanceof Promise).toBeTruthy();
+		await expect(runResult).resolves.toEqual(mockUpdateTenant);
+	});
+});

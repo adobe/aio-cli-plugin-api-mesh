@@ -9,34 +9,41 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const { Command } = require('@oclif/command')
-const { readFile } = require('fs/promises')
-const { initSdk } = require('../../../helpers')
+const { Command } = require('@oclif/command');
+const { readFile } = require('fs/promises');
+const { UUID } = require('../../../classes/UUID');
+const { initSdk } = require('../../../helpers');
+const logger = require('pino');
+const requestContext = require('request-context');
 
 class CreateCommand extends Command {
-  static args = [
-    { name: 'file' }
-  ]
+	static args = [{ name: 'file' }];
 
-  async run () {
-    console.log('Start create tenant')
-    const { args } = this.parse(CreateCommand)
-    const { schemaServiceClient, imsOrgCode } = await initSdk()
-    let data
-    try {
-      data = JSON.parse(await readFile(args.file, 'utf8'))
-    } catch (error) {
-      this.error('Unable to create a tenant with the given configuration')
-    }
-    data.imsOrgId = imsOrgCode
-    const tenant = await schemaServiceClient.createTenant(data)
-    tenant
-      ? this.log(`Successfully created a tenant with the ID: ${data.tenantId} and imsOrgCode: ${data.imsOrgId}`)
-      : this.error(`Unable to create a tenant with the ID ${data.tenantId}`)
-    return tenant
-  }
+	async run() {
+		logger.info('Start create tenant');
+		const { args } = this.parse(CreateCommand);
+		const { schemaServiceClient, imsOrgCode } = await initSdk();
+		//let's generate a requestid
+		const requestId = UUID.newUuid();
+		requestContext.set('requestId', requestId);
+		let data;
+		try {
+			data = JSON.parse(await readFile(args.file, 'utf8'));
+		} catch (error) {
+			logger.error('Unable to create a tenant with the given configuration');
+			this.error('Unable to create a tenant with the given configuration');
+		}
+		data.imsOrgId = imsOrgCode;
+		const tenant = await schemaServiceClient.createTenant(data);
+		tenant
+			? this.log(
+					`Successfully created a tenant with the ID: ${data.tenantId} and imsOrgCode: ${data.imsOrgId}`,
+			  )
+			: this.error(`Unable to create a tenant with the ID ${data.tenantId}`);
+		return tenant;
+	}
 }
 
-CreateCommand.description = 'Create a tenant with the given config.'
+CreateCommand.description = 'Create a tenant with the given config.';
 
-module.exports = CreateCommand
+module.exports = CreateCommand;

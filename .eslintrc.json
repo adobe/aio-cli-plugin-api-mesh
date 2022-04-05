@@ -1,5 +1,4 @@
 {
-    "extends": "@adobe/eslint-config-aio-lib-config",
     "settings": {
         "jsdoc": {
           "ignorePrivate": true
@@ -8,5 +7,25 @@
     "parser": "@babel/eslint-parser",
     "parserOptions": {
         "requireConfigFile": false
-    }
+    },
+    "extends": [
+        "eslint:recommended",
+		"plugin:@typescript-eslint/recommended",
+		"plugin:@typescript-eslint/eslint-recommended",
+		"plugin:prettier/recommended"
+    ],
+    "plugins": ["@typescript-eslint/eslint-plugin", "prettier"],
+	"rules": {
+        "no-unused-vars": "warn",
+		"prettier/prettier": "warn"
+	},
+    "overrides": [
+		{
+			"files": ["*.js"],
+			"rules": {
+				"@typescript-eslint/no-var-requires": "off",
+                "no-undef": "off"
+			}
+		}
+	]
 }
