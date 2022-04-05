@@ -10,12 +10,15 @@ governing permissions and limitations under the License.
 */
 
 const { Command } = require('@oclif/command');
-const { initSdk } = require('../../../helpers');
+const logger = require('../../../classes/logger');
+const { initSdk, initRequestId } = require('../../../helpers');
 
 class GetCommand extends Command {
 	static args = [{ name: 'tenantId' }];
 
 	async run() {
+		await initRequestId();
+		logger.info(`RequestId: ${global.requestId}`);
 		const { args } = this.parse(GetCommand);
 		const { schemaServiceClient, imsOrgCode } = await initSdk();
 		const tenant = await schemaServiceClient.getTenant(args.tenantId, imsOrgCode);

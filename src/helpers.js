@@ -109,17 +109,8 @@ async function initRequestId() {
 	global.requestId = UUID.newUuid().toString();
 }
 
-/**
- * 
- * @returns Returns a requestId created for this particular command
- */
-async function getRequestId() {
-	return global.requestId;
-}
-
 module.exports = {
 	getCommerceAdminConfig,
 	initSdk,
 	initRequestId,
-	getRequestId,
 };

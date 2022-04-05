@@ -11,7 +11,6 @@ governing permissions and limitations under the License.
 
 const axios = require('axios');
 const logger = require('../classes/logger');
-const { getRequestId } = require('../helpers');
 
 /**
  * This class provides methods to call Schema Management Service APIs.
@@ -32,7 +31,7 @@ class SchemaServiceClient {
 			url: `${this.schemaManagementServiceUrl}/api-admin/organizations/${organizationCode}/tenants/${tenantId}?api_key=${this.apiKey}`,
 			headers: {
 				'Authorization': `Bearer ${this.accessToken}`,
-				'x-request-id': getRequestId(),
+				'x-request-id': global.requestId,
 			},
 		};
 		try {
@@ -53,7 +52,7 @@ class SchemaServiceClient {
 			headers: {
 				'Authorization': `Bearer ${this.accessToken}`,
 				'Content-Type': 'application/json',
-				'x-request-id': getRequestId(),
+				'x-request-id': global.requestId,
 			},
 			data: JSON.stringify(data),
 		};
@@ -75,7 +74,7 @@ class SchemaServiceClient {
 			headers: {
 				'Authorization': `Bearer ${this.accessToken}`,
 				'Content-Type': 'application/json',
-				'x-request-id': getRequestId(),
+				'x-request-id': global.requestId,
 			},
 			data: JSON.stringify(data),
 		};

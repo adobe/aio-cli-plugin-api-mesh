@@ -18,12 +18,11 @@ class CreateCommand extends Command {
 	static args = [{ name: 'file' }];
 
 	async run() {
+		await initRequestId();
+		logger.info(`RequestId: ${global.requestId}`);
 		logger.info('Start create tenant');
 		const { args } = this.parse(CreateCommand);
 		const { schemaServiceClient, imsOrgCode } = await initSdk();
-		await initRequestId();
-		logger.info(`RequestId: ${global.requestId}`);
-		
 		let data;
 		try {
 			data = JSON.parse(await readFile(args.file, 'utf8'));

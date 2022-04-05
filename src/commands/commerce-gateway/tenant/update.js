@@ -11,12 +11,15 @@ governing permissions and limitations under the License.
 
 const { Command } = require('@oclif/command');
 const { readFile } = require('fs/promises');
-const { initSdk } = require('../../../helpers');
+const logger = require('../../../classes/logger');
+const { initSdk, initRequestId } = require('../../../helpers');
 
 class UpdateCommand extends Command {
 	static args = [{ name: 'tenantId' }, { name: 'file' }];
 
 	async run() {
+		await initRequestId();
+		logger.info(`RequestId: ${global.requestId}`);
 		const { args } = this.parse(UpdateCommand);
 		const { schemaServiceClient, imsOrgCode } = await initSdk();
 		let data;
