@@ -26,6 +26,7 @@ class UpdateCommand extends Command {
 		try {
 			data = JSON.parse(await readFile(args.file, 'utf8'));
 		} catch (error) {
+			logger.error(error);
 			this.error('Unable to update the tenant with the given configuration');
 		}
 		data.imsOrgId = imsOrgCode;

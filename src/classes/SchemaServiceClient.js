@@ -39,6 +39,7 @@ class SchemaServiceClient {
 			logger.info(`Config : ${config}`);
 			return response && response.data && response.status === 200 ? response.data : null;
 		} catch (error) {
+			logger.error(error);
 			throw new Error(JSON.stringify(error.response.data));
 		}
 	}
@@ -61,6 +62,7 @@ class SchemaServiceClient {
 			const response = await axios(config);
 			return response && response.status === 201 ? response : null;
 		} catch (error) {
+			logger.error(error);
 			throw new Error(JSON.stringify(error.response.data));
 		}
 	}
@@ -83,6 +85,7 @@ class SchemaServiceClient {
 			logger.info(response.status);
 			return response && response.status === 204 ? response : null;
 		} catch (error) {
+			logger.error(error);
 			throw new Error(JSON.stringify(error.response.data));
 		}
 	}
