@@ -9,25 +9,26 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const { Command } = require('@oclif/command')
-const { initSdk } = require('../../../helpers')
+const { Command } = require('@oclif/command');
+const logger = require('../../../classes/logger');
+const { initSdk, initRequestId } = require('../../../helpers');
 
 class GetCommand extends Command {
-  static args = [
-    { name: 'tenantId' }
-  ]
+	static args = [{ name: 'tenantId' }];
 
-  async run () {
-    const { args } = this.parse(GetCommand)
-    const { schemaServiceClient, imsOrgCode } = await initSdk()
-    const tenant = await schemaServiceClient.getTenant(args.tenantId, imsOrgCode)
-    tenant
-      ? this.log(JSON.stringify(tenant))
-      : this.error(`Unable to retrieve the tenant config for ${args.tenantId}`)
-    return tenant
-  }
+	async run() {
+		await initRequestId();
+		logger.info(`RequestId: ${global.requestId}`);
+		const { args } = this.parse(GetCommand);
+		const { schemaServiceClient, imsOrgCode } = await initSdk();
+		const tenant = await schemaServiceClient.getTenant(args.tenantId, imsOrgCode);
+		tenant
+			? this.log(JSON.stringify(tenant))
+			: this.error(`Unable to retrieve the tenant config for ${args.tenantId}`);
+		return tenant;
+	}
 }
 
-GetCommand.description = 'Get the config of a given tenant'
+GetCommand.description = 'Get the config of a given tenant';
 
-module.exports = GetCommand
+module.exports = GetCommand;

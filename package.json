@@ -5,15 +5,21 @@
     "access": "public"
   },
   "dependencies": {
+    "@adobe/aio-cli-lib-console": "^3.0.0",
     "@adobe/aio-lib-core-config": "^2.0.0",
     "@adobe/aio-lib-core-logging": "^1.1.0",
     "@adobe/aio-lib-env": "^1.1.0",
     "@adobe/aio-lib-ims": "^5.0.1",
-    "@adobe/aio-cli-lib-console": "^3.0.0",
     "@oclif/command": "^1.6.1",
     "@oclif/config": "^1.15.1",
     "@oclif/errors": "^1.1.2",
-    "axios": "^0.23.0"
+    "@typescript-eslint/eslint-plugin": "^5.18.0",
+    "axios": "^0.23.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-prettier": "^4.0.0",
+    "pino": "^7.9.2",
+    "pino-pretty": "^7.6.0",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@adobe/eslint-config-aio-lib-config": "^1.4.0",
@@ -65,7 +71,9 @@
     "prepack": "oclif-dev manifest && oclif-dev readme",
     "postpack": "rm -f oclif.manifest.json",
     "version": "oclif-dev readme && git add README.md",
-    "e2e": "jest --collectCoverage=false --testRegex './e2e/e2e.js'"
+    "e2e": "jest --collectCoverage=false --testRegex './e2e/e2e.js'",
+    "lint": "eslint .",
+    "lint:fix": "eslint --fix ."
   },
   "jest": {
     "collectCoverage": true,
