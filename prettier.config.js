@@ -9,7 +9,7 @@ const config = {
 	endOfLine: 'lf',
 
 	// config options to be passed to prettier-plugin-sort-imports
-	importOrder: ['^@core/(.*)$', '^@server/(.*)$', '^@ui/(.*)$', '^[./]'],
+	importOrder: ['^[./]'],
 	importOrderSeparation: true,
 	importOrderSortSpecifiers: true,
 };
