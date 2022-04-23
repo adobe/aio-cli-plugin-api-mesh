@@ -1,10 +1,10 @@
 {
-  "name": "@adobe/aio-cli-plugin-commerce-admin",
-  "version": "0.0.5",
-  "publishConfig": {
-    "access": "public"
-  },
-  "dependencies": {
+	"name": "@adobe/aio-cli-plugin-commerce-admin",
+	"version": "0.0.5",
+	"publishConfig": {
+		"access": "public"
+	},
+	"dependencies": {
 		"@adobe/aio-lib-core-config": "^2.0.0",
 		"@adobe/aio-lib-core-logging": "^1.1.0",
 		"@adobe/aio-lib-env": "^1.1.0",
@@ -13,7 +13,10 @@
 		"@oclif/command": "^1.6.1",
 		"@oclif/config": "^1.15.1",
 		"@oclif/errors": "^1.1.2",
-		"axios": "^0.23.0"
+		"axios": "^0.23.0",
+		"pino": "^7.9.2",
+		"pino-pretty": "^7.6.0",
+		"uuid": "^8.3.2"
 	},
 	"devDependencies": {
 		"@adobe/eslint-config-aio-lib-config": "^1.4.0",
@@ -41,27 +44,27 @@
 		"prettier": "2.2.1",
 		"stdout-stderr": "^0.1.9"
 	},
-  "engines": {
-    "node": ">=8.0.0"
-  },
-  "files": [
-    "/oclif.manifest.json",
-    "/src"
-  ],
-  "keywords": [
-    "oclif-plugin"
-  ],
-  "license": "Apache-2.0",
-  "oclif": {
-    "commands": "./src/commands",
-    "bin": "aio",
-    "devPlugins": [
-      "@oclif/plugin-help"
-    ],
-    "repositoryPrefix": "<%- repo %>/blob/<%- version %>/<%- commandPath %>"
-  },
-  "main": "src/index.js",
-  "scripts": {
+	"engines": {
+		"node": ">=8.0.0"
+	},
+	"files": [
+		"/oclif.manifest.json",
+		"/src"
+	],
+	"keywords": [
+		"oclif-plugin"
+	],
+	"license": "Apache-2.0",
+	"oclif": {
+		"commands": "./src/commands",
+		"bin": "aio",
+		"devPlugins": [
+			"@oclif/plugin-help"
+		],
+		"repositoryPrefix": "<%- repo %>/blob/<%- version %>/<%- commandPath %>"
+	},
+	"main": "src/index.js",
+	"scripts": {
 		"test": "jest",
 		"test:ci": "jest --ci",
 		"unit-tests": "jest --ci",
@@ -74,17 +77,17 @@
 		"format": "prettier --check \"./**/*.{ts,tsx,js,css,json,md}\"",
 		"format:fix": "prettier --write  \"./**/*.{ts,tsx,js,css,json,md}\""
 	},
-  "description": "Basic working repo structure for Adobe teams to use as a starting point for their own plugins, and available as a github template to the @adobe github org.",
-  "directories": {
-    "test": "test"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/adobe/aio-cli-plugin-commerce-admin"
-  },
-  "author": "Adobe Inc.",
-  "bugs": {
-    "url": "https://github.com/adobe/aio-cli-plugin-commerce-admin/issues"
-  },
-  "homepage": "https://www.npmjs.com/package/@adobe/aio-cli-plugin-commerce-admin"
+	"description": "Basic working repo structure for Adobe teams to use as a starting point for their own plugins, and available as a github template to the @adobe github org.",
+	"directories": {
+		"test": "test"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/adobe/aio-cli-plugin-commerce-admin"
+	},
+	"author": "Adobe Inc.",
+	"bugs": {
+		"url": "https://github.com/adobe/aio-cli-plugin-commerce-admin/issues"
+	},
+	"homepage": "https://www.npmjs.com/package/@adobe/aio-cli-plugin-commerce-admin"
 }
