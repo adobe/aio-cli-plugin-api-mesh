@@ -1,15 +1,15 @@
 {
-  "meshConfig": {
-    "sources": [
-      {
-        "name": "<api_name>",
-        "handler": {
-          "graphql": {
-            "endpoint": "<gql_endpoint>"
-          }
-        }
-      }
-    ]
-  },
-  "tenantId": "sample_merchant"
+	"meshConfig": {
+		"sources": [
+			{
+				"name": "<api_name>",
+				"handler": {
+					"graphql": {
+						"endpoint": "<gql_endpoint>"
+					}
+				}
+			}
+		]
+	},
+	"tenantId": "sample_merchant"
 }

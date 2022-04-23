@@ -10,10 +10,16 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const { stdout, stderr } = require('stdout-stderr')
+const { stdout, stderr } = require('stdout-stderr');
 
-jest.setTimeout(30000)
+jest.setTimeout(30000);
 
 // trap console log
-beforeEach(() => { stdout.start(); stderr.start() })
-afterEach(() => { stdout.stop(); stderr.stop() })
+beforeEach(() => {
+	stdout.start();
+	stderr.start();
+});
+afterEach(() => {
+	stdout.stop();
+	stderr.stop();
+});
