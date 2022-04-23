@@ -29,9 +29,9 @@ jest.mock('@adobe/aio-cli-lib-console', () => ({
 	cleanStdOut: jest.fn(),
 }));
 jest.mock('@adobe/aio-lib-ims');
-const GetCommand = require('../../../../src/commands/commerce-gateway/tenant/get');
-const { SchemaServiceClient } = require('../../../../src/classes/SchemaServiceClient');
-const mockGetTenant = require('../../../data/sample_mesh.json');
+const GetCommand = require('../get');
+const { SchemaServiceClient } = require('../../../../classes/SchemaServiceClient');
+const mockGetTenant = require('../../../__fixtures__/sample_mesh.json');
 
 describe('get command tests', () => {
 	beforeEach(() => {

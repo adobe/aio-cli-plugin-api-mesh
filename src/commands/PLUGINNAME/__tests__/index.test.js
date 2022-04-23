@@ -10,7 +10,7 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const IndexCommand = require('../../../src/commands/PLUGINNAME');
+const IndexCommand = require('..');
 
 test('exports', async () => {
 	expect(typeof IndexCommand).toEqual('function');
