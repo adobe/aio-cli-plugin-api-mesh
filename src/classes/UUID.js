@@ -1,5 +1,5 @@
 const { v4: uuidv4 } = require('uuid');
-//Class representing a new unique UUID which is used for request-id tracing
+// Class representing a new unique UUID which is used for request-id tracing
 class UUID {
 	constructor(uuid = '') {
 		this.uuid = uuid;

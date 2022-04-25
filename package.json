@@ -1,108 +1,93 @@
 {
-  "name": "@adobe/aio-cli-plugin-commerce-admin",
-  "version": "0.0.5",
-  "publishConfig": {
-    "access": "public"
-  },
-  "dependencies": {
-    "@adobe/aio-cli-lib-console": "^3.0.0",
-    "@adobe/aio-lib-core-config": "^2.0.0",
-    "@adobe/aio-lib-core-logging": "^1.1.0",
-    "@adobe/aio-lib-env": "^1.1.0",
-    "@adobe/aio-lib-ims": "^5.0.1",
-    "@oclif/command": "^1.6.1",
-    "@oclif/config": "^1.15.1",
-    "@oclif/errors": "^1.1.2",
-    "@typescript-eslint/eslint-plugin": "^5.18.0",
-    "axios": "^0.23.0",
-    "eslint-config-prettier": "^8.5.0",
-    "eslint-plugin-prettier": "^4.0.0",
-    "pino": "^7.9.2",
-    "pino-pretty": "^7.6.0",
-    "uuid": "^8.3.2"
-  },
-  "devDependencies": {
-    "@adobe/eslint-config-aio-lib-config": "^1.4.0",
-    "@babel/eslint-parser": "^7.15.8",
-    "@oclif/dev-cli": "^1",
-    "@oclif/plugin-help": "^2",
-    "acorn": "^7",
-    "chalk": "^4",
-    "eslint": "^7",
-    "eslint-config-oclif": "^3.1.0",
-    "eslint-config-standard": "^16.0.0",
-    "eslint-plugin-import": "^2.21.2",
-    "eslint-plugin-jest": "^23.13.2",
-    "eslint-plugin-jsdoc": "^37.0.0",
-    "eslint-plugin-node": "^11.0.0",
-    "eslint-plugin-promise": "^5.0.0",
-    "eslint-plugin-standard": "^4.0.1",
-    "execa": "^4",
-    "jest": "^24.9.0",
-    "jest-haste-map": "^24.5.0",
-    "jest-junit": "^6.0.0",
-    "jest-resolve": "^24.5.0",
-    "stdout-stderr": "^0.1.9"
-  },
-  "engines": {
-    "node": ">=8.0.0"
-  },
-  "files": [
-    "/oclif.manifest.json",
-    "/src"
-  ],
-  "keywords": [
-    "oclif-plugin"
-  ],
-  "license": "Apache-2.0",
-  "oclif": {
-    "commands": "./src/commands",
-    "bin": "aio",
-    "devPlugins": [
-      "@oclif/plugin-help"
-    ],
-    "repositoryPrefix": "<%- repo %>/blob/<%- version %>/<%- commandPath %>"
-  },
-  "main": "src/index.js",
-  "scripts": {
-    "pretest": "eslint src test e2e",
-    "test": "npm run unit-tests",
-    "unit-tests": "jest --ci",
-    "prepack": "oclif-dev manifest && oclif-dev readme",
-    "postpack": "rm -f oclif.manifest.json",
-    "version": "oclif-dev readme && git add README.md",
-    "e2e": "jest --collectCoverage=false --testRegex './e2e/e2e.js'",
-    "lint": "eslint .",
-    "lint:fix": "eslint --fix ."
-  },
-  "jest": {
-    "collectCoverage": true,
-    "testPathIgnorePatterns": [
-      "<rootDir>/tests/fixtures/"
-    ],
-    "coveragePathIgnorePatterns": [
-      "<rootDir>/tests/fixtures/"
-    ],
-    "reporters": [
-      "default",
-      "jest-junit"
-    ],
-    "testEnvironment": "node",
-    "setupFilesAfterEnv": [
-      "./jest.setup.js"
-    ]
-  },
-  "description": "Basic working repo structure for Adobe teams to use as a starting point for their own plugins, and available as a github template to the @adobe github org.",
-  "directories": {
-    "test": "test"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/adobe/aio-cli-plugin-commerce-admin"
-  },
-  "author": "Adobe Inc.",
-  "bugs": {
-    "url": "https://github.com/adobe/aio-cli-plugin-commerce-admin/issues"
-  },
-  "homepage": "https://www.npmjs.com/package/@adobe/aio-cli-plugin-commerce-admin"
+	"name": "@adobe/aio-cli-plugin-commerce-admin",
+	"version": "0.0.5",
+	"publishConfig": {
+		"access": "public"
+	},
+	"dependencies": {
+		"@adobe/aio-lib-core-config": "^2.0.0",
+		"@adobe/aio-lib-core-logging": "^1.1.0",
+		"@adobe/aio-lib-env": "^1.1.0",
+		"@adobe/aio-lib-ims": "^5.0.1",
+		"@adobe/aio-cli-lib-console": "^3.0.0",
+		"@oclif/command": "^1.6.1",
+		"@oclif/config": "^1.15.1",
+		"@oclif/errors": "^1.1.2",
+		"axios": "^0.23.0",
+		"pino": "^7.9.2",
+		"pino-pretty": "^7.6.0",
+		"uuid": "^8.3.2"
+	},
+	"devDependencies": {
+		"@adobe/eslint-config-aio-lib-config": "^1.4.0",
+		"@babel/eslint-parser": "^7.15.8",
+		"@oclif/dev-cli": "1.26.10",
+		"@oclif/plugin-help": "2.2.3",
+		"@trivago/prettier-plugin-sort-imports": "^3.1.1",
+		"acorn": "7.4.1",
+		"chalk": "4.1.2",
+		"eslint": "7.28.0",
+		"eslint-config-prettier": "^8.3.0",
+		"eslint-plugin-prettier": "^4.0.0",
+		"eslint-config-oclif": "^3.1.0",
+		"eslint-config-standard": "^16.0.0",
+		"eslint-plugin-import": "^2.21.2",
+		"eslint-plugin-jest": "^23.13.2",
+		"eslint-plugin-jsdoc": "^37.0.0",
+		"eslint-plugin-node": "^11.0.0",
+		"eslint-plugin-promise": "^5.0.0",
+		"eslint-plugin-standard": "^4.0.1",
+		"execa": "4.1.0",
+		"husky": "7.0.4",
+		"jest": "26.6.3",
+		"jest-junit": "^6.0.0",
+		"prettier": "2.2.1",
+		"stdout-stderr": "^0.1.9"
+	},
+	"engines": {
+		"node": ">=8.0.0"
+	},
+	"files": [
+		"/oclif.manifest.json",
+		"/src"
+	],
+	"keywords": [
+		"oclif-plugin"
+	],
+	"license": "Apache-2.0",
+	"oclif": {
+		"commands": "./src/commands",
+		"bin": "aio",
+		"devPlugins": [
+			"@oclif/plugin-help"
+		],
+		"repositoryPrefix": "<%- repo %>/blob/<%- version %>/<%- commandPath %>"
+	},
+	"main": "src/index.js",
+	"scripts": {
+		"test": "jest",
+		"test:ci": "jest --ci",
+		"unit-tests": "jest --ci",
+		"prepack": "oclif-dev manifest && oclif-dev readme",
+		"postpack": "rm -f oclif.manifest.json",
+		"version": "oclif-dev readme && git add README.md",
+		"e2e": "jest --collectCoverage=false --testRegex './e2e/e2e.js'",
+		"lint": "eslint .",
+		"lint:fix": "eslint --fix .",
+		"format": "prettier --check \"./**/*.{ts,tsx,js,css,json,md}\"",
+		"format:fix": "prettier --write  \"./**/*.{ts,tsx,js,css,json,md}\""
+	},
+	"description": "Basic working repo structure for Adobe teams to use as a starting point for their own plugins, and available as a github template to the @adobe github org.",
+	"directories": {
+		"test": "test"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/adobe/aio-cli-plugin-commerce-admin"
+	},
+	"author": "Adobe Inc.",
+	"bugs": {
+		"url": "https://github.com/adobe/aio-cli-plugin-commerce-admin/issues"
+	},
+	"homepage": "https://www.npmjs.com/package/@adobe/aio-cli-plugin-commerce-admin"
 }

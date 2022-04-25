@@ -5,7 +5,6 @@
 /dist
 /lib
 /tmp
-/yarn.lock
 node_modules
 .DS_Store
 /test-results.xml
@@ -54,8 +53,5 @@ Thumbs.db
 # Ignore built ts files
 dist/**/*
 dist
-
-# ignore yarn.lock
-yarn.lock
 
 CHANGELOG.md
