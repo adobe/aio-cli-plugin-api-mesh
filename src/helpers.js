@@ -36,15 +36,27 @@ const CONSOLE_API_KEYS = {
  */
 async function getCommerceAdminConfig() {
 	const configFile = Config.get('aio-cli-plugin-commerce-admin');
-	try {
-		const data = JSON.parse(fs.readFileSync(configFile, { encoding: 'utf8', flag: 'r' }));
+
+	if (!configFile) {
 		return {
-			baseUrl: data.baseUrl || 'https://commerce.adobe.io',
+			baseUrl: 'https://graph.adobe.io',
 			accessToken: (await getLibConsoleCLI()).accessToken,
-			apiKey: data.apiKey,
+			apiKey: 'graphql-onboarding-io',
 		};
-	} catch (error) {
-		return null;
+	} else {
+		try {
+			const data = JSON.parse(fs.readFileSync(configFile, { encoding: 'utf8', flag: 'r' }));
+			return {
+				baseUrl: data.baseUrl || 'https://graph.adobe.io',
+				accessToken: (await getLibConsoleCLI()).accessToken,
+				apiKey: data.apiKey || 'graphql-onboarding-io',
+			};
+		} catch (error) {
+			logger.error(
+				'Please run aio config set command to set the correct path to config json with valid baseUrl and apiKey',
+			);
+			throw new Error();
+		}
 	}
 }
 

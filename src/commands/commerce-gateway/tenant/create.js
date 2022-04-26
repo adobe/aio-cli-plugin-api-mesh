@@ -28,7 +28,7 @@ class CreateCommand extends Command {
 			data = JSON.parse(await readFile(args.file, 'utf8'));
 		} catch (error) {
 			logger.error(error);
-			this.error('Unable to create a tenant with the given configuration');
+			logger.error('Unable to create a tenant with the given configuration');
 		}
 		data.imsOrgId = imsOrgCode;
 		const tenant = await schemaServiceClient.createTenant(data);
