@@ -27,7 +27,7 @@ class UpdateCommand extends Command {
 			data = JSON.parse(await readFile(args.file, 'utf8'));
 		} catch (error) {
 			logger.error(error);
-			logger.error('Unable to update the tenant with the given configuration');
+			this.error('Unable to update the tenant with the given configuration');
 		}
 		data.imsOrgId = imsOrgCode;
 		const tenant = await schemaServiceClient.updateTenant(args.tenantId, data);
