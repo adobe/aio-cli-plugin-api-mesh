@@ -53,7 +53,10 @@ describe('update command tests', () => {
 	});
 	test('update-tenant-with-configuration', async () => {
 		expect.assertions(2);
-		const runResult = UpdateCommand.run(['sample_merchant', 'test/data/sample_mesh.json']);
+		const runResult = UpdateCommand.run([
+			'sample_merchant',
+			'src/commands/__fixtures__/sample_mesh.json',
+		]);
 		await expect(runResult instanceof Promise).toBeTruthy();
 		await expect(runResult).resolves.toEqual(mockUpdateTenant);
 	});

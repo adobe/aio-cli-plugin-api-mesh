@@ -54,7 +54,7 @@ describe('create command tests', () => {
 	});
 	test('create-tenant-with-configuration', async () => {
 		expect.assertions(2);
-		const runResult = CreateCommand.run(['test/data/sample_mesh.json']);
+		const runResult = CreateCommand.run(['src/commands/__fixtures__/sample_mesh.json']);
 		await expect(runResult instanceof Promise).toBeTruthy();
 		await expect(runResult).resolves.toEqual(mockCreateTenant);
 	});
