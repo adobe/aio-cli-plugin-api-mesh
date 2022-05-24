@@ -24,7 +24,7 @@ class CreateCommand extends Command {
 		logger.info('Start create mesh');
 
 		const { args } = this.parse(CreateCommand);
-		const { schemaServiceClient, imsOrgCode } = await initSdk();
+		const { schemaServiceClient, imsOrgCode, projectId, workspaceId } = await initSdk();
 		let data;
 
 		try {
@@ -36,14 +36,6 @@ class CreateCommand extends Command {
 				'Unable to read the mesh configuration file provided. Please check the file and try again.',
 			);
 		}
-
-		/**
-		 * Mock data
-		 *
-		 * To be implemented soon
-		 */
-		const projectId = 'test-project';
-		const workspaceId = 'test-workspace';
 
 		const mesh = await schemaServiceClient.createMesh(imsOrgCode, projectId, workspaceId, data);
 
