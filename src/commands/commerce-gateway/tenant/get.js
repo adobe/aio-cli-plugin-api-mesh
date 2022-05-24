@@ -13,12 +13,16 @@ const { Command } = require('@oclif/command');
 const logger = require('../../../classes/logger');
 const { initSdk, initRequestId } = require('../../../helpers');
 
+require('dotenv').config();
+
 class GetCommand extends Command {
 	static args = [{ name: 'meshId' }];
 
 	async run() {
 		await initRequestId();
+
 		logger.info(`RequestId: ${global.requestId}`);
+
 		const { args } = this.parse(GetCommand);
 		const { schemaServiceClient, imsOrgCode } = await initSdk();
 
@@ -30,19 +34,22 @@ class GetCommand extends Command {
 		const projectId = 'test-project';
 		const workspaceId = 'test-workspace';
 
-		const tenant = await schemaServiceClient.getTenant(
-			imsOrgCode,
-			projectId,
-			workspaceId,
-			args.meshId,
-		);
-		tenant
-			? this.log(JSON.stringify(tenant))
-			: this.error(`Unable to retrieve the tenant config for ${args.meshId}`);
-		return tenant;
+		const mesh = await schemaServiceClient.getMesh(imsOrgCode, projectId, workspaceId, args.meshId);
+
+		if (mesh) {
+			logger.info(`Mesh: ${JSON.stringify(mesh)}`);
+
+			this.log('Mesh config: %s', JSON.stringify(mesh, null, 2));
+		} else {
+			logger.info(`Mesh ${args.meshId} not found`);
+
+			this.error(`Unable to get a mesh with the ID ${args.meshId}`);
+		}
+
+		return mesh;
 	}
 }
 
-GetCommand.description = 'Get the config of a given tenant';
+GetCommand.description = 'Get the config of a given mesh';
 
 module.exports = GetCommand;

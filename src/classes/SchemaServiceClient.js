@@ -24,7 +24,7 @@ class SchemaServiceClient {
 		this.apiKey = apiKey;
 	}
 
-	async getTenant(organizationCode, projectId, workspaceId, meshId) {
+	async getMesh(organizationCode, projectId, workspaceId, meshId) {
 		logger.info(`OrgCode - getTenant: ${organizationCode}`);
 		const config = {
 			method: 'get',
@@ -50,7 +50,7 @@ class SchemaServiceClient {
 		}
 	}
 
-	async createTenant(organizationCode, projectId, workspaceId, data) {
+	async createMesh(organizationCode, projectId, workspaceId, data) {
 		logger.info(`OrgCode - createTenant: ${organizationCode}`);
 		const config = {
 			method: 'post',
@@ -65,14 +65,15 @@ class SchemaServiceClient {
 		try {
 			logger.info('here');
 			const response = await axios(config);
-			return response && response.status === 201 ? response : null;
+
+			return response && response.status === 201 ? response.data : null;
 		} catch (error) {
 			logger.error(error);
 			throw new Error(JSON.stringify(error.response.data));
 		}
 	}
 
-	async updateTenant(organizationCode, projectId, workspaceId, meshId, data) {
+	async updateMesh(organizationCode, projectId, workspaceId, meshId, data) {
 		logger.info(`OrgCode - updateTenant: ${organizationCode}`);
 		const config = {
 			method: 'put',

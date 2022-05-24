@@ -2,7 +2,7 @@ const { default: pino } = require('pino');
 
 const logger = pino({
 	level: process.env.LOG_LEVEL || 'info',
-	enabled: process.env.NODE_ENV !== 'test',
+	enabled: process.env.NODE_ENV !== 'prod',
 	mixin() {
 		return {
 			requestId: global.requestId,

@@ -19,16 +19,22 @@ class CreateCommand extends Command {
 
 	async run() {
 		await initRequestId();
+
 		logger.info(`RequestId: ${global.requestId}`);
-		logger.info('Start create tenant');
+		logger.info('Start create mesh');
+
 		const { args } = this.parse(CreateCommand);
 		const { schemaServiceClient, imsOrgCode } = await initSdk();
 		let data;
+
 		try {
 			data = JSON.parse(await readFile(args.file, 'utf8'));
 		} catch (error) {
 			logger.error(error);
-			this.error('Unable to create a tenant with the given configuration');
+
+			this.error(
+				'Unable to read the mesh configuration file provided. Please check the file and try again.',
+			);
 		}
 
 		/**
@@ -39,16 +45,18 @@ class CreateCommand extends Command {
 		const projectId = 'test-project';
 		const workspaceId = 'test-workspace';
 
-		const tenant = await schemaServiceClient.createTenant(imsOrgCode, projectId, workspaceId, data);
+		const mesh = await schemaServiceClient.createMesh(imsOrgCode, projectId, workspaceId, data);
 
-		tenant
-			? this.log(`Successfully created a tenant with the ID: ${tenant.meshId}`)
-			: this.error(`Unable to create a tenant with the ID ${tenant.meshId}`);
+		if (mesh) {
+			this.log('Successfully created mesh %s', JSON.stringify(mesh, null, 2));
 
-		return tenant;
+			return mesh;
+		} else {
+			this.error(`Unable to create a mesh with the ID ${mesh.meshId}`);
+		}
 	}
 }
 
-CreateCommand.description = 'Create a tenant with the given config.';
+CreateCommand.description = 'Create a mesh with the given config.';
 
 module.exports = CreateCommand;

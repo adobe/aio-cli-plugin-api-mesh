@@ -19,15 +19,21 @@ class UpdateCommand extends Command {
 
 	async run() {
 		await initRequestId();
+
 		logger.info(`RequestId: ${global.requestId}`);
+
 		const { args } = this.parse(UpdateCommand);
 		const { schemaServiceClient, imsOrgCode } = await initSdk();
 		let data;
+
 		try {
 			data = JSON.parse(await readFile(args.file, 'utf8'));
 		} catch (error) {
 			logger.error(error);
-			this.error('Unable to update the tenant with the given configuration');
+
+			this.error(
+				'Unable to read the mesh configuration file provided. Please check the file and try again.',
+			);
 		}
 
 		/**
@@ -38,7 +44,7 @@ class UpdateCommand extends Command {
 		const projectId = 'test-project';
 		const workspaceId = 'test-workspace';
 
-		const tenant = await schemaServiceClient.updateTenant(
+		const mesh = await schemaServiceClient.updateMesh(
 			imsOrgCode,
 			projectId,
 			workspaceId,
@@ -46,13 +52,16 @@ class UpdateCommand extends Command {
 			data,
 		);
 
-		tenant
-			? logger.info(`Successfully updated the tenant with the id: ${args.meshId}`)
-			: logger.info(`Unable to update the tenant with the id: ${args.meshId}`);
-		return tenant;
+		if (mesh) {
+			this.log('Successfully updated the mesh with the id: %s', args.meshId);
+
+			return mesh;
+		} else {
+			this.error(`Unable to update the mesh with the id: ${args.meshId}`);
+		}
 	}
 }
 
-UpdateCommand.description = 'Update a tenant with the given config.';
+UpdateCommand.description = 'Update a mesh with the given config.';
 
 module.exports = UpdateCommand;
