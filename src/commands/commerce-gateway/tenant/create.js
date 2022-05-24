@@ -27,15 +27,24 @@ class CreateCommand extends Command {
 		try {
 			data = JSON.parse(await readFile(args.file, 'utf8'));
 		} catch (error) {
+			logger.error(error);
 			this.error('Unable to create a tenant with the given configuration');
 		}
-		data.imsOrgId = imsOrgCode;
-		const tenant = await schemaServiceClient.createTenant(data);
+
+		/**
+		 * Mock data
+		 *
+		 * To be implemented soon
+		 */
+		const projectId = 'test-project';
+		const workspaceId = 'test-workspace';
+
+		const tenant = await schemaServiceClient.createTenant(imsOrgCode, projectId, workspaceId, data);
+
 		tenant
-			? this.log(
-					`Successfully created a tenant with the ID: ${data.tenantId} and imsOrgCode: ${data.imsOrgId}`,
-			  )
-			: this.error(`Unable to create a tenant with the ID ${data.tenantId}`);
+			? this.log(`Successfully created a tenant with the ID: ${tenant.meshId}`)
+			: this.error(`Unable to create a tenant with the ID ${tenant.meshId}`);
+
 		return tenant;
 	}
 }

@@ -45,17 +45,33 @@ async function getCommerceAdminConfig() {
 		};
 	} else {
 		try {
+			if (!fs.existsSync(configFile)) {
+				logger.error(
+					`The config file does not exist. Please run the command: aio config:set aio-cli-plugin-commerce-admin <path_to_json_file> with a valid file.`,
+				);
+
+				throw new Error('Config file does not exist');
+			}
+
 			const data = JSON.parse(fs.readFileSync(configFile, { encoding: 'utf8', flag: 'r' }));
+
+			if (!data.baseUrl || !data.apiKey) {
+				logger.error('Invalid config file. Please check the file and try again.');
+
+				throw new Error('Invalid config file. Please check the file and try again.');
+			}
+
 			return {
-				baseUrl: data.baseUrl || 'https://graph.adobe.io',
+				baseUrl: data.baseUrl,
 				accessToken: (await getLibConsoleCLI()).accessToken,
-				apiKey: data.apiKey || 'graphql-onboarding-io',
+				apiKey: data.apiKey,
 			};
 		} catch (error) {
 			logger.error(
 				'Please run aio config set command to set the correct path to config json with valid baseUrl and apiKey',
 			);
-			throw new Error();
+
+			throw new Error(error);
 		}
 	}
 }

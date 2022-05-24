@@ -41,7 +41,7 @@ describe('get command tests', () => {
 		jest.restoreAllMocks();
 	});
 
-	test('get-tenant-missing-tenantId', async () => {
+	test('get-tenant-missing-meshId', async () => {
 		jest.spyOn(SchemaServiceClient.prototype, 'getTenant').mockImplementation(() => {
 			throw new Error('{"message":"There was an error fetching undefined"}');
 		});
@@ -52,13 +52,13 @@ describe('get command tests', () => {
 			new Error('{"message":"There was an error fetching undefined"}'),
 		);
 	});
-	test('get-tenant-with-tenantId', async () => {
+	test('get-tenant-with-meshId', async () => {
 		jest
 			.spyOn(SchemaServiceClient.prototype, 'getTenant')
-			.mockImplementation(tenantId => mockGetTenant);
+			.mockImplementation(meshId => mockGetTenant);
 		expect.assertions(1);
-		const tenantId = 'sample_merchant';
-		const runResult = GetCommand.run([tenantId]);
+		const meshId = 'sample_merchant';
+		const runResult = GetCommand.run([meshId]);
 		await expect(runResult).resolves.toEqual(mockGetTenant);
 	});
 });

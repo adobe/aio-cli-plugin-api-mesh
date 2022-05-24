@@ -24,11 +24,11 @@ class SchemaServiceClient {
 		this.apiKey = apiKey;
 	}
 
-	async getTenant(tenantId, organizationCode) {
+	async getTenant(organizationCode, projectId, workspaceId, meshId) {
 		logger.info(`OrgCode - getTenant: ${organizationCode}`);
 		const config = {
 			method: 'get',
-			url: `${this.schemaManagementServiceUrl}/api-admin/organizations/${organizationCode}/tenants/${tenantId}?api_key=${this.apiKey}`,
+			url: `${this.schemaManagementServiceUrl}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}?api_key=${this.apiKey}`,
 			headers: {
 				'Authorization': `Bearer ${this.accessToken}`,
 				'x-request-id': global.requestId,
@@ -36,20 +36,25 @@ class SchemaServiceClient {
 		};
 		try {
 			const response = await axios(config);
-			logger.info(`Config : ${config}`);
-			return response && response.data && response.status === 200 ? response.data : null;
+
+			if (response && response.status === 200) {
+				logger.info(`Mesh Config : ${JSON.stringify(response.data)}`);
+
+				return response.data;
+			} else {
+				return null;
+			}
 		} catch (error) {
 			logger.error(error);
 			throw new Error(JSON.stringify(error.response.data));
 		}
 	}
 
-	async createTenant(data) {
-		const organizationCode = data.imsOrgId;
+	async createTenant(organizationCode, projectId, workspaceId, data) {
 		logger.info(`OrgCode - createTenant: ${organizationCode}`);
 		const config = {
 			method: 'post',
-			url: `${this.schemaManagementServiceUrl}/api-admin/organizations/${organizationCode}/tenants?api_key=${this.apiKey}`,
+			url: `${this.schemaManagementServiceUrl}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes?api_key=${this.apiKey}`,
 			headers: {
 				'Authorization': `Bearer ${this.accessToken}`,
 				'Content-Type': 'application/json',
@@ -67,12 +72,11 @@ class SchemaServiceClient {
 		}
 	}
 
-	async updateTenant(tenantId, data) {
-		const organizationCode = data.imsOrgId;
+	async updateTenant(organizationCode, projectId, workspaceId, meshId, data) {
 		logger.info(`OrgCode - updateTenant: ${organizationCode}`);
 		const config = {
 			method: 'put',
-			url: `${this.schemaManagementServiceUrl}/api-admin/organizations/${organizationCode}/tenants/${tenantId}?api_key=${this.apiKey}`,
+			url: `${this.schemaManagementServiceUrl}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}?api_key=${this.apiKey}`,
 			headers: {
 				'Authorization': `Bearer ${this.accessToken}`,
 				'Content-Type': 'application/json',

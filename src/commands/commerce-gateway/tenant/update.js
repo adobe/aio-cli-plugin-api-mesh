@@ -15,7 +15,7 @@ const logger = require('../../../classes/logger');
 const { initSdk, initRequestId } = require('../../../helpers');
 
 class UpdateCommand extends Command {
-	static args = [{ name: 'tenantId' }, { name: 'file' }];
+	static args = [{ name: 'meshId' }, { name: 'file' }];
 
 	async run() {
 		await initRequestId();
@@ -29,11 +29,26 @@ class UpdateCommand extends Command {
 			logger.error(error);
 			this.error('Unable to update the tenant with the given configuration');
 		}
-		data.imsOrgId = imsOrgCode;
-		const tenant = await schemaServiceClient.updateTenant(args.tenantId, data);
+
+		/**
+		 * Mock data
+		 *
+		 * To be implemented soon
+		 */
+		const projectId = 'test-project';
+		const workspaceId = 'test-workspace';
+
+		const tenant = await schemaServiceClient.updateTenant(
+			imsOrgCode,
+			projectId,
+			workspaceId,
+			args.meshId,
+			data,
+		);
+
 		tenant
-			? logger.info(`Successfully updated the tenant with the id: ${args.tenantId}`)
-			: logger.info(`Unable to update the tenant with the id: ${args.tenantId}`);
+			? logger.info(`Successfully updated the tenant with the id: ${args.meshId}`)
+			: logger.info(`Unable to update the tenant with the id: ${args.meshId}`);
 		return tenant;
 	}
 }

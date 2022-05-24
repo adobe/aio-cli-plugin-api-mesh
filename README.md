@@ -48,6 +48,6 @@ aio config:set aio-cli-plugin-commerce-admin <path_to_json_file>
 
 ```
 aio commerce-gateway:tenant:create BODYJSONFILE
-aio commerce-gateway:tenant:update tenantid BODYJSONFILE
-aio commerce-gateway:tenant:get tenantid
+aio commerce-gateway:tenant:update meshId BODYJSONFILE
+aio commerce-gateway:tenant:get meshId
 ```

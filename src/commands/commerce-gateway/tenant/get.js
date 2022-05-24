@@ -14,17 +14,31 @@ const logger = require('../../../classes/logger');
 const { initSdk, initRequestId } = require('../../../helpers');
 
 class GetCommand extends Command {
-	static args = [{ name: 'tenantId' }];
+	static args = [{ name: 'meshId' }];
 
 	async run() {
 		await initRequestId();
 		logger.info(`RequestId: ${global.requestId}`);
 		const { args } = this.parse(GetCommand);
 		const { schemaServiceClient, imsOrgCode } = await initSdk();
-		const tenant = await schemaServiceClient.getTenant(args.tenantId, imsOrgCode);
+
+		/**
+		 * Mock data
+		 *
+		 * To be implemented soon
+		 */
+		const projectId = 'test-project';
+		const workspaceId = 'test-workspace';
+
+		const tenant = await schemaServiceClient.getTenant(
+			imsOrgCode,
+			projectId,
+			workspaceId,
+			args.meshId,
+		);
 		tenant
 			? this.log(JSON.stringify(tenant))
-			: this.error(`Unable to retrieve the tenant config for ${args.tenantId}`);
+			: this.error(`Unable to retrieve the tenant config for ${args.meshId}`);
 		return tenant;
 	}
 }

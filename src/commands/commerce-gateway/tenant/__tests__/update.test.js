@@ -43,7 +43,7 @@ describe('update command tests', () => {
 		jest.restoreAllMocks();
 	});
 
-	test('update-tenant-missing-tenantId-file', async () => {
+	test('update-tenant-missing-meshId-file', async () => {
 		expect.assertions(2);
 		const runResult = UpdateCommand.run([]);
 		await expect(runResult instanceof Promise).toBeTruthy();
