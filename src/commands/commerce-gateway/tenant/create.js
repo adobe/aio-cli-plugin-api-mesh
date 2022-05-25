@@ -21,10 +21,11 @@ class CreateCommand extends Command {
 		await initRequestId();
 
 		logger.info(`RequestId: ${global.requestId}`);
-		logger.info('Start create mesh');
 
 		const { args } = this.parse(CreateCommand);
+
 		const { schemaServiceClient, imsOrgCode, projectId, workspaceId } = await initSdk();
+
 		let data;
 
 		try {
@@ -37,14 +38,21 @@ class CreateCommand extends Command {
 			);
 		}
 
-		const mesh = await schemaServiceClient.createMesh(imsOrgCode, projectId, workspaceId, data);
+		try {
+			const mesh = await schemaServiceClient.createMesh(imsOrgCode, projectId, workspaceId, data);
 
-		if (mesh) {
-			this.log('Successfully created mesh %s', JSON.stringify(mesh, null, 2));
+			if (mesh) {
+				this.log('Successfully created mesh %s', JSON.stringify(mesh, null, 2));
 
-			return mesh;
-		} else {
-			this.error(`Unable to create a mesh with the ID ${mesh.meshId}`);
+				return mesh;
+			} else {
+				this.error(`Unable to create a mesh with the ID ${mesh.meshId}`);
+			}
+		} catch (error) {
+			this.log(error.message);
+			this.error(
+				`Unable to create a mesh. Please check the mesh configuration file and try again. If the error persists please contact support. RequestId: ${global.requestId}`,
+			);
 		}
 	}
 }

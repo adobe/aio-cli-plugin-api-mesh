@@ -47,13 +47,19 @@ class SchemaServiceClient {
 
 		if (response) {
 			if (response.status === 200) {
-				logger.info(`Mesh Config : ${JSON.stringify(response.data)}`);
+				logger.info(`Mesh Config : ${JSON.stringify(response.data, null, 2)}`);
 
 				return response.data;
 			} else {
-				logger.error(response.data);
+				if (response.data && response.data.message) {
+					logger.error('Error while getting mesh %s', JSON.stringify(response.data, null, 2));
 
-				throw new Error(response.data.message);
+					throw new Error(response.data.message);
+				} else {
+					logger.error('Error while getting mesh %o', response);
+
+					throw new Error('Unable to retrieve mesh from Schema Management Service');
+				}
 			}
 		} else {
 			logger.info('No response');
@@ -75,14 +81,30 @@ class SchemaServiceClient {
 		};
 
 		try {
-			logger.info('here');
 			const response = await axios(config);
 
-			return response && response.status === 201 ? response.data : null;
-		} catch (error) {
-			logger.error(error);
+			logger.info('Response from POST %s', response.status);
 
-			throw new Error(JSON.stringify(error.response.data));
+			if (response && response.status === 201) {
+				logger.info(`Mesh Config : ${JSON.stringify(response.data, null, 2)}`);
+
+				return response.data;
+			}
+		} catch (error) {
+			if (error.response) {
+				// The request was made and the server responded with a status code
+				logger.error('Error while creating mesh %s', JSON.stringify(error.response.data, null, 2));
+
+				throw new Error(error.response.data.message);
+			} else {
+				// The request was made but no response was received
+				logger.error(
+					'Error while creating mesh. No response received from the server: %s',
+					JSON.stringify(error, null, 2),
+				);
+
+				throw new Error('Unable to create mesh in Schema Management Service: %s', error.message);
+			}
 		}
 	}
 
