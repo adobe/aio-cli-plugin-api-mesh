@@ -36,20 +36,18 @@ class GetCommand extends Command {
 			);
 
 			if (mesh) {
-				this.log('Mesh config: %s', JSON.stringify(mesh, null, 2));
-			} else {
-				this.error(`Unable to get a mesh with the ID ${args.meshId}`);
-			}
+				this.log('Successfully retrieved mesh %s', JSON.stringify(mesh, null, 2));
 
-			return mesh;
+				return mesh;
+			} else {
+				this.error(`Unable to get mesh with the ID ${mesh.meshId}`);
+			}
 		} catch (error) {
-			logger.error(JSON.stringify(error, null, 2));
+			this.log(error.message);
 
-			if (error.response && error.response.data && error.response.data.message) {
-				this.error(error.response.data.message);
-			} else {
-				this.error(error);
-			}
+			this.error(
+				`Unable to get mesh. Please check the details and try again. If the error persists please contact support. RequestId: ${global.requestId}`,
+			);
 		}
 	}
 }

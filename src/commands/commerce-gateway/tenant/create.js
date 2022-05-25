@@ -50,6 +50,7 @@ class CreateCommand extends Command {
 			}
 		} catch (error) {
 			this.log(error.message);
+
 			this.error(
 				`Unable to create a mesh. Please check the mesh configuration file and try again. If the error persists please contact support. RequestId: ${global.requestId}`,
 			);

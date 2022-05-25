@@ -25,8 +25,6 @@ class SchemaServiceClient {
 	}
 
 	async getMesh(organizationCode, projectId, workspaceId, meshId) {
-		logger.info('Initiating getMesh function');
-
 		const config = {
 			method: 'get',
 			url: `${this.schemaManagementServiceUrl}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}?api_key=${this.apiKey}`,
@@ -41,30 +39,31 @@ class SchemaServiceClient {
 			`${this.schemaManagementServiceUrl}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}?api_key=${this.apiKey}`,
 		);
 
-		const response = await axios(config);
+		try {
+			const response = await axios(config);
 
-		logger.info('Response from GET %s', response.status);
+			logger.info('Response from GET %s', response.status);
 
-		if (response) {
-			if (response.status === 200) {
+			if (response && response.status === 200) {
 				logger.info(`Mesh Config : ${JSON.stringify(response.data, null, 2)}`);
 
 				return response.data;
-			} else {
-				if (response.data && response.data.message) {
-					logger.error('Error while getting mesh %s', JSON.stringify(response.data, null, 2));
-
-					throw new Error(response.data.message);
-				} else {
-					logger.error('Error while getting mesh %o', response);
-
-					throw new Error('Unable to retrieve mesh from Schema Management Service');
-				}
 			}
-		} else {
-			logger.info('No response');
+		} catch (error) {
+			if (error.response) {
+				// The request was made and the server responded with a status code
+				logger.error('Error while getting mesh %s', JSON.stringify(error.response.data, null, 2));
 
-			throw new Error('Unable to retrieve mesh from Schema Management Service');
+				throw new Error(error.response.data.message);
+			} else {
+				// The request was made but no response was received
+				logger.error(
+					'Error while getting mesh. No response received from the server: %s',
+					JSON.stringify(error, null, 2),
+				);
+
+				throw new Error('Unable to get mesh from Schema Management Service: %s', error.message);
+			}
 		}
 	}
 
@@ -79,6 +78,11 @@ class SchemaServiceClient {
 			},
 			data: JSON.stringify(data),
 		};
+
+		logger.info(
+			'Initiating POST %s',
+			`${this.schemaManagementServiceUrl}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes?api_key=${this.apiKey}`,
+		);
 
 		try {
 			const response = await axios(config);
