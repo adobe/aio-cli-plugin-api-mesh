@@ -140,14 +140,18 @@ async function getWorkspaces(orgId, projectId, imsOrgTitle, projectTitle) {
  */
 async function getLibConsoleCLI() {
 	await context.setCli({ 'cli.bare-output': true }, false);
+
 	const clientEnv = getCliEnv();
-	this.accessToken = await getToken(CLI);
-	this.consoleCLI = await libConsoleCLI.init({
-		accessToken: this.accessToken,
+
+	const accessToken = await getToken(CLI);
+
+	const consoleCLI = await libConsoleCLI.init({
+		accessToken: accessToken,
 		apiKey: CONSOLE_API_KEYS[clientEnv],
 		env: clientEnv,
 	});
-	return { consoleCLI: this.consoleCLI, accessToken: this.accessToken };
+
+	return { consoleCLI: consoleCLI, accessToken: accessToken };
 }
 
 /**
