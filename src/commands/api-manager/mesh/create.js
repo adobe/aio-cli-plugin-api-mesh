@@ -43,7 +43,8 @@ class CreateCommand extends Command {
 			const mesh = await schemaServiceClient.createMesh(imsOrgCode, projectId, workspaceId, data);
 
 			if (mesh) {
-				this.log('Successfully created mesh %s', JSON.stringify(mesh, null, 2));
+				this.log('Successfully created mesh %s', mesh.meshId);
+				this.log(JSON.stringify(mesh, null, 2));
 
 				return mesh;
 			} else {
