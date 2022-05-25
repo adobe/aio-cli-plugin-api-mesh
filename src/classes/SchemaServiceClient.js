@@ -25,7 +25,8 @@ class SchemaServiceClient {
 	}
 
 	async getMesh(organizationCode, projectId, workspaceId, meshId) {
-		logger.info(`OrgCode - getTenant: ${organizationCode}`);
+		logger.info('Initiating getMesh function');
+
 		const config = {
 			method: 'get',
 			url: `${this.schemaManagementServiceUrl}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}?api_key=${this.apiKey}`,
@@ -34,24 +35,34 @@ class SchemaServiceClient {
 				'x-request-id': global.requestId,
 			},
 		};
-		try {
-			const response = await axios(config);
 
-			if (response && response.status === 200) {
+		logger.info(
+			'Initiating GET %s',
+			`${this.schemaManagementServiceUrl}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}?api_key=${this.apiKey}`,
+		);
+
+		const response = await axios(config);
+
+		logger.info('Response from GET %s', response.status);
+
+		if (response) {
+			if (response.status === 200) {
 				logger.info(`Mesh Config : ${JSON.stringify(response.data)}`);
 
 				return response.data;
 			} else {
-				return null;
+				logger.error(response.data);
+
+				throw new Error(response.data.message);
 			}
-		} catch (error) {
-			logger.error(error);
-			throw new Error(JSON.stringify(error.response.data));
+		} else {
+			logger.info('No response');
+
+			throw new Error('Unable to retrieve mesh from Schema Management Service');
 		}
 	}
 
 	async createMesh(organizationCode, projectId, workspaceId, data) {
-		logger.info(`OrgCode - createTenant: ${organizationCode}`);
 		const config = {
 			method: 'post',
 			url: `${this.schemaManagementServiceUrl}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes?api_key=${this.apiKey}`,
@@ -62,6 +73,7 @@ class SchemaServiceClient {
 			},
 			data: JSON.stringify(data),
 		};
+
 		try {
 			logger.info('here');
 			const response = await axios(config);
@@ -69,12 +81,14 @@ class SchemaServiceClient {
 			return response && response.status === 201 ? response.data : null;
 		} catch (error) {
 			logger.error(error);
+
 			throw new Error(JSON.stringify(error.response.data));
 		}
 	}
 
 	async updateMesh(organizationCode, projectId, workspaceId, meshId, data) {
 		logger.info(`OrgCode - updateTenant: ${organizationCode}`);
+
 		const config = {
 			method: 'put',
 			url: `${this.schemaManagementServiceUrl}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}?api_key=${this.apiKey}`,
@@ -85,12 +99,15 @@ class SchemaServiceClient {
 			},
 			data: JSON.stringify(data),
 		};
+
 		try {
 			const response = await axios(config);
 			logger.info(response.status);
+
 			return response && response.status === 204 ? response : null;
 		} catch (error) {
 			logger.error(error);
+
 			throw new Error(JSON.stringify(error.response.data));
 		}
 	}

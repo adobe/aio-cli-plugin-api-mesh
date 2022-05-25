@@ -24,21 +24,33 @@ class GetCommand extends Command {
 		logger.info(`RequestId: ${global.requestId}`);
 
 		const { args } = this.parse(GetCommand);
+
 		const { schemaServiceClient, imsOrgCode, projectId, workspaceId } = await initSdk();
 
-		const mesh = await schemaServiceClient.getMesh(imsOrgCode, projectId, workspaceId, args.meshId);
+		try {
+			const mesh = await schemaServiceClient.getMesh(
+				imsOrgCode,
+				projectId,
+				workspaceId,
+				args.meshId,
+			);
 
-		if (mesh) {
-			logger.info(`Mesh: ${JSON.stringify(mesh)}`);
+			if (mesh) {
+				this.log('Mesh config: %s', JSON.stringify(mesh, null, 2));
+			} else {
+				this.error(`Unable to get a mesh with the ID ${args.meshId}`);
+			}
 
-			this.log('Mesh config: %s', JSON.stringify(mesh, null, 2));
-		} else {
-			logger.info(`Mesh ${args.meshId} not found`);
+			return mesh;
+		} catch (error) {
+			logger.error(JSON.stringify(error, null, 2));
 
-			this.error(`Unable to get a mesh with the ID ${args.meshId}`);
+			if (error.response && error.response.data && error.response.data.message) {
+				this.error(error.response.data.message);
+			} else {
+				this.error(error);
+			}
 		}
-
-		return mesh;
 	}
 }
 
