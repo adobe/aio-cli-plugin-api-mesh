@@ -33,6 +33,7 @@ class CreateCommand extends Command {
 		} catch (error) {
 			logger.error(error);
 
+			this.log(error.message);
 			this.error(
 				'Unable to read the mesh configuration file provided. Please check the file and try again.',
 			);
