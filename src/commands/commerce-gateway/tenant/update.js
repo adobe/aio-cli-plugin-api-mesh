@@ -47,13 +47,9 @@ class UpdateCommand extends Command {
 				data,
 			);
 
-			if (response) {
-				this.log('Successfully updated the mesh with the id: %s', args.meshId);
+			this.log('Successfully updated the mesh with the id: %s', args.meshId);
 
-				return response;
-			} else {
-				this.error(`Unable to update the mesh with the id: ${args.meshId}`);
-			}
+			return response;
 		} catch (error) {
 			this.log(error.message);
 

@@ -35,11 +35,9 @@ class DeleteCommand extends Command {
 				args.meshId,
 			);
 
-			if (response) {
-				this.log('Successfully deleted mesh %s', args.meshId);
-			} else {
-				this.error(`Unable to delete mesh with the ID. Please try again.`);
-			}
+			this.log('Successfully deleted mesh %s', args.meshId);
+
+			return response;
 		} catch (error) {
 			this.log(error.message);
 
