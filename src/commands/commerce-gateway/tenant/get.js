@@ -10,13 +10,14 @@ governing permissions and limitations under the License.
 */
 
 const { Command } = require('@oclif/command');
+const { writeFile } = require('fs/promises');
 const logger = require('../../../classes/logger');
 const { initSdk, initRequestId } = require('../../../helpers');
 
 require('dotenv').config();
 
 class GetCommand extends Command {
-	static args = [{ name: 'meshId' }];
+	static args = [{ name: 'meshId' }, { name: 'file' }];
 
 	async run() {
 		await initRequestId();
@@ -37,6 +38,18 @@ class GetCommand extends Command {
 
 			if (mesh) {
 				this.log('Successfully retrieved mesh %s', JSON.stringify(mesh, null, 2));
+
+				if (args.file) {
+					try {
+						await writeFile(args.file, JSON.stringify(mesh, null, 2));
+
+						this.log('Successfully wrote mesh to file %s', args.file);
+					} catch (error) {
+						this.log('Unable to write mesh to file %s', args.file);
+
+						logger.error(error);
+					}
+				}
 
 				return mesh;
 			} else {
