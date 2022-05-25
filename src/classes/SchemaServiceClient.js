@@ -166,6 +166,51 @@ class SchemaServiceClient {
 			}
 		}
 	}
+
+	async deleteMesh(organizationCode, projectId, workspaceId, meshId) {
+		const config = {
+			method: 'delete',
+			url: `${this.schemaManagementServiceUrl}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}?api_key=${this.apiKey}`,
+			headers: {
+				'Authorization': `Bearer ${this.accessToken}`,
+				'x-request-id': global.requestId,
+			},
+		};
+
+		logger.info(
+			'Initiating DELETE %s',
+			`${this.schemaManagementServiceUrl}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}?api_key=${this.apiKey}`,
+		);
+
+		try {
+			const response = await axios(config);
+
+			logger.info('Response from DELETE %s', response.status);
+
+			if (response && response.status === 204) {
+				return response;
+			} else {
+				logger.error(`Something went wrong: ${JSON.stringify(response.data, null, 2)}`);
+
+				throw new Error(response.data.message);
+			}
+		} catch (error) {
+			if (error.response) {
+				// The request was made and the server responded with a status code
+				logger.error('Error while deleting mesh %s', JSON.stringify(error.response.data, null, 2));
+
+				throw new Error(error.response.data.message);
+			} else {
+				// The request was made but no response was received
+				logger.error(
+					'Error while deleting mesh. No response received from the server: %s',
+					JSON.stringify(error, null, 2),
+				);
+
+				throw new Error('Unable to delete mesh from Schema Management Service: %s', error.message);
+			}
+		}
+	}
 }
 
 module.exports = { SchemaServiceClient };
