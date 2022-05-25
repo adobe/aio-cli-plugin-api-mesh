@@ -48,6 +48,10 @@ class SchemaServiceClient {
 				logger.info(`Mesh Config : ${JSON.stringify(response.data, null, 2)}`);
 
 				return response.data;
+			} else {
+				logger.error(`Something went wrong: ${JSON.stringify(response.data, null, 2)}`);
+
+				throw new Error(response.data.message);
 			}
 		} catch (error) {
 			if (error.response) {
@@ -93,6 +97,10 @@ class SchemaServiceClient {
 				logger.info(`Mesh Config : ${JSON.stringify(response.data, null, 2)}`);
 
 				return response.data;
+			} else {
+				logger.error(`Something went wrong: ${JSON.stringify(response.data, null, 2)}`);
+
+				throw new Error(response.data.message);
 			}
 		} catch (error) {
 			if (error.response) {
@@ -113,8 +121,6 @@ class SchemaServiceClient {
 	}
 
 	async updateMesh(organizationCode, projectId, workspaceId, meshId, data) {
-		logger.info(`OrgCode - updateTenant: ${organizationCode}`);
-
 		const config = {
 			method: 'put',
 			url: `${this.schemaManagementServiceUrl}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}?api_key=${this.apiKey}`,
@@ -126,15 +132,38 @@ class SchemaServiceClient {
 			data: JSON.stringify(data),
 		};
 
+		logger.info(
+			'Initiating PUT %s',
+			`${this.schemaManagementServiceUrl}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}?api_key=${this.apiKey}`,
+		);
+
 		try {
 			const response = await axios(config);
-			logger.info(response.status);
 
-			return response && response.status === 204 ? response : null;
+			logger.info('Response from POST %s', response.status);
+
+			if (response && response.status === 204) {
+				return response.data;
+			} else {
+				logger.error(`Something went wrong: ${JSON.stringify(response.data, null, 2)}`);
+
+				throw new Error(response.data.message);
+			}
 		} catch (error) {
-			logger.error(error);
+			if (error.response) {
+				// The request was made and the server responded with a status code
+				logger.error('Error while updating mesh %s', JSON.stringify(error.response.data, null, 2));
 
-			throw new Error(JSON.stringify(error.response.data));
+				throw new Error(error.response.data.message);
+			} else {
+				// The request was made but no response was received
+				logger.error(
+					'Error while updating mesh. No response received from the server: %s',
+					JSON.stringify(error, null, 2),
+				);
+
+				throw new Error('Unable to update mesh in Schema Management Service: %s', error.message);
+			}
 		}
 	}
 }

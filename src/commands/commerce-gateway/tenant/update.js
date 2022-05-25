@@ -23,6 +23,7 @@ class UpdateCommand extends Command {
 		logger.info(`RequestId: ${global.requestId}`);
 
 		const { args } = this.parse(UpdateCommand);
+
 		const { schemaServiceClient, imsOrgCode, projectId, workspaceId } = await initSdk();
 		let data;
 
@@ -36,20 +37,28 @@ class UpdateCommand extends Command {
 			);
 		}
 
-		const mesh = await schemaServiceClient.updateMesh(
-			imsOrgCode,
-			projectId,
-			workspaceId,
-			args.meshId,
-			data,
-		);
+		try {
+			const response = await schemaServiceClient.updateMesh(
+				imsOrgCode,
+				projectId,
+				workspaceId,
+				args.meshId,
+				data,
+			);
 
-		if (mesh) {
-			this.log('Successfully updated the mesh with the id: %s', args.meshId);
+			if (response) {
+				this.log('Successfully updated the mesh with the id: %s', args.meshId);
 
-			return mesh;
-		} else {
-			this.error(`Unable to update the mesh with the id: ${args.meshId}`);
+				return response;
+			} else {
+				this.error(`Unable to update the mesh with the id: ${args.meshId}`);
+			}
+		} catch (error) {
+			this.log(error.message);
+
+			this.error(
+				`Unable to update the mesh. Please check the mesh configuration file and try again. If the error persists please contact support. RequestId: ${global.requestId}`,
+			);
 		}
 	}
 }
