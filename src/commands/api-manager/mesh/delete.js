@@ -13,22 +13,41 @@ const { Command } = require('@oclif/command');
 const logger = require('../../../classes/logger');
 const { initSdk, initRequestId } = require('../../../helpers');
 
-class GetCommand extends Command {
-	static args = [{ name: 'tenantId' }];
+require('dotenv').config();
+
+class DeleteCommand extends Command {
+	static args = [{ name: 'meshId' }];
 
 	async run() {
 		await initRequestId();
+
 		logger.info(`RequestId: ${global.requestId}`);
-		const { args } = this.parse(GetCommand);
-		const { schemaServiceClient, imsOrgCode } = await initSdk();
-		const tenant = await schemaServiceClient.getTenant(args.tenantId, imsOrgCode);
-		tenant
-			? this.log(JSON.stringify(tenant))
-			: this.error(`Unable to retrieve the tenant config for ${args.tenantId}`);
-		return tenant;
+
+		const { args } = this.parse(DeleteCommand);
+
+		const { schemaServiceClient, imsOrgCode, projectId, workspaceId } = await initSdk();
+
+		try {
+			const response = await schemaServiceClient.deleteMesh(
+				imsOrgCode,
+				projectId,
+				workspaceId,
+				args.meshId,
+			);
+
+			this.log('Successfully deleted mesh %s', args.meshId);
+
+			return response;
+		} catch (error) {
+			this.log(error.message);
+
+			this.error(
+				`Unable to delete mesh. Please check the details and try again. If the error persists please contact support. RequestId: ${global.requestId}`,
+			);
+		}
 	}
 }
 
-GetCommand.description = 'Get the config of a given tenant';
+DeleteCommand.description = 'Delete the config of a given mesh';
 
-module.exports = GetCommand;
+module.exports = DeleteCommand;

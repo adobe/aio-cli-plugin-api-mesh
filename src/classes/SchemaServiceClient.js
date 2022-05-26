@@ -24,32 +24,57 @@ class SchemaServiceClient {
 		this.apiKey = apiKey;
 	}
 
-	async getTenant(tenantId, organizationCode) {
-		logger.info(`OrgCode - getTenant: ${organizationCode}`);
+	async getMesh(organizationCode, projectId, workspaceId, meshId) {
 		const config = {
 			method: 'get',
-			url: `${this.schemaManagementServiceUrl}/api-admin/organizations/${organizationCode}/tenants/${tenantId}?api_key=${this.apiKey}`,
+			url: `${this.schemaManagementServiceUrl}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}?api_key=${this.apiKey}`,
 			headers: {
 				'Authorization': `Bearer ${this.accessToken}`,
 				'x-request-id': global.requestId,
 			},
 		};
+
+		logger.info(
+			'Initiating GET %s',
+			`${this.schemaManagementServiceUrl}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}?api_key=${this.apiKey}`,
+		);
+
 		try {
 			const response = await axios(config);
-			logger.info(`Config : ${config}`);
-			return response && response.data && response.status === 200 ? response.data : null;
+
+			logger.info('Response from GET %s', response.status);
+
+			if (response && response.status === 200) {
+				logger.info(`Mesh Config : ${JSON.stringify(response.data, null, 2)}`);
+
+				return response.data;
+			} else {
+				logger.error(`Something went wrong: ${JSON.stringify(response.data, null, 2)}`);
+
+				throw new Error(response.data.message);
+			}
 		} catch (error) {
-			logger.error(error);
-			throw new Error(JSON.stringify(error.response.data));
+			if (error.response) {
+				// The request was made and the server responded with a status code
+				logger.error('Error while getting mesh %s', JSON.stringify(error.response.data, null, 2));
+
+				throw new Error(error.response.data.message);
+			} else {
+				// The request was made but no response was received
+				logger.error(
+					'Error while getting mesh. No response received from the server: %s',
+					JSON.stringify(error, null, 2),
+				);
+
+				throw new Error('Unable to get mesh from Schema Management Service: %s', error.message);
+			}
 		}
 	}
 
-	async createTenant(data) {
-		const organizationCode = data.imsOrgId;
-		logger.info(`OrgCode - createTenant: ${organizationCode}`);
+	async createMesh(organizationCode, projectId, workspaceId, data) {
 		const config = {
 			method: 'post',
-			url: `${this.schemaManagementServiceUrl}/api-admin/organizations/${organizationCode}/tenants?api_key=${this.apiKey}`,
+			url: `${this.schemaManagementServiceUrl}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes?api_key=${this.apiKey}`,
 			headers: {
 				'Authorization': `Bearer ${this.accessToken}`,
 				'Content-Type': 'application/json',
@@ -57,22 +82,48 @@ class SchemaServiceClient {
 			},
 			data: JSON.stringify(data),
 		};
+
+		logger.info(
+			'Initiating POST %s',
+			`${this.schemaManagementServiceUrl}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes?api_key=${this.apiKey}`,
+		);
+
 		try {
-			logger.info('here');
 			const response = await axios(config);
-			return response && response.status === 201 ? response : null;
+
+			logger.info('Response from POST %s', response.status);
+
+			if (response && response.status === 201) {
+				logger.info(`Mesh Config : ${JSON.stringify(response.data, null, 2)}`);
+
+				return response.data;
+			} else {
+				logger.error(`Something went wrong: ${JSON.stringify(response.data, null, 2)}`);
+
+				throw new Error(response.data.message);
+			}
 		} catch (error) {
-			logger.error(error);
-			throw new Error(JSON.stringify(error.response.data));
+			if (error.response) {
+				// The request was made and the server responded with a status code
+				logger.error('Error while creating mesh %s', JSON.stringify(error.response.data, null, 2));
+
+				throw new Error(error.response.data.message);
+			} else {
+				// The request was made but no response was received
+				logger.error(
+					'Error while creating mesh. No response received from the server: %s',
+					JSON.stringify(error, null, 2),
+				);
+
+				throw new Error('Unable to create mesh in Schema Management Service: %s', error.message);
+			}
 		}
 	}
 
-	async updateTenant(tenantId, data) {
-		const organizationCode = data.imsOrgId;
-		logger.info(`OrgCode - updateTenant: ${organizationCode}`);
+	async updateMesh(organizationCode, projectId, workspaceId, meshId, data) {
 		const config = {
 			method: 'put',
-			url: `${this.schemaManagementServiceUrl}/api-admin/organizations/${organizationCode}/tenants/${tenantId}?api_key=${this.apiKey}`,
+			url: `${this.schemaManagementServiceUrl}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}?api_key=${this.apiKey}`,
 			headers: {
 				'Authorization': `Bearer ${this.accessToken}`,
 				'Content-Type': 'application/json',
@@ -80,13 +131,84 @@ class SchemaServiceClient {
 			},
 			data: JSON.stringify(data),
 		};
+
+		logger.info(
+			'Initiating PUT %s',
+			`${this.schemaManagementServiceUrl}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}?api_key=${this.apiKey}`,
+		);
+
 		try {
 			const response = await axios(config);
-			logger.info(response.status);
-			return response && response.status === 204 ? response : null;
+
+			logger.info('Response from POST %s', response.status);
+
+			if (response && response.status === 204) {
+				return response.data;
+			} else {
+				logger.error(`Something went wrong: ${JSON.stringify(response.data, null, 2)}`);
+
+				throw new Error(response.data.message);
+			}
 		} catch (error) {
-			logger.error(error);
-			throw new Error(JSON.stringify(error.response.data));
+			if (error.response) {
+				// The request was made and the server responded with a status code
+				logger.error('Error while updating mesh %s', JSON.stringify(error.response.data, null, 2));
+
+				throw new Error(error.response.data.message);
+			} else {
+				// The request was made but no response was received
+				logger.error(
+					'Error while updating mesh. No response received from the server: %s',
+					JSON.stringify(error, null, 2),
+				);
+
+				throw new Error('Unable to update mesh in Schema Management Service: %s', error.message);
+			}
+		}
+	}
+
+	async deleteMesh(organizationCode, projectId, workspaceId, meshId) {
+		const config = {
+			method: 'delete',
+			url: `${this.schemaManagementServiceUrl}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}?api_key=${this.apiKey}`,
+			headers: {
+				'Authorization': `Bearer ${this.accessToken}`,
+				'x-request-id': global.requestId,
+			},
+		};
+
+		logger.info(
+			'Initiating DELETE %s',
+			`${this.schemaManagementServiceUrl}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}?api_key=${this.apiKey}`,
+		);
+
+		try {
+			const response = await axios(config);
+
+			logger.info('Response from DELETE %s', response.status);
+
+			if (response && response.status === 204) {
+				return response;
+			} else {
+				logger.error(`Something went wrong: ${JSON.stringify(response.data, null, 2)}`);
+
+				throw new Error(response.data.message);
+			}
+		} catch (error) {
+			if (error.response) {
+				// The request was made and the server responded with a status code
+				logger.error('Error while deleting mesh %s', JSON.stringify(error.response.data, null, 2));
+
+				throw new Error(error.response.data.message);
+			} else {
+				// The request was made but no response was received
+				logger.error(
+					'Error while deleting mesh. No response received from the server: %s',
+					JSON.stringify(error, null, 2),
+				);
+
+				throw new Error('Unable to delete mesh from Schema Management Service: %s', error.message);
+			}
 		}
 	}
 }

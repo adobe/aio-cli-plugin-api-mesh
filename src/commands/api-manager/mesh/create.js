@@ -19,27 +19,47 @@ class CreateCommand extends Command {
 
 	async run() {
 		await initRequestId();
+
 		logger.info(`RequestId: ${global.requestId}`);
-		logger.info('Start create tenant');
+
 		const { args } = this.parse(CreateCommand);
-		const { schemaServiceClient, imsOrgCode } = await initSdk();
+
+		const { schemaServiceClient, imsOrgCode, projectId, workspaceId } = await initSdk();
+
 		let data;
+
 		try {
 			data = JSON.parse(await readFile(args.file, 'utf8'));
 		} catch (error) {
-			this.error('Unable to create a tenant with the given configuration');
+			logger.error(error);
+
+			this.log(error.message);
+			this.error(
+				'Unable to read the mesh configuration file provided. Please check the file and try again.',
+			);
 		}
-		data.imsOrgId = imsOrgCode;
-		const tenant = await schemaServiceClient.createTenant(data);
-		tenant
-			? this.log(
-					`Successfully created a tenant with the ID: ${data.tenantId} and imsOrgCode: ${data.imsOrgId}`,
-			  )
-			: this.error(`Unable to create a tenant with the ID ${data.tenantId}`);
-		return tenant;
+
+		try {
+			const mesh = await schemaServiceClient.createMesh(imsOrgCode, projectId, workspaceId, data);
+
+			if (mesh) {
+				this.log('Successfully created mesh %s', mesh.meshId);
+				this.log(JSON.stringify(mesh, null, 2));
+
+				return mesh;
+			} else {
+				this.error(`Unable to create a mesh. Please try again. RequestId: ${global.requestId}`);
+			}
+		} catch (error) {
+			this.log(error.message);
+
+			this.error(
+				`Unable to create a mesh. Please check the mesh configuration file and try again. If the error persists please contact support. RequestId: ${global.requestId}`,
+			);
+		}
 	}
 }
 
-CreateCommand.description = 'Create a tenant with the given config.';
+CreateCommand.description = 'Create a mesh with the given config.';
 
 module.exports = CreateCommand;

@@ -15,29 +15,51 @@ const logger = require('../../../classes/logger');
 const { initSdk, initRequestId } = require('../../../helpers');
 
 class UpdateCommand extends Command {
-	static args = [{ name: 'tenantId' }, { name: 'file' }];
+	static args = [{ name: 'meshId' }, { name: 'file' }];
 
 	async run() {
 		await initRequestId();
+
 		logger.info(`RequestId: ${global.requestId}`);
+
 		const { args } = this.parse(UpdateCommand);
-		const { schemaServiceClient, imsOrgCode } = await initSdk();
+
+		const { schemaServiceClient, imsOrgCode, projectId, workspaceId } = await initSdk();
 		let data;
+
 		try {
 			data = JSON.parse(await readFile(args.file, 'utf8'));
 		} catch (error) {
 			logger.error(error);
-			this.error('Unable to update the tenant with the given configuration');
+
+			this.log(error.message);
+			this.error(
+				'Unable to read the mesh configuration file provided. Please check the file and try again.',
+			);
 		}
-		data.imsOrgId = imsOrgCode;
-		const tenant = await schemaServiceClient.updateTenant(args.tenantId, data);
-		tenant
-			? logger.info(`Successfully updated the tenant with the id: ${args.tenantId}`)
-			: logger.info(`Unable to update the tenant with the id: ${args.tenantId}`);
-		return tenant;
+
+		try {
+			const response = await schemaServiceClient.updateMesh(
+				imsOrgCode,
+				projectId,
+				workspaceId,
+				args.meshId,
+				data,
+			);
+
+			this.log('Successfully updated the mesh with the id: %s', args.meshId);
+
+			return response;
+		} catch (error) {
+			this.log(error.message);
+
+			this.error(
+				`Unable to update the mesh. Please check the mesh configuration file and try again. If the error persists please contact support. RequestId: ${global.requestId}`,
+			);
+		}
 	}
 }
 
-UpdateCommand.description = 'Update a tenant with the given config.';
+UpdateCommand.description = 'Update a mesh with the given config.';
 
 module.exports = UpdateCommand;

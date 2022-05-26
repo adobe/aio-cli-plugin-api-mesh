@@ -10,55 +10,73 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const mockConsoleCLIInstance = {};
 jest.mock('@adobe/aio-lib-env');
 jest.mock('@adobe/aio-cli-lib-console');
+
+const mockConsoleCLIInstance = {};
+
 const orgs = [{ id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' }];
 const selectedOrg = { id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' };
-/**
- *
- */
+
+const projects = [{ id: '5678', title: 'Project01' }];
+const selectedProject = { id: '5678', title: 'Project01' };
+
+const workspaces = [{ id: '123456789', title: 'Workspace01' }];
+const selectedWorkspace = { id: '123456789', title: 'Workspace01' };
+
 function setDefaultMockConsoleCLI() {
 	mockConsoleCLIInstance.getToken = jest.fn().mockReturnValue('test_token');
 	mockConsoleCLIInstance.getCliEnv = jest.fn().mockReturnValue('prod');
+
 	mockConsoleCLIInstance.getOrganizations = jest.fn().mockResolvedValue(orgs);
 	mockConsoleCLIInstance.promptForSelectOrganization = jest.fn().mockResolvedValue(selectedOrg);
+
+	mockConsoleCLIInstance.getProjects = jest.fn().mockResolvedValue(projects);
+	mockConsoleCLIInstance.promptForSelectProject = jest.fn().mockResolvedValue(selectedProject);
+
+	mockConsoleCLIInstance.getWorkspaces = jest.fn().mockResolvedValue(workspaces);
+	mockConsoleCLIInstance.promptForSelectWorkspace = jest.fn().mockResolvedValue(selectedWorkspace);
 }
+
 jest.mock('@adobe/aio-cli-lib-console', () => ({
 	init: jest.fn().mockResolvedValue(mockConsoleCLIInstance),
 	cleanStdOut: jest.fn(),
 }));
 jest.mock('@adobe/aio-lib-ims');
-const GetCommand = require('../get');
-const { SchemaServiceClient } = require('../../../../classes/SchemaServiceClient');
-const mockGetTenant = require('../../../__fixtures__/sample_mesh.json');
 
-describe('get command tests', () => {
+const DeleteCommand = require('../delete');
+const { SchemaServiceClient } = require('../../../../classes/SchemaServiceClient');
+
+describe('delete command tests', () => {
 	beforeEach(() => {
 		setDefaultMockConsoleCLI();
 	});
+
 	afterEach(() => {
 		jest.restoreAllMocks();
 	});
 
-	test('get-tenant-missing-tenantId', async () => {
-		jest.spyOn(SchemaServiceClient.prototype, 'getTenant').mockImplementation(() => {
-			throw new Error('{"message":"There was an error fetching undefined"}');
+	test('delete-mesh-missing-meshId', async () => {
+		const runResult = DeleteCommand.run([]);
+
+		return runResult.catch(err => {
+			expect(err).toHaveProperty(
+				'message',
+				expect.stringMatching(
+					/^Unable to delete mesh\. Please check the details and try again\. If the error persists please contact support\. RequestId: [a-z A-Z 0-9 -_]+/,
+				),
+			);
 		});
-		expect.assertions(2);
-		const runResult = GetCommand.run([]);
-		await expect(runResult instanceof Promise).toBeTruthy();
-		await expect(runResult).rejects.toEqual(
-			new Error('{"message":"There was an error fetching undefined"}'),
-		);
 	});
-	test('get-tenant-with-tenantId', async () => {
+
+	test('delete-mesh-with-meshId', async () => {
 		jest
-			.spyOn(SchemaServiceClient.prototype, 'getTenant')
-			.mockImplementation(tenantId => mockGetTenant);
+			.spyOn(SchemaServiceClient.prototype, 'deleteMesh')
+			.mockImplementation(() => Promise.resolve({}));
 		expect.assertions(1);
-		const tenantId = 'sample_merchant';
-		const runResult = GetCommand.run([tenantId]);
-		await expect(runResult).resolves.toEqual(mockGetTenant);
+		const meshId = 'sample_merchant';
+		const runResult = DeleteCommand.run([meshId]);
+
+		await expect(runResult).resolves.toEqual({});
 	});
 });
