@@ -46,7 +46,6 @@ jest.mock('@adobe/aio-lib-ims');
 
 const DeleteCommand = require('../delete');
 const { SchemaServiceClient } = require('../../../../classes/SchemaServiceClient');
-const mockGetMesh = require('../../../__fixtures__/sample_mesh.json');
 
 describe('delete command tests', () => {
 	beforeEach(() => {
@@ -73,10 +72,11 @@ describe('delete command tests', () => {
 	test('delete-mesh-with-meshId', async () => {
 		jest
 			.spyOn(SchemaServiceClient.prototype, 'deleteMesh')
-			.mockImplementation(meshId => mockGetMesh);
+			.mockImplementation(() => Promise.resolve({}));
 		expect.assertions(1);
 		const meshId = 'sample_merchant';
 		const runResult = DeleteCommand.run([meshId]);
-		await expect(runResult).resolves.toEqual(mockGetMesh);
+
+		await expect(runResult).resolves.toEqual({});
 	});
 });
