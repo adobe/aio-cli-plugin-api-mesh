@@ -10,8 +10,11 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const mockConsoleCLIInstance = {};
 jest.mock('@adobe/aio-lib-env');
+jest.mock('@adobe/aio-cli-lib-console');
+
+const mockConsoleCLIInstance = {};
+
 const orgs = [{ id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' }];
 const selectedOrg = { id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' };
 
@@ -40,38 +43,40 @@ jest.mock('@adobe/aio-cli-lib-console', () => ({
 	cleanStdOut: jest.fn(),
 }));
 jest.mock('@adobe/aio-lib-ims');
-const UpdateCommand = require('../update');
-const { SchemaServiceClient } = require('../../../../classes/SchemaServiceClient');
-const mockUpdateMesh = require('../../../__fixtures__/sample_mesh.json');
 
-describe('update command tests', () => {
+const DeleteCommand = require('../delete');
+const { SchemaServiceClient } = require('../../../../classes/SchemaServiceClient');
+const mockGetMesh = require('../../../__fixtures__/sample_mesh.json');
+
+describe('delete command tests', () => {
 	beforeEach(() => {
 		setDefaultMockConsoleCLI();
-		const response = mockUpdateMesh;
-		jest.spyOn(SchemaServiceClient.prototype, 'updateMesh').mockImplementation(data => response);
 	});
 
 	afterEach(() => {
 		jest.restoreAllMocks();
 	});
 
-	test('update-mesh-missing-meshId-file', async () => {
-		expect.assertions(2);
-		const runResult = UpdateCommand.run([]);
-		await expect(runResult instanceof Promise).toBeTruthy();
-		await expect(runResult).rejects.toEqual(
-			new Error(
-				'Unable to read the mesh configuration file provided. Please check the file and try again.',
-			),
-		);
+	test('delete-mesh-missing-meshId', async () => {
+		const runResult = DeleteCommand.run([]);
+
+		return runResult.catch(err => {
+			expect(err).toHaveProperty(
+				'message',
+				expect.stringMatching(
+					/^Unable to delete mesh\. Please check the details and try again\. If the error persists please contact support\. RequestId: [a-z A-Z 0-9 -_]+/,
+				),
+			);
+		});
 	});
-	test('update-mesh-with-configuration', async () => {
-		expect.assertions(2);
-		const runResult = UpdateCommand.run([
-			'sample_merchant',
-			'src/commands/__fixtures__/sample_mesh.json',
-		]);
-		await expect(runResult instanceof Promise).toBeTruthy();
-		await expect(runResult).resolves.toEqual(mockUpdateMesh);
+
+	test('delete-mesh-with-meshId', async () => {
+		jest
+			.spyOn(SchemaServiceClient.prototype, 'deleteMesh')
+			.mockImplementation(meshId => mockGetMesh);
+		expect.assertions(1);
+		const meshId = 'sample_merchant';
+		const runResult = DeleteCommand.run([meshId]);
+		await expect(runResult).resolves.toEqual(mockGetMesh);
 	});
 });
