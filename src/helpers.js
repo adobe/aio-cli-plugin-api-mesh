@@ -36,7 +36,7 @@ async function getCommerceAdminConfig() {
 
 	if (!configFile) {
 		return {
-			baseUrl: 'https://graph.adobe.io',
+			baseUrl: 'https://graph.adobe.io/api-admin',
 			accessToken: (await getLibConsoleCLI()).accessToken,
 			apiKey: 'graphql-onboarding-io',
 		};
