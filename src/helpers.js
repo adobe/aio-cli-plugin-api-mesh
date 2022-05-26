@@ -76,14 +76,14 @@ async function getCommerceAdminConfig() {
 /**
  * @returns {string} Returns organizations the user belongs to
  */
-async function getAuthorizedOrganizations() {
+async function getAuthorizedOrganization() {
 	const { consoleCLI } = await getLibConsoleCLI();
 
 	aioConsoleLogger.debug('Get the selected organization');
 
-	const consoleConfig = Config.get('console.org');
+	const consoleConfigOrg = Config.get('console.org');
 
-	if (!consoleConfig) {
+	if (!consoleConfigOrg) {
 		const organizations = await consoleCLI.getOrganizations();
 		const selectedOrg = await consoleCLI.promptForSelectOrganization(organizations);
 
@@ -97,13 +97,13 @@ async function getAuthorizedOrganizations() {
 
 		return Object.assign({}, selectedOrg);
 	} else {
-		logger.info(`Selecting your organization as: ${consoleConfig.name}`);
+		logger.info(`Selecting your organization as: ${consoleConfigOrg.name}`);
 
-		return Object.assign({}, consoleConfig);
+		return Object.assign({}, consoleConfigOrg);
 	}
 }
 
-async function getProjects(imsOrgId, imsOrgTitle) {
+async function getProject(imsOrgId, imsOrgTitle) {
 	logger.info(`Initializing project selection for ${imsOrgId}`);
 
 	const { consoleCLI } = await getLibConsoleCLI();
@@ -118,7 +118,7 @@ async function getProjects(imsOrgId, imsOrgTitle) {
 	}
 }
 
-async function getWorkspaces(orgId, projectId, imsOrgTitle, projectTitle) {
+async function getWorkspace(orgId, projectId, imsOrgTitle, projectTitle) {
 	logger.info(`Initializing workspace selection for ${orgId} / ${projectId}`);
 
 	const { consoleCLI } = await getLibConsoleCLI();
@@ -158,9 +158,9 @@ async function getLibConsoleCLI() {
  * @returns {any} Returns an object with properties ready for consumption
  */
 async function initSdk() {
-	const org = await getAuthorizedOrganizations();
-	const project = await getProjects(org.id, org.name);
-	const workspace = await getWorkspaces(org.id, project.id, org.name, project.title);
+	const org = await getAuthorizedOrganization();
+	const project = await getProject(org.id, org.name);
+	const workspace = await getWorkspace(org.id, project.id, org.name, project.title);
 
 	aioConsoleLogger.log(
 		`Initializing SDK for org: ${org.name}, project: ${project.title} and workspace: ${workspace.title}`,

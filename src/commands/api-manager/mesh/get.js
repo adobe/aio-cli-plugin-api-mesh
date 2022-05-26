@@ -53,7 +53,9 @@ class GetCommand extends Command {
 
 				return mesh;
 			} else {
-				this.error(`Unable to get mesh with the ID ${mesh.meshId}`);
+				this.error(
+					`Unable to get mesh with the ID ${args.meshId}. Please check the mesh ID and try again. RequestId: ${global.requestId}`,
+				);
 			}
 		} catch (error) {
 			this.log(error.message);

@@ -48,7 +48,7 @@ class CreateCommand extends Command {
 
 				return mesh;
 			} else {
-				this.error(`Unable to create a mesh with the ID ${mesh.meshId}`);
+				this.error(`Unable to create a mesh. Please try again. RequestId: ${global.requestId}`);
 			}
 		} catch (error) {
 			this.log(error.message);
