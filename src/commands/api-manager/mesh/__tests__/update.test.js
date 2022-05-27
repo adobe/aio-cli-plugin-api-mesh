@@ -12,53 +12,66 @@ governing permissions and limitations under the License.
 
 const mockConsoleCLIInstance = {};
 jest.mock('@adobe/aio-lib-env');
-jest.mock('@adobe/aio-cli-lib-console');
 const orgs = [{ id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' }];
 const selectedOrg = { id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' };
-/**
- *
- */
+
+const projects = [{ id: '5678', title: 'Project01' }];
+const selectedProject = { id: '5678', title: 'Project01' };
+
+const workspaces = [{ id: '123456789', title: 'Workspace01' }];
+const selectedWorkspace = { id: '123456789', title: 'Workspace01' };
+
 function setDefaultMockConsoleCLI() {
 	mockConsoleCLIInstance.getToken = jest.fn().mockReturnValue('test_token');
 	mockConsoleCLIInstance.getCliEnv = jest.fn().mockReturnValue('prod');
+
 	mockConsoleCLIInstance.getOrganizations = jest.fn().mockResolvedValue(orgs);
 	mockConsoleCLIInstance.promptForSelectOrganization = jest.fn().mockResolvedValue(selectedOrg);
+
+	mockConsoleCLIInstance.getProjects = jest.fn().mockResolvedValue(projects);
+	mockConsoleCLIInstance.promptForSelectProject = jest.fn().mockResolvedValue(selectedProject);
+
+	mockConsoleCLIInstance.getWorkspaces = jest.fn().mockResolvedValue(workspaces);
+	mockConsoleCLIInstance.promptForSelectWorkspace = jest.fn().mockResolvedValue(selectedWorkspace);
 }
+
 jest.mock('@adobe/aio-cli-lib-console', () => ({
 	init: jest.fn().mockResolvedValue(mockConsoleCLIInstance),
 	cleanStdOut: jest.fn(),
 }));
 jest.mock('@adobe/aio-lib-ims');
-const GetCommand = require('../get');
+const UpdateCommand = require('../update');
 const { SchemaServiceClient } = require('../../../../classes/SchemaServiceClient');
-const mockGetTenant = require('../../../__fixtures__/sample_mesh.json');
+const mockUpdateMesh = require('../../../__fixtures__/sample_mesh.json');
 
-describe('get command tests', () => {
+describe('update command tests', () => {
 	beforeEach(() => {
 		setDefaultMockConsoleCLI();
+		const response = mockUpdateMesh;
+		jest.spyOn(SchemaServiceClient.prototype, 'updateMesh').mockImplementation(data => response);
 	});
+
 	afterEach(() => {
 		jest.restoreAllMocks();
 	});
 
-	test('get-tenant-missing-tenantId', async () => {
-		jest.spyOn(SchemaServiceClient.prototype, 'getTenant').mockImplementation(() => {
-			throw new Error('{"message":"There was an error fetching undefined"}');
-		});
+	test('update-mesh-missing-meshId-file', async () => {
 		expect.assertions(2);
-		const runResult = GetCommand.run([]);
+		const runResult = UpdateCommand.run([]);
 		await expect(runResult instanceof Promise).toBeTruthy();
 		await expect(runResult).rejects.toEqual(
-			new Error('{"message":"There was an error fetching undefined"}'),
+			new Error(
+				'Unable to read the mesh configuration file provided. Please check the file and try again.',
+			),
 		);
 	});
-	test('get-tenant-with-tenantId', async () => {
-		jest
-			.spyOn(SchemaServiceClient.prototype, 'getTenant')
-			.mockImplementation(tenantId => mockGetTenant);
-		expect.assertions(1);
-		const tenantId = 'sample_merchant';
-		const runResult = GetCommand.run([tenantId]);
-		await expect(runResult).resolves.toEqual(mockGetTenant);
+	test('update-mesh-with-configuration', async () => {
+		expect.assertions(2);
+		const runResult = UpdateCommand.run([
+			'sample_merchant',
+			'src/commands/__fixtures__/sample_mesh.json',
+		]);
+		await expect(runResult instanceof Promise).toBeTruthy();
+		await expect(runResult).resolves.toEqual(mockUpdateMesh);
 	});
 });

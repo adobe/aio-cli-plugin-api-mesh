@@ -22,10 +22,7 @@ const aioConsoleLogger = require('@adobe/aio-lib-core-logging')(
 	'@adobe/aio-cli-plugin-commerce-admin',
 	{ provider: 'debug' },
 );
-const CONSOLE_CONFIG_KEYS = {
-	CONSOLE: 'console',
-	ORG: 'org',
-};
+
 const CONSOLE_API_KEYS = {
 	prod: 'aio-cli-console-auth',
 	stage: 'aio-cli-console-auth-stage',
@@ -36,69 +33,151 @@ const CONSOLE_API_KEYS = {
  */
 async function getCommerceAdminConfig() {
 	const configFile = Config.get('aio-cli-plugin-commerce-admin');
-	try {
-		const data = JSON.parse(fs.readFileSync(configFile, { encoding: 'utf8', flag: 'r' }));
+
+	if (!configFile) {
 		return {
-			baseUrl: data.baseUrl || 'https://commerce.adobe.io',
+			baseUrl: 'https://graph.adobe.io/api-admin',
 			accessToken: (await getLibConsoleCLI()).accessToken,
-			apiKey: data.apiKey,
+			apiKey: 'graphql-onboarding-io',
 		};
-	} catch (error) {
-		return null;
+	} else {
+		try {
+			if (!fs.existsSync(configFile)) {
+				logger.error(
+					`The config file does not exist. Please run the command: aio config:set aio-cli-plugin-commerce-admin <path_to_json_file> with a valid file.`,
+				);
+
+				throw new Error('Config file does not exist');
+			}
+
+			const data = JSON.parse(fs.readFileSync(configFile, { encoding: 'utf8', flag: 'r' }));
+
+			if (!data.baseUrl || !data.apiKey) {
+				logger.error('Invalid config file. Please check the file and try again.');
+
+				throw new Error('Invalid config file. Please check the file and try again.');
+			}
+
+			return {
+				baseUrl: data.baseUrl,
+				accessToken: (await getLibConsoleCLI()).accessToken,
+				apiKey: data.apiKey,
+			};
+		} catch (error) {
+			logger.error(
+				'Please run aio config set command to set the correct path to config json with valid baseUrl and apiKey',
+			);
+
+			throw new Error(error);
+		}
 	}
 }
 
 /**
  * @returns {string} Returns organizations the user belongs to
  */
-async function getAuthorizedOrganizations() {
+async function getAuthorizedOrganization() {
 	const { consoleCLI } = await getLibConsoleCLI();
+
 	aioConsoleLogger.debug('Get the selected organization');
-	const key = CONSOLE_CONFIG_KEYS.ORG;
-	this.configOrgCode = Config.get(`${CONSOLE_CONFIG_KEYS.CONSOLE}.${key}`);
-	if (!this.configOrgCode) {
+
+	const consoleConfigOrg = Config.get('console.org');
+
+	if (!consoleConfigOrg) {
 		const organizations = await consoleCLI.getOrganizations();
 		const selectedOrg = await consoleCLI.promptForSelectOrganization(organizations);
+
 		aioConsoleLogger.debug('Set the console config');
-		Config.set(`${CONSOLE_CONFIG_KEYS.CONSOLE}.${key}`, {
+
+		Config.set('console.org', {
 			id: selectedOrg.id,
 			code: selectedOrg.code,
 			name: selectedOrg.name,
 		});
-		this.imsOrgCode = selectedOrg.code;
-		return { imsOrgCode: this.imsOrgCode };
+
+		return Object.assign({}, selectedOrg);
 	} else {
-		logger.info(`Selecting your organization as: ${this.configOrgCode.name}`);
-		return { imsOrgCode: this.configOrgCode.code };
+		logger.info(`Selecting your organization as: ${consoleConfigOrg.name}`);
+
+		return Object.assign({}, consoleConfigOrg);
 	}
 }
+
+async function getProject(imsOrgId, imsOrgTitle) {
+	logger.info(`Initializing project selection for ${imsOrgId}`);
+
+	const { consoleCLI } = await getLibConsoleCLI();
+
+	const projects = await consoleCLI.getProjects(imsOrgId);
+	if (projects.length !== 0) {
+		const selectedProject = await consoleCLI.promptForSelectProject(projects);
+
+		return selectedProject;
+	} else {
+		aioConsoleLogger.error(`No projects found for the selected organization: ${imsOrgTitle}`);
+	}
+}
+
+async function getWorkspace(orgId, projectId, imsOrgTitle, projectTitle) {
+	logger.info(`Initializing workspace selection for ${orgId} / ${projectId}`);
+
+	const { consoleCLI } = await getLibConsoleCLI();
+
+	const workspaces = await consoleCLI.getWorkspaces(orgId, projectId);
+	if (workspaces.length !== 0) {
+		const selectedWorkspace = await consoleCLI.promptForSelectWorkspace(workspaces);
+
+		return selectedWorkspace;
+	} else {
+		aioConsoleLogger.error(
+			`No workspaces found for the selected organization: ${imsOrgTitle} and project: ${projectTitle}`,
+		);
+	}
+}
+
 /**
  * @private
  */
 async function getLibConsoleCLI() {
 	await context.setCli({ 'cli.bare-output': true }, false);
+
 	const clientEnv = getCliEnv();
-	this.accessToken = await getToken(CLI);
-	this.consoleCLI = await libConsoleCLI.init({
-		accessToken: this.accessToken,
+
+	const accessToken = await getToken(CLI);
+
+	const consoleCLI = await libConsoleCLI.init({
+		accessToken: accessToken,
 		apiKey: CONSOLE_API_KEYS[clientEnv],
 		env: clientEnv,
 	});
-	return { consoleCLI: this.consoleCLI, accessToken: this.accessToken };
+
+	return { consoleCLI: consoleCLI, accessToken: accessToken };
 }
 
 /**
  * @returns {any} Returns an object with properties ready for consumption
  */
 async function initSdk() {
-	const { imsOrgCode } = await getAuthorizedOrganizations();
+	const org = await getAuthorizedOrganization();
+	const project = await getProject(org.id, org.name);
+	const workspace = await getWorkspace(org.id, project.id, org.name, project.title);
+
+	aioConsoleLogger.log(
+		`Initializing SDK for org: ${org.name}, project: ${project.title} and workspace: ${workspace.title}`,
+	);
+
 	logger.info('Initialized user login and the selected organization');
+
 	const { baseUrl, accessToken, apiKey } = await getCommerceAdminConfig();
+
 	const schemaServiceClient = new SchemaServiceClient();
 	schemaServiceClient.init(baseUrl, accessToken, apiKey);
+
 	return {
 		schemaServiceClient: schemaServiceClient,
-		imsOrgCode: imsOrgCode,
+		imsOrgCode: org.code,
+		projectId: project.id,
+		workspaceId: workspace.id,
 	};
 }
 

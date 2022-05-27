@@ -47,7 +47,9 @@ aio config:set aio-cli-plugin-commerce-admin <path_to_json_file>
 # Commands
 
 ```
-aio commerce-gateway:tenant:create BODYJSONFILE
-aio commerce-gateway:tenant:update tenantid BODYJSONFILE
-aio commerce-gateway:tenant:get tenantid
+aio api-manager:mesh:get meshId
+aio api-manager:mesh:get meshId PATH_OF_FILE_TO_DOWNLOAD_INTO
+aio api-manager:mesh:create PATH_OF_MESH_CONFIG_JSON_FILE
+aio api-manager:mesh:update meshId PATH_OF_MESH_CONFIG_JSON_FILE
+aio api-manager:mesh:delete meshId
 ```
