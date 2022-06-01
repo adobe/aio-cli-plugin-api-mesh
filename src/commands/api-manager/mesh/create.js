@@ -24,7 +24,7 @@ class CreateCommand extends Command {
 
 		const { args } = this.parse(CreateCommand);
 
-		const { schemaServiceClient, imsOrgCode, projectId, workspaceId } = await initSdk();
+		const { schemaServiceClient, imsOrgId, projectId, workspaceId } = await initSdk();
 
 		let data;
 
@@ -40,7 +40,7 @@ class CreateCommand extends Command {
 		}
 
 		try {
-			const mesh = await schemaServiceClient.createMesh(imsOrgCode, projectId, workspaceId, data);
+			const mesh = await schemaServiceClient.createMesh(imsOrgId, projectId, workspaceId, data);
 
 			if (mesh) {
 				this.log('Successfully created mesh %s', mesh.meshId);

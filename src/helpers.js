@@ -36,9 +36,9 @@ async function getCommerceAdminConfig() {
 
 	if (!configFile) {
 		return {
-			baseUrl: 'https://graph.adobe.io/api-admin',
+			baseUrl: 'https://developers.adobe.io/console',
 			accessToken: (await getLibConsoleCLI()).accessToken,
-			apiKey: 'graphql-onboarding-io',
+			apiKey: 'adobe-api-manager-sms-stage',
 		};
 	} else {
 		try {
@@ -58,8 +58,12 @@ async function getCommerceAdminConfig() {
 				throw new Error('Invalid config file. Please check the file and try again.');
 			}
 
+			const baseUrl = data.baseUrl.endsWith('/')
+				? data.baseUrl.slice(0, data.baseUrl.length - 1)
+				: data.baseUrl;
+
 			return {
-				baseUrl: data.baseUrl,
+				baseUrl: baseUrl,
 				accessToken: (await getLibConsoleCLI()).accessToken,
 				apiKey: data.apiKey,
 			};
@@ -175,7 +179,7 @@ async function initSdk() {
 
 	return {
 		schemaServiceClient: schemaServiceClient,
-		imsOrgCode: org.code,
+		imsOrgId: org.id,
 		projectId: project.id,
 		workspaceId: workspace.id,
 	};

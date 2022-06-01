@@ -11,6 +11,7 @@ governing permissions and limitations under the License.
 
 const axios = require('axios');
 const logger = require('../classes/logger');
+const { objToString } = require('../utils');
 
 /**
  * This class provides methods to call Schema Management Service APIs.
@@ -19,15 +20,15 @@ const logger = require('../classes/logger');
  */
 class SchemaServiceClient {
 	init(baseUrl, accessToken, apiKey) {
-		this.schemaManagementServiceUrl = baseUrl;
+		this.devConsoleUrl = baseUrl;
 		this.accessToken = accessToken;
 		this.apiKey = apiKey;
 	}
 
-	async getMesh(organizationCode, projectId, workspaceId, meshId) {
+	async getMesh(organizationId, projectId, workspaceId, meshId) {
 		const config = {
 			method: 'get',
-			url: `${this.schemaManagementServiceUrl}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}?api_key=${this.apiKey}`,
+			url: `${this.devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}?API_KEY=${this.apiKey}`,
 			headers: {
 				'Authorization': `Bearer ${this.accessToken}`,
 				'x-request-id': global.requestId,
@@ -36,7 +37,7 @@ class SchemaServiceClient {
 
 		logger.info(
 			'Initiating GET %s',
-			`${this.schemaManagementServiceUrl}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}?api_key=${this.apiKey}`,
+			`${this.devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}?API_KEY=${this.apiKey}`,
 		);
 
 		try {
@@ -45,25 +46,58 @@ class SchemaServiceClient {
 			logger.info('Response from GET %s', response.status);
 
 			if (response && response.status === 200) {
-				logger.info(`Mesh Config : ${JSON.stringify(response.data, null, 2)}`);
+				logger.info(`Mesh Config : ${objToString(response, ['data'])}`);
 
 				return response.data;
 			} else {
-				logger.error(`Something went wrong: ${JSON.stringify(response.data, null, 2)}`);
+				// Non 200 response received
+				logger.error(
+					`Something went wrong: ${objToString(
+						response,
+						['data'],
+						'Unable to get mesh',
+					)}. Received ${response.status} response instead of 200`,
+				);
 
-				throw new Error(response.data.message);
+				return null;
 			}
 		} catch (error) {
-			if (error.response) {
-				// The request was made and the server responded with a status code
-				logger.error('Error while getting mesh %s', JSON.stringify(error.response.data, null, 2));
+			logger.info('Response from GET %s', error.response.status);
 
-				throw new Error(error.response.data.message);
+			if (error.response.status === 404) {
+				// The request was made and the server responded with a 404 status code
+				logger.error('Mesh not found');
+
+				return null;
+			} else if (error.response && error.response.data) {
+				// The request was made and the server responded with an unsupported status code
+				logger.error(
+					'Error while getting mesh. Response: %s',
+					objToString(error, ['response', 'data'], 'Unable to get mesh'),
+				);
+
+				if (error.response.data.messages) {
+					const message = objToString(
+						error,
+						['response', 'data', 'messages'],
+						'Unable to get mesh',
+					);
+
+					throw new Error(message);
+				} else if (error.response.data.message) {
+					const message = objToString(error, ['response', 'data', 'message'], 'Unable to get mesh');
+
+					throw new Error(message);
+				} else {
+					const message = objToString(error, ['response', 'data'], 'Unable to get mesh');
+
+					throw new Error(message);
+				}
 			} else {
 				// The request was made but no response was received
 				logger.error(
 					'Error while getting mesh. No response received from the server: %s',
-					JSON.stringify(error, null, 2),
+					objToString(error, [], 'Unable to get mesh'),
 				);
 
 				throw new Error('Unable to get mesh from Schema Management Service: %s', error.message);
@@ -71,10 +105,10 @@ class SchemaServiceClient {
 		}
 	}
 
-	async createMesh(organizationCode, projectId, workspaceId, data) {
+	async createMesh(organizationId, projectId, workspaceId, data) {
 		const config = {
 			method: 'post',
-			url: `${this.schemaManagementServiceUrl}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes?api_key=${this.apiKey}`,
+			url: `${this.devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes?API_KEY=${this.apiKey}`,
 			headers: {
 				'Authorization': `Bearer ${this.accessToken}`,
 				'Content-Type': 'application/json',
@@ -85,7 +119,7 @@ class SchemaServiceClient {
 
 		logger.info(
 			'Initiating POST %s',
-			`${this.schemaManagementServiceUrl}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes?api_key=${this.apiKey}`,
+			`${this.devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes?API_KEY=${this.apiKey}`,
 		);
 
 		try {
@@ -120,10 +154,10 @@ class SchemaServiceClient {
 		}
 	}
 
-	async updateMesh(organizationCode, projectId, workspaceId, meshId, data) {
+	async updateMesh(organizationId, projectId, workspaceId, meshId, data) {
 		const config = {
 			method: 'put',
-			url: `${this.schemaManagementServiceUrl}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}?api_key=${this.apiKey}`,
+			url: `${this.devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}?API_KEY=${this.apiKey}`,
 			headers: {
 				'Authorization': `Bearer ${this.accessToken}`,
 				'Content-Type': 'application/json',
@@ -134,7 +168,7 @@ class SchemaServiceClient {
 
 		logger.info(
 			'Initiating PUT %s',
-			`${this.schemaManagementServiceUrl}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}?api_key=${this.apiKey}`,
+			`${this.devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}?API_KEY=${this.apiKey}`,
 		);
 
 		try {
@@ -167,10 +201,10 @@ class SchemaServiceClient {
 		}
 	}
 
-	async deleteMesh(organizationCode, projectId, workspaceId, meshId) {
+	async deleteMesh(organizationId, projectId, workspaceId, meshId) {
 		const config = {
 			method: 'delete',
-			url: `${this.schemaManagementServiceUrl}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}?api_key=${this.apiKey}`,
+			url: `${this.devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}?API_KEY=${this.apiKey}`,
 			headers: {
 				'Authorization': `Bearer ${this.accessToken}`,
 				'x-request-id': global.requestId,
@@ -179,7 +213,7 @@ class SchemaServiceClient {
 
 		logger.info(
 			'Initiating DELETE %s',
-			`${this.schemaManagementServiceUrl}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}?api_key=${this.apiKey}`,
+			`${this.devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}?API_KEY=${this.apiKey}`,
 		);
 
 		try {
