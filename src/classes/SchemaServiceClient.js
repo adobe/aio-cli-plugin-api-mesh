@@ -298,21 +298,60 @@ class SchemaServiceClient {
 			if (response && response.status === 204) {
 				return response;
 			} else {
-				logger.error(`Something went wrong: ${JSON.stringify(response.data, null, 2)}`);
+				// Non 204 response received
+				logger.error(
+					`Something went wrong: ${objToString(
+						response,
+						['data'],
+						'Unable to delete mesh',
+					)}. Received ${response.status} response instead of 204`,
+				);
 
-				throw new Error(response.data.message);
+				throw new Error(
+					`Something went wrong: ${objToString(response, ['data'], 'Unable to delete mesh')}`,
+				);
 			}
 		} catch (error) {
-			if (error.response) {
-				// The request was made and the server responded with a status code
-				logger.error('Error while deleting mesh %s', JSON.stringify(error.response.data, null, 2));
+			logger.info('Response from DELETE %s', error.response.status);
 
-				throw new Error(error.response.data.message);
+			if (error.response.status === 404) {
+				// The request was made and the server responded with a 404 status code
+				logger.error('Mesh not found');
+
+				throw new Error('Mesh not found');
+			} else if (error.response && error.response.data) {
+				// The request was made and the server responded with an unsupported status code
+				logger.error(
+					'Error while deleting mesh. Response: %s',
+					objToString(error, ['response', 'data'], 'Unable to delete mesh'),
+				);
+
+				if (error.response.data.messages) {
+					const message = objToString(
+						error,
+						['response', 'data', 'messages'],
+						'Unable to delete mesh',
+					);
+
+					throw new Error(message);
+				} else if (error.response.data.message) {
+					const message = objToString(
+						error,
+						['response', 'data', 'message'],
+						'Unable to delete mesh',
+					);
+
+					throw new Error(message);
+				} else {
+					const message = objToString(error, ['response', 'data'], 'Unable to delete mesh');
+
+					throw new Error(message);
+				}
 			} else {
 				// The request was made but no response was received
 				logger.error(
 					'Error while deleting mesh. No response received from the server: %s',
-					JSON.stringify(error, null, 2),
+					objToString(error, [], 'Unable to delete mesh'),
 				);
 
 				throw new Error('Unable to delete mesh from Schema Management Service: %s', error.message);
