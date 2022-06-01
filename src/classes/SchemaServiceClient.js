@@ -59,7 +59,9 @@ class SchemaServiceClient {
 					)}. Received ${response.status} response instead of 200`,
 				);
 
-				return null;
+				throw new Error(
+					`Something went wrong: ${objToString(response, ['data'], 'Unable to get mesh')}`,
+				);
 			}
 		} catch (error) {
 			logger.info('Response from GET %s', error.response.status);
