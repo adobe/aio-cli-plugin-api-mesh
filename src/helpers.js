@@ -32,7 +32,7 @@ const CONSOLE_API_KEYS = {
  * @returns {any} Returns a config object or null
  */
 async function getCommerceAdminConfig() {
-	const configFile = Config.get('aio-cli-plugin-commerce-admin');
+	const configFile = Config.get('mesh-api-manager.configPath');
 
 	if (!configFile) {
 		return {
@@ -43,19 +43,17 @@ async function getCommerceAdminConfig() {
 	} else {
 		try {
 			if (!fs.existsSync(configFile)) {
-				logger.error(
-					`The config file does not exist. Please run the command: aio config:set aio-cli-plugin-commerce-admin <path_to_json_file> with a valid file.`,
+				throw new Error(
+					`Config file does not exist. Please run the command: aio config:set mesh-api-manager.configPath <path_to_json_file> with a valid file.`,
 				);
-
-				throw new Error('Config file does not exist');
 			}
 
 			const data = JSON.parse(fs.readFileSync(configFile, { encoding: 'utf8', flag: 'r' }));
 
 			if (!data.baseUrl || !data.apiKey) {
-				logger.error('Invalid config file. Please check the file and try again.');
-
-				throw new Error('Invalid config file. Please check the file and try again.');
+				throw new Error(
+					'Invalid config file. Please validate the file contents and try again. Config file must contain baseUrl and apiKey.',
+				);
 			}
 
 			const baseUrl = data.baseUrl.endsWith('/')
@@ -69,7 +67,7 @@ async function getCommerceAdminConfig() {
 			};
 		} catch (error) {
 			logger.error(
-				'Please run aio config set command to set the correct path to config json with valid baseUrl and apiKey',
+				'Please run the command: aio config:set mesh-api-manager.configPath <path_to_json_file> with a valid config file.',
 			);
 
 			throw new Error(error);
