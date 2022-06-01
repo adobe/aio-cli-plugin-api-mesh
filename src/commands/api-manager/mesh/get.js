@@ -36,7 +36,8 @@ class GetCommand extends Command {
 
 				if (args.file) {
 					try {
-						await writeFile(args.file, JSON.stringify(mesh, null, 2));
+						const { meshConfig } = mesh;
+						await writeFile(args.file, JSON.stringify({ meshConfig }, null, 2));
 
 						this.log('Successfully wrote mesh to file %s', args.file);
 					} catch (error) {
