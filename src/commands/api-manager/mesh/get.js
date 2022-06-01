@@ -24,10 +24,7 @@ class GetCommand extends Command {
 
 		logger.info(`RequestId: ${global.requestId}`);
 
-		// const { args } = this.parse(GetCommand);
-		const args = {
-			meshId: 'mesh-id',
-		};
+		const { args } = this.parse(GetCommand);
 
 		const { schemaServiceClient, imsOrgId, projectId, workspaceId } = await initSdk();
 
