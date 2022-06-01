@@ -128,25 +128,60 @@ class SchemaServiceClient {
 			logger.info('Response from POST %s', response.status);
 
 			if (response && response.status === 201) {
-				logger.info(`Mesh Config : ${JSON.stringify(response.data, null, 2)}`);
+				logger.info(`Mesh Config : ${objToString(response, ['data'])}`);
 
 				return response.data;
 			} else {
-				logger.error(`Something went wrong: ${JSON.stringify(response.data, null, 2)}`);
+				// Non 201 response received
+				logger.error(
+					`Something went wrong: ${objToString(
+						response,
+						['data'],
+						'Unable to create mesh',
+					)}. Received ${response.status} response instead of 201`,
+				);
 
 				throw new Error(response.data.message);
 			}
 		} catch (error) {
-			if (error.response) {
-				// The request was made and the server responded with a status code
-				logger.error('Error while creating mesh %s', JSON.stringify(error.response.data, null, 2));
+			if (error.response.status === 409) {
+				// The request was made and the server responded with a 409 status code
+				logger.error('Error while creating mesh: %j', error.response.data);
 
-				throw new Error(error.response.data.message);
+				throw new Error('Selected org, project and workspace already has a mesh');
+			} else if (error.response && error.response.data) {
+				// The request was made and the server responded with an unsupported status code
+				logger.error(
+					'Error while creating mesh. Response: %s',
+					objToString(error, ['response', 'data'], 'Unable to create mesh'),
+				);
+
+				if (error.response.data.messages) {
+					const message = objToString(
+						error,
+						['response', 'data', 'messages'],
+						'Unable to create mesh',
+					);
+
+					throw new Error(message);
+				} else if (error.response.data.message) {
+					const message = objToString(
+						error,
+						['response', 'data', 'message'],
+						'Unable to create mesh',
+					);
+
+					throw new Error(message);
+				} else {
+					const message = objToString(error, ['response', 'data'], 'Unable to create mesh');
+
+					throw new Error(message);
+				}
 			} else {
 				// The request was made but no response was received
 				logger.error(
 					'Error while creating mesh. No response received from the server: %s',
-					JSON.stringify(error, null, 2),
+					objToString(error, [], 'Unable to create mesh'),
 				);
 
 				throw new Error('Unable to create mesh in Schema Management Service: %s', error.message);
