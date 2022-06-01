@@ -81,7 +81,7 @@ class SchemaServiceClient {
 				if (error.response.data.messages) {
 					const message = objToString(
 						error,
-						['response', 'data', 'messages'],
+						['response', 'data', 'messages', '0', 'message'],
 						'Unable to get mesh',
 					);
 
@@ -247,7 +247,7 @@ class SchemaServiceClient {
 				if (error.response.data.messages) {
 					const message = objToString(
 						error,
-						['response', 'data', 'messages'],
+						['response', 'data', 'messages', '0', 'message'],
 						'Unable to update mesh',
 					);
 
@@ -331,7 +331,7 @@ class SchemaServiceClient {
 				if (error.response.data.messages) {
 					const message = objToString(
 						error,
-						['response', 'data', 'messages'],
+						['response', 'data', 'messages', '0', 'message'],
 						'Unable to delete mesh',
 					);
 
