@@ -24,7 +24,7 @@ class UpdateCommand extends Command {
 
 		const { args } = this.parse(UpdateCommand);
 
-		const { schemaServiceClient, imsOrgCode, projectId, workspaceId } = await initSdk();
+		const { schemaServiceClient, imsOrgId, projectId, workspaceId } = await initSdk();
 		let data;
 
 		try {
@@ -40,7 +40,7 @@ class UpdateCommand extends Command {
 
 		try {
 			const response = await schemaServiceClient.updateMesh(
-				imsOrgCode,
+				imsOrgId,
 				projectId,
 				workspaceId,
 				args.meshId,

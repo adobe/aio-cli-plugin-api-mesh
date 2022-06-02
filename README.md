@@ -41,7 +41,7 @@ create a config.json file with the following parameters
 Perform the following command to update the configuration
 
 ```
-aio config:set aio-cli-plugin-commerce-admin <path_to_json_file>
+aio config:set mesh-api-manager.configPath <path_to_json_file>
 ```
 
 # Commands

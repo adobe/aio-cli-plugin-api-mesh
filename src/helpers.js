@@ -32,40 +32,42 @@ const CONSOLE_API_KEYS = {
  * @returns {any} Returns a config object or null
  */
 async function getCommerceAdminConfig() {
-	const configFile = Config.get('aio-cli-plugin-commerce-admin');
+	const configFile = Config.get('mesh-api-manager.configPath');
 
 	if (!configFile) {
 		return {
-			baseUrl: 'https://graph.adobe.io/api-admin',
+			baseUrl: 'https://developers.adobe.io/console',
 			accessToken: (await getLibConsoleCLI()).accessToken,
-			apiKey: 'graphql-onboarding-io',
+			apiKey: 'adobe-api-manager-sms-stage',
 		};
 	} else {
 		try {
 			if (!fs.existsSync(configFile)) {
-				logger.error(
-					`The config file does not exist. Please run the command: aio config:set aio-cli-plugin-commerce-admin <path_to_json_file> with a valid file.`,
+				throw new Error(
+					`Config file does not exist. Please run the command: aio config:set mesh-api-manager.configPath <path_to_json_file> with a valid file.`,
 				);
-
-				throw new Error('Config file does not exist');
 			}
 
 			const data = JSON.parse(fs.readFileSync(configFile, { encoding: 'utf8', flag: 'r' }));
 
 			if (!data.baseUrl || !data.apiKey) {
-				logger.error('Invalid config file. Please check the file and try again.');
-
-				throw new Error('Invalid config file. Please check the file and try again.');
+				throw new Error(
+					'Invalid config file. Please validate the file contents and try again. Config file must contain baseUrl and apiKey.',
+				);
 			}
 
+			const baseUrl = data.baseUrl.endsWith('/')
+				? data.baseUrl.slice(0, data.baseUrl.length - 1)
+				: data.baseUrl;
+
 			return {
-				baseUrl: data.baseUrl,
+				baseUrl: baseUrl,
 				accessToken: (await getLibConsoleCLI()).accessToken,
 				apiKey: data.apiKey,
 			};
 		} catch (error) {
 			logger.error(
-				'Please run aio config set command to set the correct path to config json with valid baseUrl and apiKey',
+				'Please run the command: aio config:set mesh-api-manager.configPath <path_to_json_file> with a valid config file.',
 			);
 
 			throw new Error(error);
@@ -175,7 +177,7 @@ async function initSdk() {
 
 	return {
 		schemaServiceClient: schemaServiceClient,
-		imsOrgCode: org.code,
+		imsOrgId: org.id,
 		projectId: project.id,
 		workspaceId: workspace.id,
 	};

@@ -25,11 +25,11 @@ class DeleteCommand extends Command {
 
 		const { args } = this.parse(DeleteCommand);
 
-		const { schemaServiceClient, imsOrgCode, projectId, workspaceId } = await initSdk();
+		const { schemaServiceClient, imsOrgId, projectId, workspaceId } = await initSdk();
 
 		try {
 			const response = await schemaServiceClient.deleteMesh(
-				imsOrgCode,
+				imsOrgId,
 				projectId,
 				workspaceId,
 				args.meshId,

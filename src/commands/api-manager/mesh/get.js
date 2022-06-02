@@ -26,22 +26,18 @@ class GetCommand extends Command {
 
 		const { args } = this.parse(GetCommand);
 
-		const { schemaServiceClient, imsOrgCode, projectId, workspaceId } = await initSdk();
+		const { schemaServiceClient, imsOrgId, projectId, workspaceId } = await initSdk();
 
 		try {
-			const mesh = await schemaServiceClient.getMesh(
-				imsOrgCode,
-				projectId,
-				workspaceId,
-				args.meshId,
-			);
+			const mesh = await schemaServiceClient.getMesh(imsOrgId, projectId, workspaceId, args.meshId);
 
 			if (mesh) {
 				this.log('Successfully retrieved mesh %s', JSON.stringify(mesh, null, 2));
 
 				if (args.file) {
 					try {
-						await writeFile(args.file, JSON.stringify(mesh, null, 2));
+						const { meshConfig } = mesh;
+						await writeFile(args.file, JSON.stringify({ meshConfig }, null, 2));
 
 						this.log('Successfully wrote mesh to file %s', args.file);
 					} catch (error) {
@@ -55,6 +51,7 @@ class GetCommand extends Command {
 			} else {
 				this.error(
 					`Unable to get mesh with the ID ${args.meshId}. Please check the mesh ID and try again. RequestId: ${global.requestId}`,
+					{ exit: false },
 				);
 			}
 		} catch (error) {
