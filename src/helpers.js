@@ -38,7 +38,7 @@ async function getCommerceAdminConfig() {
 		return {
 			baseUrl: 'https://developers.adobe.io/console',
 			accessToken: (await getLibConsoleCLI()).accessToken,
-			apiKey: 'adobe-api-manager-sms-stage',
+			apiKey: 'adobe-graph-prod',
 		};
 	} else {
 		try {
