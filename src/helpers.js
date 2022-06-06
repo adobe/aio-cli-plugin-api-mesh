@@ -31,7 +31,7 @@ const CONSOLE_API_KEYS = {
 /**
  * @returns {any} Returns a config object or null
  */
-async function getCommerceAdminConfig() {
+async function getDevConsoleConfig() {
 	const configFile = Config.get('api-mesh.configPath');
 
 	if (!configFile) {
@@ -170,7 +170,7 @@ async function initSdk() {
 
 	logger.info('Initialized user login and the selected organization');
 
-	const { baseUrl, accessToken, apiKey } = await getCommerceAdminConfig();
+	const { baseUrl, accessToken, apiKey } = await getDevConsoleConfig();
 
 	const schemaServiceClient = new SchemaServiceClient();
 	schemaServiceClient.init(baseUrl, accessToken, apiKey);
@@ -191,7 +191,7 @@ async function initRequestId() {
 }
 
 module.exports = {
-	getCommerceAdminConfig,
+	getDevConsoleConfig,
 	initSdk,
 	initRequestId,
 };
