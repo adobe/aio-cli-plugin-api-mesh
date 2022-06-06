@@ -13,7 +13,7 @@ pipeline{
         HOME = "$WORKSPACE"
         TMPDIR = "$WORKSPACE"
         DEVELOP_BRANCH = 'develop'
-        GIT_REPO = 'git@github.com:adobe/aio-cli-plugin-commerce-admin.git'
+        GIT_REPO = 'git@github.com:adobe/aio-cli-plugin-api-mesh.git'
         CHECKOUTBRANCH = "${env.BRANCH_NAME == 'master' ? env.DEVELOP_BRANCH : params.GIT_BRANCH}"
         VAULT_CREDENTIALS = 'cgvault'
     }

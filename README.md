@@ -4,13 +4,13 @@ Prerequisites: [node.js](https://nodejs.org/en/), [aio-cli](https://github.com/a
 To install a revision from this repository:
 
 ```
-$ aio plugins:install @adobe/aio-cli-plugin-commerce-admin
+$ aio plugins:install @adobe/aio-cli-plugin-api-mesh
 ```
 
 To install globally from a released npm package:
 
 ```
-$ aio plugins:install -g @adobe/aio-cli-plugin-commerce-admin
+$ aio plugins:install -g @adobe/aio-cli-plugin-api-mesh
 ```
 
 To discover available aio packages:

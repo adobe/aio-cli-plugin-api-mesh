@@ -19,7 +19,7 @@ const { getCliEnv } = require('@adobe/aio-lib-env');
 const logger = require('../src/classes/logger');
 const { UUID } = require('./classes/UUID');
 const aioConsoleLogger = require('@adobe/aio-lib-core-logging')(
-	'@adobe/aio-cli-plugin-commerce-admin',
+	'@adobe/aio-cli-plugin-api-mesh',
 	{ provider: 'debug' },
 );
 
