@@ -11,8 +11,8 @@ governing permissions and limitations under the License.
 
 const { Command } = require('@oclif/command');
 const { writeFile } = require('fs/promises');
-const logger = require('../../../classes/logger');
-const { initSdk, initRequestId } = require('../../../helpers');
+const logger = require('../../classes/logger');
+const { initSdk, initRequestId } = require('../../helpers');
 
 require('dotenv').config();
 

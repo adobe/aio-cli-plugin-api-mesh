@@ -10,10 +10,10 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
+const mockConsoleCLIInstance = {};
+
 jest.mock('@adobe/aio-lib-env');
 jest.mock('@adobe/aio-cli-lib-console');
-
-const mockConsoleCLIInstance = {};
 
 const orgs = [{ id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' }];
 const selectedOrg = { id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' };
@@ -37,46 +37,40 @@ function setDefaultMockConsoleCLI() {
 	mockConsoleCLIInstance.getWorkspaces = jest.fn().mockResolvedValue(workspaces);
 	mockConsoleCLIInstance.promptForSelectWorkspace = jest.fn().mockResolvedValue(selectedWorkspace);
 }
-
 jest.mock('@adobe/aio-cli-lib-console', () => ({
 	init: jest.fn().mockResolvedValue(mockConsoleCLIInstance),
 	cleanStdOut: jest.fn(),
 }));
 jest.mock('@adobe/aio-lib-ims');
+const CreateCommand = require('../create');
+const { SchemaServiceClient } = require('../../../classes/SchemaServiceClient');
+const mockCreateMesh = require('../../__fixtures__/sample_mesh.json');
 
-const DeleteCommand = require('../delete');
-const { SchemaServiceClient } = require('../../../../classes/SchemaServiceClient');
-
-describe('delete command tests', () => {
+describe('create command tests', () => {
 	beforeEach(() => {
 		setDefaultMockConsoleCLI();
+		const response = mockCreateMesh;
+		jest.spyOn(SchemaServiceClient.prototype, 'createMesh').mockImplementation(data => response);
 	});
 
 	afterEach(() => {
 		jest.restoreAllMocks();
 	});
 
-	test('delete-mesh-missing-meshId', async () => {
-		const runResult = DeleteCommand.run([]);
-
-		return runResult.catch(err => {
-			expect(err).toHaveProperty(
-				'message',
-				expect.stringMatching(
-					/^Unable to delete mesh\. Please check the details and try again\. If the error persists please contact support\. RequestId: [a-z A-Z 0-9 -_]+/,
-				),
-			);
-		});
+	test('create-mesh-missing-file', async () => {
+		expect.assertions(2);
+		const runResult = CreateCommand.run([]);
+		await expect(runResult instanceof Promise).toBeTruthy();
+		await expect(runResult).rejects.toEqual(
+			new Error(
+				'Unable to read the mesh configuration file provided. Please check the file and try again.',
+			),
+		);
 	});
-
-	test('delete-mesh-with-meshId', async () => {
-		jest
-			.spyOn(SchemaServiceClient.prototype, 'deleteMesh')
-			.mockImplementation(() => Promise.resolve({}));
-		expect.assertions(1);
-		const meshId = 'sample_merchant';
-		const runResult = DeleteCommand.run([meshId]);
-
-		await expect(runResult).resolves.toEqual({});
+	test('create-mesh-with-configuration', async () => {
+		expect.assertions(2);
+		const runResult = CreateCommand.run(['src/commands/__fixtures__/sample_mesh.json']);
+		await expect(runResult instanceof Promise).toBeTruthy();
+		await expect(runResult).resolves.toEqual(mockCreateMesh);
 	});
 });

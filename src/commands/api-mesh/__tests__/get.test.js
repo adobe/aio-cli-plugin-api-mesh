@@ -11,10 +11,8 @@ governing permissions and limitations under the License.
 */
 
 const mockConsoleCLIInstance = {};
-
 jest.mock('@adobe/aio-lib-env');
 jest.mock('@adobe/aio-cli-lib-console');
-
 const orgs = [{ id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' }];
 const selectedOrg = { id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' };
 
@@ -37,40 +35,42 @@ function setDefaultMockConsoleCLI() {
 	mockConsoleCLIInstance.getWorkspaces = jest.fn().mockResolvedValue(workspaces);
 	mockConsoleCLIInstance.promptForSelectWorkspace = jest.fn().mockResolvedValue(selectedWorkspace);
 }
+
 jest.mock('@adobe/aio-cli-lib-console', () => ({
 	init: jest.fn().mockResolvedValue(mockConsoleCLIInstance),
 	cleanStdOut: jest.fn(),
 }));
 jest.mock('@adobe/aio-lib-ims');
-const CreateCommand = require('../create');
-const { SchemaServiceClient } = require('../../../../classes/SchemaServiceClient');
-const mockCreateMesh = require('../../../__fixtures__/sample_mesh.json');
+const GetCommand = require('../get');
+const { SchemaServiceClient } = require('../../../classes/SchemaServiceClient');
+const mockGetMesh = require('../../__fixtures__/sample_mesh.json');
 
-describe('create command tests', () => {
+describe('get command tests', () => {
 	beforeEach(() => {
 		setDefaultMockConsoleCLI();
-		const response = mockCreateMesh;
-		jest.spyOn(SchemaServiceClient.prototype, 'createMesh').mockImplementation(data => response);
 	});
-
 	afterEach(() => {
 		jest.restoreAllMocks();
 	});
 
-	test('create-mesh-missing-file', async () => {
-		expect.assertions(2);
-		const runResult = CreateCommand.run([]);
-		await expect(runResult instanceof Promise).toBeTruthy();
-		await expect(runResult).rejects.toEqual(
-			new Error(
-				'Unable to read the mesh configuration file provided. Please check the file and try again.',
-			),
-		);
+	test('get-mesh-missing-meshId', async () => {
+		const runResult = GetCommand.run([]);
+
+		return runResult.catch(err => {
+			expect(err).toHaveProperty(
+				'message',
+				expect.stringMatching(
+					/^Unable to get mesh\. Please check the details and try again\. If the error persists please contact support\. RequestId: [a-z A-Z 0-9 -_]+/,
+				),
+			);
+		});
 	});
-	test('create-mesh-with-configuration', async () => {
-		expect.assertions(2);
-		const runResult = CreateCommand.run(['src/commands/__fixtures__/sample_mesh.json']);
-		await expect(runResult instanceof Promise).toBeTruthy();
-		await expect(runResult).resolves.toEqual(mockCreateMesh);
+
+	test('get-mesh-with-meshId', async () => {
+		jest.spyOn(SchemaServiceClient.prototype, 'getMesh').mockImplementation(meshId => mockGetMesh);
+		expect.assertions(1);
+		const meshId = 'sample_merchant';
+		const runResult = GetCommand.run([meshId]);
+		await expect(runResult).resolves.toEqual(mockGetMesh);
 	});
 });

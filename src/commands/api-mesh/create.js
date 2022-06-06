@@ -11,8 +11,8 @@ governing permissions and limitations under the License.
 
 const { Command } = require('@oclif/command');
 const { readFile } = require('fs/promises');
-const { initSdk, initRequestId } = require('../../../helpers');
-const logger = require('../../../classes/logger');
+const { initSdk, initRequestId } = require('../../helpers');
+const logger = require('../../classes/logger');
 
 class CreateCommand extends Command {
 	static args = [{ name: 'file' }];

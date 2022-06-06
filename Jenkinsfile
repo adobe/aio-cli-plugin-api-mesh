@@ -44,7 +44,7 @@ pipeline{
                                     ]) {
                                 writeFile file: 'config.json', text: "${env.AIO_CONFIG}"
                             }
-                            sh 'aio config:set mesh-api-manager.configPath config.json'
+                            sh 'aio config:set api-mesh.configPath config.json'
                         }
                     }
                 }
