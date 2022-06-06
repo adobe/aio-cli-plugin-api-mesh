@@ -9,20 +9,23 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const execa = require('execa')
-const chalk = require('chalk')
-const { stdout } = require('stdout-stderr')
-const fs = require('fs')
+const execa = require('execa');
+const chalk = require('chalk');
+const { stdout } = require('stdout-stderr');
+const fs = require('fs');
+const logger = require('../src/classes/logger');
 
-stdout.print = true
+stdout.print = true;
 
 test('boilerplate help test', async () => {
-  const packagejson = JSON.parse(fs.readFileSync('package.json').toString())
-  const name = `${packagejson.name}`
-  console.log(chalk.blue(`> e2e tests for ${chalk.bold(name)}`))
+	const packagejson = JSON.parse(fs.readFileSync('package.json').toString());
+	const name = `${packagejson.name}`;
+	logger.info(chalk.blue(`> e2e tests for ${chalk.bold(name)}`));
 
-  console.log(chalk.dim('    - boilerplate help ..'))
-  expect(() => { execa.sync('./bin/run', ['--help'], { stderr: 'inherit' }) }).not.toThrow()
+	logger.info(chalk.dim('    - boilerplate help ..'));
+	expect(() => {
+		execa.sync('./bin/run', ['--help'], { stderr: 'inherit' });
+	}).not.toThrow();
 
-  console.log(chalk.green(`    - done for ${chalk.bold(name)}`))
-})
+	logger.info(chalk.green(`    - done for ${chalk.bold(name)}`));
+});

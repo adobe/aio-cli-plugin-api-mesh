@@ -10,21 +10,21 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const IndexCommand = require('../../../src/commands/PLUGINNAME')
+const IndexCommand = require('..');
 
 test('exports', async () => {
-  expect(typeof IndexCommand).toEqual('function')
-})
+	expect(typeof IndexCommand).toEqual('function');
+});
 
 describe('command tests', () => {
-  let command
+	let command;
 
-  beforeEach(() => {
-    command = new IndexCommand([])
-  })
+	beforeEach(() => {
+		command = new IndexCommand([]);
+	});
 
-  test('run', async () => {
-    command.argv = []
-    await expect(command.run()).resolves.not.toThrowError()
-  })
-})
+	test('run', async () => {
+		command.argv = [];
+		await expect(command.run()).resolves.not.toThrowError();
+	});
+});

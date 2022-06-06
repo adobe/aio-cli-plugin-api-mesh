@@ -1,12 +1,25 @@
 {
-    "extends": "@adobe/eslint-config-aio-lib-config",
-    "settings": {
-        "jsdoc": {
-          "ignorePrivate": true
-        }
-    },
-    "parser": "@babel/eslint-parser",
-    "parserOptions": {
-        "requireConfigFile": false
-    }
+	"settings": {
+		"jsdoc": {
+			"ignorePrivate": true
+		}
+	},
+	"parser": "@babel/eslint-parser",
+	"parserOptions": {
+		"requireConfigFile": false
+	},
+	"env": {
+		"node": true,
+		"es6": true
+	},
+	"extends": [
+		"eslint:recommended",
+		"@adobe/eslint-config-aio-lib-config",
+		"plugin:prettier/recommended"
+	],
+	"plugins": ["prettier"],
+	"rules": {
+		"no-console": ["warn"],
+		"prettier/prettier": "error"
+	}
 }

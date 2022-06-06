@@ -4,13 +4,13 @@ Prerequisites: [node.js](https://nodejs.org/en/), [aio-cli](https://github.com/a
 To install a revision from this repository:
 
 ```
-$ aio plugins:install @adobe/aio-cli-plugin-commerce-admin
+$ aio plugins:install @adobe/aio-cli-plugin-api-mesh
 ```
 
 To install globally from a released npm package:
 
 ```
-$ aio plugins:install -g @adobe/aio-cli-plugin-commerce-admin
+$ aio plugins:install -g @adobe/aio-cli-plugin-api-mesh
 ```
 
 To discover available aio packages:
@@ -41,13 +41,15 @@ create a config.json file with the following parameters
 Perform the following command to update the configuration
 
 ```
-aio config:set aio-cli-plugin-commerce-admin <path_to_json_file>
+aio config:set api-mesh.configPath <path_to_json_file>
 ```
 
 # Commands
 
 ```
-aio commerce-gateway:tenant:create BODYJSONFILE
-aio commerce-gateway:tenant:update tenantid BODYJSONFILE
-aio commerce-gateway:tenant:get tenantid
+aio api-mesh:get meshId
+aio api-mesh:get meshId PATH_OF_FILE_TO_DOWNLOAD_INTO
+aio api-mesh:create PATH_OF_MESH_CONFIG_JSON_FILE
+aio api-mesh:update meshId PATH_OF_MESH_CONFIG_JSON_FILE
+aio api-mesh:delete meshId
 ```

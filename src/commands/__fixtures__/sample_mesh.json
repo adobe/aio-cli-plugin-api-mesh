@@ -1,0 +1,14 @@
+{
+	"meshConfig": {
+		"sources": [
+			{
+				"name": "<api_name>",
+				"handler": {
+					"graphql": {
+						"endpoint": "<gql_endpoint>"
+					}
+				}
+			}
+		]
+	}
+}
