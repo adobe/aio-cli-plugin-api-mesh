@@ -24,7 +24,7 @@ $ aio discover -i
 Install project dependencies. `npm install`
 
 ```
-aio plugins:link commerce-gateway/tenant
+aio plugins:link api-mesh
 ```
 
 ### Configuration
