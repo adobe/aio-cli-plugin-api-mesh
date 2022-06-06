@@ -10,44 +10,56 @@ governing permissions and limitations under the License.
 */
 
 const { Command } = require('@oclif/command');
-const logger = require('../../../classes/logger');
-const { initSdk, initRequestId } = require('../../../helpers');
+const { readFile } = require('fs/promises');
+const logger = require('../../classes/logger');
+const { initSdk, initRequestId } = require('../../helpers');
 
-require('dotenv').config();
-
-class DeleteCommand extends Command {
-	static args = [{ name: 'meshId' }];
+class UpdateCommand extends Command {
+	static args = [{ name: 'meshId' }, { name: 'file' }];
 
 	async run() {
 		await initRequestId();
 
 		logger.info(`RequestId: ${global.requestId}`);
 
-		const { args } = this.parse(DeleteCommand);
+		const { args } = this.parse(UpdateCommand);
 
 		const { schemaServiceClient, imsOrgId, projectId, workspaceId } = await initSdk();
+		let data;
 
 		try {
-			const response = await schemaServiceClient.deleteMesh(
+			data = JSON.parse(await readFile(args.file, 'utf8'));
+		} catch (error) {
+			logger.error(error);
+
+			this.log(error.message);
+			this.error(
+				'Unable to read the mesh configuration file provided. Please check the file and try again.',
+			);
+		}
+
+		try {
+			const response = await schemaServiceClient.updateMesh(
 				imsOrgId,
 				projectId,
 				workspaceId,
 				args.meshId,
+				data,
 			);
 
-			this.log('Successfully deleted mesh %s', args.meshId);
+			this.log('Successfully updated the mesh with the id: %s', args.meshId);
 
 			return response;
 		} catch (error) {
 			this.log(error.message);
 
 			this.error(
-				`Unable to delete mesh. Please check the details and try again. If the error persists please contact support. RequestId: ${global.requestId}`,
+				`Unable to update the mesh. Please check the mesh configuration file and try again. If the error persists please contact support. RequestId: ${global.requestId}`,
 			);
 		}
 	}
 }
 
-DeleteCommand.description = 'Delete the config of a given mesh';
+UpdateCommand.description = 'Update a mesh with the given config.';
 
-module.exports = DeleteCommand;
+module.exports = UpdateCommand;

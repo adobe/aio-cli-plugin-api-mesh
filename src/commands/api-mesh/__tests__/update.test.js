@@ -41,8 +41,8 @@ jest.mock('@adobe/aio-cli-lib-console', () => ({
 }));
 jest.mock('@adobe/aio-lib-ims');
 const UpdateCommand = require('../update');
-const { SchemaServiceClient } = require('../../../../classes/SchemaServiceClient');
-const mockUpdateMesh = require('../../../__fixtures__/sample_mesh.json');
+const { SchemaServiceClient } = require('../../../classes/SchemaServiceClient');
+const mockUpdateMesh = require('../../__fixtures__/sample_mesh.json');
 
 describe('update command tests', () => {
 	beforeEach(() => {

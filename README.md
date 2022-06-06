@@ -41,15 +41,15 @@ create a config.json file with the following parameters
 Perform the following command to update the configuration
 
 ```
-aio config:set mesh-api-manager.configPath <path_to_json_file>
+aio config:set api-mesh.configPath <path_to_json_file>
 ```
 
 # Commands
 
 ```
-aio api-manager:mesh:get meshId
-aio api-manager:mesh:get meshId PATH_OF_FILE_TO_DOWNLOAD_INTO
-aio api-manager:mesh:create PATH_OF_MESH_CONFIG_JSON_FILE
-aio api-manager:mesh:update meshId PATH_OF_MESH_CONFIG_JSON_FILE
-aio api-manager:mesh:delete meshId
+aio api-mesh:get meshId
+aio api-mesh:get meshId PATH_OF_FILE_TO_DOWNLOAD_INTO
+aio api-mesh:create PATH_OF_MESH_CONFIG_JSON_FILE
+aio api-mesh:update meshId PATH_OF_MESH_CONFIG_JSON_FILE
+aio api-mesh:delete meshId
 ```
