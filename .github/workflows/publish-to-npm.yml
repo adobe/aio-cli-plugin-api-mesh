@@ -2,10 +2,10 @@ name: publish-to-npm
 on:
     push:
         branches:
-            - master # Change this if not your default branch
+            - main # Change this if not your default branch
 jobs:
     publish:
-        if: github.repository == 'adobe/aio-cli-plugin-commerce-admin'
+        if: github.repository == 'adobe/aio-cli-plugin-api-mesh'
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v2

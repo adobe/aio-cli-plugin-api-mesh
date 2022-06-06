@@ -1,6 +1,6 @@
 {
-  "name": "@adobe/aio-cli-plugin-commerce-admin",
-  "version": "0.0.5",
+  "name": "@adobe/aio-cli-plugin-api-mesh",
+  "version": "1.0.0-beta",
   "publishConfig": {
     "access": "public"
   },
@@ -90,11 +90,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/adobe/aio-cli-plugin-commerce-admin"
+    "url": "https://github.com/adobe/aio-cli-plugin-api-mesh"
   },
   "author": "Adobe Inc.",
   "bugs": {
-    "url": "https://github.com/adobe/aio-cli-plugin-commerce-admin/issues"
+    "url": "https://github.com/adobe/aio-cli-plugin-api-mesh/issues"
   },
-  "homepage": "https://www.npmjs.com/package/@adobe/aio-cli-plugin-commerce-admin"
+  "homepage": "https://www.npmjs.com/package/@adobe/aio-cli-plugin-api-mesh"
 }
