@@ -10,6 +10,8 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
+const inquirer = require('inquirer');
+
 const mockConsoleCLIInstance = {};
 jest.mock('@adobe/aio-lib-env');
 const orgs = [{ id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' }];
@@ -35,11 +37,20 @@ function setDefaultMockConsoleCLI() {
 	mockConsoleCLIInstance.promptForSelectWorkspace = jest.fn().mockResolvedValue(selectedWorkspace);
 }
 
+jest.mock('inquirer', () => ({
+	createPromptModule: jest.fn().mockReturnValue(
+		jest.fn().mockResolvedValue({
+			res: true,
+		}),
+	),
+}));
+
 jest.mock('@adobe/aio-cli-lib-console', () => ({
 	init: jest.fn().mockResolvedValue(mockConsoleCLIInstance),
 	cleanStdOut: jest.fn(),
 }));
 jest.mock('@adobe/aio-lib-ims');
+
 const UpdateCommand = require('../update');
 const { SchemaServiceClient } = require('../../../classes/SchemaServiceClient');
 const mockUpdateMesh = require('../../__fixtures__/sample_mesh.json');
@@ -65,6 +76,7 @@ describe('update command tests', () => {
 			),
 		);
 	});
+
 	test('update-mesh-with-configuration', async () => {
 		expect.assertions(2);
 		const runResult = UpdateCommand.run([
@@ -73,5 +85,20 @@ describe('update command tests', () => {
 		]);
 		await expect(runResult instanceof Promise).toBeTruthy();
 		await expect(runResult).resolves.toEqual(mockUpdateMesh);
+	});
+
+	test('should not delete if user prompt returns false', async () => {
+		inquirer.createPromptModule.mockReturnValue(
+			jest.fn().mockResolvedValue({
+				res: false,
+			}),
+		);
+
+		const runResult = await UpdateCommand.run([
+			'sample_merchant',
+			'src/commands/__fixtures__/sample_mesh.json',
+		]);
+
+		expect(runResult).toBe('Update cancelled');
 	});
 });
