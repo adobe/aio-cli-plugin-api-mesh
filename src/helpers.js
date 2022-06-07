@@ -209,6 +209,7 @@ async function promptConfirm(message) {
 			message,
 		},
 	]);
+
 	return confirm.res;
 }
 

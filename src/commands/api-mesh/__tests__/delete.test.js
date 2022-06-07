@@ -13,6 +13,8 @@ governing permissions and limitations under the License.
 jest.mock('@adobe/aio-lib-env');
 jest.mock('@adobe/aio-cli-lib-console');
 
+const inquirer = require('inquirer');
+
 const mockConsoleCLIInstance = {};
 
 const orgs = [{ id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' }];
@@ -42,7 +44,16 @@ jest.mock('@adobe/aio-cli-lib-console', () => ({
 	init: jest.fn().mockResolvedValue(mockConsoleCLIInstance),
 	cleanStdOut: jest.fn(),
 }));
+
 jest.mock('@adobe/aio-lib-ims');
+
+jest.mock('inquirer', () => ({
+	createPromptModule: jest.fn().mockReturnValue(
+		jest.fn().mockResolvedValue({
+			res: true,
+		}),
+	),
+}));
 
 const DeleteCommand = require('../delete');
 const { SchemaServiceClient } = require('../../../classes/SchemaServiceClient');
@@ -78,5 +89,18 @@ describe('delete command tests', () => {
 		const runResult = DeleteCommand.run([meshId]);
 
 		await expect(runResult).resolves.toEqual({});
+	});
+
+	test('should not delete if user prompt returns false', async () => {
+		inquirer.createPromptModule.mockReturnValue(
+			jest.fn().mockResolvedValue({
+				res: false,
+			}),
+		);
+
+		const meshId = 'sample_merchant';
+		const runResult = await DeleteCommand.run([meshId]);
+
+		expect(runResult).toBe('Delete cancelled');
 	});
 });

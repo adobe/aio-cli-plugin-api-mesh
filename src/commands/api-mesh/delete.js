@@ -53,6 +53,8 @@ class DeleteCommand extends Command {
 			}
 		} else {
 			this.log('Delete cancelled');
+
+			return 'Delete cancelled';
 		}
 	}
 }

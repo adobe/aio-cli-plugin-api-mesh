@@ -39,12 +39,12 @@ class UpdateCommand extends Command {
 			);
 		}
 
-		try {
-			const shouldContinue = await promptConfirm(
-				`Are you sure you want to update the mesh: ${args.meshId}?`,
-			);
+		const shouldContinue = await promptConfirm(
+			`Are you sure you want to update the mesh: ${args.meshId}?`,
+		);
 
-			if (shouldContinue) {
+		if (shouldContinue) {
+			try {
 				const response = await schemaServiceClient.updateMesh(
 					imsOrgId,
 					projectId,
@@ -56,17 +56,17 @@ class UpdateCommand extends Command {
 				this.log('Successfully updated the mesh with the id: %s', args.meshId);
 
 				return response;
-			} else {
-				this.log('Update cancelled');
+			} catch (error) {
+				this.log(error.message);
 
-				return;
+				this.error(
+					`Unable to update the mesh. Please check the mesh configuration file and try again. If the error persists please contact support. RequestId: ${global.requestId}`,
+				);
 			}
-		} catch (error) {
-			this.log(error.message);
+		} else {
+			this.log('Update cancelled');
 
-			this.error(
-				`Unable to update the mesh. Please check the mesh configuration file and try again. If the error persists please contact support. RequestId: ${global.requestId}`,
-			);
+			return 'Update cancelled';
 		}
 	}
 }
