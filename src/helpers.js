@@ -9,19 +9,21 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
+const fs = require('fs');
+const inquirer = require('inquirer');
+
 const Config = require('@adobe/aio-lib-core-config');
 const { getToken, context } = require('@adobe/aio-lib-ims');
 const { CLI } = require('@adobe/aio-lib-ims/src/context');
-const fs = require('fs');
 const libConsoleCLI = require('@adobe/aio-cli-lib-console');
-const { SchemaServiceClient } = require('./classes/SchemaServiceClient');
 const { getCliEnv } = require('@adobe/aio-lib-env');
+const aioConsoleLogger = require('@adobe/aio-lib-core-logging')('@adobe/aio-cli-plugin-api-mesh', {
+	provider: 'debug',
+});
+
+const { SchemaServiceClient } = require('./classes/SchemaServiceClient');
 const logger = require('../src/classes/logger');
 const { UUID } = require('./classes/UUID');
-const aioConsoleLogger = require('@adobe/aio-lib-core-logging')(
-	'@adobe/aio-cli-plugin-api-mesh',
-	{ provider: 'debug' },
-);
 
 const CONSOLE_API_KEYS = {
 	prod: 'aio-cli-console-auth',
@@ -190,7 +192,29 @@ async function initRequestId() {
 	global.requestId = UUID.newUuid().toString();
 }
 
+/**
+ * Function to run the CLI Y/N prompt to confirm the user's action
+ *
+ * @param {string} message
+ *
+ * @returns boolean
+ */
+async function promptConfirm(message) {
+	const prompt = inquirer.createPromptModule({ output: process.stderr });
+
+	const confirm = await prompt([
+		{
+			type: 'confirm',
+			name: 'res',
+			message,
+		},
+	]);
+	return confirm.res;
+}
+
 module.exports = {
+	promptConfirm,
+	getLibConsoleCLI,
 	getDevConsoleConfig,
 	initSdk,
 	initRequestId,
