@@ -11,8 +11,9 @@ governing permissions and limitations under the License.
 
 const { Command } = require('@oclif/command');
 const { readFile } = require('fs/promises');
+
 const logger = require('../../classes/logger');
-const { initSdk, initRequestId } = require('../../helpers');
+const { initSdk, initRequestId, promptConfirm } = require('../../helpers');
 
 class UpdateCommand extends Command {
 	static args = [{ name: 'meshId' }, { name: 'file' }];
@@ -39,17 +40,27 @@ class UpdateCommand extends Command {
 		}
 
 		try {
-			const response = await schemaServiceClient.updateMesh(
-				imsOrgId,
-				projectId,
-				workspaceId,
-				args.meshId,
-				data,
+			const confirm = await promptConfirm(
+				`Are you sure you want to update the mesh: ${args.meshId}?`,
 			);
 
-			this.log('Successfully updated the mesh with the id: %s', args.meshId);
+			if (confirm) {
+				const response = await schemaServiceClient.updateMesh(
+					imsOrgId,
+					projectId,
+					workspaceId,
+					args.meshId,
+					data,
+				);
 
-			return response;
+				this.log('Successfully updated the mesh with the id: %s', args.meshId);
+
+				return response;
+			} else {
+				this.log('Update cancelled');
+
+				return;
+			}
 		} catch (error) {
 			this.log(error.message);
 
