@@ -40,11 +40,11 @@ class UpdateCommand extends Command {
 		}
 
 		try {
-			const confirm = await promptConfirm(
+			const shouldContinue = await promptConfirm(
 				`Are you sure you want to update the mesh: ${args.meshId}?`,
 			);
 
-			if (confirm) {
+			if (shouldContinue) {
 				const response = await schemaServiceClient.updateMesh(
 					imsOrgId,
 					projectId,
