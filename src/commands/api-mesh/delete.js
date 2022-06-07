@@ -10,8 +10,9 @@ governing permissions and limitations under the License.
 */
 
 const { Command } = require('@oclif/command');
+
 const logger = require('../../classes/logger');
-const { initSdk, initRequestId } = require('../../helpers');
+const { initSdk, initRequestId, promptConfirm } = require('../../helpers');
 
 require('dotenv').config();
 
@@ -27,23 +28,31 @@ class DeleteCommand extends Command {
 
 		const { schemaServiceClient, imsOrgId, projectId, workspaceId } = await initSdk();
 
-		try {
-			const response = await schemaServiceClient.deleteMesh(
-				imsOrgId,
-				projectId,
-				workspaceId,
-				args.meshId,
-			);
+		const shouldContinue = await promptConfirm(
+			`Are you sure you want to delete the mesh: ${args.meshId}?`,
+		);
 
-			this.log('Successfully deleted mesh %s', args.meshId);
+		if (shouldContinue) {
+			try {
+				const response = await schemaServiceClient.deleteMesh(
+					imsOrgId,
+					projectId,
+					workspaceId,
+					args.meshId,
+				);
 
-			return response;
-		} catch (error) {
-			this.log(error.message);
+				this.log('Successfully deleted mesh %s', args.meshId);
 
-			this.error(
-				`Unable to delete mesh. Please check the details and try again. If the error persists please contact support. RequestId: ${global.requestId}`,
-			);
+				return response;
+			} catch (error) {
+				this.log(error.message);
+
+				this.error(
+					`Unable to delete mesh. Please check the details and try again. If the error persists please contact support. RequestId: ${global.requestId}`,
+				);
+			}
+		} else {
+			this.log('Delete cancelled');
 		}
 	}
 }
