@@ -11,8 +11,9 @@ governing permissions and limitations under the License.
 
 const { Command } = require('@oclif/command');
 const { readFile } = require('fs/promises');
+
 const logger = require('../../classes/logger');
-const { initSdk, initRequestId } = require('../../helpers');
+const { initSdk, initRequestId, promptConfirm } = require('../../helpers');
 
 class UpdateCommand extends Command {
 	static args = [{ name: 'meshId' }, { name: 'file' }];
@@ -38,24 +39,34 @@ class UpdateCommand extends Command {
 			);
 		}
 
-		try {
-			const response = await schemaServiceClient.updateMesh(
-				imsOrgId,
-				projectId,
-				workspaceId,
-				args.meshId,
-				data,
-			);
+		const shouldContinue = await promptConfirm(
+			`Are you sure you want to update the mesh: ${args.meshId}?`,
+		);
 
-			this.log('Successfully updated the mesh with the id: %s', args.meshId);
+		if (shouldContinue) {
+			try {
+				const response = await schemaServiceClient.updateMesh(
+					imsOrgId,
+					projectId,
+					workspaceId,
+					args.meshId,
+					data,
+				);
 
-			return response;
-		} catch (error) {
-			this.log(error.message);
+				this.log('Successfully updated the mesh with the id: %s', args.meshId);
 
-			this.error(
-				`Unable to update the mesh. Please check the mesh configuration file and try again. If the error persists please contact support. RequestId: ${global.requestId}`,
-			);
+				return response;
+			} catch (error) {
+				this.log(error.message);
+
+				this.error(
+					`Unable to update the mesh. Please check the mesh configuration file and try again. If the error persists please contact support. RequestId: ${global.requestId}`,
+				);
+			}
+		} else {
+			this.log('Update cancelled');
+
+			return 'Update cancelled';
 		}
 	}
 }
