@@ -62,7 +62,7 @@ describe('describe command tests', () => {
 			expect(err).toHaveProperty(
 				'message',
 				expect.stringMatching(
-					/^Unable to get mesh\. Please check the details and try again\. If the error persists please contact support\. RequestId: [a-z A-Z 0-9 -_]+/,
+					/^Unable to get mesh details\. Please check the details and try again\. If the error persists please contact support\. RequestId: [a-z A-Z 0-9 -_]+/,
 				),
 			);
 		});
