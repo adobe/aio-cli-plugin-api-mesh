@@ -47,6 +47,7 @@ aio config:set api-mesh.configPath <path_to_json_file>
 # Commands
 
 ```
+aio api-mesh:describe
 aio api-mesh:get meshId
 aio api-mesh:get meshId PATH_OF_FILE_TO_DOWNLOAD_INTO
 aio api-mesh:create PATH_OF_MESH_CONFIG_JSON_FILE
