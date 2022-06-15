@@ -70,10 +70,10 @@ describe('describe command tests', () => {
 
 	test('should return meshId if correct details are provided', async () => {
 		const meshId = 'sample-mesh-id';
-		jest.spyOn(SchemaServiceClient.prototype, 'describeMesh').mockImplementation(() => meshId);
+		jest.spyOn(SchemaServiceClient.prototype, 'describeMesh').mockResolvedValue({ meshId });
 
-		const runResult = DescribeCommand.run();
+		const runResult = await DescribeCommand.run();
 
-		await expect(runResult).resolves.toEqual(meshId);
+		await expect(runResult).toEqual({ meshId });
 	});
 });
