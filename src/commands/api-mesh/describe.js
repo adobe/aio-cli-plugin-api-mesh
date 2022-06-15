@@ -16,14 +16,10 @@ const { initSdk, initRequestId } = require('../../helpers');
 require('dotenv').config();
 
 class DescribeCommand extends Command {
-	static args = [{ name: 'meshId' }, { name: 'file' }];
-
 	async run() {
 		await initRequestId();
 
 		logger.info(`RequestId: ${global.requestId}`);
-
-		const { args } = this.parse(DescribeCommand);
 
 		const { schemaServiceClient, imsOrgId, projectId, workspaceId } = await initSdk();
 
@@ -34,9 +30,13 @@ class DescribeCommand extends Command {
 				const { meshId } = meshDetails;
 
 				if (meshId) {
-					this.log('Successfully retrieved mesh details %s', meshId);
+					this.log('Successfully retrieved mesh details \n');
+					this.log('Org ID: %s', imsOrgId);
+					this.log('Project ID: %s', projectId);
+					this.log('Workspace ID: %s', workspaceId);
+					this.log('Mesh ID: %s', meshId);
 
-					return meshId;
+					return meshDetails;
 				} else {
 					this.error(
 						`Unable to get mesh details. Please check the details and try again. RequestId: ${global.requestId}`,
@@ -50,7 +50,7 @@ class DescribeCommand extends Command {
 			this.log(error.message);
 
 			this.error(
-				`Unable to describe mesh. Please check the details and try again. If the error persists please contact support. RequestId: ${global.requestId}`,
+				`Unable to get mesh details. Please check the details and try again. If the error persists please contact support. RequestId: ${global.requestId}`,
 			);
 		}
 	}
