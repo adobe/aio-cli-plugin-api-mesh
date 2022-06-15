@@ -64,8 +64,8 @@ class SchemaServiceClient {
 				);
 			}
 		} catch (error) {
-			if (error.response.status === 404) {
-				// The request was made and the server responded with a 404 status code
+			if (error.response.status === 400) {
+				// The request was made and the server responded with a 400 status code
 				logger.error('Mesh not found');
 
 				return null;
