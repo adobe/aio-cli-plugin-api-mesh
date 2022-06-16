@@ -24,6 +24,12 @@ class CreateCommand extends Command {
 
 		const { args } = this.parse(CreateCommand);
 
+		if (!args.file) {
+			this.error('Missing file path. Run aio api-mesh create --help for more info.');
+
+			return;
+		}
+
 		const { schemaServiceClient, imsOrgId, projectId, workspaceId } = await initSdk();
 
 		let data;

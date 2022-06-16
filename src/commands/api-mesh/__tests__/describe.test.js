@@ -10,10 +10,9 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const inquirer = require('inquirer');
-
 const mockConsoleCLIInstance = {};
 jest.mock('@adobe/aio-lib-env');
+jest.mock('@adobe/aio-cli-lib-console');
 const orgs = [{ id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' }];
 const selectedOrg = { id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' };
 
@@ -37,77 +36,44 @@ function setDefaultMockConsoleCLI() {
 	mockConsoleCLIInstance.promptForSelectWorkspace = jest.fn().mockResolvedValue(selectedWorkspace);
 }
 
-jest.mock('inquirer', () => ({
-	createPromptModule: jest.fn().mockReturnValue(
-		jest.fn().mockResolvedValue({
-			res: true,
-		}),
-	),
-}));
-
 jest.mock('@adobe/aio-cli-lib-console', () => ({
 	init: jest.fn().mockResolvedValue(mockConsoleCLIInstance),
 	cleanStdOut: jest.fn(),
 }));
+
 jest.mock('@adobe/aio-lib-ims');
 
-const UpdateCommand = require('../update');
+const DescribeCommand = require('../describe');
 const { SchemaServiceClient } = require('../../../classes/SchemaServiceClient');
-const mockUpdateMesh = require('../../__fixtures__/sample_mesh.json');
 
-describe('update command tests', () => {
+describe('describe command tests', () => {
 	beforeEach(() => {
 		setDefaultMockConsoleCLI();
-		const response = mockUpdateMesh;
-		jest.spyOn(SchemaServiceClient.prototype, 'updateMesh').mockImplementation(data => response);
 	});
 
 	afterEach(() => {
 		jest.restoreAllMocks();
 	});
 
-	test('should fail if update file path is missing', async () => {
-		expect.assertions(2);
-		const runResult = UpdateCommand.run(['dummy_mesh_id']);
-		await expect(runResult instanceof Promise).toBeTruthy();
-		await expect(runResult).rejects.toEqual(
-			new Error('Missing required args. Run aio api-mesh update --help for more info.'),
-		);
+	test('should error if wrong details are provided', async () => {
+		const runResult = DescribeCommand.run([]);
+
+		return runResult.catch(err => {
+			expect(err).toHaveProperty(
+				'message',
+				expect.stringMatching(
+					/^Unable to get mesh details\. Please check the details and try again\. If the error persists please contact support\. RequestId: [a-z A-Z 0-9 -_]+/,
+				),
+			);
+		});
 	});
 
-	test('should fail if dummy file path is provided', async () => {
-		expect.assertions(2);
-		const runResult = UpdateCommand.run(['dummy_mesh_id', 'dummy_file_path']);
-		await expect(runResult instanceof Promise).toBeTruthy();
-		await expect(runResult).rejects.toEqual(
-			new Error(
-				'Unable to read the mesh configuration file provided. Please check the file and try again.',
-			),
-		);
-	});
+	test('should return meshId if correct details are provided', async () => {
+		const meshId = 'sample-mesh-id';
+		jest.spyOn(SchemaServiceClient.prototype, 'describeMesh').mockResolvedValue({ meshId });
 
-	test('should pass with valid args', async () => {
-		expect.assertions(2);
-		const runResult = UpdateCommand.run([
-			'sample_merchant',
-			'src/commands/__fixtures__/sample_mesh.json',
-		]);
-		await expect(runResult instanceof Promise).toBeTruthy();
-		await expect(runResult).resolves.toEqual(mockUpdateMesh);
-	});
+		const runResult = await DescribeCommand.run();
 
-	test('should not update if user prompt returns false', async () => {
-		inquirer.createPromptModule.mockReturnValue(
-			jest.fn().mockResolvedValue({
-				res: false,
-			}),
-		);
-
-		const runResult = await UpdateCommand.run([
-			'sample_merchant',
-			'src/commands/__fixtures__/sample_mesh.json',
-		]);
-
-		expect(runResult).toBe('Update cancelled');
+		await expect(runResult).toEqual({ meshId });
 	});
 });
