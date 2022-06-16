@@ -57,16 +57,15 @@ describe('create command tests', () => {
 		jest.restoreAllMocks();
 	});
 
-	test('create-mesh-missing-file', async () => {
+	test('should fail mesh id is missing', async () => {
 		expect.assertions(2);
 		const runResult = CreateCommand.run([]);
 		await expect(runResult instanceof Promise).toBeTruthy();
 		await expect(runResult).rejects.toEqual(
-			new Error(
-				'Unable to read the mesh configuration file provided. Please check the file and try again.',
-			),
+			new Error('Missing file path. Run aio api-mesh create --help for more info.'),
 		);
 	});
+
 	test('create-mesh-with-configuration', async () => {
 		expect.assertions(2);
 		const runResult = CreateCommand.run(['src/commands/__fixtures__/sample_mesh.json']);

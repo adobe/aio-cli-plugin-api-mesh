@@ -66,9 +66,18 @@ describe('update command tests', () => {
 		jest.restoreAllMocks();
 	});
 
-	test('update-mesh-missing-meshId-file', async () => {
+	test('should fail if update file path is missing', async () => {
 		expect.assertions(2);
-		const runResult = UpdateCommand.run([]);
+		const runResult = UpdateCommand.run(['dummy_mesh_id']);
+		await expect(runResult instanceof Promise).toBeTruthy();
+		await expect(runResult).rejects.toEqual(
+			new Error('Missing required args. Run aio api-mesh update --help for more info.'),
+		);
+	});
+
+	test('should fail if dummy file path is provided', async () => {
+		expect.assertions(2);
+		const runResult = UpdateCommand.run(['dummy_mesh_id', 'dummy_file_path']);
 		await expect(runResult instanceof Promise).toBeTruthy();
 		await expect(runResult).rejects.toEqual(
 			new Error(
@@ -77,7 +86,7 @@ describe('update command tests', () => {
 		);
 	});
 
-	test('update-mesh-with-configuration', async () => {
+	test('should pass with valid args', async () => {
 		expect.assertions(2);
 		const runResult = UpdateCommand.run([
 			'sample_merchant',
@@ -87,7 +96,7 @@ describe('update command tests', () => {
 		await expect(runResult).resolves.toEqual(mockUpdateMesh);
 	});
 
-	test('should not delete if user prompt returns false', async () => {
+	test('should not update if user prompt returns false', async () => {
 		inquirer.createPromptModule.mockReturnValue(
 			jest.fn().mockResolvedValue({
 				res: false,

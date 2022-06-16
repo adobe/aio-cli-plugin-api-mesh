@@ -25,6 +25,12 @@ class UpdateCommand extends Command {
 
 		const { args } = this.parse(UpdateCommand);
 
+		if (!args.meshId || !args.file) {
+			this.error('Missing required args. Run aio api-mesh update --help for more info.');
+
+			return;
+		}
+
 		const { schemaServiceClient, imsOrgId, projectId, workspaceId } = await initSdk();
 		let data;
 
