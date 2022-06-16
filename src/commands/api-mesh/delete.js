@@ -26,6 +26,12 @@ class DeleteCommand extends Command {
 
 		const { args } = this.parse(DeleteCommand);
 
+		if (!args.meshId) {
+			this.error('Missing Mesh ID. Run aio api-mesh delete --help for more info.');
+
+			return;
+		}
+
 		const { schemaServiceClient, imsOrgId, projectId, workspaceId } = await initSdk();
 
 		const shouldContinue = await promptConfirm(

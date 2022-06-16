@@ -25,6 +25,57 @@ class SchemaServiceClient {
 		this.apiKey = apiKey;
 	}
 
+	async describeMesh(organizationId, projectId, workspaceId) {
+		const config = {
+			method: 'get',
+			url: `${this.devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/describe?API_KEY=${this.apiKey}`,
+			headers: {
+				'Authorization': `Bearer ${this.accessToken}`,
+				'x-request-id': global.requestId,
+			},
+		};
+
+		logger.info(
+			'Initiating GET %s',
+			`${this.devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/describe?API_KEY=${this.apiKey}`,
+		);
+
+		try {
+			const response = await axios(config);
+
+			logger.info('Response from GET %s', response.status);
+
+			if (response && response.status === 200) {
+				logger.info(`Mesh Config : ${objToString(response, ['data'])}`);
+
+				return response.data;
+			} else {
+				// Non 200 response received
+				logger.error(
+					`Something went wrong: ${objToString(
+						response,
+						['data'],
+						'Unable to get mesh',
+					)}. Received ${response.status} response instead of 200`,
+				);
+
+				throw new Error(
+					`Something went wrong: ${objToString(response, ['data'], 'Unable to get mesh')}`,
+				);
+			}
+		} catch (error) {
+			if (error.response.status === 400) {
+				// The request was made and the server responded with a 400 status code
+				logger.error('Mesh not found');
+
+				return null;
+			} else {
+				// The request was made and the server responded with a different status code
+				logger.error('Error while describing mesh');
+			}
+		}
+	}
+
 	async getMesh(organizationId, projectId, workspaceId, meshId) {
 		const config = {
 			method: 'get',

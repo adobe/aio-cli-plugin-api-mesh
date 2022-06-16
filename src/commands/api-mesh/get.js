@@ -26,6 +26,12 @@ class GetCommand extends Command {
 
 		const { args } = this.parse(GetCommand);
 
+		if (!args.meshId) {
+			this.error('Missing Mesh ID. Run aio api-mesh get --help for more info.');
+
+			return;
+		}
+
 		const { schemaServiceClient, imsOrgId, projectId, workspaceId } = await initSdk();
 
 		try {

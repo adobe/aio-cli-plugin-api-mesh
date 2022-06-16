@@ -53,20 +53,18 @@ describe('get command tests', () => {
 		jest.restoreAllMocks();
 	});
 
-	test('get-mesh-missing-meshId', async () => {
+	test('should fail if mesh id is missing', async () => {
 		const runResult = GetCommand.run([]);
 
 		return runResult.catch(err => {
 			expect(err).toHaveProperty(
 				'message',
-				expect.stringMatching(
-					/^Unable to get mesh\. Please check the details and try again\. If the error persists please contact support\. RequestId: [a-z A-Z 0-9 -_]+/,
-				),
+				expect.stringMatching(/^Missing Mesh ID. Run aio api-mesh get --help for more info./),
 			);
 		});
 	});
 
-	test('get-mesh-with-meshId', async () => {
+	test('should pass if mesh id is provided', async () => {
 		jest.spyOn(SchemaServiceClient.prototype, 'getMesh').mockImplementation(meshId => mockGetMesh);
 		expect.assertions(1);
 		const meshId = 'sample_merchant';

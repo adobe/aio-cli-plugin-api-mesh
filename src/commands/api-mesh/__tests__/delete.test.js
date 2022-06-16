@@ -67,20 +67,18 @@ describe('delete command tests', () => {
 		jest.restoreAllMocks();
 	});
 
-	test('delete-mesh-missing-meshId', async () => {
+	test('should fail if mesh id is missing', async () => {
 		const runResult = DeleteCommand.run([]);
 
 		return runResult.catch(err => {
 			expect(err).toHaveProperty(
 				'message',
-				expect.stringMatching(
-					/^Unable to delete mesh\. Please check the details and try again\. If the error persists please contact support\. RequestId: [a-z A-Z 0-9 -_]+/,
-				),
+				expect.stringMatching(/^Missing Mesh ID. Run aio api-mesh delete --help for more info/),
 			);
 		});
 	});
 
-	test('delete-mesh-with-meshId', async () => {
+	test('should delete if correct args are provided', async () => {
 		jest
 			.spyOn(SchemaServiceClient.prototype, 'deleteMesh')
 			.mockImplementation(() => Promise.resolve({}));
