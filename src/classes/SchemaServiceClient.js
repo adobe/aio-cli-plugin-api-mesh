@@ -12,6 +12,9 @@ governing permissions and limitations under the License.
 const axios = require('axios');
 const logger = require('../classes/logger');
 const { objToString } = require('../utils');
+const aioConsoleLogger = require('@adobe/aio-lib-core-logging')('@adobe/aio-cli-plugin-api-mesh', {
+	provider: 'debug',
+});
 
 /**
  * This class provides methods to call Schema Management Service APIs.
@@ -178,11 +181,10 @@ class SchemaServiceClient {
 		try {
 			const response = await axios(config);
 
-			logger.info('Response from POST %s', response.status);
+			aioConsoleLogger.log('Response from POST %s', response.status);
 
 			if (response && response.status === 201) {
 				logger.info(`Mesh Config : ${objToString(response, ['data'])}`);
-
 				return response.data;
 			} else {
 				// Non 201 response received
@@ -408,6 +410,97 @@ class SchemaServiceClient {
 				);
 
 				throw new Error('Unable to delete mesh from Schema Management Service: %s', error.message);
+			}
+		}
+	}
+
+	async createAPIMeshCredentials(organizationId, projectId, workspaceId) {
+		const input = {
+			name: `Project ${Date.now()}K`,
+			description: `Project ${Date.now()}K`,
+			platform: 'apiKey',
+			domain: 'www.graph.adobe.io',
+		};
+		const credentialConfig = {
+			method: 'post',
+			url: `${this.devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/credentials/adobeid`,
+			headers: {
+				'Authorization': `Bearer ${this.accessToken}`,
+				'Content-Type': 'application/json',
+				'x-request-id': global.requestId,
+				'x-api-key': 'UDPWeb1',
+			},
+			data: JSON.stringify(input),
+		};
+		try {
+			const response = await axios(credentialConfig);
+			if (response && response.status === 200) {
+				aioConsoleLogger.log(`API Key credential  : ${objToString(response, ['data'])}`);
+
+				return response.data;
+			} else {
+				// Receive a non 200 response
+				aioConsoleLogger.error(
+					`Something went wrong: ${objToString(
+						response,
+						['data'],
+						'Unable to create credential',
+					)}. Received ${response.status} response instead of 200`,
+				);
+
+				throw new Error(response.data.message);
+			}
+		} catch (error) {
+			aioConsoleLogger.log('Response from Create Mesh Credential %s', error.response.status);
+			return null;
+		}
+	}
+
+	async subscribeCredentialToMeshService(organizationId, projectId, workspaceId, credentialId) {
+		const credentialType = 'adobeid';
+		const input = [
+			{
+				sdkCode: 'GraphQLServiceSDK',
+			},
+		];
+		const subscribeCredentialToService = {
+			method: 'put',
+			url: `${this.devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/credentials/${credentialType}/${credentialId}/services`,
+			headers: {
+				'Authorization': `Bearer ${this.accessToken}`,
+				'Content-Type': 'application/json',
+				'x-request-id': global.requestId,
+				'x-api-key': 'UDPWeb1',
+			},
+			data: JSON.stringify(input),
+		};
+		try {
+			const response = await axios(subscribeCredentialToService);
+			if (response && response.status === 200) {
+				aioConsoleLogger.log(
+					`SDK codes associated with credential  : ${objToString(response, ['data'])}`,
+				);
+
+				return response.data;
+			} else {
+				// Receive a non 200 response
+				logger.error(
+					`Something went wrong: ${objToString(
+						response,
+						['data'],
+						'Unable to create credential',
+					)}. Received ${response.status} response instead of 200`,
+				);
+
+				throw new Error(response.data.message);
+			}
+		} catch (error) {
+			aioConsoleLogger.log('Response from subscribe credential %s', error.response.status);
+
+			if (error.response.status === 404) {
+				// The request was made and the server responded with a 404 status code
+				logger.error('Credential not found');
+				return [];
 			}
 		}
 	}
