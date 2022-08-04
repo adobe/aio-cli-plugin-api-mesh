@@ -24,11 +24,9 @@ const aioConsoleLogger = require('@adobe/aio-lib-core-logging')('@adobe/aio-cli-
 const { SchemaServiceClient } = require('./classes/SchemaServiceClient');
 const logger = require('../src/classes/logger');
 const { UUID } = require('./classes/UUID');
+const CONSTANTS = require('./constants');
 
-const CONSOLE_API_KEYS = {
-	prod: 'aio-cli-console-auth',
-	stage: 'aio-cli-console-auth-stage',
-};
+const { DEV_CONSOLE_BASE_URL, DEV_CONSOLE_API_KEY, AIO_CLI_API_KEY } = CONSTANTS;
 
 /**
  * @returns {any} Returns a config object or null
@@ -38,9 +36,9 @@ async function getDevConsoleConfig() {
 
 	if (!configFile) {
 		return {
-			baseUrl: 'https://developers.adobe.io/console',
+			baseUrl: DEV_CONSOLE_BASE_URL,
 			accessToken: (await getLibConsoleCLI()).accessToken,
-			apiKey: 'adobe-graph-prod',
+			apiKey: DEV_CONSOLE_API_KEY,
 		};
 	} else {
 		try {
@@ -151,7 +149,7 @@ async function getLibConsoleCLI() {
 
 	const consoleCLI = await libConsoleCLI.init({
 		accessToken: accessToken,
-		apiKey: CONSOLE_API_KEYS[clientEnv],
+		apiKey: AIO_CLI_API_KEY,
 		env: clientEnv,
 	});
 
