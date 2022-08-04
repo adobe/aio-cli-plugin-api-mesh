@@ -68,7 +68,22 @@ class CreateCommand extends Command {
 						workspaceId,
 						adobeIdIntegrationsForWorkspace.id,
 					);
+
+					if (sdkList) {
+						this.log(
+							'Successfully subscribed API Key %s to API Mesh service',
+							adobeIdIntegrationsForWorkspace.apiKey,
+						);
+					} else {
+						this.log(
+							'Unable to subscribe API Key %s to API Mesh service',
+							adobeIdIntegrationsForWorkspace.apiKey,
+						);
+					}
+				} else {
+					this.log('Unable to create API Key');
 				}
+
 				return {
 					adobeIdIntegrationsForWorkspace,
 					sdkList,
