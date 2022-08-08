@@ -15,6 +15,8 @@ const { readFile } = require('fs/promises');
 const logger = require('../../classes/logger');
 const { initSdk, initRequestId, promptConfirm } = require('../../helpers');
 
+require('dotenv').config();
+
 class UpdateCommand extends Command {
 	static args = [{ name: 'meshId' }, { name: 'file' }];
 

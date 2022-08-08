@@ -49,11 +49,7 @@ const mockCreateAPIMeshCredentials = jest.fn().mockResolvedValue({
 	id: 'dummy_id',
 });
 
-const mockSubscribeCredentialToMeshService = jest.fn().mockResolvedValue([
-	{
-		service: 'dummy_service',
-	},
-]);
+const mockSubscribeCredentialToMeshService = jest.fn().mockResolvedValue(['dummy_service']);
 
 const mockSchemaServiceClient = {
 	createMesh: mockCreateMesh,
@@ -335,9 +331,7 @@ describe('create command tests', () => {
 		    "meshId": "dummy_mesh_id",
 		  },
 		  "sdkList": Array [
-		    Object {
-		      "service": "dummy_service",
-		    },
+		    "dummy_service",
 		  ],
 		}
 	`);

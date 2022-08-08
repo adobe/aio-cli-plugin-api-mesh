@@ -14,6 +14,8 @@ const { readFile } = require('fs/promises');
 const { initSdk, initRequestId } = require('../../helpers');
 const logger = require('../../classes/logger');
 
+require('dotenv').config();
+
 class CreateCommand extends Command {
 	static args = [{ name: 'file' }];
 
