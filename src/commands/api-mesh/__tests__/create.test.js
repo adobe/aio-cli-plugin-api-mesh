@@ -13,7 +13,6 @@ governing permissions and limitations under the License.
 const mockConsoleCLIInstance = {};
 
 const CreateCommand = require('../create');
-// const { SchemaServiceClient } = require('../../../classes/SchemaServiceClient');
 const sampleCreateMeshConfig = require('../../__fixtures__/sample_mesh.json');
 const { initSdk, initRequestId } = require('../../../helpers');
 
@@ -278,6 +277,42 @@ describe('create command tests', () => {
 		const runResult = await CreateCommand.run(['src/commands/__fixtures__/sample_mesh.json']);
 
 		expect(initRequestId).toHaveBeenCalled();
+		expect(mockCreateMesh.mock.calls[0]).toMatchInlineSnapshot(`
+		Array [
+		  "1234",
+		  "5678",
+		  "123456789",
+		  Object {
+		    "meshConfig": Object {
+		      "sources": Array [
+		        Object {
+		          "handler": Object {
+		            "graphql": Object {
+		              "endpoint": "<gql_endpoint>",
+		            },
+		          },
+		          "name": "<api_name>",
+		        },
+		      ],
+		    },
+		  },
+		]
+	`);
+		expect(mockCreateAPIMeshCredentials.mock.calls[0]).toMatchInlineSnapshot(`
+		Array [
+		  "1234",
+		  "5678",
+		  "123456789",
+		]
+	`);
+		expect(mockSubscribeCredentialToMeshService.mock.calls[0]).toMatchInlineSnapshot(`
+		Array [
+		  "1234",
+		  "5678",
+		  "123456789",
+		  "dummy_id",
+		]
+	`);
 		expect(runResult).toMatchInlineSnapshot(`
 		Object {
 		  "adobeIdIntegrationsForWorkspace": Object {
