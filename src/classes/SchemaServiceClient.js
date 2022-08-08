@@ -491,7 +491,7 @@ class SchemaServiceClient {
 		};
 		const credentialConfig = {
 			method: 'post',
-			url: `${this.devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/credentials/adobeid`,
+			url: `${this.devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/credentials/adobeId`,
 			headers: {
 				'Authorization': `Bearer ${this.accessToken}`,
 				'Content-Type': 'application/json',
