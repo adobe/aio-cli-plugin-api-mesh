@@ -419,15 +419,6 @@ class SchemaServiceClient {
 			logger.info('Response from DELETE %s', response.status);
 
 			if (response && response.status === 204) {
-				const credential = await this.getApiKeyCredential(organizationId, projectId, workspaceId);
-
-				await this.unsubscribeCredentialFromMeshService(
-					organizationId,
-					projectId,
-					workspaceId,
-					credential.id_integration,
-				);
-
 				return response;
 			} else {
 				// Non 204 response received

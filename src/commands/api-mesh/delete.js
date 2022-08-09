@@ -40,16 +40,43 @@ class DeleteCommand extends Command {
 
 		if (shouldContinue) {
 			try {
-				const response = await schemaServiceClient.deleteMesh(
+				const deleteMeshResponse = await schemaServiceClient.deleteMesh(
 					imsOrgId,
 					projectId,
 					workspaceId,
 					args.meshId,
 				);
 
-				this.log('Successfully deleted mesh %s', args.meshId);
+				if (deleteMeshResponse) {
+					this.log('Successfully deleted mesh %s', args.meshId);
 
-				return response;
+					const credential = await schemaServiceClient.getApiKeyCredential(
+						imsOrgId,
+						projectId,
+						workspaceId,
+					);
+
+					if (credential) {
+						const newSDKList = await schemaServiceClient.unsubscribeCredentialFromMeshService(
+							imsOrgId,
+							projectId,
+							workspaceId,
+							credential.id_integration,
+						);
+
+						if (newSDKList) {
+							this.log('Successfully unsubscribed API Key %s', credential.client_id);
+						} else {
+							this.log('Unable to unsubscribe API Key %s', credential.client_id);
+						}
+					} else {
+						this.log('No API Key found to unsubscribe');
+					}
+
+					return deleteMeshResponse;
+				} else {
+					throw new Error('Unable to delete mesh');
+				}
 			} catch (error) {
 				this.log(error.message);
 
