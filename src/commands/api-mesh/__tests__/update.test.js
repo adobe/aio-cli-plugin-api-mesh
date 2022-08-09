@@ -11,65 +11,74 @@ governing permissions and limitations under the License.
 */
 
 jest.mock('axios');
-const inquirer = require('inquirer');
-
-const mockConsoleCLIInstance = {};
+jest.mock('fs/promises');
 jest.mock('@adobe/aio-lib-env');
-const orgs = [{ id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' }];
-const selectedOrg = { id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' };
-
-const projects = [{ id: '5678', title: 'Project01' }];
-const selectedProject = { id: '5678', title: 'Project01' };
-
-const workspaces = [{ id: '123456789', title: 'Workspace01' }];
-const selectedWorkspace = { id: '123456789', title: 'Workspace01' };
-
-function setDefaultMockConsoleCLI() {
-	mockConsoleCLIInstance.getToken = jest.fn().mockReturnValue('test_token');
-	mockConsoleCLIInstance.getCliEnv = jest.fn().mockReturnValue('prod');
-
-	mockConsoleCLIInstance.getOrganizations = jest.fn().mockResolvedValue(orgs);
-	mockConsoleCLIInstance.promptForSelectOrganization = jest.fn().mockResolvedValue(selectedOrg);
-
-	mockConsoleCLIInstance.getProjects = jest.fn().mockResolvedValue(projects);
-	mockConsoleCLIInstance.promptForSelectProject = jest.fn().mockResolvedValue(selectedProject);
-
-	mockConsoleCLIInstance.getWorkspaces = jest.fn().mockResolvedValue(workspaces);
-	mockConsoleCLIInstance.promptForSelectWorkspace = jest.fn().mockResolvedValue(selectedWorkspace);
-}
-
-jest.mock('inquirer', () => ({
-	createPromptModule: jest.fn().mockReturnValue(
-		jest.fn().mockResolvedValue({
-			res: true,
-		}),
-	),
+jest.mock('../../../helpers', () => ({
+	initSdk: jest.fn().mockResolvedValue({}),
+	initRequestId: jest.fn().mockResolvedValue({}),
+	promptConfirm: jest.fn().mockResolvedValue(true),
 }));
-
 jest.mock('@adobe/aio-cli-lib-console', () => ({
 	init: jest.fn().mockResolvedValue(mockConsoleCLIInstance),
 	cleanStdOut: jest.fn(),
 }));
 jest.mock('@adobe/aio-lib-ims');
 
+const mockConsoleCLIInstance = {};
+
+const selectedOrg = { id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' };
+const selectedProject = { id: '5678', title: 'Project01' };
+const selectedWorkspace = { id: '123456789', title: 'Workspace01' };
+
+const { readFile } = require('fs/promises');
+
 const UpdateCommand = require('../update');
-const { SchemaServiceClient } = require('../../../classes/SchemaServiceClient');
-const mockUpdateMesh = require('../../__fixtures__/sample_mesh.json');
+const { initSdk, initRequestId, promptConfirm } = require('../../../helpers');
+
+const mockUpdateMesh = jest.fn().mockResolvedValue({ status: 'success' });
+
+const mockSchemaServiceClient = {
+	updateMesh: mockUpdateMesh,
+};
 
 let logSpy = null;
 let errorLogSpy = null;
 
 describe('update command tests', () => {
 	beforeEach(() => {
-		setDefaultMockConsoleCLI();
-		const response = mockUpdateMesh;
-		jest.spyOn(SchemaServiceClient.prototype, 'updateMesh').mockImplementation(data => response);
+		initSdk.mockResolvedValue({
+			schemaServiceClient: mockSchemaServiceClient,
+			imsOrgId: selectedOrg.id,
+			projectId: selectedProject.id,
+			workspaceId: selectedWorkspace.id,
+		});
+
+		global.requestId = 'dummy_request_id';
+
 		logSpy = jest.spyOn(UpdateCommand.prototype, 'log');
 		errorLogSpy = jest.spyOn(UpdateCommand.prototype, 'error');
+
+		readFile.mockResolvedValue(true);
 	});
 
 	afterEach(() => {
 		jest.restoreAllMocks();
+	});
+
+	test('should fail if mesh id is missing', async () => {
+		const runResult = UpdateCommand.run([]);
+
+		await expect(runResult).rejects.toEqual(
+			new Error('Missing required args. Run aio api-mesh update --help for more info.'),
+		);
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`Array []`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
+		Array [
+		  Array [
+		    "Missing required args. Run aio api-mesh update --help for more info.",
+		  ],
+		]
+	`);
 	});
 
 	test('should fail if update file path is missing', async () => {
@@ -89,6 +98,7 @@ describe('update command tests', () => {
 	});
 
 	test('should fail if dummy file path is provided', async () => {
+		readFile.mockRejectedValueOnce(new Error('File not found'));
 		const runResult = UpdateCommand.run(['dummy_mesh_id', 'dummy_file_path']);
 
 		await expect(runResult).rejects.toEqual(
@@ -99,7 +109,7 @@ describe('update command tests', () => {
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
 		Array [
 		  Array [
-		    "ENOENT: no such file or directory, open 'dummy_file_path'",
+		    "File not found",
 		  ],
 		]
 	`);
@@ -112,41 +122,62 @@ describe('update command tests', () => {
 	`);
 	});
 
-	test('should pass with valid args', async () => {
-		const runResult = UpdateCommand.run([
-			'sample_merchant',
-			'src/commands/__fixtures__/sample_mesh.json',
-		]);
+	test('should not update if user prompt returns false', async () => {
+		promptConfirm.mockResolvedValueOnce(false);
 
-		await expect(runResult).resolves.toEqual(mockUpdateMesh);
+		const runResult = await UpdateCommand.run(['sample_merchant', 'valid_mesh_path']);
+
+		expect(runResult).toMatchInlineSnapshot(`"Update cancelled"`);
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
 		Array [
 		  Array [
-		    "Successfully updated the mesh with the id: %s",
-		    "sample_merchant",
+		    "Update cancelled",
 		  ],
 		]
 	`);
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`Array []`);
 	});
 
-	test('should not update if user prompt returns false', async () => {
-		inquirer.createPromptModule.mockReturnValue(
-			jest.fn().mockResolvedValue({
-				res: false,
-			}),
+	test('should fail if updateMesh method failed', async () => {
+		mockUpdateMesh.mockRejectedValueOnce(new Error('dummy_error'));
+
+		const runResult = UpdateCommand.run(['sample_merchant', 'valid_mesh_path']);
+
+		await expect(runResult).rejects.toEqual(
+			new Error(
+				'Unable to update the mesh. Please check the mesh configuration file and try again. If the error persists please contact support. RequestId: dummy_request_id',
+			),
 		);
-
-		const runResult = await UpdateCommand.run([
-			'sample_merchant',
-			'src/commands/__fixtures__/sample_mesh.json',
-		]);
-
-		expect(runResult).toBe('Update cancelled');
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
 		Array [
 		  Array [
-		    "Update cancelled",
+		    "dummy_error",
+		  ],
+		]
+	`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
+		Array [
+		  Array [
+		    "Unable to update the mesh. Please check the mesh configuration file and try again. If the error persists please contact support. RequestId: dummy_request_id",
+		  ],
+		]
+	`);
+	});
+
+	test('should pass with valid args', async () => {
+		const runResult = await UpdateCommand.run(['sample_merchant', 'valid_mesh_path']);
+
+		expect(runResult).toMatchInlineSnapshot(`
+		Object {
+		  "status": "success",
+		}
+	`);
+		expect(initRequestId).toHaveBeenCalled();
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
+		Array [
+		  Array [
+		    "Successfully updated the mesh with the id: %s",
+		    "sample_merchant",
 		  ],
 		]
 	`);

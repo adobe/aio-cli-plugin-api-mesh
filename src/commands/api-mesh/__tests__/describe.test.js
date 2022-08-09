@@ -29,9 +29,7 @@ const DescribeCommand = require('../describe');
 const { initSdk, initRequestId } = require('../../../helpers');
 
 const selectedOrg = { id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' };
-
 const selectedProject = { id: '5678', title: 'Project01' };
-
 const selectedWorkspace = { id: '123456789', title: 'Workspace01' };
 
 const mockDescribeMesh = jest.fn().mockResolvedValue({
