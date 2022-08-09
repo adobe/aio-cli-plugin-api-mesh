@@ -10,6 +10,7 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
+jest.mock('axios');
 const inquirer = require('inquirer');
 
 const mockConsoleCLIInstance = {};
@@ -55,11 +56,16 @@ const UpdateCommand = require('../update');
 const { SchemaServiceClient } = require('../../../classes/SchemaServiceClient');
 const mockUpdateMesh = require('../../__fixtures__/sample_mesh.json');
 
+let logSpy = null;
+let errorLogSpy = null;
+
 describe('update command tests', () => {
 	beforeEach(() => {
 		setDefaultMockConsoleCLI();
 		const response = mockUpdateMesh;
 		jest.spyOn(SchemaServiceClient.prototype, 'updateMesh').mockImplementation(data => response);
+		logSpy = jest.spyOn(UpdateCommand.prototype, 'log');
+		errorLogSpy = jest.spyOn(UpdateCommand.prototype, 'error');
 	});
 
 	afterEach(() => {
@@ -67,33 +73,61 @@ describe('update command tests', () => {
 	});
 
 	test('should fail if update file path is missing', async () => {
-		expect.assertions(2);
 		const runResult = UpdateCommand.run(['dummy_mesh_id']);
-		await expect(runResult instanceof Promise).toBeTruthy();
+
 		await expect(runResult).rejects.toEqual(
 			new Error('Missing required args. Run aio api-mesh update --help for more info.'),
 		);
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`Array []`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
+		Array [
+		  Array [
+		    "Missing required args. Run aio api-mesh update --help for more info.",
+		  ],
+		]
+	`);
 	});
 
 	test('should fail if dummy file path is provided', async () => {
-		expect.assertions(2);
 		const runResult = UpdateCommand.run(['dummy_mesh_id', 'dummy_file_path']);
-		await expect(runResult instanceof Promise).toBeTruthy();
+
 		await expect(runResult).rejects.toEqual(
 			new Error(
 				'Unable to read the mesh configuration file provided. Please check the file and try again.',
 			),
 		);
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
+		Array [
+		  Array [
+		    "ENOENT: no such file or directory, open 'dummy_file_path'",
+		  ],
+		]
+	`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
+		Array [
+		  Array [
+		    "Unable to read the mesh configuration file provided. Please check the file and try again.",
+		  ],
+		]
+	`);
 	});
 
 	test('should pass with valid args', async () => {
-		expect.assertions(2);
 		const runResult = UpdateCommand.run([
 			'sample_merchant',
 			'src/commands/__fixtures__/sample_mesh.json',
 		]);
-		await expect(runResult instanceof Promise).toBeTruthy();
+
 		await expect(runResult).resolves.toEqual(mockUpdateMesh);
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
+		Array [
+		  Array [
+		    "Successfully updated the mesh with the id: %s",
+		    "sample_merchant",
+		  ],
+		]
+	`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`Array []`);
 	});
 
 	test('should not update if user prompt returns false', async () => {
@@ -109,5 +143,13 @@ describe('update command tests', () => {
 		]);
 
 		expect(runResult).toBe('Update cancelled');
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
+		Array [
+		  Array [
+		    "Update cancelled",
+		  ],
+		]
+	`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`Array []`);
 	});
 });
