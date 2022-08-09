@@ -60,10 +60,10 @@ class SchemaServiceClient {
 							credential.integration_type === 'apikey' && credential.flow_type === 'adobeid',
 					);
 
-					logger.info(`API Key credential on the workspace : ${apiCred}`);
+					logger.info(`API Key credential on the workspace : ${objToString(apiCred)}`);
 
 					if (apiCred) {
-						return apiCred.client_id;
+						return apiCred;
 					} else {
 						logger.error('API Key credential not found on workspace');
 
@@ -117,9 +117,9 @@ class SchemaServiceClient {
 			if (response && response.status === 200) {
 				logger.info(`Mesh Config : ${objToString(response, ['data'])}`);
 
-				const apiKey = await this.getApiKeyCredential(organizationId, projectId, workspaceId);
+				const credential = await this.getApiKeyCredential(organizationId, projectId, workspaceId);
 
-				return { meshId: response.data.meshId, apiKey };
+				return { meshId: response.data.meshId, apiKey: credential.client_id };
 			} else {
 				// Non 200 response received
 				logger.error(
@@ -419,6 +419,15 @@ class SchemaServiceClient {
 			logger.info('Response from DELETE %s', response.status);
 
 			if (response && response.status === 204) {
+				const credential = await this.getApiKeyCredential(organizationId, projectId, workspaceId);
+
+				await this.unsubscribeCredentialFromMeshService(
+					organizationId,
+					projectId,
+					workspaceId,
+					credential.id_integration,
+				);
+
 				return response;
 			} else {
 				// Non 204 response received
@@ -562,27 +571,16 @@ class SchemaServiceClient {
 		}
 	}
 
-	async subscribeCredentialToMeshService(organizationId, projectId, workspaceId, credentialId) {
-		const credentialType = 'adobeid';
-
+	async subscribeCredentialToServices(
+		organizationId,
+		projectId,
+		workspaceId,
+		credentialType,
+		credentialId,
+		services,
+	) {
 		try {
-			const currentListOfServices = await this.getListOfCurrentServices(
-				organizationId,
-				credentialId,
-			);
-
-			if (!currentListOfServices) {
-				throw new Error('Unable to get list of current services');
-			}
-
-			if (currentListOfServices.includes('GraphQLServiceSDK')) {
-				logger.info('Service is already subscribed');
-
-				return currentListOfServices;
-			}
-
-			const newListOfServices = [...currentListOfServices, 'GraphQLServiceSDK'];
-			const input = newListOfServices.map(service => ({
+			const input = services.map(service => ({
 				sdkCode: service,
 			}));
 
@@ -616,8 +614,96 @@ class SchemaServiceClient {
 
 				throw new Error(response.data.message);
 			}
+		} catch (err) {
+			logger.error(`Error while subscribing credential to services: ${err}`);
+
+			return null;
+		}
+	}
+
+	async subscribeCredentialToMeshService(organizationId, projectId, workspaceId, credentialId) {
+		const credentialType = 'adobeid';
+
+		try {
+			const currentListOfServices = await this.getListOfCurrentServices(
+				organizationId,
+				credentialId,
+			);
+
+			if (!currentListOfServices) {
+				throw new Error('Unable to get list of current services');
+			}
+
+			if (currentListOfServices.includes('GraphQLServiceSDK')) {
+				logger.info('Service is already subscribed');
+
+				return currentListOfServices;
+			}
+
+			const newListOfServices = [...currentListOfServices, 'GraphQLServiceSDK'];
+
+			const sdkList = await this.subscribeCredentialToServices(
+				organizationId,
+				projectId,
+				workspaceId,
+				credentialType,
+				credentialId,
+				newListOfServices,
+			);
+
+			logger.info(`Successfully subscribed credential to services: ${sdkList}`);
+
+			return sdkList;
 		} catch (error) {
 			logger.info('Response from subscribe credential %s', error.response);
+
+			if (error.response.status === 404) {
+				// The request was made and the server responded with a 404 status code
+				logger.error('Credential not found');
+				return [];
+			}
+
+			return null;
+		}
+	}
+
+	async unsubscribeCredentialFromMeshService(organizationId, projectId, workspaceId, credentialId) {
+		const credentialType = 'adobeid';
+
+		try {
+			const currentListOfServices = await this.getListOfCurrentServices(
+				organizationId,
+				credentialId,
+			);
+
+			if (!currentListOfServices) {
+				throw new Error('Unable to get list of current services');
+			}
+
+			if (!currentListOfServices.includes('GraphQLServiceSDK')) {
+				logger.info('Service is not subscribed');
+
+				return currentListOfServices;
+			}
+
+			const newListOfServices = currentListOfServices.filter(
+				service => service !== 'GraphQLServiceSDK',
+			);
+
+			const sdkList = await this.subscribeCredentialToServices(
+				organizationId,
+				projectId,
+				workspaceId,
+				credentialType,
+				credentialId,
+				newListOfServices,
+			);
+
+			logger.info(`Successfully unsubscribed credential to services: ${sdkList}`);
+
+			return sdkList;
+		} catch (error) {
+			logger.info('Response from unsubscribe credential %s', error.response);
 
 			if (error.response.status === 404) {
 				// The request was made and the server responded with a 404 status code
