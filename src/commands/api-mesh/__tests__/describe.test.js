@@ -65,7 +65,7 @@ describe('describe command tests', () => {
 		jest.restoreAllMocks();
 	});
 
-	test('snapshot create command description', () => {
+	test('snapshot describe command description', () => {
 		expect(DescribeCommand.description).toMatchInlineSnapshot(`"Get details of a mesh"`);
 	});
 
