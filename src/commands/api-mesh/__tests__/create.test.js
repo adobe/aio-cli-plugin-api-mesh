@@ -16,28 +16,11 @@ const CreateCommand = require('../create');
 const sampleCreateMeshConfig = require('../../__fixtures__/sample_mesh.json');
 const { initSdk, initRequestId } = require('../../../helpers');
 
-const orgs = [{ id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' }];
 const selectedOrg = { id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' };
 
-const projects = [{ id: '5678', title: 'Project01' }];
 const selectedProject = { id: '5678', title: 'Project01' };
 
-const workspaces = [{ id: '123456789', title: 'Workspace01' }];
 const selectedWorkspace = { id: '123456789', title: 'Workspace01' };
-
-function setDefaultMockConsoleCLI() {
-	mockConsoleCLIInstance.getToken = jest.fn().mockReturnValue('test_token');
-	mockConsoleCLIInstance.getCliEnv = jest.fn().mockReturnValue('prod');
-
-	mockConsoleCLIInstance.getOrganizations = jest.fn().mockResolvedValue(orgs);
-	mockConsoleCLIInstance.promptForSelectOrganization = jest.fn().mockResolvedValue(selectedOrg);
-
-	mockConsoleCLIInstance.getProjects = jest.fn().mockResolvedValue(projects);
-	mockConsoleCLIInstance.promptForSelectProject = jest.fn().mockResolvedValue(selectedProject);
-
-	mockConsoleCLIInstance.getWorkspaces = jest.fn().mockResolvedValue(workspaces);
-	mockConsoleCLIInstance.promptForSelectWorkspace = jest.fn().mockResolvedValue(selectedWorkspace);
-}
 
 const mockCreateMesh = jest.fn().mockResolvedValue({
 	meshId: 'dummy_mesh_id',
@@ -76,8 +59,6 @@ let errorLogSpy = null;
 
 describe('create command tests', () => {
 	beforeEach(() => {
-		setDefaultMockConsoleCLI();
-
 		initSdk.mockResolvedValue({
 			schemaServiceClient: mockSchemaServiceClient,
 			imsOrgId: selectedOrg.id,
