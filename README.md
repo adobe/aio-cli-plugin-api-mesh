@@ -29,7 +29,24 @@ aio plugins:link api-mesh
 
 ### Configuration
 
-create a config.json file with the following parameters
+The plugin comes out of the box with configurations for stage and prod. The plugin by default connects to PROD dev console. To connect to STAGE instead:
+
+1. Clear your config before switching the env
+
+```
+aio config clear
+```
+
+2. Switch to stage environment
+```
+aio config set cli.env stage
+```
+
+#### Custom Configuration
+
+If you want to have custom configuration instead, please follow the steps below:
+
+1. create a config.json file with the following parameters
 
 ```
 {
@@ -38,7 +55,7 @@ create a config.json file with the following parameters
 }
 ```
 
-Perform the following command to update the configuration
+2. Perform the following command to update the configuration
 
 ```
 aio config:set api-mesh.configPath <path_to_json_file>
