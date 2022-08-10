@@ -347,6 +347,11 @@ describe('create command tests', () => {
 		    "Successfully subscribed API Key %s to API Mesh service",
 		    "dummy_api_key",
 		  ],
+		  Array [
+		    "Mesh Endpoint: %s
+		",
+		    "https://graph.adobe.io/api/dummy_mesh_id/graphql?api_key=dummy_api_key",
+		  ],
 		]
 	`);
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`Array []`);
