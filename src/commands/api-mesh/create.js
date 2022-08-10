@@ -47,12 +47,48 @@ class CreateCommand extends Command {
 
 		try {
 			const mesh = await schemaServiceClient.createMesh(imsOrgId, projectId, workspaceId, data);
+			let sdkList = [];
 
 			if (mesh) {
 				this.log('Successfully created mesh %s', mesh.meshId);
 				this.log(JSON.stringify(mesh, null, 2));
+				// create API key credential
+				const adobeIdIntegrationsForWorkspace = await schemaServiceClient.createAPIMeshCredentials(
+					imsOrgId,
+					projectId,
+					workspaceId,
+				);
 
-				return mesh;
+				if (adobeIdIntegrationsForWorkspace) {
+					this.log('Successfully created API Key %s', adobeIdIntegrationsForWorkspace.apiKey);
+					// subscribe the credential to API mesh service
+					sdkList = await schemaServiceClient.subscribeCredentialToMeshService(
+						imsOrgId,
+						projectId,
+						workspaceId,
+						adobeIdIntegrationsForWorkspace.id,
+					);
+
+					if (sdkList) {
+						this.log(
+							'Successfully subscribed API Key %s to API Mesh service',
+							adobeIdIntegrationsForWorkspace.apiKey,
+						);
+					} else {
+						this.log(
+							'Unable to subscribe API Key %s to API Mesh service',
+							adobeIdIntegrationsForWorkspace.apiKey,
+						);
+					}
+				} else {
+					this.log('Unable to create API Key');
+				}
+
+				return {
+					adobeIdIntegrationsForWorkspace,
+					sdkList,
+					mesh,
+				};
 			} else {
 				this.error(`Unable to create a mesh. Please try again. RequestId: ${global.requestId}`, {
 					exit: false,

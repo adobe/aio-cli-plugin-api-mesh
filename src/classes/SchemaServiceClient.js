@@ -10,8 +10,12 @@ governing permissions and limitations under the License.
 */
 
 const axios = require('axios');
+
 const logger = require('../classes/logger');
 const { objToString } = require('../utils');
+const CONSTANTS = require('../constants');
+
+const { DEV_CONSOLE_TRANSPORTER_API_KEY } = CONSTANTS;
 
 /**
  * This class provides methods to call Schema Management Service APIs.
@@ -22,7 +26,72 @@ class SchemaServiceClient {
 	init(baseUrl, accessToken, apiKey) {
 		this.devConsoleUrl = baseUrl;
 		this.accessToken = accessToken;
-		this.apiKey = apiKey;
+		this.apiKey = apiKey; // API Key for SMS
+	}
+
+	async getApiKeyCredential(organizationId, projectId, workspaceId) {
+		const config = {
+			method: 'get',
+			url: `${this.devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/credentials`,
+			headers: {
+				'Authorization': `Bearer ${this.accessToken}`,
+				'Content-Type': 'application/json',
+				'x-request-id': global.requestId,
+				'x-api-key': DEV_CONSOLE_TRANSPORTER_API_KEY, // API Key for Dev Console
+			},
+		};
+
+		logger.info(
+			'Initiating GET %s',
+			`${this.devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/credentials`,
+		);
+
+		try {
+			const response = await axios(config);
+
+			logger.info('Response from GET %s', response.status);
+
+			if (response && response.status === 200) {
+				logger.info(`Credentials on the workspace : ${objToString(response, ['data'])}`);
+
+				if (response.data && Array.isArray(response.data) && response.data.length > 0) {
+					const apiCred = response.data.find(
+						credential =>
+							credential.integration_type === 'apikey' && credential.flow_type === 'adobeid',
+					);
+
+					logger.info(`API Key credential on the workspace : ${apiCred}`);
+
+					if (apiCred) {
+						return apiCred.client_id;
+					} else {
+						logger.error('API Key credential not found on workspace');
+
+						return null;
+					}
+				} else {
+					return null;
+				}
+			} else {
+				// Non 200 response received
+				logger.error(
+					`Something went wrong: ${objToString(
+						response,
+						['data'],
+						'Unable to get credential',
+					)}. Received ${response.status} response instead of 200`,
+				);
+
+				throw new Error(
+					`Something went wrong: ${objToString(response, ['data'], 'Unable to get credential')}`,
+				);
+			}
+		} catch (error) {
+			logger.error('Error while getting credential');
+			logger.error(error);
+
+			return null;
+		}
 	}
 
 	async describeMesh(organizationId, projectId, workspaceId) {
@@ -48,7 +117,9 @@ class SchemaServiceClient {
 			if (response && response.status === 200) {
 				logger.info(`Mesh Config : ${objToString(response, ['data'])}`);
 
-				return response.data;
+				const apiKey = await this.getApiKeyCredential(organizationId, projectId, workspaceId);
+
+				return { meshId: response.data.meshId, apiKey };
 			} else {
 				// Non 200 response received
 				logger.error(
@@ -182,7 +253,6 @@ class SchemaServiceClient {
 
 			if (response && response.status === 201) {
 				logger.info(`Mesh Config : ${objToString(response, ['data'])}`);
-
 				return response.data;
 			} else {
 				// Non 201 response received
@@ -408,6 +478,95 @@ class SchemaServiceClient {
 				);
 
 				throw new Error('Unable to delete mesh from Schema Management Service: %s', error.message);
+			}
+		}
+	}
+
+	async createAPIMeshCredentials(organizationId, projectId, workspaceId) {
+		const input = {
+			name: `Project ${Date.now()}K`,
+			description: `Project ${Date.now()}K`,
+			platform: 'apiKey',
+			domain: 'www.graph.adobe.io',
+		};
+		const credentialConfig = {
+			method: 'post',
+			url: `${this.devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/credentials/adobeId`,
+			headers: {
+				'Authorization': `Bearer ${this.accessToken}`,
+				'Content-Type': 'application/json',
+				'x-request-id': global.requestId,
+				'x-api-key': DEV_CONSOLE_TRANSPORTER_API_KEY,
+			},
+			data: JSON.stringify(input),
+		};
+		try {
+			const response = await axios(credentialConfig);
+			if (response && response.status === 200) {
+				logger.info(`API Key credential  : ${objToString(response, ['data'])}`);
+
+				return response.data;
+			} else {
+				// Receive a non 200 response
+				logger.error(
+					`Something went wrong: ${objToString(
+						response,
+						['data'],
+						'Unable to create credential',
+					)}. Received ${response.status} response instead of 200`,
+				);
+
+				throw new Error(response.data.message);
+			}
+		} catch (error) {
+			logger.info('Response from Create Mesh Credential %s', error.response.status);
+			return null;
+		}
+	}
+
+	async subscribeCredentialToMeshService(organizationId, projectId, workspaceId, credentialId) {
+		const credentialType = 'adobeid';
+		const input = [
+			{
+				sdkCode: 'GraphQLServiceSDK',
+			},
+		];
+		const subscribeCredentialToService = {
+			method: 'put',
+			url: `${this.devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/credentials/${credentialType}/${credentialId}/services`,
+			headers: {
+				'Authorization': `Bearer ${this.accessToken}`,
+				'Content-Type': 'application/json',
+				'x-request-id': global.requestId,
+				'x-api-key': DEV_CONSOLE_TRANSPORTER_API_KEY,
+			},
+			data: JSON.stringify(input),
+		};
+		try {
+			const response = await axios(subscribeCredentialToService);
+			if (response && response.status === 200) {
+				logger.info(`SDK codes associated with credential  : ${objToString(response, ['data'])}`);
+
+				return response.data;
+			} else {
+				// Receive a non 200 response
+				logger.error(
+					`Something went wrong: ${objToString(
+						response,
+						['data'],
+						'Unable to create credential',
+					)}. Received ${response.status} response instead of 200`,
+				);
+
+				throw new Error(response.data.message);
+			}
+		} catch (error) {
+			logger.info('Response from subscribe credential %s', error.response.status);
+
+			if (error.response.status === 404) {
+				// The request was made and the server responded with a 404 status code
+				logger.error('Credential not found');
+				return [];
 			}
 		}
 	}
