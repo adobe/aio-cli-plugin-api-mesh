@@ -37,7 +37,7 @@ The plugin comes out of the box with configurations for stage and prod. The plug
 aio config clear
 ```
 
-2. Switch to stage environment
+2. Switch to stage environment 
 ```
 aio config set cli.env stage
 ```
