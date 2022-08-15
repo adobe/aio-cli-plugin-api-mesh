@@ -79,6 +79,8 @@ async function getDevConsoleConfig() {
  * @returns {string} Returns organizations the user belongs to
  */
 async function getAuthorizedOrganization() {
+	logger.info(`Initializing organization selection for`);
+
 	const { consoleCLI } = await getLibConsoleCLI();
 
 	aioConsoleLogger.debug('Get the selected organization');
@@ -99,7 +101,7 @@ async function getAuthorizedOrganization() {
 
 		return Object.assign({}, selectedOrg);
 	} else {
-		logger.info(`Selecting your organization as: ${consoleConfigOrg.name}`);
+		aioConsoleLogger.info(`Selected organization: ${consoleConfigOrg.name}`);
 
 		return Object.assign({}, consoleConfigOrg);
 	}
@@ -110,30 +112,55 @@ async function getProject(imsOrgId, imsOrgTitle) {
 
 	const { consoleCLI } = await getLibConsoleCLI();
 
-	const projects = await consoleCLI.getProjects(imsOrgId);
-	if (projects.length !== 0) {
-		const selectedProject = await consoleCLI.promptForSelectProject(projects);
+	aioConsoleLogger.debug('Get the selected project');
 
-		return selectedProject;
+	const consoleConfigProject = Config.get('console.project');
+
+	if (!consoleConfigProject) {
+		const projects = await consoleCLI.getProjects(imsOrgId);
+
+		if (projects.length !== 0) {
+			const selectedProject = await consoleCLI.promptForSelectProject(projects);
+
+			return selectedProject;
+		} else {
+			aioConsoleLogger.error(`No projects found for the selected organization: ${imsOrgTitle}`);
+		}
 	} else {
-		aioConsoleLogger.error(`No projects found for the selected organization: ${imsOrgTitle}`);
+		aioConsoleLogger.info(`Selected project: ${consoleConfigProject.title}`);
+
+		return consoleConfigProject;
 	}
 }
 
 async function getWorkspace(orgId, projectId, imsOrgTitle, projectTitle) {
-	logger.info(`Initializing workspace selection for ${orgId} / ${projectId}`);
+	logger.info(`Initializing workspace selection for ${orgId} -> ${projectId}`);
 
 	const { consoleCLI } = await getLibConsoleCLI();
 
-	const workspaces = await consoleCLI.getWorkspaces(orgId, projectId);
-	if (workspaces.length !== 0) {
-		const selectedWorkspace = await consoleCLI.promptForSelectWorkspace(workspaces);
+	aioConsoleLogger.debug('Get the selected workspace');
 
-		return selectedWorkspace;
+	const consoleConfigWorkspace = Config.get('console.workspace');
+
+	if (!consoleConfigWorkspace) {
+		const workspaces = await consoleCLI.getWorkspaces(orgId, projectId);
+
+		if (workspaces.length !== 0) {
+			const selectedWorkspace = await consoleCLI.promptForSelectWorkspace(workspaces);
+
+			return selectedWorkspace;
+		} else {
+			aioConsoleLogger.error(
+				`No workspaces found for the selected organization: ${imsOrgTitle} and project: ${projectTitle}`,
+			);
+		}
 	} else {
-		aioConsoleLogger.error(
-			`No workspaces found for the selected organization: ${imsOrgTitle} and project: ${projectTitle}`,
-		);
+		aioConsoleLogger.info(`Select workspace: ${consoleConfigWorkspace.name}`);
+
+		return {
+			id: consoleConfigWorkspace.id,
+			title: consoleConfigWorkspace.name,
+		};
 	}
 }
 
