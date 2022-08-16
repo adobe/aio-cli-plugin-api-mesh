@@ -197,7 +197,7 @@ async function getWorkspace(orgId, projectId, imsOrgTitle, projectTitle) {
 }
 
 /**
- * @private
+ * @returns {consoleCLI, accessToken}
  */
 async function getLibConsoleCLI() {
 	await context.setCli({ 'cli.bare-output': true }, false);
@@ -213,6 +213,15 @@ async function getLibConsoleCLI() {
 	});
 
 	return { consoleCLI: consoleCLI, accessToken: accessToken };
+}
+
+async function initSchemaServiceClient() {
+	const { baseUrl, accessToken, apiKey } = await getDevConsoleConfig();
+
+	const schemaServiceClient = new SchemaServiceClient();
+	schemaServiceClient.init(baseUrl, accessToken, apiKey);
+
+	return schemaServiceClient;
 }
 
 /**
@@ -276,4 +285,5 @@ module.exports = {
 	getDevConsoleConfig,
 	initSdk,
 	initRequestId,
+	initSchemaServiceClient,
 };
