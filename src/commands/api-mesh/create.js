@@ -53,7 +53,7 @@ class CreateCommand extends Command {
 
 		const shouldContinue = await promptConfirm(`Are you sure you want to create a mesh?`);
 
-		if (!shouldContinue) {
+		if (shouldContinue) {
 			try {
 				const mesh = await schemaServiceClient.createMesh(imsOrgId, projectId, workspaceId, data);
 				let sdkList = [];
