@@ -18,7 +18,7 @@ const { initSdk, initRequestId, promptConfirm } = require('../../helpers');
 require('dotenv').config();
 
 class UpdateCommand extends Command {
-	static args = [{ name: 'meshId' }, { name: 'file' }];
+	static args = [{ name: 'file' }];
 
 	async run() {
 		await initRequestId();
@@ -27,7 +27,7 @@ class UpdateCommand extends Command {
 
 		const { args } = this.parse(UpdateCommand);
 
-		if (!args.meshId || !args.file) {
+		if (!args.file) {
 			this.error('Missing required args. Run aio api-mesh update --help for more info.');
 
 			return;
@@ -47,34 +47,50 @@ class UpdateCommand extends Command {
 			);
 		}
 
-		const shouldContinue = await promptConfirm(
-			`Are you sure you want to update the mesh: ${args.meshId}?`,
-		);
+		let meshId = null;
 
-		if (shouldContinue) {
-			try {
-				const response = await schemaServiceClient.updateMesh(
-					imsOrgId,
-					projectId,
-					workspaceId,
-					args.meshId,
-					data,
-				);
+		try {
+			meshId = await schemaServiceClient.getMeshId(imsOrgId, projectId, workspaceId);
+		} catch (err) {
+			this.error(
+				`Unable to get mesh ID. Please check the details and try again. RequestId: ${global.requestId}`,
+			);
+		}
 
-				this.log('Successfully updated the mesh with the id: %s', args.meshId);
+		if (meshId) {
+			const shouldContinue = await promptConfirm(
+				`Are you sure you want to update the mesh: ${meshId}?`,
+			);
 
-				return response;
-			} catch (error) {
-				this.log(error.message);
+			if (shouldContinue) {
+				try {
+					const response = await schemaServiceClient.updateMesh(
+						imsOrgId,
+						projectId,
+						workspaceId,
+						meshId,
+						data,
+					);
 
-				this.error(
-					`Unable to update the mesh. Please check the mesh configuration file and try again. If the error persists please contact support. RequestId: ${global.requestId}`,
-				);
+					this.log('Successfully updated the mesh with the id: %s', meshId);
+
+					return response;
+				} catch (error) {
+					this.log(error.message);
+
+					this.error(
+						`Unable to update the mesh. Please check the mesh configuration file and try again. If the error persists please contact support. RequestId: ${global.requestId}`,
+					);
+				}
+			} else {
+				this.log('Update cancelled');
+
+				return 'Update cancelled';
 			}
 		} else {
-			this.log('Update cancelled');
-
-			return 'Update cancelled';
+			this.error(
+				`Unable to update. No mesh found for Org(${imsOrgId}) -> Project(${projectId}) -> Workspace(${workspaceId}). Please check the details and try again.`,
+			);
 		}
 	}
 }

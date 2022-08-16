@@ -95,55 +95,32 @@ class SchemaServiceClient {
 	}
 
 	async describeMesh(organizationId, projectId, workspaceId) {
-		const config = {
-			method: 'get',
-			url: `${this.devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/describe?API_KEY=${this.apiKey}`,
-			headers: {
-				'Authorization': `Bearer ${this.accessToken}`,
-				'x-request-id': global.requestId,
-			},
-		};
-
-		logger.info(
-			'Initiating GET %s',
-			`${this.devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/describe?API_KEY=${this.apiKey}`,
-		);
+		logger.info('Initiating Describe Mesh');
 
 		try {
-			const response = await axios(config);
+			const meshId = await this.getMeshId(organizationId, projectId, workspaceId);
 
-			logger.info('Response from GET %s', response.status);
+			logger.info('Response from this.getMeshId %s', meshId);
 
-			if (response && response.status === 200) {
-				logger.info(`Mesh Config : ${objToString(response, ['data'])}`);
-
+			if (meshId) {
 				const credential = await this.getApiKeyCredential(organizationId, projectId, workspaceId);
 
-				return { meshId: response.data.meshId, apiKey: credential.client_id };
-			} else {
-				// Non 200 response received
-				logger.error(
-					`Something went wrong: ${objToString(
-						response,
-						['data'],
-						'Unable to get mesh',
-					)}. Received ${response.status} response instead of 200`,
-				);
+				if (credential) {
+					return { meshId, apiKey: credential.client_id };
+				} else {
+					logger.error('API Key credential not found on workspace');
 
-				throw new Error(
-					`Something went wrong: ${objToString(response, ['data'], 'Unable to get mesh')}`,
-				);
+					return { meshId, apiKey: null };
+				}
+			} else {
+				logger.error(`Unable to retrieve meshId.`);
+
+				throw new Error(`Unable to retrieve meshId.`);
 			}
 		} catch (error) {
-			if (error.response.status === 400) {
-				// The request was made and the server responded with a 400 status code
-				logger.error('Mesh not found');
+			logger.error(error);
 
-				return null;
-			} else {
-				// The request was made and the server responded with a different status code
-				logger.error('Error while describing mesh');
-			}
+			return null;
 		}
 	}
 
@@ -479,6 +456,59 @@ class SchemaServiceClient {
 
 				throw new Error('Unable to delete mesh from Schema Management Service: %s', error.message);
 			}
+		}
+	}
+
+	async getMeshId(organizationId, projectId, workspaceId) {
+		logger.info('Initiating Mesh ID request');
+
+		const config = {
+			method: 'get',
+			url: `${this.devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/describe?API_KEY=${this.apiKey}`,
+			headers: {
+				'Authorization': `Bearer ${this.accessToken}`,
+				'x-request-id': global.requestId,
+			},
+		};
+
+		logger.info(
+			'Initiating GET %s',
+			`${this.devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/describe?API_KEY=${this.apiKey}`,
+		);
+
+		try {
+			const response = await axios(config);
+
+			logger.info('Response from GET %s', response.status);
+
+			if (response && response.status === 200) {
+				logger.info(`Mesh Config : ${objToString(response, ['data'])}`);
+
+				return response.data.meshId;
+			} else {
+				// Non 200 response received
+				logger.error(
+					`Something went wrong: ${objToString(
+						response,
+						['data'],
+						'Unable to get mesh ID',
+					)}. Received ${response.status} response instead of 200`,
+				);
+
+				throw new Error(
+					`Something went wrong: ${objToString(response, ['data'], 'Unable to get mesh')}`,
+				);
+			}
+		} catch (error) {
+			if (error.response.status === 400) {
+				// The request was made and the server responded with a 400 status code
+				logger.error('Mesh not found');
+			} else {
+				// The request was made and the server responded with a different status code
+				logger.error('Error while describing mesh');
+			}
+
+			return null;
 		}
 	}
 
