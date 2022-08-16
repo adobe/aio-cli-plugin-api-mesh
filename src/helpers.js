@@ -96,11 +96,11 @@ async function getAuthorizedOrganization() {
 
 			logger.debug('Set the console org config');
 
-			Config.set('console.org', {
-				id: selectedOrg.id,
-				code: selectedOrg.code,
-				name: selectedOrg.name,
-			});
+			Config.set('console.org', selectedOrg);
+
+			// remove selected project and workspace from config and let the user select a new one
+			Config.delete('console.project');
+			Config.delete('console.workspace');
 
 			return Object.assign({}, selectedOrg);
 		} else {
@@ -131,7 +131,18 @@ async function getProject(imsOrgId, imsOrgTitle) {
 		if (projects.length !== 0) {
 			const selectedProject = await consoleCLI.promptForSelectProject(projects);
 
-			return selectedProject;
+			const shouldCacheProject = await promptConfirm(
+				`Do you want to use ${selectedProject.title} as selected project for future operations?`,
+			);
+
+			if (shouldCacheProject) {
+				Config.set('console.project', selectedProject);
+			}
+
+			// remove selected workspace from config and let the user select a new one
+			Config.delete('console.workspace');
+
+			return Object.assign({}, selectedProject);
 		} else {
 			logger.error(`No projects found for the selected organization: ${imsOrgTitle}`);
 		}
@@ -160,7 +171,15 @@ async function getWorkspace(orgId, projectId, imsOrgTitle, projectTitle) {
 		if (workspaces.length !== 0) {
 			const selectedWorkspace = await consoleCLI.promptForSelectWorkspace(workspaces);
 
-			return selectedWorkspace;
+			const shouldCacheWorkspace = await promptConfirm(
+				`Do you want to use ${selectedWorkspace.name} as selected workspace for future operations?`,
+			);
+
+			if (shouldCacheWorkspace) {
+				Config.set('console.workspace', selectedWorkspace);
+			}
+
+			return Object.assign({}, selectedWorkspace);
 		} else {
 			logger.error(
 				`No workspaces found for the selected organization: ${imsOrgTitle} and project: ${projectTitle}`,
