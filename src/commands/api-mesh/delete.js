@@ -17,77 +17,87 @@ const { initSdk, initRequestId, promptConfirm } = require('../../helpers');
 require('dotenv').config();
 
 class DeleteCommand extends Command {
-	static args = [{ name: 'meshId' }];
+	static args = [];
 
 	async run() {
 		await initRequestId();
 
 		logger.info(`RequestId: ${global.requestId}`);
 
-		const { args } = this.parse(DeleteCommand);
-
-		if (!args.meshId) {
-			this.error('Missing Mesh ID. Run aio api-mesh delete --help for more info.');
-
-			return;
-		}
+		// const { args } = this.parse(DeleteCommand);
 
 		const { schemaServiceClient, imsOrgId, projectId, workspaceId } = await initSdk();
 
-		const shouldContinue = await promptConfirm(
-			`Are you sure you want to delete the mesh: ${args.meshId}?`,
-		);
+		let meshId = null;
 
-		if (shouldContinue) {
-			try {
-				const deleteMeshResponse = await schemaServiceClient.deleteMesh(
-					imsOrgId,
-					projectId,
-					workspaceId,
-					args.meshId,
-				);
+		try {
+			meshId = await schemaServiceClient.getMeshId(imsOrgId, projectId, workspaceId);
+		} catch (err) {
+			this.error(
+				`Unable to get mesh ID. Please check the details and try again. RequestId: ${global.requestId}`,
+			);
+		}
 
-				if (deleteMeshResponse) {
-					this.log('Successfully deleted mesh %s', args.meshId);
+		if (meshId) {
+			const shouldContinue = await promptConfirm(
+				`Are you sure you want to delete the mesh: ${meshId}?`,
+			);
 
-					const credential = await schemaServiceClient.getApiKeyCredential(
+			if (shouldContinue) {
+				try {
+					const deleteMeshResponse = await schemaServiceClient.deleteMesh(
 						imsOrgId,
 						projectId,
 						workspaceId,
+						meshId,
 					);
 
-					if (credential) {
-						const newSDKList = await schemaServiceClient.unsubscribeCredentialFromMeshService(
+					if (deleteMeshResponse) {
+						this.log('Successfully deleted mesh %s', meshId);
+
+						const credential = await schemaServiceClient.getApiKeyCredential(
 							imsOrgId,
 							projectId,
 							workspaceId,
-							credential.id_integration,
 						);
 
-						if (newSDKList) {
-							this.log('Successfully unsubscribed API Key %s', credential.client_id);
+						if (credential) {
+							const newSDKList = await schemaServiceClient.unsubscribeCredentialFromMeshService(
+								imsOrgId,
+								projectId,
+								workspaceId,
+								credential.id_integration,
+							);
+
+							if (newSDKList) {
+								this.log('Successfully unsubscribed API Key %s', credential.client_id);
+							} else {
+								this.log('Unable to unsubscribe API Key %s', credential.client_id);
+							}
 						} else {
-							this.log('Unable to unsubscribe API Key %s', credential.client_id);
+							this.log('No API Key found to unsubscribe');
 						}
+
+						return deleteMeshResponse;
 					} else {
-						this.log('No API Key found to unsubscribe');
+						throw new Error('Unable to delete mesh');
 					}
+				} catch (error) {
+					this.log(error.message);
 
-					return deleteMeshResponse;
-				} else {
-					throw new Error('Unable to delete mesh');
+					this.error(
+						`Unable to delete mesh. Please check the details and try again. If the error persists please contact support. RequestId: ${global.requestId}`,
+					);
 				}
-			} catch (error) {
-				this.log(error.message);
+			} else {
+				this.log('Delete cancelled');
 
-				this.error(
-					`Unable to delete mesh. Please check the details and try again. If the error persists please contact support. RequestId: ${global.requestId}`,
-				);
+				return 'Delete cancelled';
 			}
 		} else {
-			this.log('Delete cancelled');
-
-			return 'Delete cancelled';
+			this.error(
+				`Unable to delete. No mesh found for Org(${imsOrgId}) -> Project(${projectId}) -> Workspace(${workspaceId}). Please check the details and try again.`,
+			);
 		}
 	}
 }
