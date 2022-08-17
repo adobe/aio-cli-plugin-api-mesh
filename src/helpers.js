@@ -196,6 +196,62 @@ async function getWorkspace(orgId, projectId, imsOrgTitle, projectTitle) {
 	}
 }
 
+const selectAuthorizedOrganization = async () => {
+	const { consoleCLI } = await getLibConsoleCLI();
+	const organizations = await consoleCLI.getOrganizations();
+
+	if (organizations.length > 0) {
+		const selectedOrg = await consoleCLI.promptForSelectOrganization(organizations);
+
+		if (selectedOrg) {
+			return selectedOrg;
+		} else {
+			throw new Error('No org selected');
+		}
+	} else {
+		this.error('No organizations found');
+	}
+};
+
+const selectProject = async (imsOrgId, imsOrgTitle) => {
+	const { consoleCLI } = await getLibConsoleCLI();
+	const projects = await consoleCLI.getProjects(imsOrgId);
+
+	if (projects.length > 0) {
+		const selectedProject = await consoleCLI.promptForSelectProject(projects);
+
+		if (selectedProject) {
+			return selectedProject;
+		} else {
+			throw new Error('No project selected');
+		}
+	} else {
+		this.error('No projects found for the selected organization: ' + imsOrgTitle);
+	}
+};
+
+const selectWorkspace = async (orgId, projectId, imsOrgTitle, projectTitle) => {
+	const { consoleCLI } = await getLibConsoleCLI();
+	const workspaces = await consoleCLI.getWorkspaces(orgId, projectId);
+
+	if (workspaces.length > 0) {
+		const selectedWorkspace = await consoleCLI.promptForSelectWorkspace(workspaces);
+
+		if (selectedWorkspace) {
+			return selectedWorkspace;
+		} else {
+			throw new Error('No workspace selected');
+		}
+	} else {
+		this.error(
+			'No workspaces found for the selected organization: ' +
+				imsOrgTitle +
+				' and project: ' +
+				projectTitle,
+		);
+	}
+};
+
 /**
  * @returns {consoleCLI, accessToken}
  */
@@ -227,10 +283,22 @@ async function initSchemaServiceClient() {
 /**
  * @returns {any} Returns an object with properties ready for consumption
  */
-async function initSdk() {
-	const org = await getAuthorizedOrganization();
-	const project = await getProject(org.id, org.name);
-	const workspace = await getWorkspace(org.id, project.id, org.name, project.title);
+async function initSdk(options) {
+	const { ignoreCache = false } = options;
+
+	let org;
+	let project;
+	let workspace;
+
+	if (!ignoreCache) {
+		org = await getAuthorizedOrganization();
+		project = await getProject(org.id, org.name);
+		workspace = await getWorkspace(org.id, project.id, org.name, project.title);
+	} else {
+		org = await selectAuthorizedOrganization();
+		project = await selectProject(org.id, org.name);
+		workspace = await selectWorkspace(org.id, project.id, org.name, project.title);
+	}
 
 	logger.info(
 		`Initializing SDK for org: ${org.name}, project: ${project.title} and workspace: ${workspace.title}`,

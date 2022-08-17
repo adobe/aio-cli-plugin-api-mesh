@@ -15,6 +15,7 @@ const { readFile } = require('fs/promises');
 const { initSdk, initRequestId, promptConfirm } = require('../../helpers');
 const logger = require('../../classes/logger');
 const CONSTANTS = require('../../constants');
+const { ignoreCacheFlag } = require('../../utils');
 
 require('dotenv').config();
 
@@ -22,13 +23,16 @@ const { MULTITENANT_GRAPHQL_SERVER_BASE_URL } = CONSTANTS;
 
 class CreateCommand extends Command {
 	static args = [{ name: 'file' }];
+	static flags = {
+		ignoreCache: ignoreCacheFlag,
+	};
 
 	async run() {
 		await initRequestId();
 
 		logger.info(`RequestId: ${global.requestId}`);
 
-		const { args } = this.parse(CreateCommand);
+		const { args, flags } = this.parse(CreateCommand);
 
 		if (!args.file) {
 			this.error('Missing file path. Run aio api-mesh create --help for more info.');
@@ -36,7 +40,11 @@ class CreateCommand extends Command {
 			return;
 		}
 
-		const { schemaServiceClient, imsOrgId, projectId, workspaceId } = await initSdk();
+		const ignoreCache = await flags.ignoreCache;
+
+		const { schemaServiceClient, imsOrgId, projectId, workspaceId } = await initSdk({
+			ignoreCache,
+		});
 
 		let data;
 

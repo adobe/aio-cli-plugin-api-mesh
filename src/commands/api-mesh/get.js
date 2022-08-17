@@ -11,22 +11,31 @@ governing permissions and limitations under the License.
 
 const { Command } = require('@oclif/command');
 const { writeFile } = require('fs/promises');
+
 const logger = require('../../classes/logger');
 const { initSdk, initRequestId } = require('../../helpers');
+const { ignoreCacheFlag } = require('../../utils');
 
 require('dotenv').config();
 
 class GetCommand extends Command {
 	static args = [{ name: 'file' }];
+	static flags = {
+		ignoreCache: ignoreCacheFlag,
+	};
 
 	async run() {
 		await initRequestId();
 
 		logger.info(`RequestId: ${global.requestId}`);
 
-		const { args } = this.parse(GetCommand);
+		const { args, flags } = await this.parse(GetCommand);
 
-		const { schemaServiceClient, imsOrgId, projectId, workspaceId } = await initSdk();
+		const ignoreCache = await flags.ignoreCache;
+
+		const { schemaServiceClient, imsOrgId, projectId, workspaceId } = await initSdk({
+			ignoreCache,
+		});
 
 		let meshId = null;
 

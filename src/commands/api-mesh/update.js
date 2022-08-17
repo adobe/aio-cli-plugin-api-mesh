@@ -14,18 +14,22 @@ const { readFile } = require('fs/promises');
 
 const logger = require('../../classes/logger');
 const { initSdk, initRequestId, promptConfirm } = require('../../helpers');
+const { ignoreCacheFlag } = require('../../utils');
 
 require('dotenv').config();
 
 class UpdateCommand extends Command {
 	static args = [{ name: 'file' }];
+	static flags = {
+		ignoreCache: ignoreCacheFlag,
+	};
 
 	async run() {
 		await initRequestId();
 
 		logger.info(`RequestId: ${global.requestId}`);
 
-		const { args } = this.parse(UpdateCommand);
+		const { args, flags } = this.parse(UpdateCommand);
 
 		if (!args.file) {
 			this.error('Missing required args. Run aio api-mesh update --help for more info.');
@@ -33,7 +37,12 @@ class UpdateCommand extends Command {
 			return;
 		}
 
-		const { schemaServiceClient, imsOrgId, projectId, workspaceId } = await initSdk();
+		const ignoreCache = await flags.ignoreCache;
+
+		const { schemaServiceClient, imsOrgId, projectId, workspaceId } = await initSdk({
+			ignoreCache,
+		});
+
 		let data;
 
 		try {

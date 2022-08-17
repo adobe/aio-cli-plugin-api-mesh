@@ -13,20 +13,27 @@ const { Command } = require('@oclif/command');
 
 const logger = require('../../classes/logger');
 const { initSdk, initRequestId, promptConfirm } = require('../../helpers');
+const { ignoreCacheFlag } = require('../../utils');
 
 require('dotenv').config();
 
 class DeleteCommand extends Command {
-	static args = [];
+	static flags = {
+		ignoreCache: ignoreCacheFlag,
+	};
 
 	async run() {
 		await initRequestId();
 
 		logger.info(`RequestId: ${global.requestId}`);
 
-		// const { args } = this.parse(DeleteCommand);
+		const { flags } = this.parse(DeleteCommand);
 
-		const { schemaServiceClient, imsOrgId, projectId, workspaceId } = await initSdk();
+		const ignoreCache = await flags.ignoreCache;
+
+		const { schemaServiceClient, imsOrgId, projectId, workspaceId } = await initSdk({
+			ignoreCache,
+		});
 
 		let meshId = null;
 

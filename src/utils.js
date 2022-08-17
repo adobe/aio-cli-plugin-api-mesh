@@ -34,6 +34,15 @@ function objToString(obj, path = [], defaultString = '') {
 	}
 }
 
+const { Flags } = require('@oclif/core');
+
+const ignoreCacheFlag = Flags.boolean({
+	char: 'i',
+	description: 'Ignore cache and force manual org -> project -> workspace selection',
+	default: false,
+});
+
 module.exports = {
 	objToString,
+	ignoreCacheFlag,
 };
