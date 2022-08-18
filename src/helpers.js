@@ -211,10 +211,54 @@ async function promptConfirm(message) {
 	return confirm.res;
 }
 
+/**
+ * Function to run the CLI selectable list
+ * 
+ * @param {string} message 
+ * @param {[]Object} choices
+ * @returns []Object
+ */
+async function promptMultiselect(message, choices) {
+
+	const selected = await inquirer.prompt([
+		{
+			name: 'items',
+			message: message,
+			type: 'checkbox',
+			choices: choices
+		},
+	]);
+
+	return selected.items;
+}
+
+/**
+ * Function to run the CLI selectable list
+ * 
+ * @param {string} message 
+ * @param {[]Object} choices
+ * @returns Object
+ */
+async function promptSelect(message, choices) {
+
+	const selected = await inquirer.prompt([
+		{
+			name: 'item',
+			message: message,
+			type: 'list',
+			choices: choices
+		},
+	]);
+
+	return selected.item;
+}
+
 module.exports = {
 	promptConfirm,
 	getLibConsoleCLI,
 	getDevConsoleConfig,
 	initSdk,
 	initRequestId,
+	promptSelect,
+	promptMultiselect
 };
