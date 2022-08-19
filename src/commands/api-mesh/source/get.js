@@ -10,74 +10,80 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const { Command, Flags } = require('@oclif/core')
-const SourceRegistryStorage = require("connector-registry-storage-adapter")
+const { Command, Flags } = require('@oclif/core');
+const SourceRegistryStorage = require('connector-registry-storage-adapter');
 const { promptMultiselect, promptSelect, promptConfirm } = require('../../../helpers');
-const inquirer = require('inquirer');
-const ncp = require("copy-paste");
-const chalk = require("chalk");
+const ncp = require('copy-paste');
+const chalk = require('chalk');
 const config = require('@adobe/aio-lib-core-config');
 
 class GetCommand extends Command {
 	constructor() {
-		super(...arguments)
+		super(...arguments);
 		this.sourceRegistryStorage = new SourceRegistryStorage(
-			config.get('api-mesh.source-registry.path')
+			config.get('api-mesh.source-registry.path'),
 		);
 	}
+
 	async run() {
-		console.log("QQQQ")
 		const list = await this.sourceRegistryStorage.getList();
 		const { flags } = await this.parse(GetCommand);
 		if (!flags.source && !flags.multiple) {
 			this.error(
 				`The "aio api-mesh:source:get" command require additional parameters` +
-				`\nUse "aio api-mesh:source:get --help" to see parameters information.`
+					`\nUse "aio api-mesh:source:get --help" to see parameters information.`,
 			);
 		}
 		const sources = flags.multiple ? await this.handleMultiple(list) : flags.source;
-		let sourceConfigs = []
+		const sourceConfigs = [];
 		for (const source of sources) {
-			let [name, version] = source.split("@");
+			let [name, version] = source.split('@');
 			const normalizedName = this.normalizeName(name);
 			if (!list[normalizedName]) {
-				this.error(chalk.red(
-					`The source with the name "${name}" doesn't exist.` +
-					`\nUse "aio api-mesh:source:discover" command to see avaliable sources.`
-				));
+				this.error(
+					chalk.red(
+						`The source with the name "${name}" doesn't exist.` +
+							`\nUse "aio api-mesh:source:discover" command to see avaliable sources.`,
+					),
+				);
 			}
 			version = version || list[normalizedName].latest;
 			if (!list[normalizedName].versions.includes(version)) {
-				this.error(chalk.red(
-					`The version "${version}" for source name "${name}" doesn't exist.` +
-					`\nUse "aio api-mesh:source:discover" command to see avaliable source versions.`
-				));
+				this.error(
+					chalk.red(
+						`The version "${version}" for source name "${name}" doesn't exist.` +
+							`\nUse "aio api-mesh:source:discover" command to see avaliable source versions.`,
+					),
+				);
 			}
 			const sourceConfig = await this.sourceRegistryStorage.get(name, version);
 			sourceConfigs.push(sourceConfig.provider);
 		}
 		const sourceConfigsString = JSON.stringify(sourceConfigs, null, 4);
-		await ncp.copy(sourceConfigsString)
+		await ncp.copy(sourceConfigsString);
 		this.log(
-			chalk.green.bold.underline("The sources are copied to clipboard, please paste they to your API Mesh configuration")
-		)
+			chalk.green.bold.underline(
+				'The sources are copied to clipboard, please paste they to your API Mesh configuration',
+			),
+		);
 		const print = await promptConfirm(`Do you want to print Source configurations in console?`);
 		if (print) {
-			this.log(sourceConfigsString)
+			this.log(sourceConfigsString);
 		}
 	}
+
 	async handleMultiple(data) {
 		const result = [];
 		const selectedList = await promptMultiselect(
 			'Select sources to install',
-			Object.values(data).map((elem) => ({ name: elem.name, value: elem }))
+			Object.values(data).map(elem => ({ name: elem.name, value: elem })),
 		);
 		for (const selected of selectedList) {
 			if (selected.versions.length > 1) {
 				const version = await promptSelect(
 					`Please choose the version of "${selected.name}" source`,
-					selected.versions.map(v => ({ name: `v${v}`, value: `${selected.name}@${v}` }))
-				)
+					selected.versions.map(v => ({ name: `v${v}`, value: `${selected.name}@${v}` })),
+				);
 				result.push(version);
 			} else {
 				result.push(`${selected.name}@${selected.latest}`);
@@ -85,6 +91,7 @@ class GetCommand extends Command {
 		}
 		return result;
 	}
+
 	normalizeName(name) {
 		return name.toLowerCase().split(' ').join('-');
 	}
@@ -94,20 +101,20 @@ GetCommand.flags = {
 	source: Flags.string({
 		char: 's',
 		description: 'Source name',
-		multiple: true
+		multiple: true,
 	}),
 	multiple: Flags.boolean({
 		char: 'm',
 		description: 'Select multiple sources',
-		exclusive: ['name']
-	})
-}
+		exclusive: ['name'],
+	}),
+};
 
-GetCommand.description = 'Command returns the content of specific connector'
+GetCommand.description = 'Command returns the content of specific connector';
 GetCommand.examples = [
 	'$ aio connector:get <version>@<source_name>',
 	'$ aio connector:get <source_name>',
-	'$ aio connector:get -m'
-]
+	'$ aio connector:get -m',
+];
 
-module.exports = GetCommand
+module.exports = GetCommand;
