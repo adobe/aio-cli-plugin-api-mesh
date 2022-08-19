@@ -13,7 +13,7 @@ governing permissions and limitations under the License.
 const mockMetadataFixture = require('../__fixtures__/connectors-metadata.json');
 const mockSourceTest01v1Fixture = require('../__fixtures__/0.0.1-test-01.json');
 const mockSourceTest02v1Fixture = require('../__fixtures__/0.0.1-test-02.json');
-const mockAdapter = require('connector-registry-storage-adapter');
+const mockAdapter = require('source-registry-storage-adapter');
 const chalk = require('chalk');
 const ncp = require('copy-paste');
 const { promptMultiselect, promptSelect, promptConfirm } = require('../../../../helpers');
@@ -21,7 +21,7 @@ const mockSources = {
 	'0.0.1-test-01': mockSourceTest01v1Fixture,
 	'0.0.1-test-02': mockSourceTest02v1Fixture,
 };
-jest.mock('connector-registry-storage-adapter');
+jest.mock('source-registry-storage-adapter');
 jest.mock('../../../../helpers');
 const GetCommand = require('../get');
 const logSpy = jest.spyOn(GetCommand.prototype, 'log');
@@ -54,7 +54,7 @@ describe('source:get command tests', () => {
 				'message',
 				expect.stringMatching(
 					`The "aio api-mesh:source:get" command require additional parameters` +
-						`\nUse "aio api-mesh:source:get --help" to see parameters information.`,
+					`\nUse "aio api-mesh:source:get --help" to see parameters information.`,
 				),
 			);
 		});
@@ -80,7 +80,7 @@ describe('source:get command tests', () => {
 			expect(err.message).toEqual(
 				chalk.red(
 					`The source with the name "${name}" doesn't exist.` +
-						`\nUse "aio api-mesh:source:discover" command to see avaliable sources.`,
+					`\nUse "aio api-mesh:source:discover" command to see avaliable sources.`,
 				),
 			);
 		});
@@ -92,7 +92,7 @@ describe('source:get command tests', () => {
 			expect(err.message).toEqual(
 				chalk.red(
 					`The version "${version}" for source name "${name}" doesn't exist.` +
-						`\nUse "aio api-mesh:source:discover" command to see avaliable source versions.`,
+					`\nUse "aio api-mesh:source:discover" command to see avaliable source versions.`,
 				),
 			);
 		});

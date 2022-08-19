@@ -12,7 +12,7 @@ governing permissions and limitations under the License.
 const { Command, CliUx } = require('@oclif/core');
 const { promptConfirm } = require('../../../helpers');
 const GetCommand = require('./get');
-const SourceRegistryStorage = require('connector-registry-storage-adapter');
+const SourceRegistryStorage = require('source-registry-storage-adapter');
 const config = require('@adobe/aio-lib-core-config');
 
 class DiscoverCommand extends Command {

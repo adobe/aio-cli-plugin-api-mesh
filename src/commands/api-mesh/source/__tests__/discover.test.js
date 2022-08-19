@@ -11,12 +11,12 @@ governing permissions and limitations under the License.
 */
 
 const mockMetadataFixture = require('../__fixtures__/connectors-metadata.json');
-const mockAdapter = require('connector-registry-storage-adapter');
+const mockAdapter = require('source-registry-storage-adapter');
 const { promptConfirm } = require('../../../../helpers');
 const GetCommand = require('../get');
 const { CliUx } = require('@oclif/core');
 const DiscoverCommand = require('../discover');
-jest.mock('connector-registry-storage-adapter');
+jest.mock('source-registry-storage-adapter');
 jest.mock('../../../../helpers');
 jest.mock('../get');
 jest.mock('@oclif/core', () => ({
