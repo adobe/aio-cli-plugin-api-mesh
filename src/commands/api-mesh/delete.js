@@ -13,13 +13,14 @@ const { Command } = require('@oclif/command');
 
 const logger = require('../../classes/logger');
 const { initSdk, initRequestId, promptConfirm } = require('../../helpers');
-const { ignoreCacheFlag } = require('../../utils');
+const { ignoreCacheFlag, autoApproveActionFlag } = require('../../utils');
 
 require('dotenv').config();
 
 class DeleteCommand extends Command {
 	static flags = {
 		ignoreCache: ignoreCacheFlag,
+		autoApproveAction: autoApproveActionFlag,
 	};
 
 	async run() {
@@ -30,6 +31,7 @@ class DeleteCommand extends Command {
 		const { flags } = this.parse(DeleteCommand);
 
 		const ignoreCache = await flags.ignoreCache;
+		const autoApproveAction = await flags.autoApproveAction;
 
 		const { schemaServiceClient, imsOrgId, projectId, workspaceId } = await initSdk({
 			ignoreCache,
@@ -46,9 +48,13 @@ class DeleteCommand extends Command {
 		}
 
 		if (meshId) {
-			const shouldContinue = await promptConfirm(
-				`Are you sure you want to delete the mesh: ${meshId}?`,
-			);
+			let shouldContinue = true;
+
+			if (!autoApproveAction) {
+				shouldContinue = await promptConfirm(
+					`Are you sure you want to delete the mesh: ${meshId}?`,
+				);
+			}
 
 			if (shouldContinue) {
 				try {

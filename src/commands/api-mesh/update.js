@@ -14,7 +14,7 @@ const { readFile } = require('fs/promises');
 
 const logger = require('../../classes/logger');
 const { initSdk, initRequestId, promptConfirm } = require('../../helpers');
-const { ignoreCacheFlag } = require('../../utils');
+const { ignoreCacheFlag, autoApproveActionFlag } = require('../../utils');
 
 require('dotenv').config();
 
@@ -22,6 +22,7 @@ class UpdateCommand extends Command {
 	static args = [{ name: 'file' }];
 	static flags = {
 		ignoreCache: ignoreCacheFlag,
+		autoApproveAction: autoApproveActionFlag,
 	};
 
 	async run() {
@@ -38,6 +39,7 @@ class UpdateCommand extends Command {
 		}
 
 		const ignoreCache = await flags.ignoreCache;
+		const autoApproveAction = await flags.autoApproveAction;
 
 		const { schemaServiceClient, imsOrgId, projectId, workspaceId } = await initSdk({
 			ignoreCache,
@@ -67,9 +69,13 @@ class UpdateCommand extends Command {
 		}
 
 		if (meshId) {
-			const shouldContinue = await promptConfirm(
-				`Are you sure you want to update the mesh: ${meshId}?`,
-			);
+			let shouldContinue = true;
+
+			if (!autoApproveAction) {
+				shouldContinue = await promptConfirm(
+					`Are you sure you want to update the mesh: ${meshId}?`,
+				);
+			}
 
 			if (shouldContinue) {
 				try {

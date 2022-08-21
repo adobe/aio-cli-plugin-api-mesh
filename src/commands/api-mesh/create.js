@@ -15,7 +15,7 @@ const { readFile } = require('fs/promises');
 const { initSdk, initRequestId, promptConfirm } = require('../../helpers');
 const logger = require('../../classes/logger');
 const CONSTANTS = require('../../constants');
-const { ignoreCacheFlag } = require('../../utils');
+const { ignoreCacheFlag, autoApproveActionFlag } = require('../../utils');
 
 require('dotenv').config();
 
@@ -25,6 +25,7 @@ class CreateCommand extends Command {
 	static args = [{ name: 'file' }];
 	static flags = {
 		ignoreCache: ignoreCacheFlag,
+		autoApproveAction: autoApproveActionFlag,
 	};
 
 	async run() {
@@ -41,6 +42,7 @@ class CreateCommand extends Command {
 		}
 
 		const ignoreCache = await flags.ignoreCache;
+		const autoApproveAction = await flags.autoApproveAction;
 
 		const { schemaServiceClient, imsOrgId, projectId, workspaceId } = await initSdk({
 			ignoreCache,
@@ -59,7 +61,11 @@ class CreateCommand extends Command {
 			);
 		}
 
-		const shouldContinue = await promptConfirm(`Are you sure you want to create a mesh?`);
+		let shouldContinue = true;
+
+		if (!autoApproveAction) {
+			shouldContinue = await promptConfirm(`Are you sure you want to create a mesh?`);
+		}
 
 		if (shouldContinue) {
 			try {
