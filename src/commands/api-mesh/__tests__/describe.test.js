@@ -24,30 +24,30 @@ jest.mock('@adobe/aio-cli-lib-console', () => ({
 	init: jest.fn().mockResolvedValue(mockConsoleCLIInstance),
 	cleanStdOut: jest.fn(),
 }));
+jest.mock('../../../lib/devConsole');
 
 const DescribeCommand = require('../describe');
 const { initSdk, initRequestId } = require('../../../helpers');
+const { describeMesh } = require('../../../lib/devConsole');
 
 const selectedOrg = { id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' };
 const selectedProject = { id: '5678', title: 'Project01' };
 const selectedWorkspace = { id: '123456789', title: 'Workspace01' };
 
-const mockDescribeMesh = jest.fn().mockResolvedValue({
-	meshId: 'dummy_meshId',
-	apiKey: 'dummy_apiKey',
-});
-
-const mockSchemaServiceClient = {
-	describeMesh: mockDescribeMesh,
-};
-
 let logSpy = null;
 let errorLogSpy = null;
+let parseSpy = null;
+
+const mockIgnoreCacheFlag = jest.fn().mockResolvedValue(true);
 
 describe('describe command tests', () => {
 	beforeEach(() => {
+		describeMesh.mockResolvedValue({
+			meshId: 'dummy_meshId',
+			apiKey: 'dummy_apiKey',
+		});
+
 		initSdk.mockResolvedValue({
-			schemaServiceClient: mockSchemaServiceClient,
 			imsOrgId: selectedOrg.id,
 			projectId: selectedProject.id,
 			workspaceId: selectedWorkspace.id,
@@ -57,6 +57,13 @@ describe('describe command tests', () => {
 
 		logSpy = jest.spyOn(DescribeCommand.prototype, 'log');
 		errorLogSpy = jest.spyOn(DescribeCommand.prototype, 'error');
+
+		parseSpy = jest.spyOn(DescribeCommand.prototype, 'parse');
+		parseSpy.mockResolvedValue({
+			flags: {
+				ignoreCache: mockIgnoreCacheFlag,
+			},
+		});
 	});
 
 	afterEach(() => {
@@ -65,10 +72,23 @@ describe('describe command tests', () => {
 
 	test('snapshot describe command description', () => {
 		expect(DescribeCommand.description).toMatchInlineSnapshot(`"Get details of a mesh"`);
+		expect(DescribeCommand.args).toMatchInlineSnapshot(`undefined`);
+		expect(DescribeCommand.flags).toMatchInlineSnapshot(`
+		Object {
+		  "ignoreCache": Object {
+		    "allowNo": false,
+		    "default": false,
+		    "description": "Ignore cache and force manual org -> project -> workspace selection",
+		    "parse": [Function],
+		    "type": "boolean",
+		  },
+		}
+	`);
+		expect(DescribeCommand.aliases).toMatchInlineSnapshot(`Array []`);
 	});
 
 	test('should error if describe api has failed', async () => {
-		mockDescribeMesh.mockRejectedValueOnce(new Error('describe api failed'));
+		describeMesh.mockRejectedValueOnce(new Error('describe api failed'));
 
 		const runResult = DescribeCommand.run();
 
@@ -94,7 +114,7 @@ describe('describe command tests', () => {
 	});
 
 	test('should error if mesh details is missing from describe api response', async () => {
-		mockDescribeMesh.mockResolvedValueOnce(null);
+		describeMesh.mockResolvedValueOnce(null);
 
 		const runResult = DescribeCommand.run();
 
@@ -120,7 +140,7 @@ describe('describe command tests', () => {
 	});
 
 	test('should error if mesh id is missing from describe api response', async () => {
-		mockDescribeMesh.mockResolvedValueOnce({});
+		describeMesh.mockResolvedValueOnce({});
 
 		const runResult = await DescribeCommand.run();
 
@@ -139,7 +159,7 @@ describe('describe command tests', () => {
 	});
 
 	test('should not fail if api key is missing from mesh details', async () => {
-		mockDescribeMesh.mockResolvedValueOnce({ meshId: 'dummy_meshId' });
+		describeMesh.mockResolvedValueOnce({ meshId: 'dummy_meshId' });
 
 		const runResult = await DescribeCommand.run();
 
@@ -179,7 +199,7 @@ describe('describe command tests', () => {
 		const runResult = await DescribeCommand.run();
 
 		expect(initRequestId).toHaveBeenCalled();
-		expect(mockDescribeMesh).toHaveBeenCalledWith(
+		expect(describeMesh).toHaveBeenCalledWith(
 			selectedOrg.id,
 			selectedProject.id,
 			selectedWorkspace.id,

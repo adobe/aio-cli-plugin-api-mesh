@@ -23,6 +23,7 @@ jest.mock('../../../helpers', () => ({
 	initSdk: jest.fn().mockResolvedValue({}),
 	initRequestId: jest.fn().mockResolvedValue({}),
 }));
+jest.mock('../../../lib/devConsole');
 
 const mockConsoleCLIInstance = {};
 const selectedOrg = { id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' };
@@ -33,23 +34,18 @@ const { writeFile } = require('fs/promises');
 const { initSdk, initRequestId } = require('../../../helpers');
 const GetCommand = require('../get');
 const mockGetMeshConfig = require('../../__fixtures__/sample_mesh.json');
+const { getMeshId, getMesh } = require('../../../lib/devConsole');
 
 let logSpy = null;
 let errorLogSpy = null;
 
-const mockGetMesh = jest.fn().mockResolvedValue({
-	meshId: 'dummy_meshId',
-	mesh: mockGetMeshConfig,
-});
+let parseSpy = null;
 
-const mockSchemaServiceClient = {
-	getMesh: mockGetMesh,
-};
+const mockIgnoreCacheFlag = Promise.resolve(true);
 
 describe('get command tests', () => {
 	beforeEach(() => {
 		initSdk.mockResolvedValue({
-			schemaServiceClient: mockSchemaServiceClient,
 			imsOrgId: selectedOrg.id,
 			projectId: selectedProject.id,
 			workspaceId: selectedWorkspace.id,
@@ -61,25 +57,81 @@ describe('get command tests', () => {
 		errorLogSpy = jest.spyOn(GetCommand.prototype, 'error');
 
 		writeFile.mockResolvedValue(true);
+
+		getMeshId.mockResolvedValue('dummy_meshId');
+		getMesh.mockResolvedValue({
+			meshId: 'dummy_meshId',
+			mesh: mockGetMeshConfig,
+		});
+
+		parseSpy = jest.spyOn(GetCommand.prototype, 'parse');
+		parseSpy.mockResolvedValue({
+			args: { file: 'mesh.json' },
+			flags: {
+				ignoreCache: mockIgnoreCacheFlag,
+			},
+		});
 	});
 
 	afterEach(() => {
 		jest.restoreAllMocks();
 	});
 
+	test('snapshot get command', () => {
+		expect(GetCommand.description).toMatchInlineSnapshot(`"Get the config of a given mesh"`);
+		expect(GetCommand.args).toMatchInlineSnapshot(`
+		Array [
+		  Object {
+		    "name": "file",
+		  },
+		]
+	`);
+		expect(GetCommand.flags).toMatchInlineSnapshot(`
+		Object {
+		  "ignoreCache": Object {
+		    "allowNo": false,
+		    "default": false,
+		    "description": "Ignore cache and force manual org -> project -> workspace selection",
+		    "parse": [Function],
+		    "type": "boolean",
+		  },
+		}
+	`);
+		expect(GetCommand.aliases).toMatchInlineSnapshot(`Array []`);
+	});
+
 	test('should fail if mesh id is missing', async () => {
-		const runResult = GetCommand.run([]);
+		getMeshId.mockResolvedValue(null);
+		const runResult = GetCommand.run();
 
 		return runResult.catch(err => {
-			expect(err).toHaveProperty(
-				'message',
-				expect.stringMatching(/^Missing Mesh ID. Run aio api-mesh get --help for more info./),
+			expect(err.message).toMatchInlineSnapshot(
+				`"Unable to get mesh config. No mesh found for Org(1234) -> Project(5678) -> Workspace(123456789). Please check the details and try again."`,
 			);
 			expect(logSpy.mock.calls).toMatchInlineSnapshot(`Array []`);
 			expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
 			Array [
 			  Array [
-			    "Missing Mesh ID. Run aio api-mesh get --help for more info.",
+			    "Unable to get mesh config. No mesh found for Org(1234) -> Project(5678) -> Workspace(123456789). Please check the details and try again.",
+			  ],
+			]
+		`);
+		});
+	});
+
+	test('should fail if getMeshId failed', async () => {
+		getMeshId.mockRejectedValue(new Error('getMeshId failed'));
+		const runResult = GetCommand.run();
+
+		return runResult.catch(err => {
+			expect(err.message).toMatchInlineSnapshot(
+				`"Unable to get mesh ID. Please check the details and try again. RequestId: dummy_request_id"`,
+			);
+			expect(logSpy.mock.calls).toMatchInlineSnapshot(`Array []`);
+			expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
+			Array [
+			  Array [
+			    "Unable to get mesh ID. Please check the details and try again. RequestId: dummy_request_id",
 			  ],
 			]
 		`);
@@ -87,17 +139,16 @@ describe('get command tests', () => {
 	});
 
 	test('should fail if mesh id is not found', async () => {
-		mockGetMesh.mockResolvedValueOnce(null);
+		getMesh.mockResolvedValueOnce(null);
 
-		const meshId = 'sample_merchant';
-		const runResult = await GetCommand.run([meshId]);
+		const runResult = await GetCommand.run();
 
 		expect(runResult).toMatchInlineSnapshot(`undefined`);
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`Array []`);
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
 		Array [
 		  Array [
-		    "Unable to get mesh with the ID sample_merchant. Please check the mesh ID and try again. RequestId: dummy_request_id",
+		    "Unable to get mesh with the ID dummy_meshId. Please check the mesh ID and try again. RequestId: dummy_request_id",
 		    Object {
 		      "exit": false,
 		    },
@@ -107,10 +158,9 @@ describe('get command tests', () => {
 	});
 
 	test('should fail if get mesh method failed', async () => {
-		mockGetMesh.mockRejectedValueOnce(new Error('get mesh failed'));
+		getMesh.mockRejectedValueOnce(new Error('get mesh failed'));
 
-		const meshId = 'sample_merchant';
-		const runResult = GetCommand.run([meshId]);
+		const runResult = GetCommand.run();
 
 		await expect(runResult).rejects.toEqual(
 			new Error(
@@ -133,10 +183,14 @@ describe('get command tests', () => {
 	`);
 	});
 
-	test('should pass if mesh id is provided', async () => {
-		const meshId = 'sample_merchant';
-		const runResult = await GetCommand.run([meshId]);
+	test('should pass if mesh id is valid', async () => {
+		const meshId = 'dummy_meshId';
+		getMeshId.mockResolvedValueOnce(meshId);
+		const runResult = await GetCommand.run();
 
+		expect(initSdk).toHaveBeenCalledWith({
+			ignoreCache: true,
+		});
 		expect(initRequestId).toHaveBeenCalled();
 		expect(runResult).toEqual({ meshId: 'dummy_meshId', mesh: mockGetMeshConfig });
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
@@ -161,6 +215,10 @@ describe('get command tests', () => {
 		  }
 		}",
 		  ],
+		  Array [
+		    "Successfully wrote mesh to file %s",
+		    "mesh.json",
+		  ],
 		]
 	`);
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`Array []`);
@@ -169,9 +227,17 @@ describe('get command tests', () => {
 	test('should write to file if file argument is provided', async () => {
 		writeFile.mockResolvedValueOnce(true);
 
-		const meshId = 'sample_merchant';
 		const file = './mesh.json';
-		const runResult = await GetCommand.run([meshId, file]);
+		parseSpy.mockResolvedValueOnce({
+			args: {
+				file,
+			},
+			flags: {
+				ignoreCache: mockIgnoreCacheFlag,
+			},
+		});
+
+		const runResult = await GetCommand.run();
 
 		expect(runResult).toEqual({ meshId: 'dummy_meshId', mesh: mockGetMeshConfig });
 		expect(writeFile.mock.calls).toMatchInlineSnapshot(`
@@ -216,9 +282,16 @@ describe('get command tests', () => {
 	test('should log error if failed to write to file', async () => {
 		writeFile.mockRejectedValueOnce(false);
 
-		const meshId = 'sample_merchant';
 		const file = './mesh.json';
-		const runResult = await GetCommand.run([meshId, file]);
+		parseSpy.mockResolvedValueOnce({
+			args: {
+				file,
+			},
+			flags: {
+				ignoreCache: mockIgnoreCacheFlag,
+			},
+		});
+		const runResult = await GetCommand.run();
 
 		expect(runResult).toEqual({ meshId: 'dummy_meshId', mesh: mockGetMeshConfig });
 		expect(writeFile.mock.calls).toMatchInlineSnapshot(`

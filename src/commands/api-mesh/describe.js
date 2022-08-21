@@ -15,7 +15,7 @@ const logger = require('../../classes/logger');
 const { initSdk, initRequestId } = require('../../helpers');
 const CONSTANTS = require('../../constants');
 const { ignoreCacheFlag } = require('../../utils');
-const { describeMesh } = require('../../lib');
+const { describeMesh } = require('../../lib/devConsole');
 
 require('dotenv').config();
 
