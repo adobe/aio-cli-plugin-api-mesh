@@ -15,6 +15,7 @@ const logger = require('../../classes/logger');
 const { initSdk, initRequestId } = require('../../helpers');
 const CONSTANTS = require('../../constants');
 const { ignoreCacheFlag } = require('../../utils');
+const { describeMesh } = require('../../lib');
 
 require('dotenv').config();
 
@@ -34,12 +35,12 @@ class DescribeCommand extends Command {
 
 		const ignoreCache = await flags.ignoreCache;
 
-		const { schemaServiceClient, imsOrgId, projectId, workspaceId } = await initSdk({
+		const { imsOrgId, projectId, workspaceId } = await initSdk({
 			ignoreCache,
 		});
 
 		try {
-			const meshDetails = await schemaServiceClient.describeMesh(imsOrgId, projectId, workspaceId);
+			const meshDetails = await describeMesh(imsOrgId, projectId, workspaceId);
 
 			if (meshDetails) {
 				const { meshId, apiKey } = meshDetails;

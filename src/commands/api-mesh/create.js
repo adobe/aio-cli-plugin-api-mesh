@@ -16,6 +16,11 @@ const { initSdk, initRequestId, promptConfirm } = require('../../helpers');
 const logger = require('../../classes/logger');
 const CONSTANTS = require('../../constants');
 const { ignoreCacheFlag, autoApproveActionFlag } = require('../../utils');
+const {
+	createMesh,
+	createAPIMeshCredentials,
+	subscribeCredentialToMeshService,
+} = require('../../lib/devConsole');
 
 require('dotenv').config();
 
@@ -44,7 +49,7 @@ class CreateCommand extends Command {
 		const ignoreCache = await flags.ignoreCache;
 		const autoApproveAction = await flags.autoApproveAction;
 
-		const { schemaServiceClient, imsOrgId, projectId, workspaceId } = await initSdk({
+		const { imsOrgId, projectId, workspaceId } = await initSdk({
 			ignoreCache,
 		});
 
@@ -69,14 +74,14 @@ class CreateCommand extends Command {
 
 		if (shouldContinue) {
 			try {
-				const mesh = await schemaServiceClient.createMesh(imsOrgId, projectId, workspaceId, data);
+				const mesh = await createMesh(imsOrgId, projectId, workspaceId, data);
 				let sdkList = [];
 
 				if (mesh) {
 					this.log('Successfully created mesh %s', mesh.meshId);
 					this.log(JSON.stringify(mesh, null, 2));
 					// create API key credential
-					const adobeIdIntegrationsForWorkspace = await schemaServiceClient.createAPIMeshCredentials(
+					const adobeIdIntegrationsForWorkspace = await createAPIMeshCredentials(
 						imsOrgId,
 						projectId,
 						workspaceId,
@@ -85,7 +90,7 @@ class CreateCommand extends Command {
 					if (adobeIdIntegrationsForWorkspace) {
 						this.log('Successfully created API Key %s', adobeIdIntegrationsForWorkspace.apiKey);
 						// subscribe the credential to API mesh service
-						sdkList = await schemaServiceClient.subscribeCredentialToMeshService(
+						sdkList = await subscribeCredentialToMeshService(
 							imsOrgId,
 							projectId,
 							workspaceId,

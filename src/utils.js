@@ -43,7 +43,7 @@ const ignoreCacheFlag = Flags.boolean({
 
 const autoApproveActionFlag = Flags.boolean({
 	description:
-		'Auto approve action prompts with YES. CLI will not check for user approval before executing the action.',
+		'Auto approve action prompt. CLI will not check for user approval before executing the action.',
 	default: false,
 });
 

@@ -19,7 +19,6 @@ const { CLI } = require('@adobe/aio-lib-ims/src/context');
 const libConsoleCLI = require('@adobe/aio-cli-lib-console');
 const { getCliEnv } = require('@adobe/aio-lib-env');
 
-const { SchemaServiceClient } = require('./classes/SchemaServiceClient');
 const logger = require('../src/classes/logger');
 const { UUID } = require('./classes/UUID');
 const CONSTANTS = require('./constants');
@@ -271,15 +270,6 @@ async function getLibConsoleCLI() {
 	return { consoleCLI: consoleCLI, accessToken: accessToken };
 }
 
-async function initSchemaServiceClient() {
-	const { baseUrl, accessToken, apiKey } = await getDevConsoleConfig();
-
-	const schemaServiceClient = new SchemaServiceClient();
-	schemaServiceClient.init(baseUrl, accessToken, apiKey);
-
-	return schemaServiceClient;
-}
-
 /**
  * @returns {any} Returns an object with properties ready for consumption
  */
@@ -306,13 +296,7 @@ async function initSdk(options) {
 
 	logger.info('Initialized user login and the selected organization');
 
-	const { baseUrl, accessToken, apiKey } = await getDevConsoleConfig();
-
-	const schemaServiceClient = new SchemaServiceClient();
-	schemaServiceClient.init(baseUrl, accessToken, apiKey);
-
 	return {
-		schemaServiceClient: schemaServiceClient,
 		imsOrgId: org.id,
 		projectId: project.id,
 		workspaceId: workspace.id,
@@ -353,5 +337,4 @@ module.exports = {
 	getDevConsoleConfig,
 	initSdk,
 	initRequestId,
-	initSchemaServiceClient,
 };

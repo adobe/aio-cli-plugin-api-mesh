@@ -15,6 +15,7 @@ const { readFile } = require('fs/promises');
 const logger = require('../../classes/logger');
 const { initSdk, initRequestId, promptConfirm } = require('../../helpers');
 const { ignoreCacheFlag, autoApproveActionFlag } = require('../../utils');
+const { getMeshId, updateMesh } = require('../../lib/devConsole');
 
 require('dotenv').config();
 
@@ -41,7 +42,7 @@ class UpdateCommand extends Command {
 		const ignoreCache = await flags.ignoreCache;
 		const autoApproveAction = await flags.autoApproveAction;
 
-		const { schemaServiceClient, imsOrgId, projectId, workspaceId } = await initSdk({
+		const { imsOrgId, projectId, workspaceId } = await initSdk({
 			ignoreCache,
 		});
 
@@ -61,7 +62,7 @@ class UpdateCommand extends Command {
 		let meshId = null;
 
 		try {
-			meshId = await schemaServiceClient.getMeshId(imsOrgId, projectId, workspaceId);
+			meshId = await getMeshId(imsOrgId, projectId, workspaceId);
 		} catch (err) {
 			this.error(
 				`Unable to get mesh ID. Please check the details and try again. RequestId: ${global.requestId}`,
@@ -79,13 +80,7 @@ class UpdateCommand extends Command {
 
 			if (shouldContinue) {
 				try {
-					const response = await schemaServiceClient.updateMesh(
-						imsOrgId,
-						projectId,
-						workspaceId,
-						meshId,
-						data,
-					);
+					const response = await updateMesh(imsOrgId, projectId, workspaceId, meshId, data);
 
 					this.log('Successfully updated the mesh with the id: %s', meshId);
 

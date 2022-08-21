@@ -15,6 +15,7 @@ const { writeFile } = require('fs/promises');
 const logger = require('../../classes/logger');
 const { initSdk, initRequestId } = require('../../helpers');
 const { ignoreCacheFlag } = require('../../utils');
+const { getMeshId, getMesh } = require('../../lib/devConsole');
 
 require('dotenv').config();
 
@@ -33,14 +34,14 @@ class GetCommand extends Command {
 
 		const ignoreCache = await flags.ignoreCache;
 
-		const { schemaServiceClient, imsOrgId, projectId, workspaceId } = await initSdk({
+		const { imsOrgId, projectId, workspaceId } = await initSdk({
 			ignoreCache,
 		});
 
 		let meshId = null;
 
 		try {
-			meshId = await schemaServiceClient.getMeshId(imsOrgId, projectId, workspaceId);
+			meshId = await getMeshId(imsOrgId, projectId, workspaceId);
 		} catch (err) {
 			this.error(
 				`Unable to get mesh ID. Please check the details and try again. RequestId: ${global.requestId}`,
@@ -49,7 +50,7 @@ class GetCommand extends Command {
 
 		if (meshId) {
 			try {
-				const mesh = await schemaServiceClient.getMesh(imsOrgId, projectId, workspaceId, meshId);
+				const mesh = await getMesh(imsOrgId, projectId, workspaceId, meshId);
 
 				if (mesh) {
 					this.log('Successfully retrieved mesh %s', JSON.stringify(mesh, null, 2));

@@ -14,6 +14,12 @@ const { Command } = require('@oclif/command');
 const logger = require('../../classes/logger');
 const { initSdk, initRequestId, promptConfirm } = require('../../helpers');
 const { ignoreCacheFlag, autoApproveActionFlag } = require('../../utils');
+const {
+	getMeshId,
+	deleteMesh,
+	getApiKeyCredential,
+	unsubscribeCredentialFromMeshService,
+} = require('../../lib/devConsole');
 
 require('dotenv').config();
 
@@ -33,14 +39,14 @@ class DeleteCommand extends Command {
 		const ignoreCache = await flags.ignoreCache;
 		const autoApproveAction = await flags.autoApproveAction;
 
-		const { schemaServiceClient, imsOrgId, projectId, workspaceId } = await initSdk({
+		const { imsOrgId, projectId, workspaceId } = await initSdk({
 			ignoreCache,
 		});
 
 		let meshId = null;
 
 		try {
-			meshId = await schemaServiceClient.getMeshId(imsOrgId, projectId, workspaceId);
+			meshId = await getMeshId(imsOrgId, projectId, workspaceId);
 		} catch (err) {
 			this.error(
 				`Unable to get mesh ID. Please check the details and try again. RequestId: ${global.requestId}`,
@@ -58,24 +64,15 @@ class DeleteCommand extends Command {
 
 			if (shouldContinue) {
 				try {
-					const deleteMeshResponse = await schemaServiceClient.deleteMesh(
-						imsOrgId,
-						projectId,
-						workspaceId,
-						meshId,
-					);
+					const deleteMeshResponse = await deleteMesh(imsOrgId, projectId, workspaceId, meshId);
 
 					if (deleteMeshResponse) {
 						this.log('Successfully deleted mesh %s', meshId);
 
-						const credential = await schemaServiceClient.getApiKeyCredential(
-							imsOrgId,
-							projectId,
-							workspaceId,
-						);
+						const credential = await getApiKeyCredential(imsOrgId, projectId, workspaceId);
 
 						if (credential) {
-							const newSDKList = await schemaServiceClient.unsubscribeCredentialFromMeshService(
+							const newSDKList = await unsubscribeCredentialFromMeshService(
 								imsOrgId,
 								projectId,
 								workspaceId,
