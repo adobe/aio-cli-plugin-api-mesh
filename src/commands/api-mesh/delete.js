@@ -34,7 +34,7 @@ class DeleteCommand extends Command {
 
 		logger.info(`RequestId: ${global.requestId}`);
 
-		const { flags } = this.parse(DeleteCommand);
+		const { flags } = await this.parse(DeleteCommand);
 
 		const ignoreCache = await flags.ignoreCache;
 		const autoApproveAction = await flags.autoApproveAction;

@@ -31,7 +31,7 @@ class UpdateCommand extends Command {
 
 		logger.info(`RequestId: ${global.requestId}`);
 
-		const { args, flags } = this.parse(UpdateCommand);
+		const { args, flags } = await this.parse(UpdateCommand);
 
 		if (!args.file) {
 			this.error('Missing required args. Run aio api-mesh update --help for more info.');

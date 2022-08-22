@@ -38,7 +38,7 @@ class CreateCommand extends Command {
 
 		logger.info(`RequestId: ${global.requestId}`);
 
-		const { args, flags } = this.parse(CreateCommand);
+		const { args, flags } = await this.parse(CreateCommand);
 
 		if (!args.file) {
 			this.error('Missing file path. Run aio api-mesh create --help for more info.');
