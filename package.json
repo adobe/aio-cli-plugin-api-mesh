@@ -1,6 +1,6 @@
 {
 	"name": "@adobe/aio-cli-plugin-api-mesh",
-	"version": "1.0.3-beta",
+	"version": "1.0.4-beta",
 	"publishConfig": {
 		"access": "public"
 	},
