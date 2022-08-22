@@ -8,7 +8,7 @@
  *
  * @returns {string}
  */
-function objToString(obj, path, defaultString = '') {
+function objToString(obj, path = [], defaultString = '') {
 	try {
 		// Cache the current object
 		let current = obj;

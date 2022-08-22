@@ -16,28 +16,11 @@ const CreateCommand = require('../create');
 const sampleCreateMeshConfig = require('../../__fixtures__/sample_mesh.json');
 const { initSdk, initRequestId } = require('../../../helpers');
 
-const orgs = [{ id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' }];
 const selectedOrg = { id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' };
 
-const projects = [{ id: '5678', title: 'Project01' }];
 const selectedProject = { id: '5678', title: 'Project01' };
 
-const workspaces = [{ id: '123456789', title: 'Workspace01' }];
 const selectedWorkspace = { id: '123456789', title: 'Workspace01' };
-
-function setDefaultMockConsoleCLI() {
-	mockConsoleCLIInstance.getToken = jest.fn().mockReturnValue('test_token');
-	mockConsoleCLIInstance.getCliEnv = jest.fn().mockReturnValue('prod');
-
-	mockConsoleCLIInstance.getOrganizations = jest.fn().mockResolvedValue(orgs);
-	mockConsoleCLIInstance.promptForSelectOrganization = jest.fn().mockResolvedValue(selectedOrg);
-
-	mockConsoleCLIInstance.getProjects = jest.fn().mockResolvedValue(projects);
-	mockConsoleCLIInstance.promptForSelectProject = jest.fn().mockResolvedValue(selectedProject);
-
-	mockConsoleCLIInstance.getWorkspaces = jest.fn().mockResolvedValue(workspaces);
-	mockConsoleCLIInstance.promptForSelectWorkspace = jest.fn().mockResolvedValue(selectedWorkspace);
-}
 
 const mockCreateMesh = jest.fn().mockResolvedValue({
 	meshId: 'dummy_mesh_id',
@@ -49,11 +32,7 @@ const mockCreateAPIMeshCredentials = jest.fn().mockResolvedValue({
 	id: 'dummy_id',
 });
 
-const mockSubscribeCredentialToMeshService = jest.fn().mockResolvedValue([
-	{
-		service: 'dummy_service',
-	},
-]);
+const mockSubscribeCredentialToMeshService = jest.fn().mockResolvedValue(['dummy_service']);
 
 const mockSchemaServiceClient = {
 	createMesh: mockCreateMesh,
@@ -80,8 +59,6 @@ let errorLogSpy = null;
 
 describe('create command tests', () => {
 	beforeEach(() => {
-		setDefaultMockConsoleCLI();
-
 		initSdk.mockResolvedValue({
 			schemaServiceClient: mockSchemaServiceClient,
 			imsOrgId: selectedOrg.id,
@@ -335,9 +312,7 @@ describe('create command tests', () => {
 		    "meshId": "dummy_mesh_id",
 		  },
 		  "sdkList": Array [
-		    Object {
-		      "service": "dummy_service",
-		    },
+		    "dummy_service",
 		  ],
 		}
 	`);
@@ -371,6 +346,11 @@ describe('create command tests', () => {
 		  Array [
 		    "Successfully subscribed API Key %s to API Mesh service",
 		    "dummy_api_key",
+		  ],
+		  Array [
+		    "Mesh Endpoint: %s
+		",
+		    "https://graph.adobe.io/api/dummy_mesh_id/graphql?api_key=dummy_api_key",
 		  ],
 		]
 	`);

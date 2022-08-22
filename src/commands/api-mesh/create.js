@@ -11,8 +11,14 @@ governing permissions and limitations under the License.
 
 const { Command } = require('@oclif/command');
 const { readFile } = require('fs/promises');
+
 const { initSdk, initRequestId } = require('../../helpers');
 const logger = require('../../classes/logger');
+const CONSTANTS = require('../../constants');
+
+require('dotenv').config();
+
+const { MULTITENANT_GRAPHQL_SERVER_BASE_URL } = CONSTANTS;
 
 class CreateCommand extends Command {
 	static args = [{ name: 'file' }];
@@ -73,6 +79,11 @@ class CreateCommand extends Command {
 						this.log(
 							'Successfully subscribed API Key %s to API Mesh service',
 							adobeIdIntegrationsForWorkspace.apiKey,
+						);
+
+						this.log(
+							'Mesh Endpoint: %s\n',
+							`${MULTITENANT_GRAPHQL_SERVER_BASE_URL}/${mesh.meshId}/graphql?api_key=${adobeIdIntegrationsForWorkspace.apiKey}`,
 						);
 					} else {
 						this.log(
