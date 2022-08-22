@@ -92,13 +92,15 @@ describe('delete command tests', () => {
 		Object {
 		  "autoConfirmAction": Object {
 		    "allowNo": false,
+		    "char": "c",
 		    "default": false,
-		    "description": "Auto approve action prompt. CLI will not check for user approval before executing the action.",
+		    "description": "Auto confirm action prompt. CLI will not check for user approval before executing the action.",
 		    "parse": [Function],
 		    "type": "boolean",
 		  },
 		  "ignoreCache": Object {
 		    "allowNo": false,
+		    "char": "i",
 		    "default": false,
 		    "description": "Ignore cache and force manual org -> project -> workspace selection",
 		    "parse": [Function],

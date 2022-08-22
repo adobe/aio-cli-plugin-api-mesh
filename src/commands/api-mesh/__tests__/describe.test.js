@@ -77,6 +77,7 @@ describe('describe command tests', () => {
 		Object {
 		  "ignoreCache": Object {
 		    "allowNo": false,
+		    "char": "i",
 		    "default": false,
 		    "description": "Ignore cache and force manual org -> project -> workspace selection",
 		    "parse": [Function],
