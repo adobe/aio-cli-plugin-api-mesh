@@ -23,6 +23,7 @@ jest.mock('../../../helpers', () => ({
 	initRequestId: jest.fn().mockResolvedValue({}),
 	promptConfirm: jest.fn().mockResolvedValue(true),
 }));
+jest.mock('../../../lib/devConsole');
 
 const mockConsoleCLIInstance = {};
 
@@ -34,26 +35,24 @@ const selectedWorkspace = { id: '123456789', title: 'Workspace01' };
 
 const DeleteCommand = require('../delete');
 const { initSdk, initRequestId, promptConfirm } = require('../../../helpers');
-
-const mockDeleteMesh = jest.fn().mockResolvedValue({ status: 'success' });
-const mockGetApiKeyCredential = jest
-	.fn()
-	.mockResolvedValue({ id_integration: 'dummy_integration_id', client_id: 'dummy_client_id' });
-const mockUnsubscribeCredentialFromMeshService = jest.fn().mockResolvedValue(['dummy_service']);
-
-const mockSchemaServiceClient = {
-	deleteMesh: mockDeleteMesh,
-	getApiKeyCredential: mockGetApiKeyCredential,
-	unsubscribeCredentialFromMeshService: mockUnsubscribeCredentialFromMeshService,
-};
+const {
+	getMeshId,
+	deleteMesh,
+	getApiKeyCredential,
+	unsubscribeCredentialFromMeshService,
+} = require('../../../lib/devConsole');
 
 let logSpy = null;
 let errorLogSpy = null;
 
+let parseSpy = null;
+
+const mockIgnoreCacheFlag = Promise.resolve(true);
+const mockAutoApproveAction = Promise.resolve(false);
+
 describe('delete command tests', () => {
 	beforeEach(() => {
 		initSdk.mockResolvedValue({
-			schemaServiceClient: mockSchemaServiceClient,
 			imsOrgId: selectedOrg.id,
 			projectId: selectedProject.id,
 			workspaceId: selectedWorkspace.id,
@@ -63,6 +62,23 @@ describe('delete command tests', () => {
 
 		logSpy = jest.spyOn(DeleteCommand.prototype, 'log');
 		errorLogSpy = jest.spyOn(DeleteCommand.prototype, 'error');
+
+		getMeshId.mockResolvedValue('mesh_id');
+		deleteMesh.mockResolvedValue({ status: 'success' });
+		getApiKeyCredential.mockResolvedValue({
+			id_integration: 'dummy_integration_id',
+			client_id: 'dummy_client_id',
+		});
+		unsubscribeCredentialFromMeshService.mockResolvedValue(['dummy_service']);
+
+		parseSpy = jest.spyOn(DeleteCommand.prototype, 'parse');
+		parseSpy.mockResolvedValue({
+			args: {},
+			flags: {
+				ignoreCache: mockIgnoreCacheFlag,
+				autoConfirmAction: mockAutoApproveAction,
+			},
+		});
 	});
 
 	afterEach(() => {
@@ -71,21 +87,43 @@ describe('delete command tests', () => {
 
 	test('snapshot delete command description', () => {
 		expect(DeleteCommand.description).toMatchInlineSnapshot(`"Delete the config of a given mesh"`);
+		expect(DeleteCommand.args).toMatchInlineSnapshot(`undefined`);
+		expect(DeleteCommand.flags).toMatchInlineSnapshot(`
+		Object {
+		  "autoConfirmAction": Object {
+		    "allowNo": false,
+		    "char": "c",
+		    "default": false,
+		    "description": "Auto confirm action prompt. CLI will not check for user approval before executing the action.",
+		    "parse": [Function],
+		    "type": "boolean",
+		  },
+		  "ignoreCache": Object {
+		    "allowNo": false,
+		    "char": "i",
+		    "default": false,
+		    "description": "Ignore cache and force manual org -> project -> workspace selection",
+		    "parse": [Function],
+		    "type": "boolean",
+		  },
+		}
+	`);
+		expect(DeleteCommand.aliases).toMatchInlineSnapshot(`Array []`);
 	});
 
 	test('should fail if mesh id is missing', async () => {
-		const runResult = DeleteCommand.run([]);
+		getMeshId.mockResolvedValue(null);
+		const runResult = DeleteCommand.run();
 
 		return runResult.catch(err => {
-			expect(err).toHaveProperty(
-				'message',
-				expect.stringMatching(/^Missing Mesh ID. Run aio api-mesh delete --help for more info/),
+			expect(err.message).toMatchInlineSnapshot(
+				`"Unable to delete. No mesh found for Org(1234) -> Project(5678) -> Workspace(123456789). Please check the details and try again."`,
 			);
 			expect(logSpy.mock.calls).toMatchInlineSnapshot(`Array []`);
 			expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
 			Array [
 			  Array [
-			    "Missing Mesh ID. Run aio api-mesh delete --help for more info.",
+			    "Unable to delete. No mesh found for Org(1234) -> Project(5678) -> Workspace(123456789). Please check the details and try again.",
 			  ],
 			]
 		`);
@@ -95,8 +133,7 @@ describe('delete command tests', () => {
 	test('should not delete if user prompt returns false', async () => {
 		promptConfirm.mockResolvedValueOnce(false);
 
-		const meshId = 'sample_merchant';
-		const runResult = await DeleteCommand.run([meshId]);
+		const runResult = await DeleteCommand.run();
 
 		expect(runResult).toBe('Delete cancelled');
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
@@ -109,10 +146,42 @@ describe('delete command tests', () => {
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`Array []`);
 	});
 
+	test('should not ask for prompt if autoConfirmAction is set', async () => {
+		parseSpy.mockResolvedValue({
+			args: {},
+			flags: {
+				ignoreCache: mockIgnoreCacheFlag,
+				autoConfirmAction: Promise.resolve(true),
+			},
+		});
+
+		const runResult = await DeleteCommand.run();
+
+		expect(runResult).toMatchInlineSnapshot(`
+		Object {
+		  "status": "success",
+		}
+	`);
+		expect(promptConfirm).not.toHaveBeenCalled();
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
+		Array [
+		  Array [
+		    "Successfully deleted mesh %s",
+		    "mesh_id",
+		  ],
+		  Array [
+		    "Successfully unsubscribed API Key %s",
+		    "dummy_client_id",
+		  ],
+		]
+	`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`Array []`);
+	});
+
 	test('should fail if mesh delete fails', async () => {
-		mockDeleteMesh.mockRejectedValueOnce(new Error('mesh delete failed'));
-		const meshId = 'sample_merchant';
-		const runResult = DeleteCommand.run([meshId]);
+		deleteMesh.mockRejectedValueOnce(new Error('mesh delete failed'));
+
+		const runResult = DeleteCommand.run();
 
 		await expect(runResult).rejects.toEqual(
 			new Error(
@@ -136,9 +205,9 @@ describe('delete command tests', () => {
 	});
 
 	test('should delete mesh but fail to unsubscribe if unable to get api key', async () => {
-		mockGetApiKeyCredential.mockRejectedValueOnce(new Error('unable to get api key'));
-		const meshId = 'sample_merchant';
-		const runResult = DeleteCommand.run([meshId]);
+		getApiKeyCredential.mockRejectedValueOnce(new Error('unable to get api key'));
+
+		const runResult = DeleteCommand.run();
 
 		await expect(runResult).rejects.toEqual(
 			new Error(
@@ -149,7 +218,7 @@ describe('delete command tests', () => {
 		Array [
 		  Array [
 		    "Successfully deleted mesh %s",
-		    "sample_merchant",
+		    "mesh_id",
 		  ],
 		  Array [
 		    "unable to get api key",
@@ -166,11 +235,9 @@ describe('delete command tests', () => {
 	});
 
 	test('should delete mesh but fail to unsubscribe if unsubscribe api failed', async () => {
-		mockUnsubscribeCredentialFromMeshService.mockRejectedValueOnce(
-			new Error('unsubscribe api failed'),
-		);
-		const meshId = 'sample_merchant';
-		const runResult = DeleteCommand.run([meshId]);
+		unsubscribeCredentialFromMeshService.mockRejectedValueOnce(new Error('unsubscribe api failed'));
+
+		const runResult = DeleteCommand.run();
 
 		await expect(runResult).rejects.toEqual(
 			new Error(
@@ -181,7 +248,7 @@ describe('delete command tests', () => {
 		Array [
 		  Array [
 		    "Successfully deleted mesh %s",
-		    "sample_merchant",
+		    "mesh_id",
 		  ],
 		  Array [
 		    "unsubscribe api failed",
@@ -198,8 +265,7 @@ describe('delete command tests', () => {
 	});
 
 	test('should delete mesh and unsubscribe if correct args are provided', async () => {
-		const meshId = 'sample_merchant';
-		const runResult = await DeleteCommand.run([meshId]);
+		const runResult = await DeleteCommand.run();
 
 		expect(initRequestId).toHaveBeenCalled();
 		expect(runResult).toMatchInlineSnapshot(`
@@ -207,17 +273,17 @@ describe('delete command tests', () => {
 		  "status": "success",
 		}
 	`);
-		expect(mockDeleteMesh.mock.calls).toMatchInlineSnapshot(`
+		expect(deleteMesh.mock.calls).toMatchInlineSnapshot(`
 		Array [
 		  Array [
 		    "1234",
 		    "5678",
 		    "123456789",
-		    "sample_merchant",
+		    "mesh_id",
 		  ],
 		]
 	`);
-		expect(mockGetApiKeyCredential.mock.calls).toMatchInlineSnapshot(`
+		expect(getApiKeyCredential.mock.calls).toMatchInlineSnapshot(`
 		Array [
 		  Array [
 		    "1234",
@@ -226,7 +292,7 @@ describe('delete command tests', () => {
 		  ],
 		]
 	`);
-		expect(mockUnsubscribeCredentialFromMeshService.mock.calls).toMatchInlineSnapshot(`
+		expect(unsubscribeCredentialFromMeshService.mock.calls).toMatchInlineSnapshot(`
 		Array [
 		  Array [
 		    "1234",
@@ -240,7 +306,7 @@ describe('delete command tests', () => {
 		Array [
 		  Array [
 		    "Successfully deleted mesh %s",
-		    "sample_merchant",
+		    "mesh_id",
 		  ],
 		  Array [
 		    "Successfully unsubscribed API Key %s",

@@ -23,6 +23,7 @@ jest.mock('@adobe/aio-cli-lib-console', () => ({
 	cleanStdOut: jest.fn(),
 }));
 jest.mock('@adobe/aio-lib-ims');
+jest.mock('../../../lib/devConsole');
 
 const mockConsoleCLIInstance = {};
 
@@ -34,20 +35,19 @@ const { readFile } = require('fs/promises');
 
 const UpdateCommand = require('../update');
 const { initSdk, initRequestId, promptConfirm } = require('../../../helpers');
-
-const mockUpdateMesh = jest.fn().mockResolvedValue({ status: 'success' });
-
-const mockSchemaServiceClient = {
-	updateMesh: mockUpdateMesh,
-};
+const { getMeshId, updateMesh } = require('../../../lib/devConsole');
 
 let logSpy = null;
 let errorLogSpy = null;
 
+let parseSpy = null;
+
+const mockIgnoreCacheFlag = Promise.resolve(true);
+const mockAutoApproveAction = Promise.resolve(false);
+
 describe('update command tests', () => {
 	beforeEach(() => {
 		initSdk.mockResolvedValue({
-			schemaServiceClient: mockSchemaServiceClient,
 			imsOrgId: selectedOrg.id,
 			projectId: selectedProject.id,
 			workspaceId: selectedWorkspace.id,
@@ -59,6 +59,18 @@ describe('update command tests', () => {
 		errorLogSpy = jest.spyOn(UpdateCommand.prototype, 'error');
 
 		readFile.mockResolvedValue(true);
+
+		getMeshId.mockResolvedValue('mesh_id');
+		updateMesh.mockResolvedValue({ status: 'success' });
+
+		parseSpy = jest.spyOn(UpdateCommand.prototype, 'parse');
+		parseSpy.mockResolvedValue({
+			args: { file: 'valid_file_path' },
+			flags: {
+				ignoreCache: mockIgnoreCacheFlag,
+				autoConfirmAction: mockAutoApproveAction,
+			},
+		});
 	});
 
 	afterEach(() => {
@@ -66,23 +78,48 @@ describe('update command tests', () => {
 	});
 
 	test('should fail if mesh id is missing', async () => {
-		const runResult = UpdateCommand.run([]);
+		getMeshId.mockResolvedValue(null);
+		const runResult = UpdateCommand.run();
 
-		await expect(runResult).rejects.toEqual(
-			new Error('Missing required args. Run aio api-mesh update --help for more info.'),
+		await expect(runResult).rejects.toMatchInlineSnapshot(
+			`[Error: Unable to update. No mesh found for Org(1234) -> Project(5678) -> Workspace(123456789). Please check the details and try again.]`,
 		);
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`Array []`);
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
 		Array [
 		  Array [
-		    "Missing required args. Run aio api-mesh update --help for more info.",
+		    "Unable to update. No mesh found for Org(1234) -> Project(5678) -> Workspace(123456789). Please check the details and try again.",
+		  ],
+		]
+	`);
+	});
+
+	test('should fail if getMeshId api failed', async () => {
+		getMeshId.mockRejectedValue(new Error('getMeshId api failed'));
+		const runResult = UpdateCommand.run();
+
+		await expect(runResult).rejects.toMatchInlineSnapshot(
+			`[Error: Unable to get mesh ID. Please check the details and try again. RequestId: dummy_request_id]`,
+		);
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`Array []`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
+		Array [
+		  Array [
+		    "Unable to get mesh ID. Please check the details and try again. RequestId: dummy_request_id",
 		  ],
 		]
 	`);
 	});
 
 	test('should fail if update file path is missing', async () => {
-		const runResult = UpdateCommand.run(['dummy_mesh_id']);
+		parseSpy.mockResolvedValueOnce({
+			args: { file: null },
+			flags: {
+				ignoreCache: mockIgnoreCacheFlag,
+				autoConfirmAction: mockAutoApproveAction,
+			},
+		});
+		const runResult = UpdateCommand.run();
 
 		await expect(runResult).rejects.toEqual(
 			new Error('Missing required args. Run aio api-mesh update --help for more info.'),
@@ -99,7 +136,7 @@ describe('update command tests', () => {
 
 	test('should fail if dummy file path is provided', async () => {
 		readFile.mockRejectedValueOnce(new Error('File not found'));
-		const runResult = UpdateCommand.run(['dummy_mesh_id', 'dummy_file_path']);
+		const runResult = UpdateCommand.run();
 
 		await expect(runResult).rejects.toEqual(
 			new Error(
@@ -125,7 +162,7 @@ describe('update command tests', () => {
 	test('should not update if user prompt returns false', async () => {
 		promptConfirm.mockResolvedValueOnce(false);
 
-		const runResult = await UpdateCommand.run(['sample_merchant', 'valid_mesh_path']);
+		const runResult = await UpdateCommand.run();
 
 		expect(runResult).toMatchInlineSnapshot(`"Update cancelled"`);
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
@@ -139,9 +176,9 @@ describe('update command tests', () => {
 	});
 
 	test('should fail if updateMesh method failed', async () => {
-		mockUpdateMesh.mockRejectedValueOnce(new Error('dummy_error'));
+		updateMesh.mockRejectedValueOnce(new Error('dummy_error'));
 
-		const runResult = UpdateCommand.run(['sample_merchant', 'valid_mesh_path']);
+		const runResult = UpdateCommand.run();
 
 		await expect(runResult).rejects.toEqual(
 			new Error(
@@ -165,7 +202,7 @@ describe('update command tests', () => {
 	});
 
 	test('should pass with valid args', async () => {
-		const runResult = await UpdateCommand.run(['sample_merchant', 'valid_mesh_path']);
+		const runResult = await UpdateCommand.run();
 
 		expect(runResult).toMatchInlineSnapshot(`
 		Object {
@@ -173,11 +210,77 @@ describe('update command tests', () => {
 		}
 	`);
 		expect(initRequestId).toHaveBeenCalled();
+		expect(initSdk).toHaveBeenCalledWith({
+			ignoreCache: true,
+		});
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
 		Array [
 		  Array [
 		    "Successfully updated the mesh with the id: %s",
-		    "sample_merchant",
+		    "mesh_id",
+		  ],
+		]
+	`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`Array []`);
+	});
+
+	test('should pass with valid args and ignoreCache flag', async () => {
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'valid_file_name' },
+			flags: {
+				ignoreCache: Promise.resolve(true),
+				autoConfirmAction: mockAutoApproveAction,
+			},
+		});
+
+		const runResult = await UpdateCommand.run();
+
+		expect(runResult).toMatchInlineSnapshot(`
+		Object {
+		  "status": "success",
+		}
+	`);
+		expect(initRequestId).toHaveBeenCalled();
+		expect(initSdk).toHaveBeenCalledWith({
+			ignoreCache: true,
+		});
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
+		Array [
+		  Array [
+		    "Successfully updated the mesh with the id: %s",
+		    "mesh_id",
+		  ],
+		]
+	`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`Array []`);
+	});
+
+	test('should pass with valid args if autoConfirmAction flag is set', async () => {
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'valid_file_name' },
+			flags: {
+				ignoreCache: mockIgnoreCacheFlag,
+				autoConfirmAction: Promise.resolve(true),
+			},
+		});
+
+		const runResult = await UpdateCommand.run();
+
+		expect(runResult).toMatchInlineSnapshot(`
+		Object {
+		  "status": "success",
+		}
+	`);
+		expect(initRequestId).toHaveBeenCalled();
+		expect(promptConfirm).not.toHaveBeenCalled();
+		expect(initSdk).toHaveBeenCalledWith({
+			ignoreCache: true,
+		});
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
+		Array [
+		  Array [
+		    "Successfully updated the mesh with the id: %s",
+		    "mesh_id",
 		  ],
 		]
 	`);

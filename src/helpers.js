@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 /*
 Copyright 2021 Adobe. All rights reserved.
 This file is licensed to you under the Apache License, Version 2.0 (the "License");
@@ -17,14 +18,11 @@ const { getToken, context } = require('@adobe/aio-lib-ims');
 const { CLI } = require('@adobe/aio-lib-ims/src/context');
 const libConsoleCLI = require('@adobe/aio-cli-lib-console');
 const { getCliEnv } = require('@adobe/aio-lib-env');
-const aioConsoleLogger = require('@adobe/aio-lib-core-logging')('@adobe/aio-cli-plugin-api-mesh', {
-	provider: 'debug',
-});
 
-const { SchemaServiceClient } = require('./classes/SchemaServiceClient');
 const logger = require('../src/classes/logger');
 const { UUID } = require('./classes/UUID');
 const CONSTANTS = require('./constants');
+const { objToString } = require('./utils');
 
 const { DEV_CONSOLE_BASE_URL, DEV_CONSOLE_API_KEY, AIO_CLI_API_KEY } = CONSTANTS;
 
@@ -79,27 +77,37 @@ async function getDevConsoleConfig() {
  * @returns {string} Returns organizations the user belongs to
  */
 async function getAuthorizedOrganization() {
+	logger.info(`Initializing organization selection for`);
+
 	const { consoleCLI } = await getLibConsoleCLI();
 
-	aioConsoleLogger.debug('Get the selected organization');
+	logger.debug('Get the selected organization');
 
 	const consoleConfigOrg = Config.get('console.org');
 
 	if (!consoleConfigOrg) {
 		const organizations = await consoleCLI.getOrganizations();
-		const selectedOrg = await consoleCLI.promptForSelectOrganization(organizations);
 
-		aioConsoleLogger.debug('Set the console config');
+		logger.info(`Retrieved organizations : ${objToString(organizations)}`);
 
-		Config.set('console.org', {
-			id: selectedOrg.id,
-			code: selectedOrg.code,
-			name: selectedOrg.name,
-		});
+		if (organizations.length !== 0) {
+			const selectedOrg = await consoleCLI.promptForSelectOrganization(organizations);
 
-		return Object.assign({}, selectedOrg);
+			logger.debug('Set the console org config');
+
+			Config.set('console.org', selectedOrg);
+
+			// remove selected project and workspace from config and let the user select a new one
+			Config.delete('console.project');
+			Config.delete('console.workspace');
+
+			return Object.assign({}, selectedOrg);
+		} else {
+			logger.error(`No organizations found`);
+		}
 	} else {
-		logger.info(`Selecting your organization as: ${consoleConfigOrg.name}`);
+		logger.debug(`Selected organization config ${objToString(consoleConfigOrg)}`);
+		console.log(`Selected organization: ${consoleConfigOrg.name}`);
 
 		return Object.assign({}, consoleConfigOrg);
 	}
@@ -110,35 +118,141 @@ async function getProject(imsOrgId, imsOrgTitle) {
 
 	const { consoleCLI } = await getLibConsoleCLI();
 
-	const projects = await consoleCLI.getProjects(imsOrgId);
-	if (projects.length !== 0) {
-		const selectedProject = await consoleCLI.promptForSelectProject(projects);
+	logger.debug('Get the selected project');
 
-		return selectedProject;
+	const consoleConfigProject = Config.get('console.project');
+
+	if (!consoleConfigProject) {
+		const projects = await consoleCLI.getProjects(imsOrgId);
+
+		logger.debug(`Retrieved projects for ${imsOrgId} : ${objToString(projects)}`);
+
+		if (projects.length !== 0) {
+			const selectedProject = await consoleCLI.promptForSelectProject(projects);
+
+			const shouldCacheProject = await promptConfirm(
+				`Do you want to use ${selectedProject.title} as selected project for future operations?`,
+			);
+
+			if (shouldCacheProject) {
+				Config.set('console.project', selectedProject);
+			}
+
+			// remove selected workspace from config and let the user select a new one
+			Config.delete('console.workspace');
+
+			return Object.assign({}, selectedProject);
+		} else {
+			logger.error(`No projects found for the selected organization: ${imsOrgTitle}`);
+		}
 	} else {
-		aioConsoleLogger.error(`No projects found for the selected organization: ${imsOrgTitle}`);
+		logger.debug(`Selected project config ${objToString(consoleConfigProject)}`);
+		console.log(`Selected project: ${consoleConfigProject.title}`);
+
+		return consoleConfigProject;
 	}
 }
 
 async function getWorkspace(orgId, projectId, imsOrgTitle, projectTitle) {
-	logger.info(`Initializing workspace selection for ${orgId} / ${projectId}`);
+	logger.info(`Initializing workspace selection for ${orgId} -> ${projectId}`);
 
 	const { consoleCLI } = await getLibConsoleCLI();
 
-	const workspaces = await consoleCLI.getWorkspaces(orgId, projectId);
-	if (workspaces.length !== 0) {
-		const selectedWorkspace = await consoleCLI.promptForSelectWorkspace(workspaces);
+	logger.debug('Get the selected workspace');
 
-		return selectedWorkspace;
+	const consoleConfigWorkspace = Config.get('console.workspace');
+
+	if (!consoleConfigWorkspace) {
+		const workspaces = await consoleCLI.getWorkspaces(orgId, projectId);
+
+		logger.debug(`Retrieved workspaces for ${orgId} -> ${projectId} : ${objToString(workspaces)}`);
+
+		if (workspaces.length !== 0) {
+			const selectedWorkspace = await consoleCLI.promptForSelectWorkspace(workspaces);
+
+			const shouldCacheWorkspace = await promptConfirm(
+				`Do you want to use ${selectedWorkspace.name} as selected workspace for future operations?`,
+			);
+
+			if (shouldCacheWorkspace) {
+				Config.set('console.workspace', selectedWorkspace);
+			}
+
+			return Object.assign({}, selectedWorkspace);
+		} else {
+			logger.error(
+				`No workspaces found for the selected organization: ${imsOrgTitle} and project: ${projectTitle}`,
+			);
+		}
 	} else {
-		aioConsoleLogger.error(
-			`No workspaces found for the selected organization: ${imsOrgTitle} and project: ${projectTitle}`,
-		);
+		logger.debug(`Selected workspace config ${objToString(consoleConfigWorkspace)}`);
+		console.log(`Select workspace: ${consoleConfigWorkspace.name}`);
+
+		return {
+			id: consoleConfigWorkspace.id,
+			title: consoleConfigWorkspace.name,
+		};
 	}
 }
 
+const selectAuthorizedOrganization = async () => {
+	const { consoleCLI } = await getLibConsoleCLI();
+	const organizations = await consoleCLI.getOrganizations();
+
+	if (organizations.length > 0) {
+		const selectedOrg = await consoleCLI.promptForSelectOrganization(organizations);
+
+		if (selectedOrg) {
+			return selectedOrg;
+		} else {
+			throw new Error('No org selected');
+		}
+	} else {
+		this.error('No organizations found');
+	}
+};
+
+const selectProject = async (imsOrgId, imsOrgTitle) => {
+	const { consoleCLI } = await getLibConsoleCLI();
+	const projects = await consoleCLI.getProjects(imsOrgId);
+
+	if (projects.length > 0) {
+		const selectedProject = await consoleCLI.promptForSelectProject(projects);
+
+		if (selectedProject) {
+			return selectedProject;
+		} else {
+			throw new Error('No project selected');
+		}
+	} else {
+		this.error('No projects found for the selected organization: ' + imsOrgTitle);
+	}
+};
+
+const selectWorkspace = async (orgId, projectId, imsOrgTitle, projectTitle) => {
+	const { consoleCLI } = await getLibConsoleCLI();
+	const workspaces = await consoleCLI.getWorkspaces(orgId, projectId);
+
+	if (workspaces.length > 0) {
+		const selectedWorkspace = await consoleCLI.promptForSelectWorkspace(workspaces);
+
+		if (selectedWorkspace) {
+			return selectedWorkspace;
+		} else {
+			throw new Error('No workspace selected');
+		}
+	} else {
+		this.error(
+			'No workspaces found for the selected organization: ' +
+				imsOrgTitle +
+				' and project: ' +
+				projectTitle,
+		);
+	}
+};
+
 /**
- * @private
+ * @returns {consoleCLI, accessToken}
  */
 async function getLibConsoleCLI() {
 	await context.setCli({ 'cli.bare-output': true }, false);
@@ -159,24 +273,30 @@ async function getLibConsoleCLI() {
 /**
  * @returns {any} Returns an object with properties ready for consumption
  */
-async function initSdk() {
-	const org = await getAuthorizedOrganization();
-	const project = await getProject(org.id, org.name);
-	const workspace = await getWorkspace(org.id, project.id, org.name, project.title);
+async function initSdk(options) {
+	const { ignoreCache = false } = options;
 
-	aioConsoleLogger.log(
+	let org;
+	let project;
+	let workspace;
+
+	if (!ignoreCache) {
+		org = await getAuthorizedOrganization();
+		project = await getProject(org.id, org.name);
+		workspace = await getWorkspace(org.id, project.id, org.name, project.title);
+	} else {
+		org = await selectAuthorizedOrganization();
+		project = await selectProject(org.id, org.name);
+		workspace = await selectWorkspace(org.id, project.id, org.name, project.title);
+	}
+
+	logger.info(
 		`Initializing SDK for org: ${org.name}, project: ${project.title} and workspace: ${workspace.title}`,
 	);
 
 	logger.info('Initialized user login and the selected organization');
 
-	const { baseUrl, accessToken, apiKey } = await getDevConsoleConfig();
-
-	const schemaServiceClient = new SchemaServiceClient();
-	schemaServiceClient.init(baseUrl, accessToken, apiKey);
-
 	return {
-		schemaServiceClient: schemaServiceClient,
 		imsOrgId: org.id,
 		projectId: project.id,
 		workspaceId: workspace.id,

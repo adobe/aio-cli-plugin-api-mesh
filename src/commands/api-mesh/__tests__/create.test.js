@@ -14,31 +14,18 @@ const mockConsoleCLIInstance = {};
 
 const CreateCommand = require('../create');
 const sampleCreateMeshConfig = require('../../__fixtures__/sample_mesh.json');
-const { initSdk, initRequestId } = require('../../../helpers');
+const { initSdk, initRequestId, promptConfirm } = require('../../../helpers');
+const {
+	createMesh,
+	createAPIMeshCredentials,
+	subscribeCredentialToMeshService,
+} = require('../../../lib/devConsole');
 
 const selectedOrg = { id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' };
 
 const selectedProject = { id: '5678', title: 'Project01' };
 
 const selectedWorkspace = { id: '123456789', title: 'Workspace01' };
-
-const mockCreateMesh = jest.fn().mockResolvedValue({
-	meshId: 'dummy_mesh_id',
-	meshConfig: sampleCreateMeshConfig.meshConfig,
-});
-
-const mockCreateAPIMeshCredentials = jest.fn().mockResolvedValue({
-	apiKey: 'dummy_api_key',
-	id: 'dummy_id',
-});
-
-const mockSubscribeCredentialToMeshService = jest.fn().mockResolvedValue(['dummy_service']);
-
-const mockSchemaServiceClient = {
-	createMesh: mockCreateMesh,
-	createAPIMeshCredentials: mockCreateAPIMeshCredentials,
-	subscribeCredentialToMeshService: mockSubscribeCredentialToMeshService,
-};
 
 jest.mock('@adobe/aio-cli-lib-console', () => ({
 	init: jest.fn().mockResolvedValue(mockConsoleCLIInstance),
@@ -52,15 +39,21 @@ jest.mock('@adobe/aio-cli-lib-console');
 jest.mock('../../../helpers', () => ({
 	initSdk: jest.fn().mockResolvedValue({}),
 	initRequestId: jest.fn().mockResolvedValue({}),
+	promptConfirm: jest.fn().mockResolvedValue(true),
 }));
+jest.mock('../../../lib/devConsole');
 
 let logSpy = null;
 let errorLogSpy = null;
 
+let parseSpy = null;
+
+const mockIgnoreCacheFlag = Promise.resolve(true);
+const mockAutoApproveAction = Promise.resolve(false);
+
 describe('create command tests', () => {
 	beforeEach(() => {
 		initSdk.mockResolvedValue({
-			schemaServiceClient: mockSchemaServiceClient,
 			imsOrgId: selectedOrg.id,
 			projectId: selectedProject.id,
 			workspaceId: selectedWorkspace.id,
@@ -70,6 +63,25 @@ describe('create command tests', () => {
 
 		logSpy = jest.spyOn(CreateCommand.prototype, 'log');
 		errorLogSpy = jest.spyOn(CreateCommand.prototype, 'error');
+
+		createMesh.mockResolvedValue({
+			meshId: 'dummy_mesh_id',
+			meshConfig: sampleCreateMeshConfig.meshConfig,
+		});
+		createAPIMeshCredentials.mockResolvedValue({
+			apiKey: 'dummy_api_key',
+			id: 'dummy_id',
+		});
+		subscribeCredentialToMeshService.mockResolvedValue(['dummy_service']);
+
+		parseSpy = jest.spyOn(CreateCommand.prototype, 'parse');
+		parseSpy.mockResolvedValue({
+			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
+			flags: {
+				ignoreCache: mockIgnoreCacheFlag,
+				autoConfirmAction: mockAutoApproveAction,
+			},
+		});
 	});
 
 	afterEach(() => {
@@ -80,10 +92,45 @@ describe('create command tests', () => {
 		expect(CreateCommand.description).toMatchInlineSnapshot(
 			`"Create a mesh with the given config."`,
 		);
+		expect(CreateCommand.args).toMatchInlineSnapshot(`
+		Array [
+		  Object {
+		    "name": "file",
+		  },
+		]
+	`);
+		expect(CreateCommand.flags).toMatchInlineSnapshot(`
+		Object {
+		  "autoConfirmAction": Object {
+		    "allowNo": false,
+		    "char": "c",
+		    "default": false,
+		    "description": "Auto confirm action prompt. CLI will not check for user approval before executing the action.",
+		    "parse": [Function],
+		    "type": "boolean",
+		  },
+		  "ignoreCache": Object {
+		    "allowNo": false,
+		    "char": "i",
+		    "default": false,
+		    "description": "Ignore cache and force manual org -> project -> workspace selection",
+		    "parse": [Function],
+		    "type": "boolean",
+		  },
+		}
+	`);
+		expect(CreateCommand.aliases).toMatchInlineSnapshot(`Array []`);
 	});
 
 	test('should fail if mesh config file arg is missing', async () => {
-		const runResult = CreateCommand.run([]);
+		parseSpy.mockResolvedValueOnce({
+			args: {},
+			flags: {
+				ignoreCache: mockIgnoreCacheFlag,
+				autoConfirmAction: mockAutoApproveAction,
+			},
+		});
+		const runResult = CreateCommand.run();
 
 		await expect(runResult).rejects.toEqual(
 			new Error('Missing file path. Run aio api-mesh create --help for more info.'),
@@ -99,7 +146,14 @@ describe('create command tests', () => {
 	});
 
 	test('should fail if mesh file is invalid', async () => {
-		const runResult = CreateCommand.run(['invalid_file_path']);
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'dummy_file_path' },
+			flags: {
+				ignoreCache: mockIgnoreCacheFlag,
+				autoConfirmAction: mockAutoApproveAction,
+			},
+		});
+		const runResult = CreateCommand.run();
 
 		await expect(runResult).rejects.toEqual(
 			new Error(
@@ -109,7 +163,7 @@ describe('create command tests', () => {
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
 		Array [
 		  Array [
-		    "ENOENT: no such file or directory, open 'invalid_file_path'",
+		    "ENOENT: no such file or directory, open 'dummy_file_path'",
 		  ],
 		]
 	`);
@@ -123,9 +177,9 @@ describe('create command tests', () => {
 	});
 
 	test('should fail if create mesh api has failed', async () => {
-		mockCreateMesh.mockRejectedValueOnce(new Error('create mesh api failed'));
+		createMesh.mockRejectedValueOnce(new Error('create mesh api failed'));
 
-		const runResult = CreateCommand.run(['src/commands/__fixtures__/sample_mesh.json']);
+		const runResult = CreateCommand.run();
 
 		await expect(runResult).rejects.toEqual(
 			new Error(
@@ -149,11 +203,9 @@ describe('create command tests', () => {
 	});
 
 	test('should fail if create api credential api has failed', async () => {
-		mockCreateAPIMeshCredentials.mockRejectedValueOnce(
-			new Error('create api credential api failed'),
-		);
+		createAPIMeshCredentials.mockRejectedValueOnce(new Error('create api credential api failed'));
 
-		const runResult = CreateCommand.run(['src/commands/__fixtures__/sample_mesh.json']);
+		const runResult = CreateCommand.run();
 
 		await expect(runResult).rejects.toEqual(
 			new Error(
@@ -198,11 +250,11 @@ describe('create command tests', () => {
 	});
 
 	test('should fail if subscribe credential to mesh service api has failed', async () => {
-		mockSubscribeCredentialToMeshService.mockRejectedValueOnce(
+		subscribeCredentialToMeshService.mockRejectedValueOnce(
 			new Error('subscribe credential to mesh service api failed'),
 		);
 
-		const runResult = CreateCommand.run(['src/commands/__fixtures__/sample_mesh.json']);
+		const runResult = CreateCommand.run();
 
 		await expect(runResult).rejects.toEqual(
 			new Error(
@@ -251,10 +303,10 @@ describe('create command tests', () => {
 	});
 
 	test('should create if a valid mesh config file is provided', async () => {
-		const runResult = await CreateCommand.run(['src/commands/__fixtures__/sample_mesh.json']);
+		const runResult = await CreateCommand.run();
 
 		expect(initRequestId).toHaveBeenCalled();
-		expect(mockCreateMesh.mock.calls[0]).toMatchInlineSnapshot(`
+		expect(createMesh.mock.calls[0]).toMatchInlineSnapshot(`
 		Array [
 		  "1234",
 		  "5678",
@@ -275,14 +327,14 @@ describe('create command tests', () => {
 		  },
 		]
 	`);
-		expect(mockCreateAPIMeshCredentials.mock.calls[0]).toMatchInlineSnapshot(`
+		expect(createAPIMeshCredentials.mock.calls[0]).toMatchInlineSnapshot(`
 		Array [
 		  "1234",
 		  "5678",
 		  "123456789",
 		]
 	`);
-		expect(mockSubscribeCredentialToMeshService.mock.calls[0]).toMatchInlineSnapshot(`
+		expect(subscribeCredentialToMeshService.mock.calls[0]).toMatchInlineSnapshot(`
 		Array [
 		  "1234",
 		  "5678",
@@ -351,6 +403,83 @@ describe('create command tests', () => {
 		    "Mesh Endpoint: %s
 		",
 		    "https://graph.adobe.io/api/dummy_mesh_id/graphql?api_key=dummy_api_key",
+		  ],
+		]
+	`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`Array []`);
+	});
+
+	test('should not ask for confirmation if autoConfirmAction is provided', async () => {
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
+			flags: {
+				ignoreCache: mockIgnoreCacheFlag,
+				autoConfirmAction: Promise.resolve(true),
+			},
+		});
+
+		await CreateCommand.run();
+
+		expect(initRequestId).toHaveBeenCalled();
+		expect(promptConfirm).not.toHaveBeenCalled();
+		expect(initSdk).toHaveBeenCalledWith({
+			ignoreCache: true,
+		});
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
+		Array [
+		  Array [
+		    "Successfully created mesh %s",
+		    "dummy_mesh_id",
+		  ],
+		  Array [
+		    "{
+		  \\"meshId\\": \\"dummy_mesh_id\\",
+		  \\"meshConfig\\": {
+		    \\"sources\\": [
+		      {
+		        \\"name\\": \\"<api_name>\\",
+		        \\"handler\\": {
+		          \\"graphql\\": {
+		            \\"endpoint\\": \\"<gql_endpoint>\\"
+		          }
+		        }
+		      }
+		    ]
+		  }
+		}",
+		  ],
+		  Array [
+		    "Successfully created API Key %s",
+		    "dummy_api_key",
+		  ],
+		  Array [
+		    "Successfully subscribed API Key %s to API Mesh service",
+		    "dummy_api_key",
+		  ],
+		  Array [
+		    "Mesh Endpoint: %s
+		",
+		    "https://graph.adobe.io/api/dummy_mesh_id/graphql?api_key=dummy_api_key",
+		  ],
+		]
+	`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`Array []`);
+	});
+
+	test('should stop creation if user declines confirmation', async () => {
+		promptConfirm.mockResolvedValueOnce(false);
+
+		await CreateCommand.run();
+
+		expect(initRequestId).toHaveBeenCalled();
+		expect(promptConfirm).toHaveBeenCalled();
+		expect(initSdk).toHaveBeenCalledWith({
+			ignoreCache: true,
+		});
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
+		Array [
+		  Array [
+		    "Create cancelled",
 		  ],
 		]
 	`);
