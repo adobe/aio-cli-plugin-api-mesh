@@ -79,7 +79,7 @@ describe('create command tests', () => {
 			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
 			flags: {
 				ignoreCache: mockIgnoreCacheFlag,
-				autoApproveAction: mockAutoApproveAction,
+				autoConfirmAction: mockAutoApproveAction,
 			},
 		});
 	});
@@ -101,7 +101,7 @@ describe('create command tests', () => {
 	`);
 		expect(CreateCommand.flags).toMatchInlineSnapshot(`
 		Object {
-		  "autoApproveAction": Object {
+		  "autoConfirmAction": Object {
 		    "allowNo": false,
 		    "default": false,
 		    "description": "Auto approve action prompt. CLI will not check for user approval before executing the action.",
@@ -125,7 +125,7 @@ describe('create command tests', () => {
 			args: {},
 			flags: {
 				ignoreCache: mockIgnoreCacheFlag,
-				autoApproveAction: mockAutoApproveAction,
+				autoConfirmAction: mockAutoApproveAction,
 			},
 		});
 		const runResult = CreateCommand.run();
@@ -148,7 +148,7 @@ describe('create command tests', () => {
 			args: { file: 'dummy_file_path' },
 			flags: {
 				ignoreCache: mockIgnoreCacheFlag,
-				autoApproveAction: mockAutoApproveAction,
+				autoConfirmAction: mockAutoApproveAction,
 			},
 		});
 		const runResult = CreateCommand.run();
@@ -407,12 +407,12 @@ describe('create command tests', () => {
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`Array []`);
 	});
 
-	test('should not ask for confirmation if autoApproveAction is provided', async () => {
+	test('should not ask for confirmation if autoConfirmAction is provided', async () => {
 		parseSpy.mockResolvedValueOnce({
 			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
 			flags: {
 				ignoreCache: mockIgnoreCacheFlag,
-				autoApproveAction: Promise.resolve(true),
+				autoConfirmAction: Promise.resolve(true),
 			},
 		});
 

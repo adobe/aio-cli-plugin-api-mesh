@@ -37,18 +37,20 @@ function objToString(obj, path = [], defaultString = '') {
 const { Flags } = require('@oclif/core');
 
 const ignoreCacheFlag = Flags.boolean({
+	char: 'i',
 	description: 'Ignore cache and force manual org -> project -> workspace selection',
 	default: false,
 });
 
-const autoApproveActionFlag = Flags.boolean({
+const autoConfirmActionFlag = Flags.boolean({
+	char: 'c',
 	description:
-		'Auto approve action prompt. CLI will not check for user approval before executing the action.',
+		'Auto confirm action prompt. CLI will not check for user approval before executing the action.',
 	default: false,
 });
 
 module.exports = {
 	objToString,
 	ignoreCacheFlag,
-	autoApproveActionFlag,
+	autoConfirmActionFlag,
 };

@@ -76,7 +76,7 @@ describe('delete command tests', () => {
 			args: {},
 			flags: {
 				ignoreCache: mockIgnoreCacheFlag,
-				autoApproveAction: mockAutoApproveAction,
+				autoConfirmAction: mockAutoApproveAction,
 			},
 		});
 	});
@@ -90,7 +90,7 @@ describe('delete command tests', () => {
 		expect(DeleteCommand.args).toMatchInlineSnapshot(`undefined`);
 		expect(DeleteCommand.flags).toMatchInlineSnapshot(`
 		Object {
-		  "autoApproveAction": Object {
+		  "autoConfirmAction": Object {
 		    "allowNo": false,
 		    "default": false,
 		    "description": "Auto approve action prompt. CLI will not check for user approval before executing the action.",
@@ -144,12 +144,12 @@ describe('delete command tests', () => {
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`Array []`);
 	});
 
-	test('should not ask for prompt if autoApproveAction is set', async () => {
+	test('should not ask for prompt if autoConfirmAction is set', async () => {
 		parseSpy.mockResolvedValue({
 			args: {},
 			flags: {
 				ignoreCache: mockIgnoreCacheFlag,
-				autoApproveAction: Promise.resolve(true),
+				autoConfirmAction: Promise.resolve(true),
 			},
 		});
 

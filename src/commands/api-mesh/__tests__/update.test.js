@@ -68,7 +68,7 @@ describe('update command tests', () => {
 			args: { file: 'valid_file_path' },
 			flags: {
 				ignoreCache: mockIgnoreCacheFlag,
-				autoApproveAction: mockAutoApproveAction,
+				autoConfirmAction: mockAutoApproveAction,
 			},
 		});
 	});
@@ -116,7 +116,7 @@ describe('update command tests', () => {
 			args: { file: null },
 			flags: {
 				ignoreCache: mockIgnoreCacheFlag,
-				autoApproveAction: mockAutoApproveAction,
+				autoConfirmAction: mockAutoApproveAction,
 			},
 		});
 		const runResult = UpdateCommand.run();
@@ -229,7 +229,7 @@ describe('update command tests', () => {
 			args: { file: 'valid_file_name' },
 			flags: {
 				ignoreCache: Promise.resolve(true),
-				autoApproveAction: mockAutoApproveAction,
+				autoConfirmAction: mockAutoApproveAction,
 			},
 		});
 
@@ -255,12 +255,12 @@ describe('update command tests', () => {
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`Array []`);
 	});
 
-	test('should pass with valid args if autoApproveAction flag is set', async () => {
+	test('should pass with valid args if autoConfirmAction flag is set', async () => {
 		parseSpy.mockResolvedValueOnce({
 			args: { file: 'valid_file_name' },
 			flags: {
 				ignoreCache: mockIgnoreCacheFlag,
-				autoApproveAction: Promise.resolve(true),
+				autoConfirmAction: Promise.resolve(true),
 			},
 		});
 

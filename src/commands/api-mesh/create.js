@@ -15,7 +15,7 @@ const { readFile } = require('fs/promises');
 const { initSdk, initRequestId, promptConfirm } = require('../../helpers');
 const logger = require('../../classes/logger');
 const CONSTANTS = require('../../constants');
-const { ignoreCacheFlag, autoApproveActionFlag } = require('../../utils');
+const { ignoreCacheFlag, autoConfirmActionFlag } = require('../../utils');
 const {
 	createMesh,
 	createAPIMeshCredentials,
@@ -30,7 +30,7 @@ class CreateCommand extends Command {
 	static args = [{ name: 'file' }];
 	static flags = {
 		ignoreCache: ignoreCacheFlag,
-		autoApproveAction: autoApproveActionFlag,
+		autoConfirmAction: autoConfirmActionFlag,
 	};
 
 	async run() {
@@ -47,7 +47,7 @@ class CreateCommand extends Command {
 		}
 
 		const ignoreCache = await flags.ignoreCache;
-		const autoApproveAction = await flags.autoApproveAction;
+		const autoConfirmAction = await flags.autoConfirmAction;
 
 		const { imsOrgId, projectId, workspaceId } = await initSdk({
 			ignoreCache,
@@ -68,7 +68,7 @@ class CreateCommand extends Command {
 
 		let shouldContinue = true;
 
-		if (!autoApproveAction) {
+		if (!autoConfirmAction) {
 			shouldContinue = await promptConfirm(`Are you sure you want to create a mesh?`);
 		}
 
