@@ -29,7 +29,25 @@ aio plugins:link api-mesh
 
 ### Configuration
 
-create a config.json file with the following parameters
+The plugin comes out of the box with configurations for stage and prod. The plugin by default connects to PROD dev console. To connect to STAGE instead:
+
+1. Clear your config before switching the env
+
+```
+aio config clear
+```
+
+2. Switch to stage environment
+
+```
+aio config set cli.env stage
+```
+
+#### Custom Configuration
+
+If you want to have custom configuration instead, please follow the steps below:
+
+1. create a config.json file with the following parameters
 
 ```
 {
@@ -38,7 +56,7 @@ create a config.json file with the following parameters
 }
 ```
 
-Perform the following command to update the configuration
+2. Perform the following command to update the configuration
 
 ```
 aio config:set api-mesh.configPath <path_to_json_file>
@@ -48,9 +66,13 @@ aio config:set api-mesh.configPath <path_to_json_file>
 
 ```
 aio api-mesh:describe
-aio api-mesh:get meshId
-aio api-mesh:get meshId PATH_OF_FILE_TO_DOWNLOAD_INTO
+aio api-mesh:get
+aio api-mesh:get PATH_OF_FILE_TO_DOWNLOAD_INTO
 aio api-mesh:create PATH_OF_MESH_CONFIG_JSON_FILE
-aio api-mesh:update meshId PATH_OF_MESH_CONFIG_JSON_FILE
-aio api-mesh:delete meshId
+aio api-mesh:update PATH_OF_MESH_CONFIG_JSON_FILE
+aio api-mesh:delete
 ```
+
+All commands support `-i` or `--ignoreCache` flag that will force the CLI to ignore the cached Org, Project and Workspace details and prompt the user to select new options just for that action.
+
+Create, Update and Delete support `-c` or `--autoConfirmAction` flag that will not prompt the user for action confirmation mostly used for testing or scaffolding where user prompt can not be handled. This flag is only to be used in certain situations.

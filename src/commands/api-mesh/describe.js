@@ -10,24 +10,40 @@ governing permissions and limitations under the License.
 */
 
 const { Command } = require('@oclif/command');
+
 const logger = require('../../classes/logger');
 const { initSdk, initRequestId } = require('../../helpers');
+const CONSTANTS = require('../../constants');
+const { ignoreCacheFlag } = require('../../utils');
+const { describeMesh } = require('../../lib/devConsole');
 
 require('dotenv').config();
 
+const { MULTITENANT_GRAPHQL_SERVER_BASE_URL } = CONSTANTS;
+
 class DescribeCommand extends Command {
+	static flags = {
+		ignoreCache: ignoreCacheFlag,
+	};
+
 	async run() {
 		await initRequestId();
 
 		logger.info(`RequestId: ${global.requestId}`);
 
-		const { schemaServiceClient, imsOrgId, projectId, workspaceId } = await initSdk();
+		const { flags } = await this.parse(DescribeCommand);
+
+		const ignoreCache = await flags.ignoreCache;
+
+		const { imsOrgId, projectId, workspaceId } = await initSdk({
+			ignoreCache,
+		});
 
 		try {
-			const meshDetails = await schemaServiceClient.describeMesh(imsOrgId, projectId, workspaceId);
+			const meshDetails = await describeMesh(imsOrgId, projectId, workspaceId);
 
 			if (meshDetails) {
-				const { meshId } = meshDetails;
+				const { meshId, apiKey } = meshDetails;
 
 				if (meshId) {
 					this.log('Successfully retrieved mesh details \n');
@@ -35,6 +51,14 @@ class DescribeCommand extends Command {
 					this.log('Project ID: %s', projectId);
 					this.log('Workspace ID: %s', workspaceId);
 					this.log('Mesh ID: %s', meshId);
+
+					if (apiKey) {
+						this.log('API Key: %s', apiKey);
+						this.log(
+							'Mesh Endpoint: %s\n',
+							`${MULTITENANT_GRAPHQL_SERVER_BASE_URL}/${meshId}/graphql?api_key=${apiKey}`,
+						);
+					}
 
 					return meshDetails;
 				} else {
