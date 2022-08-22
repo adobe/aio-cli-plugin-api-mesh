@@ -72,3 +72,7 @@ aio api-mesh:create PATH_OF_MESH_CONFIG_JSON_FILE
 aio api-mesh:update PATH_OF_MESH_CONFIG_JSON_FILE
 aio api-mesh:delete
 ```
+
+All commands support `-i` or `--ignoreCache` flag that will force the CLI to ignore the cached Org, Project and Workspace details and prompt the user to select new options just for that action.
+
+Create, Update and Delete support `-c` or `--autoConfirmAction` flag that will not prompt the user for action confirmation mostly used for testing or scaffolding where user prompt can not be handled. This flag is only to be used in certain situations.
