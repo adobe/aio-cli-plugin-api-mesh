@@ -8,7 +8,7 @@
  *
  * @returns {string}
  */
-function objToString(obj, path, defaultString = '') {
+function objToString(obj, path = [], defaultString = '') {
 	try {
 		// Cache the current object
 		let current = obj;
@@ -34,6 +34,23 @@ function objToString(obj, path, defaultString = '') {
 	}
 }
 
+const { Flags } = require('@oclif/core');
+
+const ignoreCacheFlag = Flags.boolean({
+	char: 'i',
+	description: 'Ignore cache and force manual org -> project -> workspace selection',
+	default: false,
+});
+
+const autoConfirmActionFlag = Flags.boolean({
+	char: 'c',
+	description:
+		'Auto confirm action prompt. CLI will not check for user approval before executing the action.',
+	default: false,
+});
+
 module.exports = {
 	objToString,
+	ignoreCacheFlag,
+	autoConfirmActionFlag,
 };

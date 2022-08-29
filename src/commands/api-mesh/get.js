@@ -11,60 +11,80 @@ governing permissions and limitations under the License.
 
 const { Command } = require('@oclif/command');
 const { writeFile } = require('fs/promises');
+
 const logger = require('../../classes/logger');
 const { initSdk, initRequestId } = require('../../helpers');
+const { ignoreCacheFlag } = require('../../utils');
+const { getMeshId, getMesh } = require('../../lib/devConsole');
 
 require('dotenv').config();
 
 class GetCommand extends Command {
-	static args = [{ name: 'meshId' }, { name: 'file' }];
+	static args = [{ name: 'file' }];
+	static flags = {
+		ignoreCache: ignoreCacheFlag,
+	};
 
 	async run() {
 		await initRequestId();
 
 		logger.info(`RequestId: ${global.requestId}`);
 
-		const { args } = this.parse(GetCommand);
+		const { args, flags } = await this.parse(GetCommand);
 
-		if (!args.meshId) {
-			this.error('Missing Mesh ID. Run aio api-mesh get --help for more info.');
+		const ignoreCache = await flags.ignoreCache;
 
-			return;
-		}
+		const { imsOrgId, projectId, workspaceId } = await initSdk({
+			ignoreCache,
+		});
 
-		const { schemaServiceClient, imsOrgId, projectId, workspaceId } = await initSdk();
+		let meshId = null;
 
 		try {
-			const mesh = await schemaServiceClient.getMesh(imsOrgId, projectId, workspaceId, args.meshId);
+			meshId = await getMeshId(imsOrgId, projectId, workspaceId);
+		} catch (err) {
+			this.error(
+				`Unable to get mesh ID. Please check the details and try again. RequestId: ${global.requestId}`,
+			);
+		}
 
-			if (mesh) {
-				this.log('Successfully retrieved mesh %s', JSON.stringify(mesh, null, 2));
+		if (meshId) {
+			try {
+				const mesh = await getMesh(imsOrgId, projectId, workspaceId, meshId);
 
-				if (args.file) {
-					try {
-						const { meshConfig } = mesh;
-						await writeFile(args.file, JSON.stringify({ meshConfig }, null, 2));
+				if (mesh) {
+					this.log('Successfully retrieved mesh %s', JSON.stringify(mesh, null, 2));
 
-						this.log('Successfully wrote mesh to file %s', args.file);
-					} catch (error) {
-						this.log('Unable to write mesh to file %s', args.file);
+					if (args.file) {
+						try {
+							const { meshConfig } = mesh;
+							await writeFile(args.file, JSON.stringify({ meshConfig }, null, 2));
 
-						logger.error(error);
+							this.log('Successfully wrote mesh to file %s', args.file);
+						} catch (error) {
+							this.log('Unable to write mesh to file %s', args.file);
+
+							logger.error(error);
+						}
 					}
-				}
 
-				return mesh;
-			} else {
+					return mesh;
+				} else {
+					this.error(
+						`Unable to get mesh with the ID ${meshId}. Please check the mesh ID and try again. RequestId: ${global.requestId}`,
+						{ exit: false },
+					);
+				}
+			} catch (error) {
+				this.log(error.message);
+
 				this.error(
-					`Unable to get mesh with the ID ${args.meshId}. Please check the mesh ID and try again. RequestId: ${global.requestId}`,
-					{ exit: false },
+					`Unable to get mesh. Please check the details and try again. If the error persists please contact support. RequestId: ${global.requestId}`,
 				);
 			}
-		} catch (error) {
-			this.log(error.message);
-
+		} else {
 			this.error(
-				`Unable to get mesh. Please check the details and try again. If the error persists please contact support. RequestId: ${global.requestId}`,
+				`Unable to get mesh config. No mesh found for Org(${imsOrgId}) -> Project(${projectId}) -> Workspace(${workspaceId}). Please check the details and try again.`,
 			);
 		}
 	}
