@@ -30,7 +30,7 @@ class GetCommand extends Command {
 		const { flags } = await this.parse(GetCommand);
 		if (!flags.source && !flags.multiple) {
 			this.error(
-				`The "aio api-mesh:source:get" command require additional parameters` +
+				`The "aio api-mesh:source:get" command requires additional parameters` +
 				`\nUse "aio api-mesh:source:get --help" to see parameters information.`,
 			);
 		}
@@ -63,7 +63,7 @@ class GetCommand extends Command {
 		await ncp.copy(sourceConfigsString);
 		this.log(
 			chalk.green.bold.underline(
-				'The sources are copied to clipboard, please paste they to your API Mesh configuration',
+				'The sources are copied to the clipboard, please paste them to your API Mesh configuration',
 			),
 		);
 		const print = await promptConfirm(`Do you want to print Source configurations in console?`);
@@ -110,7 +110,7 @@ GetCommand.flags = {
 	}),
 };
 
-GetCommand.description = 'Command returns the content of specific connector';
+GetCommand.description = 'Command returns the content of a specific connector';
 GetCommand.examples = [
 	'$ aio connector:get <version>@<source_name>',
 	'$ aio connector:get <source_name>',
