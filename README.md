@@ -80,9 +80,11 @@ All commands support `-i` or `--ignoreCache` flag that will force the CLI to ign
 
 Create, Update and Delete support `-c` or `--autoConfirmAction` flag that will not prompt the user for action confirmation mostly used for testing or scaffolding where user prompt can not be handled. This flag is only to be used in certain situations.
 
-# Sources Registry 
+# Sources Registry
 
-## Custom Configuration
+Source registry is collection of the predefined sources (API mesh configuration) that are created for resolve specific use cases. The source can be installed for customer specific API mesh configuration. 
+
+To submit new source, please follow instruction that is provided in the [Source Registry](https://github.com/adobe/api-mesh-sources/) repository.
 
 
 ## Commands

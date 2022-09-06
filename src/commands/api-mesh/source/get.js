@@ -27,58 +27,66 @@ class GetCommand extends Command {
 	}
 
 	async run() {
-		await initRequestId();
-
-		logger.info(`RequestId: ${global.requestId}`);
-		let list
 		try {
-			list = await this.sourceRegistryStorage.getList();
-		} catch (err) {
-			this.log(err)
-			this.error(`Cannot get the list of sources: ${err}`)
-		}
-		const { flags } = await this.parse(GetCommand);
-		if (!flags.source && !flags.multiple) {
-			this.error(
-				`The "aio api-mesh:source:get" command requires additional parameters` +
-				`\nUse "aio api-mesh:source:get --help" to see parameters information.`,
+			await initRequestId();
+
+			logger.info(`RequestId: ${global.requestId}`);
+			let list
+			try {
+				list = await this.sourceRegistryStorage.getList();
+			} catch (err) {
+				this.log(err)
+				this.error(`Cannot get the list of sources: ${err}`)
+			}
+			const { flags } = await this.parse(GetCommand);
+			if (!flags.source && !flags.multiple) {
+				this.error(
+					`The "aio api-mesh:source:get" command requires additional parameters` +
+					`\nUse "aio api-mesh:source:get --help" to see parameters information.`,
+				);
+			}
+			const sources = flags.multiple ? await this.handleMultiple(list) : flags.source;
+			const sourceConfigs = [];
+			for (const source of sources) {
+				let [name, version] = source.split('@');
+				const normalizedName = this.normalizeName(name);
+				if (!list[normalizedName]) {
+					this.error(
+						chalk.red(
+							`The source with the name "${name}" doesn't exist.` +
+							`\nUse "aio api-mesh:source:discover" command to see avaliable sources.`,
+						),
+					);
+				}
+				version = version || list[normalizedName].latest;
+				if (!list[normalizedName].versions.includes(version)) {
+					this.error(
+						chalk.red(
+							`The version "${version}" for source name "${name}" doesn't exist.` +
+							`\nUse "aio api-mesh:source:discover" command to see avaliable source versions.`,
+						),
+					);
+				}
+				const sourceConfig = await this.sourceRegistryStorage.get(name, version);
+				sourceConfigs.push(sourceConfig.provider);
+			}
+			const sourceConfigsString = JSON.stringify(sourceConfigs, null, 4);
+			await ncp.writeSync(sourceConfigsString);
+			this.log(
+				chalk.green.bold.underline(
+					'The sources are copied to the clipboard, please paste them to your API Mesh configuration',
+				),
 			);
-		}
-		const sources = flags.multiple ? await this.handleMultiple(list) : flags.source;
-		const sourceConfigs = [];
-		for (const source of sources) {
-			let [name, version] = source.split('@');
-			const normalizedName = this.normalizeName(name);
-			if (!list[normalizedName]) {
-				this.error(
-					chalk.red(
-						`The source with the name "${name}" doesn't exist.` +
-						`\nUse "aio api-mesh:source:discover" command to see avaliable sources.`,
-					),
-				);
+			const print = await promptConfirm(`Do you want to print Source configurations in console?`);
+			if (print) {
+				this.log(sourceConfigsString);
 			}
-			version = version || list[normalizedName].latest;
-			if (!list[normalizedName].versions.includes(version)) {
-				this.error(
-					chalk.red(
-						`The version "${version}" for source name "${name}" doesn't exist.` +
-						`\nUse "aio api-mesh:source:discover" command to see avaliable source versions.`,
-					),
-				);
-			}
-			const sourceConfig = await this.sourceRegistryStorage.get(name, version);
-			sourceConfigs.push(sourceConfig.provider);
-		}
-		const sourceConfigsString = JSON.stringify(sourceConfigs, null, 4);
-		await ncp.writeSync(sourceConfigsString);
-		this.log(
-			chalk.green.bold.underline(
-				'The sources are copied to the clipboard, please paste them to your API Mesh configuration',
-			),
-		);
-		const print = await promptConfirm(`Do you want to print Source configurations in console?`);
-		if (print) {
-			this.log(sourceConfigsString);
+		} catch (error) {
+			logger.error(error);
+			this.error(`
+				Something went wrong with "get" command. Please try again later. 
+				${error}
+			`);
 		}
 	}
 

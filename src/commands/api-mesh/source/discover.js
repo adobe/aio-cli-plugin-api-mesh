@@ -19,21 +19,30 @@ const logger = require('../../../classes/logger');
 
 class DiscoverCommand extends Command {
 	async run() {
-		await initRequestId();
-
-		logger.info(`RequestId: ${global.requestId}`);
-		const srs = new SourceRegistryStorage(config.get('api-mesh.sourceRegistry.path'));
-		let list;
 		try {
-			list = await srs.getList();
+			await initRequestId();
+
+			logger.info(`RequestId: ${global.requestId}`);
+			const srs = new SourceRegistryStorage(config.get('api-mesh.sourceRegistry.path'));
+			let list;
+			try {
+				list = await srs.getList();
+			} catch (error) {
+				logger.error(error);
+				this.error(`Cannot get the list of sources: ${error}`);
+			}
+
+			this.generateSourcesTable(list);
+			const needInstall = await promptConfirm(`Are you want to install sources?`);
+			if (needInstall) {
+				GetCommand.run(['-m']);
+			}
 		} catch (error) {
-			this.log(error)
-			this.error(`Cannot get the list of sources: ${error}`)
-		}
-		this.generateSourcesTable(list);
-		const needInstall = await promptConfirm(`Are you want to install sources?`);
-		if (needInstall) {
-			GetCommand.run(['-m']);
+			logger.error(error);
+			this.error(`
+				Something went wrong with "discover" command. Please try again later. 
+				${error}
+			`);
 		}
 	}
 
