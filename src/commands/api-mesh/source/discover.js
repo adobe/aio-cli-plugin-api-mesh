@@ -10,15 +10,26 @@ governing permissions and limitations under the License.
 */
 
 const { Command, CliUx } = require('@oclif/core');
-const { promptConfirm } = require('../../../helpers');
+const { promptConfirm, initRequestId } = require('../../../helpers');
 const GetCommand = require('./get');
 const SourceRegistryStorage = require('source-registry-storage-adapter');
 const config = require('@adobe/aio-lib-core-config');
+const logger = require('../../../classes/logger');
+
 
 class DiscoverCommand extends Command {
 	async run() {
-		const srs = new SourceRegistryStorage(config.get('api-mesh.source-registry.path'));
-		const list = await srs.getList();
+		await initRequestId();
+
+		logger.info(`RequestId: ${global.requestId}`);
+		const srs = new SourceRegistryStorage(config.get('api-mesh.sourceRegistry.path'));
+		let list;
+		try {
+			list = await srs.getList();
+		} catch (error) {
+			this.log(error)
+			this.error(`Cannot get the list of sources: ${error}`)
+		}
 		this.generateSourcesTable(list);
 		const needInstall = await promptConfirm(`Are you want to install sources?`);
 		if (needInstall) {

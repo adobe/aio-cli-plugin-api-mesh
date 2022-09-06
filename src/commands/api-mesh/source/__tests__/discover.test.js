@@ -33,6 +33,12 @@ mockAdapter.mockImplementation(() => ({
 }));
 
 describe('source:discover command tests', () => {
+	test('Snapshot create command description', () => {
+		expect(DiscoverCommand.description).toMatchInlineSnapshot(
+			`"Return the list of avaliable sources"`,
+		);
+		expect(DiscoverCommand.aliases).toMatchInlineSnapshot(`Array []`);
+	});
 	test('Check table render is executed', async () => {
 		await DiscoverCommand.run([]);
 		expect(CliUx.Table.table).toHaveBeenCalledTimes(1);

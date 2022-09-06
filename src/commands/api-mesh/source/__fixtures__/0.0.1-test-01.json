@@ -38,16 +38,6 @@
 						"Query.!wishlist"
 					]
 				}
-			},
-			{
-				"cache": [
-					{
-						"field": "Query.storeConfig",
-						"invalidate": {
-							"ttl": 3600
-						}
-					}
-				]
 			}
 		]
 	}

@@ -12,21 +12,31 @@ governing permissions and limitations under the License.
 
 const { Command, Flags } = require('@oclif/core');
 const SourceRegistryStorage = require('source-registry-storage-adapter');
-const { promptMultiselect, promptSelect, promptConfirm } = require('../../../helpers');
-const ncp = require('copy-paste');
+const { promptMultiselect, promptSelect, promptConfirm, initRequestId } = require('../../../helpers');
+const ncp = require('node-clipboardy');
 const chalk = require('chalk');
 const config = require('@adobe/aio-lib-core-config');
+const logger = require('../../../classes/logger');
 
 class GetCommand extends Command {
 	constructor() {
 		super(...arguments);
 		this.sourceRegistryStorage = new SourceRegistryStorage(
-			config.get('api-mesh.source-registry.path'),
+			config.get('api-mesh.sourceRegistry.path'),
 		);
 	}
 
 	async run() {
-		const list = await this.sourceRegistryStorage.getList();
+		await initRequestId();
+
+		logger.info(`RequestId: ${global.requestId}`);
+		let list
+		try {
+			list = await this.sourceRegistryStorage.getList();
+		} catch (err) {
+			this.log(err)
+			this.error(`Cannot get the list of sources: ${err}`)
+		}
 		const { flags } = await this.parse(GetCommand);
 		if (!flags.source && !flags.multiple) {
 			this.error(
@@ -60,7 +70,7 @@ class GetCommand extends Command {
 			sourceConfigs.push(sourceConfig.provider);
 		}
 		const sourceConfigsString = JSON.stringify(sourceConfigs, null, 4);
-		await ncp.copy(sourceConfigsString);
+		await ncp.writeSync(sourceConfigsString);
 		this.log(
 			chalk.green.bold.underline(
 				'The sources are copied to the clipboard, please paste them to your API Mesh configuration',
@@ -110,11 +120,11 @@ GetCommand.flags = {
 	}),
 };
 
-GetCommand.description = 'Command returns the content of a specific connector';
+GetCommand.description = 'Command returns the content of a specific source.';
 GetCommand.examples = [
-	'$ aio connector:get <version>@<source_name>',
-	'$ aio connector:get <source_name>',
-	'$ aio connector:get -m',
+	'$ aio api-mesh:source:get <version>@<source_name>',
+	'$ aio api-mesh:source:get <source_name>',
+	'$ aio api-mesh:source:get -m',
 ];
 
 module.exports = GetCommand;
