@@ -82,9 +82,9 @@ Create, Update and Delete support `-c` or `--autoConfirmAction` flag that will n
 
 # Sources Registry
 
-Source registry is collection of the predefined sources (API mesh configuration) that are created for resolve specific use cases. The source can be installed for customer specific API mesh configuration. 
+Source registry is a collection of predefined sources (API mesh source configurations) that are created to solve specific use cases. The source can be installed for customer-specific API mesh configuration. 
 
-To submit new source, please follow instruction that is provided in the [Source Registry](https://github.com/adobe/api-mesh-sources/) repository.
+To submit a new source, please follow the instructions provided in the [Source Registry](https://github.com/adobe/api-mesh-sources/) repository.
 
 
 ## Commands
