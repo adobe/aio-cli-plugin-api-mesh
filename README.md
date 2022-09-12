@@ -52,7 +52,10 @@ If you want to have custom configuration instead, please follow the steps below:
 ```
 {
     "baseUrl": "<base_url>",
-    "apiKey": "<api_key>"
+    "apiKey": "<api_key>",
+    "sourceRegistry: {
+        "path": "<path_to_the_source_registry_storage>"
+    }
 }
 ```
 
@@ -76,3 +79,28 @@ aio api-mesh:delete
 All commands support `-i` or `--ignoreCache` flag that will force the CLI to ignore the cached Org, Project and Workspace details and prompt the user to select new options just for that action.
 
 Create, Update and Delete support `-c` or `--autoConfirmAction` flag that will not prompt the user for action confirmation mostly used for testing or scaffolding where user prompt can not be handled. This flag is only to be used in certain situations.
+
+# Sources Registry
+
+Source registry is a collection of predefined sources (API mesh source configurations) that are created to solve specific use cases. The source can be installed for customer-specific API mesh configuration. 
+
+To submit a new source, please follow the instructions provided in the [Source Registry](https://github.com/adobe/api-mesh-sources/) repository.
+
+
+## Commands
+
+```
+aio api-mesh:source:get 
+NAME_OF_THE_SOURCE
+aio api-mesh:source:get NAME_OF_THE_SOURCE@VERSION_OF_THE_SOURCE
+aio api-mesh:source:get -m 
+aio api-mesh:source:discover
+```
+
+The "source:get" command accept multiple sources per one call.
+
+Example:
+```
+aio api-mesh:source:get -m <NAME_OF_THE_SOURCE>@<VERSION_OF_THE_SOURC><NAME_OF_THE_SECOND_SOURCE>@<VERSION_OF_THE_SOURC>
+<NAME_OF_THE_THIRD_SOURCE>@<VERSION_OF_THE_SOURC>
+```

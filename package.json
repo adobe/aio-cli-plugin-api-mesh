@@ -15,10 +15,13 @@
 		"@oclif/core": "^1.14.1",
 		"@oclif/errors": "^1.1.2",
 		"axios": "^0.23.0",
+		"chalk": "^4.1.0",
 		"dotenv": "^16.0.1",
 		"inquirer": "^8.2.4",
+		"node-clipboardy": "^1.0.3",
 		"pino": "^7.9.2",
 		"pino-pretty": "^7.6.0",
+		"source-registry-storage-adapter": "github:devx-services/source-registry-storage-adapter#main",
 		"uuid": "^8.3.2"
 	},
 	"devDependencies": {
@@ -28,7 +31,6 @@
 		"@oclif/plugin-help": "2.2.3",
 		"@trivago/prettier-plugin-sort-imports": "^3.1.1",
 		"acorn": "7.4.1",
-		"chalk": "4.1.2",
 		"eslint": "7.28.0",
 		"eslint-config-oclif": "^3.1.0",
 		"eslint-config-prettier": "^8.3.0",
