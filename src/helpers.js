@@ -100,7 +100,6 @@ async function getAuthorizedOrganization() {
 			// remove selected project and workspace from config and let the user select a new one
 			Config.delete('console.project');
 			Config.delete('console.workspace');
-
 			return Object.assign({}, selectedOrg);
 		} else {
 			logger.error(`No organizations found`);
