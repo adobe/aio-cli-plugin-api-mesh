@@ -100,7 +100,6 @@ async function getAuthorizedOrganization() {
 			// remove selected project and workspace from config and let the user select a new one
 			Config.delete('console.project');
 			Config.delete('console.workspace');
-
 			return Object.assign({}, selectedOrg);
 		} else {
 			logger.error(`No organizations found`);
@@ -113,6 +112,10 @@ async function getAuthorizedOrganization() {
 	}
 }
 
+/**
+ * @param imsOrgId
+ * @param imsOrgTitle
+ */
 async function getProject(imsOrgId, imsOrgTitle) {
 	logger.info(`Initializing project selection for ${imsOrgId}`);
 
@@ -153,6 +156,12 @@ async function getProject(imsOrgId, imsOrgTitle) {
 	}
 }
 
+/**
+ * @param orgId
+ * @param projectId
+ * @param imsOrgTitle
+ * @param projectTitle
+ */
 async function getWorkspace(orgId, projectId, imsOrgTitle, projectTitle) {
 	logger.info(`Initializing workspace selection for ${orgId} -> ${projectId}`);
 
@@ -331,10 +340,52 @@ async function promptConfirm(message) {
 	return confirm.res;
 }
 
+/**
+ * Function to run the CLI selectable list
+ *
+ * @param {string} message - prompt message
+ * @param {object[]} choices - list of options
+ * @returns {object[]} - selected options
+ */
+async function promptMultiselect(message, choices) {
+	const selected = await inquirer.prompt([
+		{
+			name: 'items',
+			message: message,
+			type: 'checkbox',
+			choices: choices,
+		},
+	]);
+
+	return selected.items;
+}
+
+/**
+ * Function to run the CLI selectable list
+ *
+ * @param {string} message - prompt message
+ * @param {object[]} choices - list of options
+ * @returns {object[]} - selected options
+ */
+async function promptSelect(message, choices) {
+	const selected = await inquirer.prompt([
+		{
+			name: 'item',
+			message: message,
+			type: 'list',
+			choices: choices,
+		},
+	]);
+
+	return selected.item;
+}
+
 module.exports = {
 	promptConfirm,
 	getLibConsoleCLI,
 	getDevConsoleConfig,
 	initSdk,
 	initRequestId,
+	promptSelect,
+	promptMultiselect,
 };
