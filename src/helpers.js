@@ -100,7 +100,6 @@ async function getAuthorizedOrganization() {
 			// remove selected project and workspace from config and let the user select a new one
 			Config.delete('console.project');
 			Config.delete('console.workspace');
-
 			return Object.assign({}, selectedOrg);
 		} else {
 			logger.error(`No organizations found`);
@@ -281,7 +280,6 @@ async function getLibConsoleCLI() {
 }
 
 /**
- * @param options
  * @returns {any} Returns an object with properties ready for consumption
  */
 async function initSdk(options) {
@@ -389,7 +387,7 @@ async function promptSelect(message, choices) {
  * @param {object[]} choices - list of options
  * @returns {object[]} - selected options
  */
-async function promptInput(message) {
+ async function promptInput(message) {
 	const selected = await inquirer.prompt([
 		{
 			name: 'item',
@@ -402,8 +400,8 @@ async function promptInput(message) {
 }
 
 module.exports = {
-	promptConfirm,
 	promptInput,
+	promptConfirm,
 	getLibConsoleCLI,
 	getDevConsoleConfig,
 	initSdk,
