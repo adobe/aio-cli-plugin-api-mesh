@@ -91,12 +91,12 @@ To submit a new source, please follow the instructions provided in the [Source R
 
 ```
 
-aio api-mesh:source:install NAME_OF_THE_SOURCE
-aio api-mesh:source:install NAME_OF_THE_SOURCE -v VARIABLE_NAME=VARIABLE_VALUE
-aio api-mesh:source:install NAME_OF_THE_SOURCE -f PATH_TO_FILE_WITH_VARIABLES
+aio api-mesh:source:install SOURCE_NAME
+aio api-mesh:source:install SOURCE_NAME -v VARIABLE_NAME=VARIABLE_VALUE
+aio api-mesh:source:install SOURCE_NAME -f PATH_TO_FILE_WITH_VARIABLES
 
-aio api-mesh:source:get NAME_OF_THE_SOURCE
-aio api-mesh:source:get NAME_OF_THE_SOURCE@VERSION_OF_THE_SOURCE
+aio api-mesh:source:get SOURCE_NAME
+aio api-mesh:source:get SOURCE_NAME@VERSION_OF_THE_SOURCE
 aio api-mesh:source:get -m 
 aio api-mesh:source:discover
 ```

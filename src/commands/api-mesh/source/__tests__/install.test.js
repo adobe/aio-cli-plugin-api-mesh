@@ -47,7 +47,7 @@ promptInput.mockResolvedValueOnce('test-03');
 describe('source:install command tests', () => {
 	test('Snapshot install command description', () => {
 		expect(InstallCommand.description).toMatchInlineSnapshot(
-			`"Command install the source to your API mesh."`,
+			`"Command to install the source to your API mesh."`,
 		);
 		expect(InstallCommand.flags).toMatchInlineSnapshot(`
 		Object {
@@ -69,7 +69,7 @@ describe('source:install command tests', () => {
 		  },
 		  "variable-file": Object {
 		    "char": "f",
-		    "description": "Path to the file with variables",
+		    "description": "Variables file path",
 		    "input": Array [],
 		    "multiple": false,
 		    "parse": [Function],
@@ -83,14 +83,14 @@ describe('source:install command tests', () => {
 		await InstallCommand.run([]).catch(err => {
 			expect(err.message).toEqual(
 				`The "aio api-mesh:source:install" command requires additional parameters` +
-					`\nUse "aio api-mesh:source:install --help" to see parameters information.`,
+					`\nUse "aio api-mesh:source:install --help" to see parameters details.`,
 			);
 		});
 	});
 	test('Check executing with invalid file parameter', async () => {
 		await InstallCommand.run(['test-03', '-f=notexist.json']).catch(err => {
 			expect(err.message).toEqual(
-				`Something went wrong when reading variables file.` +
+				`Something went wrong trying to read the variables file.` +
 					`\nENOENT: no such file or directory, open 'notexist.json'`,
 			);
 		});

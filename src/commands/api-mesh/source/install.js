@@ -49,7 +49,7 @@ class InstallCommand extends Command {
 			try {
 				variables = { ...variables, ...JSON.parse(await readFile(filepath, 'utf8')) };
 			} catch (e) {
-				this.error(`Something went wrong when reading variables file.` + `\n${e.message}`);
+				this.error(`Something went wrong trying to read the variables file.` + `\n${e.message}`);
 			}
 		}
 
@@ -57,7 +57,7 @@ class InstallCommand extends Command {
 		if (!args.source && !flags.source) {
 			this.error(
 				`The "aio api-mesh:source:install" command requires additional parameters` +
-					`\nUse "aio api-mesh:source:install --help" to see parameters information.`,
+					`\nUse "aio api-mesh:source:install --help" to see parameters details.`,
 			);
 		}
 		let list;
@@ -74,7 +74,7 @@ class InstallCommand extends Command {
 			if (!list[normalizedName]) {
 				this.error(
 					chalk.red(
-						`The source with the name "${name}" doesn't exist.` +
+						`The source named "${name}" doesn't exist.` +
 							`\nUse "aio api-mesh:source:discover" command to see avaliable sources.`,
 					),
 				);
@@ -139,7 +139,7 @@ class InstallCommand extends Command {
 			let override = false;
 			if (verifiedSources.installed.length) {
 				override = await promptConfirm(
-					`The next sources are already installed: ${verifiedSources.installed
+					`The following sources are already installed: ${verifiedSources.installed
 						.map(source => source.name)
 						.join(', ')}.
                     Do you want to override?`,
@@ -204,12 +204,12 @@ InstallCommand.flags = {
 	}),
 	'variable-file': Flags.string({
 		char: 'f',
-		description: 'Path to the file with variables',
+		description: 'Variables file path',
 	}),
 	'ignoreCache': ignoreCacheFlag,
 };
 
-InstallCommand.description = 'Command install the source to your API mesh.';
+InstallCommand.description = 'Command to install the source to your API mesh.';
 InstallCommand.examples = [
 	'$ aio api-mesh:source:install <version>@<source_name>',
 	'$ aio api-mesh:source:install <source_name> -v <variable_name>=<variable_value>',
