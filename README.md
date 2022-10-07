@@ -62,7 +62,7 @@ If you want to have custom configuration instead, please follow the steps below:
 2. Perform the following command to update the configuration
 
 ```
-aio config:set api-mesh.configPath <path_to_json_file>
+aio config:set api-mesh.cliConfig <path_to_json_file>
 ```
 
 # Commands

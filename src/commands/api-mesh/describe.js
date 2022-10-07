@@ -68,13 +68,15 @@ class DescribeCommand extends Command {
 					);
 				}
 			} else {
-				throw new Error(`Unable to get mesh details`);
+				throw new Error(`Unable to get mesh details.`);
 			}
 		} catch (error) {
-			this.log(error.message);
-
 			this.error(
-				`Unable to get mesh details. Please check the details and try again. If the error persists please contact support. RequestId: ${global.requestId}`,
+				`${
+					error.message || 'Unable to get mesh details.'
+				} Please check the details and try again. If the error persists please contact support. RequestId: ${
+					global.requestId
+				}`,
 			);
 		}
 	}
