@@ -93,7 +93,14 @@ async function getDevConsoleConfig() {
 				'Found both cliConfig and configPath in api-mesh config. Please consider using only cliConfig.',
 			);
 		} else {
-			throw new Error('Please consider using cliConfig instead of configPath on api-mesh config.');
+			console.warn(
+				'Please consider using cliConfig instead of configPath on api-mesh config. configPath will be deprecated soon.',
+			);
+			logger.warn(
+				'Please consider using cliConfig instead of configPath on api-mesh config. configPath will be deprecated soon.',
+			);
+
+			return await getDevConsoleConfigFromFile(configPath);
 		}
 	}
 
