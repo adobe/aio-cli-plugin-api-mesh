@@ -89,26 +89,19 @@ describe('describe command tests', () => {
 	});
 
 	test('should error if describe api has failed', async () => {
-		describeMesh.mockRejectedValueOnce(new Error('describe api failed'));
+		describeMesh.mockRejectedValueOnce(new Error('Describe api failed'));
 
 		const runResult = DescribeCommand.run();
 
 		await expect(runResult).rejects.toEqual(
 			new Error(
-				'Unable to get mesh details. Please check the details and try again. If the error persists please contact support. RequestId: dummy_request_id',
+				'Describe api failed Please check the details and try again. If the error persists please contact support. RequestId: dummy_request_id',
 			),
 		);
-		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
-		    "describe api failed",
-		  ],
-		]
-	`);
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
 		Array [
 		  Array [
-		    "Unable to get mesh details. Please check the details and try again. If the error persists please contact support. RequestId: dummy_request_id",
+		    "Describe api failed Please check the details and try again. If the error persists please contact support. RequestId: dummy_request_id",
 		  ],
 		]
 	`);
@@ -124,13 +117,6 @@ describe('describe command tests', () => {
 				'Unable to get mesh details. Please check the details and try again. If the error persists please contact support. RequestId: dummy_request_id',
 			),
 		);
-		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
-		    "Unable to get mesh details",
-		  ],
-		]
-	`);
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
 		Array [
 		  Array [
