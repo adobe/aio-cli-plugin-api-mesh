@@ -26,49 +26,103 @@ const { objToString } = require('./utils');
 
 const { DEV_CONSOLE_BASE_URL, DEV_CONSOLE_API_KEY, AIO_CLI_API_KEY } = CONSTANTS;
 
+async function getDevConsoleConfigFromFile(configFilePath) {
+	try {
+		if (!fs.existsSync(configFilePath)) {
+			throw new Error(
+				`Config file does not exist. Please run the command: aio config:set api-mesh.configPath <path_to_json_file> with a valid file.`,
+			);
+		}
+
+		const data = JSON.parse(fs.readFileSync(configFilePath, { encoding: 'utf8', flag: 'r' }));
+
+		if (!data.baseUrl || !data.apiKey) {
+			throw new Error(
+				'Invalid config file. Please validate the file contents and try again. Config file must contain baseUrl and apiKey.',
+			);
+		}
+
+		const baseUrl = data.baseUrl.endsWith('/')
+			? data.baseUrl.slice(0, data.baseUrl.length - 1)
+			: data.baseUrl;
+
+		const config = {
+			baseUrl: baseUrl,
+			accessToken: (await getLibConsoleCLI()).accessToken,
+			apiKey: data.apiKey,
+		};
+
+		logger.debug(`Using cli config from ${configFilePath}: ${objToString(config)}`);
+
+		return config;
+	} catch (error) {
+		logger.error(
+			'Please run the command: aio config:set api-mesh.configPath <path_to_json_file> with a valid config file.',
+		);
+
+		throw new Error(error);
+	}
+}
+
+async function getDevConsoleConfigFromObject(configObject) {
+	const { baseUrl, apiKey } = configObject;
+	const config = {
+		baseUrl,
+		accessToken: (await getLibConsoleCLI()).accessToken,
+		apiKey,
+	};
+
+	logger.debug(`Using cli config: ${objToString(config)}`);
+
+	return config;
+}
+
 /**
  * @returns {any} Returns a config object or null
  */
 async function getDevConsoleConfig() {
-	const configFile = Config.get('api-mesh.configPath');
+	const configFileOrObject = Config.get('api-mesh.cliConfig');
 
-	if (!configFile) {
-		return {
+	/**
+	 * Old legacy option, needs to be deprecated
+	 */
+	const configPath = Config.get('api-mesh.configPath');
+	if (configPath) {
+		if (configFileOrObject) {
+			throw new Error(
+				'Found both cliConfig and configPath in api-mesh config. Please consider using only cliConfig.',
+			);
+		} else {
+			console.warn(
+				'Please consider using cliConfig instead of configPath on api-mesh config. configPath will be deprecated soon.',
+			);
+			logger.warn(
+				'Please consider using cliConfig instead of configPath on api-mesh config. configPath will be deprecated soon.',
+			);
+
+			return await getDevConsoleConfigFromFile(configPath);
+		}
+	}
+
+	if (!configFileOrObject) {
+		const config = {
 			baseUrl: DEV_CONSOLE_BASE_URL,
 			accessToken: (await getLibConsoleCLI()).accessToken,
 			apiKey: DEV_CONSOLE_API_KEY,
 		};
+
+		logger.debug(`No cli config found. Using defaults: ${objToString(config)}`);
+
+		return config;
 	} else {
-		try {
-			if (!fs.existsSync(configFile)) {
-				throw new Error(
-					`Config file does not exist. Please run the command: aio config:set api-mesh.configPath <path_to_json_file> with a valid file.`,
-				);
-			}
-
-			const data = JSON.parse(fs.readFileSync(configFile, { encoding: 'utf8', flag: 'r' }));
-
-			if (!data.baseUrl || !data.apiKey) {
-				throw new Error(
-					'Invalid config file. Please validate the file contents and try again. Config file must contain baseUrl and apiKey.',
-				);
-			}
-
-			const baseUrl = data.baseUrl.endsWith('/')
-				? data.baseUrl.slice(0, data.baseUrl.length - 1)
-				: data.baseUrl;
-
-			return {
-				baseUrl: baseUrl,
-				accessToken: (await getLibConsoleCLI()).accessToken,
-				apiKey: data.apiKey,
-			};
-		} catch (error) {
-			logger.error(
-				'Please run the command: aio config:set api-mesh.configPath <path_to_json_file> with a valid config file.',
+		if (typeof configFileOrObject === 'object') {
+			return getDevConsoleConfigFromObject(configFileOrObject);
+		} else if (typeof configFileOrObject === 'string') {
+			return await getDevConsoleConfigFromFile(configFileOrObject);
+		} else {
+			throw new Error(
+				'Invalid config. Please validate and try again. Config should be a JSON object or a JSON file with baseUrl and apiKey.',
 			);
-
-			throw new Error(error);
 		}
 	}
 }
