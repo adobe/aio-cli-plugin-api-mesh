@@ -60,18 +60,18 @@ class InstallCommand extends Command {
 					`\nUse "aio api-mesh:source:install --help" to see parameters details.`,
 			);
 		}
-		let list;
+		let sourceProviders;
 		try {
-			list = await this.sourceRegistryStorage.getList();
+			sourceProviders = await this.sourceRegistryStorage.getList();
 		} catch (err) {
-			this.error(`Cannot get the list of sources: ${err}`);
+			this.error(`Cannot get the list of sources: ${err}. RequestId: ${global.requestId}`);
 		}
 		const sources = flags.source ? flags.source : [args.source];
-		const sourceConfigs = [];
+		const sourceConfigs = {sources: [], files: {}};
 		for (const source of sources) {
 			let [name, version] = source.split('@');
 			const normalizedName = this.normalizeName(name);
-			if (!list[normalizedName]) {
+			if (!sourceProviders[normalizedName]) {
 				this.error(
 					chalk.red(
 						`The source named "${name}" doesn't exist.` +
@@ -79,8 +79,8 @@ class InstallCommand extends Command {
 					),
 				);
 			}
-			version = version || list[normalizedName].latest;
-			if (!list[normalizedName].versions.includes(version)) {
+			version = version || sourceProviders[normalizedName].latest;
+			if (!sourceProviders[normalizedName].versions.includes(version)) {
 				this.error(
 					chalk.red(
 						`The version "${version}" for source name "${name}" doesn't exist.` +
@@ -101,12 +101,14 @@ class InstallCommand extends Command {
 
 			const { error, data } = jsonInterpolate.interpolate(
 				JSON.stringify(sourceConfig.provider),
-				variables,
+				variables,				
 			);
 			if (error) {
 				this.error(chalk.red(`${error.message}\n${error.list.map(err => err.message).join('\n')}`));
 			}
-			sourceConfigs.push(JSON.parse(data));
+			
+			sourceConfigs.sources.push(JSON.parse(data));
+			sourceConfigs.files[sourceConfig.provider.name] = sourceConfig.files;
 		}
 
 		try {
@@ -134,8 +136,9 @@ class InstallCommand extends Command {
 			}
 			const verifiedSources = this.verifySourceAlreadyExists(
 				mesh.meshConfig.sources,
-				sourceConfigs,
-			);
+				sourceConfigs.sources,
+			);			
+
 			let override = false;
 			if (verifiedSources.installed.length) {
 				override = await promptConfirm(
@@ -144,11 +147,48 @@ class InstallCommand extends Command {
 						.join(', ')}.
                     Do you want to override?`,
 				);
+			}			
+			
+			const uniqueFiles = this.getSourceFiles(verifiedSources.unique.map(source => source.name), sourceConfigs.files);
+			const installedFiles = this.getSourceFiles(verifiedSources.installed.map(source => source.name), sourceConfigs.files);
+			let meshConfigFiles = mesh.meshConfig.files || [];
+
+			if (override) {
+				const installedMap = verifiedSources.installed.reduce((obj, source) => {
+					obj[source.name] = true;
+					return obj
+				}, {});
+				
+				mesh.meshConfig.sources = [
+					...mesh.meshConfig.sources.filter(source => !installedMap[source.name]),
+					...verifiedSources.installed
+				];
+
+				const installedFilesMap = installedFiles.reduce((obj, file) => {
+					obj[file.path] = true;
+					return obj
+				}, {});
+
+				meshConfigFiles = [
+					...meshConfigFiles.filter(file => !installedFilesMap[file.path]),
+					...installedFiles
+				];
 			}
 
-			mesh.meshConfig.sources = override
-				? [...mesh.meshConfig.sources, ...verifiedSources.installed, ...verifiedSources.unique]
-				: [...mesh.meshConfig.sources, ...verifiedSources.unique];
+			mesh.meshConfig.sources = [
+				...mesh.meshConfig.sources,
+				...verifiedSources.unique
+			]
+			
+			meshConfigFiles = [
+				...meshConfigFiles,
+				...uniqueFiles
+			]					
+			
+			if (meshConfigFiles.length) {
+				mesh.meshConfig.files = meshConfigFiles
+			}
+
 			try {
 				const response = await updateMesh(imsOrgId, projectId, workspaceId, meshId, {
 					meshConfig: mesh.meshConfig,
@@ -176,6 +216,16 @@ class InstallCommand extends Command {
 
 	normalizeName(name) {
 		return name.toLowerCase().split(' ').join('-');
+	}
+
+	getSourceFiles(sourcesList, filesList) {
+		let result = [];
+		for (const source of sourcesList) {
+			if (Array.isArray(filesList[source])) {
+				result = [...result, ...filesList[source]]
+			}
+		}
+		return result;
 	}
 
 	verifySourceAlreadyExists(meshSources, installSources) {
