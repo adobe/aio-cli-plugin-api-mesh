@@ -82,7 +82,7 @@
 		"format": "prettier --check \"./**/*.{ts,tsx,js,css,json,md}\"",
 		"format:fix": "prettier --write  \"./**/*.{ts,tsx,js,css,json,md}\""
 	},
-	"description": "Basic working repo structure for Adobe teams to use as a starting point for their own plugins, and available as a github template to the @adobe github org.",
+	"description": "Adobe I/O CLI plugin to develop and manage API mesh sources",
 	"directories": {
 		"test": "test"
 	},
