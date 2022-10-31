@@ -4342,6 +4342,13 @@ jsesc@^2.5.1:
   resolved "https://registry.yarnpkg.com/jsesc/-/jsesc-2.5.2.tgz#80564d2e483dacf6e8ef209650a67df3f0c283a4"
   integrity sha512-OYu7XEzjkCQ3C5Ps3QIZsQfNpqoJyZZA99wd9aWd05NCtC5pWOkShK2mkL6HXQR6/Cy2lbNdPlZBpuQHXE63gA==
 
+json-interpolate@^1.0.3:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/json-interpolate/-/json-interpolate-1.0.3.tgz#59b95c39a33e99721c82923dbcbcc8cb8d2d6d47"
+  integrity sha512-BaRor7I9/HbbREfN0oazEsqkJdW9rFxz7G45T2fvgPrIlVRDlnz8xzLdpl+4SdIrFPgGulgkrqni+1IPm2RzFw==
+  dependencies:
+    validator "^13.7.0"
+
 json-parse-better-errors@^1.0.1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/json-parse-better-errors/-/json-parse-better-errors-1.0.2.tgz#bb867cfb3450e69107c131d1c514bab3dc8bcaa9"
@@ -6446,6 +6453,11 @@ validate-npm-package-license@^3.0.1:
   dependencies:
     spdx-correct "^3.0.0"
     spdx-expression-parse "^3.0.0"
+
+validator@^13.7.0:
+  version "13.7.0"
+  resolved "https://registry.yarnpkg.com/validator/-/validator-13.7.0.tgz#4f9658ba13ba8f3d82ee881d3516489ea85c0857"
+  integrity sha512-nYXQLCBkpJ8X6ltALua9dRrZDHVYxjJ1wgskNt1lH9fzGjs3tgojGSCBjmEPwkWS1y29+DrizMTW19Pr9uB2nw==
 
 w3c-hr-time@^1.0.2:
   version "1.0.2"
