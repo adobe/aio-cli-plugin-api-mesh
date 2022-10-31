@@ -434,7 +434,27 @@ async function promptSelect(message, choices) {
 	return selected.item;
 }
 
+/**
+ * Function to run the CLI selectable list
+ *
+ * @param {string} message - prompt message
+ * @param {object[]} choices - list of options
+ * @returns {object[]} - selected options
+ */
+ async function promptInput(message) {
+	const selected = await inquirer.prompt([
+		{
+			name: 'item',
+			message: message,
+			type: 'input',
+		},
+	]);
+
+	return selected.item;
+}
+
 module.exports = {
+	promptInput,
 	promptConfirm,
 	getLibConsoleCLI,
 	getDevConsoleConfig,
