@@ -12,5 +12,12 @@
 		"author": "VZ",
 		"latest": "0.0.1",
 		"versions": ["0.0.1"]
+	},
+	"test-03": {
+		"name": "test-03",
+		"description": "Mock for variable injection",
+		"author": "VladimirZaets",
+		"latest": "0.0.1",
+		"versions": ["0.0.1"]
 	}
 }
