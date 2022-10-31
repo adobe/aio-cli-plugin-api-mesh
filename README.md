@@ -112,4 +112,3 @@ aio api-mesh:source:get -m <NAME_OF_THE_SOURCE>@<VERSION_OF_THE_SOURC><NAME_OF_T
 All commands support `-i` or `--ignoreCache` flag that will force the CLI to ignore the cached Org, Project and Workspace details and prompt the user to select new options just for that action.
 
 Create, Update and Delete support `-c` or `--autoConfirmAction` flag that will not prompt the user for action confirmation mostly used for testing or scaffolding where user prompt can not be handled. This flag is only to be used in certain situations.
-
