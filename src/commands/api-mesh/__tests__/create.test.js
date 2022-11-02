@@ -117,6 +117,14 @@ describe('create command tests', () => {
 		    "parse": [Function],
 		    "type": "boolean",
 		  },
+		  "json": Object {
+		    "allowNo": false,
+		    "char": "j",
+		    "default": false,
+		    "description": "Output JSON",
+		    "parse": [Function],
+		    "type": "boolean",
+		  },
 		}
 	`);
 		expect(CreateCommand.aliases).toMatchInlineSnapshot(`Array []`);
@@ -348,6 +356,7 @@ describe('create command tests', () => {
 		    "apiKey": "dummy_api_key",
 		    "id": "dummy_id",
 		  },
+		  "endpoint": "https://graph.adobe.io/api/dummy_mesh_id/graphql?api_key=dummy_api_key",
 		  "mesh": Object {
 		    "meshConfig": Object {
 		      "sources": Array [
