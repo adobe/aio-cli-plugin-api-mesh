@@ -1,0 +1,40 @@
+{
+	"name": "Test 03",
+	"version": "0.0.1",
+	"description": "Mock for variable injection",
+	"author": "VladimirZaets",
+	"variables": {
+		"ENDPOINT_URL": {
+			"name": "Test API",
+			"description": "This URL will be used to query the third-party API",
+			"type": "string"
+		}
+	},
+	"provider": {
+		"name": "Commerce",
+		"handler": {
+			"graphql": {
+				"endpoint": "${ENDPOINT_URL}"
+			}
+		},
+		"transforms": [
+			{
+				"rename": {
+					"mode": "bare | wrap",
+					"renames": [
+						{
+							"from": {
+								"type": "Query",
+								"field": "compareList"
+							},
+							"to": {
+								"type": "Query",
+								"field": "productCompareList"
+							}
+						}
+					]
+				}
+			}
+		]
+	}
+}
