@@ -141,7 +141,7 @@ class InstallCommand extends Command {
 
 			let override = false;
 			if (verifiedSources.installed.length) {
-				override = await promptConfirm(
+				override = flags.confirm ? true : await promptConfirm(
 					`The following sources are already installed: ${verifiedSources.installed
 						.map(source => source.name)
 						.join(', ')}.
@@ -247,7 +247,12 @@ class InstallCommand extends Command {
 }
 
 InstallCommand.flags = {
-	'variable': Flags.string({
+	confirm: Flags.boolean({
+		char: 'c',
+		description:'Auto confirm override action prompt. CLI will not check ask user to override source.',
+		default: false,
+	}),
+	variable: Flags.string({
 		char: 'v',
 		description: 'Variables required for the source',
 		multiple: true,
@@ -256,7 +261,7 @@ InstallCommand.flags = {
 		char: 'f',
 		description: 'Variables file path',
 	}),
-	'ignoreCache': ignoreCacheFlag,
+	ignoreCache: ignoreCacheFlag,
 };
 
 InstallCommand.description = 'Command to install the source to your API mesh.';

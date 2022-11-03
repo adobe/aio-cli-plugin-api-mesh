@@ -77,10 +77,14 @@ class GetCommand extends Command {
 					'The sources are copied to the clipboard, please paste them to your API Mesh configuration',
 				),
 			);
-			const print = await promptConfirm(`Do you want to print Source configurations in console?`);
-			if (print) {
+			if (!flags.confirm) {
+				const print = await promptConfirm(`Do you want to print Source configurations in console?`);
+				if (print) {
+					this.log(sourceConfigsString);
+				}
+			} else {
 				this.log(sourceConfigsString);
-			}
+			}	
 		} catch (error) {
 			logger.error(error);
 			this.error(`
@@ -116,6 +120,11 @@ class GetCommand extends Command {
 }
 
 GetCommand.flags = {
+	confirm: Flags.boolean({
+		char: 'c',
+		description:'Auto confirm print action prompt. CLI will not check ask user to print source.',
+		default: false,
+	}),
 	source: Flags.string({
 		char: 's',
 		description: 'Source name',
@@ -130,8 +139,8 @@ GetCommand.flags = {
 
 GetCommand.description = 'Command returns the content of a specific source.';
 GetCommand.examples = [
-	'$ aio api-mesh:source:get <version>@<source_name>',
-	'$ aio api-mesh:source:get <source_name>',
+	'$ aio api-mesh:source:get -s=<version>@<source_name>',
+	'$ aio api-mesh:source:get -s<source_name>',
 	'$ aio api-mesh:source:get -m',
 ];
 
