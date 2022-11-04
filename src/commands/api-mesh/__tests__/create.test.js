@@ -356,7 +356,6 @@ describe('create command tests', () => {
 		    "apiKey": "dummy_api_key",
 		    "id": "dummy_id",
 		  },
-		  "endpoint": "https://graph.adobe.io/api/dummy_mesh_id/graphql?api_key=dummy_api_key",
 		  "mesh": Object {
 		    "meshConfig": Object {
 		      "sources": Array [
@@ -493,5 +492,19 @@ describe('create command tests', () => {
 		]
 	`);
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`Array []`);
+	});
+
+	test('must return proper object structure used by adobe/generator-app-api-mesh', async () => {
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
+			flags: {
+				json: Promise.resolve(true)
+			},
+		});
+		const output = await CreateCommand.run()
+		expect(output).toHaveProperty('mesh')
+		expect(output).toHaveProperty('adobeIdIntegrationsForWorkspace')
+		expect(output.mesh).toEqual(expect.objectContaining({ meshId: 'dummy_mesh_id' }));
+		expect(output.adobeIdIntegrationsForWorkspace).toEqual(expect.objectContaining({ apiKey: 'dummy_api_key' })); 
 	});
 });

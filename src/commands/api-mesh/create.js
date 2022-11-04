@@ -119,12 +119,12 @@ class CreateCommand extends Command {
 					} else {
 						this.log('Unable to create API Key');
 					}
-
+                    // Do not remove or rename return values.
+					// Template adobe/generator-app-api-mesh relies on "mesh" & "adobeIdIntegrationsForWorkspace" obj structure
 					return {
 						adobeIdIntegrationsForWorkspace,
 						sdkList,
-						mesh,
-						endpoint: `${MULTITENANT_GRAPHQL_SERVER_BASE_URL}/${mesh.meshId}/graphql?api_key=${adobeIdIntegrationsForWorkspace.apiKey}`
+						mesh
 					};
 				} else {
 					this.error(`Unable to create a mesh. Please try again. RequestId: ${global.requestId}`, {
