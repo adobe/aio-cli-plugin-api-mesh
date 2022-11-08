@@ -30,6 +30,9 @@ const expectedResultForSuccessScenarios = JSON.stringify(
 	null,
 	4,
 );
+const normalizeAssertString = str => {
+	return str.replace(/[\r\t]/gm, '').replace(/[\r\n]/gm, '').replace(/  +/g, ' ')
+}
 mockAdapter.mockImplementation(() => ({
 	get: jest
 		.fn()
@@ -54,6 +57,14 @@ describe('source:get command tests', () => {
 		);
 		expect(GetCommand.flags).toMatchInlineSnapshot(`
 		Object {
+		  "confirm": Object {
+		    "allowNo": false,
+		    "char": "c",
+		    "default": false,
+		    "description": "Auto confirm print action prompt. CLI will not check ask user to print source.",
+		    "parse": [Function],
+		    "type": "boolean",
+		  },
 		  "multiple": Object {
 		    "allowNo": false,
 		    "char": "m",
@@ -78,15 +89,13 @@ describe('source:get command tests', () => {
 	});
 	test('Check executing without parameters', async () => {
 		await GetCommand.run([]).catch(err => {
-			expect(err.message).toEqual(`The "aio api-mesh:source:get" command requires additional parameters` +
-				`\nUse "aio api-mesh:source:get --help" to see parameters information.`)
+			expect(normalizeAssertString(err.message)).toEqual(
+				normalizeAssertString(`Something went wrong with "get" command. Please try again later.` +
+					`Error: \nThe "aio api-mesh:source:get" command requires additional parameters` +
+					`Use "aio api-mesh:source:get --help" to see parameters information.`)
+			);
 		});
-	});
-	test('Check executing success with multiple, copied to clipboard and logged to console', async () => {
-		await GetCommand.run(['-m']);
-		expect(ncp.readSync()).toEqual(expectedResultForSuccessScenarios);
-		expect(logSpy.mock.calls.pop()[0]).toEqual(expectedResultForSuccessScenarios);
-	});
+	});	
 	test('Check executing success with provided name and version, copied to clipboard and logged to console', async () => {
 		await GetCommand.run(['-s=test-01@0.0.1', '-s=test-02@0.0.1']);
 		expect(ncp.readSync()).toEqual(expectedResultForSuccessScenarios);
@@ -100,11 +109,8 @@ describe('source:get command tests', () => {
 	test('Check executing failed due to requested source does not exist', async () => {
 		const name = 'test-99';
 		await GetCommand.run([`-s=${name}`]).catch(err => {
-			expect(err.message).toEqual(
-				chalk.red(
-					`The source with the name "${name}" doesn't exist.` +
-					`\nUse "aio api-mesh:source:discover" command to see avaliable sources.`,
-				),
+			expect(err.message).toContain(
+				chalk.red(`The source with the name "test-99" doesn't exist.`),
 			);
 		});
 	});
@@ -112,11 +118,8 @@ describe('source:get command tests', () => {
 		const name = 'test-01';
 		const version = '1.1.1';
 		await GetCommand.run([`-s=${name}@${version}`]).catch(err => {
-			expect(err.message).toEqual(
-				chalk.red(
-					`The version "${version}" for source name "${name}" doesn't exist.` +
-					`\nUse "aio api-mesh:source:discover" command to see avaliable source versions.`,
-				),
+			expect(err.message).toContain(
+				chalk.red(`The version \"1.1.1\" for source name \"test-01\" doesn't exist.`),
 			);
 		});
 	});

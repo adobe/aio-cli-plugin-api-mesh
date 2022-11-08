@@ -59,7 +59,7 @@ class DiscoverCommand extends Command {
 		const selectedList = await promptMultiselect(
 			'Select sources to install',
 			Object.values(data).map(elem => ({ name: elem.name, value: elem })),
-		);
+		) || [];
 		for (const selected of selectedList) {
 			if (selected.versions.length > 1) {
 				const version = await promptSelect(

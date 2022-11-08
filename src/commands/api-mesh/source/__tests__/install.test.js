@@ -51,6 +51,14 @@ describe('source:install command tests', () => {
 		);
 		expect(InstallCommand.flags).toMatchInlineSnapshot(`
 		Object {
+		  "confirm": Object {
+		    "allowNo": false,
+		    "char": "c",
+		    "default": false,
+		    "description": "Auto confirm override action prompt. CLI will not check ask user to override source.",
+		    "parse": [Function],
+		    "type": "boolean",
+		  },
 		  "ignoreCache": Object {
 		    "allowNo": false,
 		    "char": "i",

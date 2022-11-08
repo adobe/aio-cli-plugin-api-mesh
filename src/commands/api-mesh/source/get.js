@@ -41,7 +41,7 @@ class GetCommand extends Command {
 			const { flags } = await this.parse(GetCommand);
 			if (!flags.source && !flags.multiple) {
 				this.error(
-					`The "aio api-mesh:source:get" command requires additional parameters` +
+					`\nThe "aio api-mesh:source:get" command requires additional parameters` +
 					`\nUse "aio api-mesh:source:get --help" to see parameters information.`,
 				);
 			}
@@ -88,9 +88,9 @@ class GetCommand extends Command {
 		} catch (error) {
 			logger.error(error);
 			this.error(`
-				Something went wrong with "get" command. Please try again later. 
-				${error}
-			`);
+				\nSomething went wrong with "get" command. Please try again later.
+				\n${error}`
+			);
 		}
 	}
 
