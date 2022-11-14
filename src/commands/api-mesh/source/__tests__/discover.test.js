@@ -12,7 +12,7 @@ governing permissions and limitations under the License.
 
 const mockMetadataFixture = require('../__fixtures__/connectors-metadata.json');
 const mockAdapter = require('source-registry-storage-adapter');
-const { promptConfirm } = require('../../../../helpers');
+const { promptConfirm, promptMultiselect } = require('../../../../helpers');
 const { CliUx } = require('@oclif/core');
 const DiscoverCommand = require('../discover');
 const InstallCommand = require('../install');
@@ -46,6 +46,7 @@ describe('source:discover command tests', () => {
 	test('Check that "source:install" command is called', async () => {
 		InstallCommand.run = jest.fn().mockImplementation(() => 'source:install');
 		promptConfirm.mockResolvedValue(true);
+		promptMultiselect.mockResolvedValue([mockMetadataFixture['test-01']])
 		await DiscoverCommand.run([]);
 		expect(InstallCommand.run).toHaveBeenCalledTimes(1);
 	});

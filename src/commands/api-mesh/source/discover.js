@@ -56,10 +56,20 @@ class DiscoverCommand extends Command {
 
 	async handleMultiple(data) {
 		const result = [];
-		const selectedList = await promptMultiselect(
+		let selectedList = await promptMultiselect(
 			'Select sources to install',
 			Object.values(data).map(elem => ({ name: elem.name, value: elem })),
 		) || [];
+		
+		if (!selectedList.length) {			
+			while (!selectedList.length) {
+				selectedList = await promptMultiselect(
+					'Please choose at least one source',
+					Object.values(data).map(elem => ({ name: elem.name, value: elem })),
+				) || []
+			}
+		}
+
 		for (const selected of selectedList) {
 			if (selected.versions.length > 1) {
 				const version = await promptSelect(
