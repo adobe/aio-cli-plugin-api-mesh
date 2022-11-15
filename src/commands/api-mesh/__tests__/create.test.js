@@ -119,7 +119,6 @@ describe('create command tests', () => {
 		  },
 		  "json": Object {
 		    "allowNo": false,
-		    "char": "j",
 		    "default": false,
 		    "description": "Output JSON",
 		    "parse": [Function],

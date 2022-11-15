@@ -50,7 +50,6 @@ const autoConfirmActionFlag = Flags.boolean({
 });
 
 const jsonFlag = Flags.boolean({
-	char: 'j',
 	description:
 		'Output JSON',
 	default: false,
