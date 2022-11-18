@@ -34,15 +34,22 @@ class DiscoverCommand extends Command {
 			}
 
 			this.generateSourcesTable(list);
-			if (!flags.confirm) {
-				const needInstall = await promptConfirm(`Are you want to install sources?`);
-				if (needInstall) {
-					const toInstall = await this.handleMultiple(list)
-					InstallCommand.run([toInstall.join(' ')]);
-				}
+			let needInstall = false;
+
+			if (flags.confirm) {
+				needInstall = true;
 			} else {
+			    needInstall = await promptConfirm(`Do you want to install sources?`);
+			}
+
+			if (needInstall) {
 				const toInstall = await this.handleMultiple(list)
-				InstallCommand.run([toInstall.join(' ')]);
+				const params = [];
+				toInstall.forEach(source => {
+					params.push('-s');
+					params.push(source)
+				})
+				InstallCommand.run(params);
 			}
 			
 		} catch (error) {

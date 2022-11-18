@@ -67,6 +67,14 @@ describe('source:install command tests', () => {
 		    "parse": [Function],
 		    "type": "boolean",
 		  },
+		  "source": Object {
+		    "char": "s",
+		    "description": "Source name",
+		    "input": Array [],
+		    "multiple": true,
+		    "parse": [Function],
+		    "type": "option",
+		  },
 		  "variable": Object {
 		    "char": "v",
 		    "description": "Variables required for the source",
