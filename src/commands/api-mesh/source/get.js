@@ -41,7 +41,7 @@ class GetCommand extends Command {
 			const { flags } = await this.parse(GetCommand);
 			if (!flags.source && !flags.multiple) {
 				this.error(
-					`\nThe "aio api-mesh:source:get" command requires additional parameters` +
+					`The "aio api-mesh:source:get" command requires additional parameters` +
 					`\nUse "aio api-mesh:source:get --help" to see parameters information.`,
 				);
 			}
@@ -77,20 +77,16 @@ class GetCommand extends Command {
 					'The sources are copied to the clipboard, please paste them to your API Mesh configuration',
 				),
 			);
-			if (!flags.confirm) {
-				const print = await promptConfirm(`Do you want to print Source configurations in console?`);
-				if (print) {
-					this.log(sourceConfigsString);
-				}
-			} else {
+			const print = await promptConfirm(`Do you want to print Source configurations in console?`);
+			if (print) {
 				this.log(sourceConfigsString);
-			}	
+			}
 		} catch (error) {
 			logger.error(error);
 			this.error(`
-				\nSomething went wrong with "get" command. Please try again later.
-				\n${error}`
-			);
+				Something went wrong with "get" command. Please try again later. 
+				${error}
+			`);
 		}
 	}
 
@@ -120,11 +116,6 @@ class GetCommand extends Command {
 }
 
 GetCommand.flags = {
-	confirm: Flags.boolean({
-		char: 'c',
-		description:'Auto confirm print action prompt. CLI will not check ask user to print source.',
-		default: false,
-	}),
 	source: Flags.string({
 		char: 's',
 		description: 'Source name',
@@ -139,8 +130,8 @@ GetCommand.flags = {
 
 GetCommand.description = 'Command returns the content of a specific source.';
 GetCommand.examples = [
-	'$ aio api-mesh:source:get -s=<version>@<source_name>',
-	'$ aio api-mesh:source:get -s<source_name>',
+	'$ aio api-mesh:source:get <version>@<source_name>',
+	'$ aio api-mesh:source:get <source_name>',
 	'$ aio api-mesh:source:get -m',
 ];
 

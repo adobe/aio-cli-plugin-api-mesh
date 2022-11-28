@@ -12,10 +12,10 @@ governing permissions and limitations under the License.
 
 const mockMetadataFixture = require('../__fixtures__/connectors-metadata.json');
 const mockAdapter = require('source-registry-storage-adapter');
-const { promptConfirm, promptMultiselect } = require('../../../../helpers');
+const { promptConfirm } = require('../../../../helpers');
+const GetCommand = require('../get');
 const { CliUx } = require('@oclif/core');
 const DiscoverCommand = require('../discover');
-const InstallCommand = require('../install');
 jest.mock('source-registry-storage-adapter');
 jest.mock('../../../../helpers');
 jest.mock('../get');
@@ -43,17 +43,16 @@ describe('source:discover command tests', () => {
 		await DiscoverCommand.run([]);
 		expect(CliUx.Table.table).toHaveBeenCalledTimes(1);
 	});
-	test('Check that "source:install" command is called', async () => {
-		InstallCommand.run = jest.fn().mockImplementation(() => 'source:install');
+	test('Check that "source:get -m" command is called', async () => {
+		GetCommand.run = jest.fn().mockImplementation(() => 'source:get -m');
 		promptConfirm.mockResolvedValue(true);
-		promptMultiselect.mockResolvedValue([mockMetadataFixture['test-01']])
 		await DiscoverCommand.run([]);
-		expect(InstallCommand.run).toHaveBeenCalledTimes(1);
+		expect(GetCommand.run).toHaveBeenCalledTimes(1);
 	});
-	test('Check that "source:install" command is not called', async () => {
-		InstallCommand.run = jest.fn().mockImplementation(() => 'source:install');
+	test('Check that "source:get -m" command is not called', async () => {
+		GetCommand.run = jest.fn().mockImplementation(() => 'source:get -m');
 		promptConfirm.mockResolvedValue(false);
 		await DiscoverCommand.run([]);
-		expect(InstallCommand.run).toHaveBeenCalledTimes(0);
+		expect(GetCommand.run).toHaveBeenCalledTimes(0);
 	});
 });
