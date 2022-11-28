@@ -49,8 +49,15 @@ const autoConfirmActionFlag = Flags.boolean({
 	default: false,
 });
 
+const jsonFlag = Flags.boolean({
+	description:
+		'Output JSON',
+	default: false,
+});
+
 module.exports = {
 	objToString,
 	ignoreCacheFlag,
 	autoConfirmActionFlag,
+	jsonFlag,
 };

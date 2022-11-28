@@ -9,13 +9,13 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const { Command } = require('@oclif/command');
+const { Command } = require('@oclif/core');
 const { readFile } = require('fs/promises');
 
 const { initSdk, initRequestId, promptConfirm } = require('../../helpers');
 const logger = require('../../classes/logger');
 const CONSTANTS = require('../../constants');
-const { ignoreCacheFlag, autoConfirmActionFlag } = require('../../utils');
+const { ignoreCacheFlag, autoConfirmActionFlag, jsonFlag } = require('../../utils');
 const {
 	createMesh,
 	createAPIMeshCredentials,
@@ -31,7 +31,10 @@ class CreateCommand extends Command {
 	static flags = {
 		ignoreCache: ignoreCacheFlag,
 		autoConfirmAction: autoConfirmActionFlag,
+		json: jsonFlag
 	};
+
+	static enableJsonFlag = true
 
 	async run() {
 		await initRequestId();
@@ -116,11 +119,12 @@ class CreateCommand extends Command {
 					} else {
 						this.log('Unable to create API Key');
 					}
-
+                    // Do not remove or rename return values.
+					// Template adobe/generator-app-api-mesh relies on "mesh" & "adobeIdIntegrationsForWorkspace" obj structure
 					return {
 						adobeIdIntegrationsForWorkspace,
 						sdkList,
-						mesh,
+						mesh
 					};
 				} else {
 					this.error(`Unable to create a mesh. Please try again. RequestId: ${global.requestId}`, {
