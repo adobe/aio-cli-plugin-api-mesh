@@ -117,6 +117,13 @@ describe('create command tests', () => {
 		    "parse": [Function],
 		    "type": "boolean",
 		  },
+		  "json": Object {
+		    "allowNo": false,
+		    "default": false,
+		    "description": "Output JSON",
+		    "parse": [Function],
+		    "type": "boolean",
+		  },
 		}
 	`);
 		expect(CreateCommand.aliases).toMatchInlineSnapshot(`Array []`);
@@ -484,5 +491,19 @@ describe('create command tests', () => {
 		]
 	`);
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`Array []`);
+	});
+
+	test('must return proper object structure used by adobe/generator-app-api-mesh', async () => {
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
+			flags: {
+				json: Promise.resolve(true)
+			},
+		});
+		const output = await CreateCommand.run()
+		expect(output).toHaveProperty('mesh')
+		expect(output).toHaveProperty('adobeIdIntegrationsForWorkspace')
+		expect(output.mesh).toEqual(expect.objectContaining({ meshId: 'dummy_mesh_id' }));
+		expect(output.adobeIdIntegrationsForWorkspace).toEqual(expect.objectContaining({ apiKey: 'dummy_api_key' })); 
 	});
 });
