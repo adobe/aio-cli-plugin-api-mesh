@@ -9,12 +9,12 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const { Command, CliUx, Flags } = require('@oclif/core');
-const { promptConfirm, initRequestId, promptMultiselect, promptSelect } = require('../../../helpers');
+const { Command, CliUx } = require('@oclif/core');
+const { promptConfirm, initRequestId } = require('../../../helpers');
+const GetCommand = require('./get');
 const SourceRegistryStorage = require('source-registry-storage-adapter');
 const config = require('@adobe/aio-lib-core-config');
 const logger = require('../../../classes/logger');
-const InstallCommand = require('./install');
 
 
 class DiscoverCommand extends Command {
@@ -23,7 +23,6 @@ class DiscoverCommand extends Command {
 			await initRequestId();
 
 			logger.info(`RequestId: ${global.requestId}`);
-			const { flags } = await this.parse(DiscoverCommand);
 			const srs = new SourceRegistryStorage(config.get('api-mesh.sourceRegistry.path'));
 			let list;
 			try {
@@ -34,24 +33,10 @@ class DiscoverCommand extends Command {
 			}
 
 			this.generateSourcesTable(list);
-			let needInstall = false;
-
-			if (flags.confirm) {
-				needInstall = true;
-			} else {
-			    needInstall = await promptConfirm(`Do you want to install sources?`);
-			}
-
+			const needInstall = await promptConfirm(`Are you want to install sources?`);
 			if (needInstall) {
-				const toInstall = await this.handleMultiple(list)
-				const params = [];
-				toInstall.forEach(source => {
-					params.push('-s');
-					params.push(source)
-				})
-				InstallCommand.run(params);
+				GetCommand.run(['-m']);
 			}
-			
 		} catch (error) {
 			logger.error(error);
 			this.error(`
@@ -59,36 +44,6 @@ class DiscoverCommand extends Command {
 				${error}
 			`);
 		}
-	}
-
-	async handleMultiple(data) {
-		const result = [];
-		let selectedList = await promptMultiselect(
-			'Select sources to install',
-			Object.values(data).map(elem => ({ name: elem.name, value: elem })),
-		) || [];
-		
-		if (!selectedList.length) {			
-			while (!selectedList.length) {
-				selectedList = await promptMultiselect(
-					'Please choose at least one source',
-					Object.values(data).map(elem => ({ name: elem.name, value: elem })),
-				) || []
-			}
-		}
-
-		for (const selected of selectedList) {
-			if (selected.versions.length > 1) {
-				const version = await promptSelect(
-					`Please choose the version of "${selected.name}" source`,
-					selected.versions.map(v => ({ name: `v${v}`, value: `${selected.name}@${v}` })),
-				);
-				result.push(version);
-			} else {
-				result.push(`${selected.name}@${selected.latest}`);
-			}
-		}
-		return result;
 	}
 
 	async generateSourcesTable(data) {
@@ -109,14 +64,6 @@ class DiscoverCommand extends Command {
 		CliUx.Table.table(Object.values(data), columns);
 	}
 }
-
-DiscoverCommand.flags = {
-	confirm: Flags.boolean({
-		char: 'c',
-		description:'Auto confirm install action prompt. CLI will not check ask user to install source.',
-		default: false,
-	}),
-};
 
 DiscoverCommand.description = 'Return the list of avaliable sources';
 

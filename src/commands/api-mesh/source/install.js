@@ -45,7 +45,6 @@ class InstallCommand extends Command {
 					return obj;
 			  }, {})
 			: {};
-			
 		if (filepath) {
 			try {
 				variables = { ...variables, ...JSON.parse(await readFile(filepath, 'utf8')) };
@@ -93,17 +92,16 @@ class InstallCommand extends Command {
 			const jsonInterpolate = new JsonInterpolate({ variablesSchema: sourceConfig.variables });
 			const sourceProviderString = JSON.stringify(sourceConfig.provider);
 			const sourceVariables = jsonInterpolate.getJsonVariables(sourceProviderString);
-			const passedSourceVariables = this.getPassedSourceVariables(sourceVariables || [], variables);
-			const missedVariables = jsonInterpolate.getMissedVariables(passedSourceVariables, sourceVariables);
-			for (const missedVariable of missedVariables.map(item => item.name).filter((value, index, self) => self.indexOf(value) === index)) {
-				passedSourceVariables[missedVariable] = await promptInput(
-					`Enter the value for variable ${missedVariable}:`,
+			const missedVariables = jsonInterpolate.getMissedVariables(variables, sourceVariables);
+			for (const missedVariable of missedVariables) {
+				variables[missedVariable.name] = await promptInput(
+					`Enter the value for variable ${missedVariable.name}:`,
 				);
 			}
 
 			const { error, data } = jsonInterpolate.interpolate(
 				JSON.stringify(sourceConfig.provider),
-				passedSourceVariables,				
+				variables,				
 			);
 			if (error) {
 				this.error(chalk.red(`${error.message}\n${error.list.map(err => err.message).join('\n')}`));
@@ -143,7 +141,7 @@ class InstallCommand extends Command {
 
 			let override = false;
 			if (verifiedSources.installed.length) {
-				override = flags.confirm ? true : await promptConfirm(
+				override = await promptConfirm(
 					`The following sources are already installed: ${verifiedSources.installed
 						.map(source => source.name)
 						.join(', ')}.
@@ -230,16 +228,6 @@ class InstallCommand extends Command {
 		return result;
 	}
 
-	getPassedSourceVariables(variablesInSource, passedVariables) {
-		const res = {}
-		variablesInSource.forEach(variable => {
-			if (passedVariables[variable.name]) {
-				res[variable.name] = passedVariables[variable.name]
-			}
-		});
-		return res;
-	}
-
 	verifySourceAlreadyExists(meshSources, installSources) {
 		const alreadyInstalledSources = [];
 		const uniqueSourcesToInstall = [];
@@ -259,17 +247,7 @@ class InstallCommand extends Command {
 }
 
 InstallCommand.flags = {
-	source: Flags.string({
-		char: 's',
-		description: 'Source name',
-		multiple: true,		
-	}),
-	confirm: Flags.boolean({
-		char: 'c',
-		description:'Auto confirm override action prompt. CLI will not check ask user to override source.',
-		default: false,
-	}),
-	variable: Flags.string({
+	'variable': Flags.string({
 		char: 'v',
 		description: 'Variables required for the source',
 		multiple: true,
@@ -278,7 +256,7 @@ InstallCommand.flags = {
 		char: 'f',
 		description: 'Variables file path',
 	}),
-	ignoreCache: ignoreCacheFlag,
+	'ignoreCache': ignoreCacheFlag,
 };
 
 InstallCommand.description = 'Command to install the source to your API mesh.';
