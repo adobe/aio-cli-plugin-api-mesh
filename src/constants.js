@@ -8,6 +8,7 @@ const StageConstants = {
 	DEV_CONSOLE_API_KEY: 'adobe-api-manager-sms-stage',
 	DEV_CONSOLE_TRANSPORTER_API_KEY: 'UDPWeb1',
 	AIO_CLI_API_KEY: 'aio-cli-console-auth-stage',
+	SMS_BASE_URL: 'https://graph-stage.adobe.io/api-admin',
 };
 
 const ProdConstants = {
@@ -16,6 +17,7 @@ const ProdConstants = {
 	DEV_CONSOLE_API_KEY: 'adobe-graph-prod',
 	DEV_CONSOLE_TRANSPORTER_API_KEY: 'UDPWeb1',
 	AIO_CLI_API_KEY: 'aio-cli-console-auth',
+	SMS_BASE_URL: 'https://graph.adobe.io/api-admin',
 };
 
 module.exports = clientEnv === 'stage' ? StageConstants : ProdConstants;

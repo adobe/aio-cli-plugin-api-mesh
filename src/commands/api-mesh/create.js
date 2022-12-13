@@ -81,7 +81,7 @@ class CreateCommand extends Command {
 				let sdkList = [];
 
 				if (mesh) {
-					this.log('Successfully created mesh %s', mesh.meshId);
+					this.log('Your mesh is being processed. Please wait 5 minutes before checking the status of your mesh %s', mesh.meshId);
 					this.log(JSON.stringify(mesh, null, 2));
 					// create API key credential
 					const adobeIdIntegrationsForWorkspace = await createAPIMeshCredentials(
@@ -110,6 +110,8 @@ class CreateCommand extends Command {
 								'Mesh Endpoint: %s\n',
 								`${MULTITENANT_GRAPHQL_SERVER_BASE_URL}/${mesh.meshId}/graphql?api_key=${adobeIdIntegrationsForWorkspace.apiKey}`,
 							);
+
+
 						} else {
 							this.log(
 								'Unable to subscribe API Key %s to API Mesh service',
