@@ -81,7 +81,8 @@ class CreateCommand extends Command {
 				let sdkList = [];
 
 				if (mesh) {
-					this.log('Your mesh is being processed. Please wait 5 minutes before checking the status of your mesh %s', mesh.meshId);
+					this.log('We have scheduled your mesh build. Wait a few minutes before checking the status of your mesh %s', mesh.meshId);
+					this.log('To check the status of your mesh, run aio api-mesh:status');
 					this.log(JSON.stringify(mesh, null, 2));
 					// create API key credential
 					const adobeIdIntegrationsForWorkspace = await createAPIMeshCredentials(
