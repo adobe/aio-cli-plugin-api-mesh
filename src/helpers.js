@@ -26,6 +26,9 @@ const { objToString } = require('./utils');
 
 const { DEV_CONSOLE_BASE_URL, DEV_CONSOLE_API_KEY, AIO_CLI_API_KEY } = CONSTANTS;
 
+/**
+ * @param configFilePath
+ */
 async function getDevConsoleConfigFromFile(configFilePath) {
 	try {
 		if (!fs.existsSync(configFilePath)) {
@@ -47,7 +50,7 @@ async function getDevConsoleConfigFromFile(configFilePath) {
 			: data.baseUrl;
 
 		const config = {
-			baseUrl: baseUrl,
+			baseUrl,
 			accessToken: (await getLibConsoleCLI()).accessToken,
 			apiKey: data.apiKey,
 		};
@@ -64,6 +67,9 @@ async function getDevConsoleConfigFromFile(configFilePath) {
 	}
 }
 
+/**
+ * @param configObject
+ */
 async function getDevConsoleConfigFromObject(configObject) {
 	const { baseUrl, apiKey } = configObject;
 	const config = {
@@ -325,15 +331,16 @@ async function getLibConsoleCLI() {
 	const accessToken = await getToken(CLI);
 
 	const consoleCLI = await libConsoleCLI.init({
-		accessToken: accessToken,
+		accessToken,
 		apiKey: AIO_CLI_API_KEY,
 		env: clientEnv,
 	});
 
-	return { consoleCLI: consoleCLI, accessToken: accessToken };
+	return { consoleCLI, accessToken };
 }
 
 /**
+ * @param options
  * @returns {any} Returns an object with properties ready for consumption
  */
 async function initSdk(options) {
@@ -377,7 +384,6 @@ async function initRequestId() {
  * Function to run the CLI Y/N prompt to confirm the user's action
  *
  * @param {string} message
- *
  * @returns boolean
  */
 async function promptConfirm(message) {
@@ -405,9 +411,9 @@ async function promptMultiselect(message, choices) {
 	const selected = await inquirer.prompt([
 		{
 			name: 'items',
-			message: message,
+			message,
 			type: 'checkbox',
-			choices: choices,
+			choices,
 		},
 	]);
 
@@ -425,9 +431,9 @@ async function promptSelect(message, choices) {
 	const selected = await inquirer.prompt([
 		{
 			name: 'item',
-			message: message,
+			message,
 			type: 'list',
-			choices: choices,
+			choices,
 		},
 	]);
 
@@ -441,11 +447,11 @@ async function promptSelect(message, choices) {
  * @param {object[]} choices - list of options
  * @returns {object[]} - selected options
  */
- async function promptInput(message) {
+async function promptInput(message) {
 	const selected = await inquirer.prompt([
 		{
 			name: 'item',
-			message: message,
+			message,
 			type: 'input',
 		},
 	]);

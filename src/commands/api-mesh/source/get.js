@@ -12,7 +12,12 @@ governing permissions and limitations under the License.
 
 const { Command, Flags } = require('@oclif/core');
 const SourceRegistryStorage = require('source-registry-storage-adapter');
-const { promptMultiselect, promptSelect, promptConfirm, initRequestId } = require('../../../helpers');
+const {
+	promptMultiselect,
+	promptSelect,
+	promptConfirm,
+	initRequestId,
+} = require('../../../helpers');
 const ncp = require('node-clipboardy');
 const chalk = require('chalk');
 const config = require('@adobe/aio-lib-core-config');
@@ -31,18 +36,18 @@ class GetCommand extends Command {
 			await initRequestId();
 
 			logger.info(`RequestId: ${global.requestId}`);
-			let list
+			let list;
 			try {
 				list = await this.sourceRegistryStorage.getList();
 			} catch (err) {
-				this.log(err)
-				this.error(`Cannot get the list of sources: ${err}`)
+				this.log(err);
+				this.error(`Cannot get the list of sources: ${err}`);
 			}
 			const { flags } = await this.parse(GetCommand);
 			if (!flags.source && !flags.multiple) {
 				this.error(
 					`\nThe "aio api-mesh:source:get" command requires additional parameters` +
-					`\nUse "aio api-mesh:source:get --help" to see parameters information.`,
+						`\nUse "aio api-mesh:source:get --help" to see parameters information.`,
 				);
 			}
 			const sources = flags.multiple ? await this.handleMultiple(list) : flags.source;
@@ -54,7 +59,7 @@ class GetCommand extends Command {
 					this.error(
 						chalk.red(
 							`The source with the name "${name}" doesn't exist.` +
-							`\nUse "aio api-mesh:source:discover" command to see avaliable sources.`,
+								`\nUse "aio api-mesh:source:discover" command to see avaliable sources.`,
 						),
 					);
 				}
@@ -63,7 +68,7 @@ class GetCommand extends Command {
 					this.error(
 						chalk.red(
 							`The version "${version}" for source name "${name}" doesn't exist.` +
-							`\nUse "aio api-mesh:source:discover" command to see avaliable source versions.`,
+								`\nUse "aio api-mesh:source:discover" command to see avaliable source versions.`,
 						),
 					);
 				}
@@ -84,13 +89,12 @@ class GetCommand extends Command {
 				}
 			} else {
 				this.log(sourceConfigsString);
-			}	
+			}
 		} catch (error) {
 			logger.error(error);
 			this.error(`
 				\nSomething went wrong with "get" command. Please try again later.
-				\n${error}`
-			);
+				\n${error}`);
 		}
 	}
 
@@ -122,7 +126,7 @@ class GetCommand extends Command {
 GetCommand.flags = {
 	confirm: Flags.boolean({
 		char: 'c',
-		description:'Auto confirm print action prompt. CLI will not check ask user to print source.',
+		description: 'Auto confirm print action prompt. CLI will not check ask user to print source.',
 		default: false,
 	}),
 	source: Flags.string({

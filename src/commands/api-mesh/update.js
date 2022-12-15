@@ -82,12 +82,19 @@ class UpdateCommand extends Command {
 				try {
 					const response = await updateMesh(imsOrgId, projectId, workspaceId, meshId, data);
 
-					this.log('******************************************************************************************************');
-					this.log('Your mesh is being provisioned. Wait a few minutes before checking the status of your mesh %s', meshId);
+					this.log(
+						'******************************************************************************************************',
+					);
+					this.log(
+						'Your mesh is being provisioned. Wait a few minutes before checking the status of your mesh %s',
+						meshId,
+					);
 					this.log('To check the status of your mesh, run:');
 					this.log('aio api-mesh:status');
-					this.log('******************************************************************************************************');
-					
+					this.log(
+						'******************************************************************************************************',
+					);
+
 					return response;
 				} catch (error) {
 					this.log(error.message);
