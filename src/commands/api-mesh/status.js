@@ -42,6 +42,8 @@ class StatusCommand extends Command {
                         this.log('Your mesh has been successfully built.');
                         break;
                     case 'pending':
+                      this.log('Your mesh is awaiting processing.');
+                      break;
                     case 'building':
                         this.log('Your mesh is currently being processed. Please wait upto 5 minutes before checking the status.');
                         break;
