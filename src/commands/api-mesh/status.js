@@ -1,8 +1,7 @@
 const { Command } = require('@oclif/core');
 const logger = require('../../classes/logger');
 const { initRequestId, initSdk } = require('../../helpers');
-const { getMeshId } = require('../../lib/devConsole');
-const { getMeshStatus } = require('../../lib/sms');
+const { getMeshId, getMesh } = require('../../lib/devConsole');
 const { ignoreCacheFlag } = require('../../utils');
 
 require('dotenv').config();
@@ -16,7 +15,7 @@ class StatusCommand extends Command {
         await initRequestId();
 		logger.info(`RequestId: ${global.requestId}`);
 
-		const { args, flags } = await this.parse(StatusCommand);
+		const { flags } = await this.parse(StatusCommand);
 		const ignoreCache = await flags.ignoreCache;
         
         const { imsOrgId, projectId, workspaceId } = await initSdk({
@@ -36,19 +35,27 @@ class StatusCommand extends Command {
 
         if (meshId) {
             try {
-                const mesh = await getMeshStatus(meshId, imsOrgId, projectId, workspaceId);
+                const mesh = await getMesh(imsOrgId, projectId, workspaceId, meshId);
                 switch (mesh.meshStatus) {
                     case 'success':
+					    this.log('******************************************************************************************************');
                         this.log('Your mesh has been successfully built.');
+					    this.log('******************************************************************************************************');
                         break;
                     case 'pending':
-                      this.log('Your mesh is awaiting processing.');
-                      break;
+                        this.log('******************************************************************************************************');
+                        this.log('Your mesh is awaiting processing.');
+                        this.log('******************************************************************************************************');
+                        break;
                     case 'building':
-                        this.log('Your mesh is currently being processed. Please wait upto 5 minutes before checking the status.');
+                        this.log('******************************************************************************************************');
+                        this.log('Your mesh is currently being provisioned. Please wait a few minutes before checking again.');
+                        this.log('******************************************************************************************************');
                         break;
                     case 'error':
+                        this.log('******************************************************************************************************');
                         this.log('Your mesh errored out with the following error. ', mesh.error);
+                        this.log('******************************************************************************************************');
                         break;
                 }
             } catch (err) {
