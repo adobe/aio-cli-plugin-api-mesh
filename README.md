@@ -74,6 +74,7 @@ aio api-mesh:get PATH_OF_FILE_TO_DOWNLOAD_INTO
 aio api-mesh:create PATH_OF_MESH_CONFIG_JSON_FILE
 aio api-mesh:update PATH_OF_MESH_CONFIG_JSON_FILE
 aio api-mesh:delete
+aio api-mesh:status
 ```
 
 All commands support `-i` or `--ignoreCache` flag that will force the CLI to ignore the cached Org, Project and Workspace details and prompt the user to select new options just for that action.

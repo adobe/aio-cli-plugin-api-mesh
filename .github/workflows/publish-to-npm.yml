@@ -1,8 +1,9 @@
 name: publish-to-npm
 on:
-    push:
+    pull_request:
+        types: [closed]
         branches:
-            - main # Change this if not your default branch
+            - main 
 jobs:
     publish:
         if: github.repository == 'adobe/aio-cli-plugin-api-mesh'
@@ -11,7 +12,7 @@ jobs:
             - uses: actions/checkout@v2
             - uses: actions/setup-node@v2
               with:
-                  node-version: 14
+                  node-version: 16
             - run: npm install
             - uses: JS-DevTools/npm-publish@v1
               with:

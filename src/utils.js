@@ -3,9 +3,8 @@
  * If the path evaluates to false, the default string is returned.
  *
  * @param {object} obj
- * @param {array<string>} path
+ * @param {Array<string>} path
  * @param {string} defaultString
- *
  * @returns {string}
  */
 function objToString(obj, path = [], defaultString = '') {
@@ -50,8 +49,7 @@ const autoConfirmActionFlag = Flags.boolean({
 });
 
 const jsonFlag = Flags.boolean({
-	description:
-		'Output JSON',
+	description: 'Output JSON',
 	default: false,
 });
 

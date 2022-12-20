@@ -20,6 +20,8 @@
 	"plugins": ["prettier"],
 	"rules": {
 		"no-console": ["warn"],
-		"prettier/prettier": "error"
+		"prettier/prettier": "error",
+		"no-useless-escape": "warn",
+		"n/no-path-concat": "warn"
 	}
 }

@@ -11,8 +11,6 @@ governing permissions and limitations under the License.
 */
 
 const mockMetadataFixture = require('../__fixtures__/connectors-metadata.json');
-const mockSourceTest01v1Fixture = require('../__fixtures__/0.0.1-test-01.json');
-const mockSourceTest02v1Fixture = require('../__fixtures__/0.0.1-test-02.json');
 const mockSourceTest03v1Fixture = require('../__fixtures__/0.0.1-test-03.json');
 const mockAdapter = require('source-registry-storage-adapter');
 const chalk = require('chalk');
