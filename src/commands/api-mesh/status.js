@@ -83,6 +83,10 @@ class StatusCommand extends Command {
 					`Unable to get the mesh status. If the error persists please contact support. RequestId: ${global.requestId}`,
 				);
 			}
+		} else {
+			this.error(
+				`Unable to get mesh status. No mesh found for Org(${imsOrgId}) -> Project(${projectId}) -> Workspace(${workspaceId}). Please check the details and try again.`,
+			);
 		}
 	}
 }
