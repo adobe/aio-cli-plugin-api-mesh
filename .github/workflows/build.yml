@@ -23,4 +23,4 @@ jobs:
         - run: npm install
         - run: npm run lint
         - run: aio config set cli.env stage
-        - run: npm test
+        - run: xvfb-run npm test
