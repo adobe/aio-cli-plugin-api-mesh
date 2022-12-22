@@ -70,7 +70,7 @@ class GetCommand extends Command {
 
 					return mesh;
 				} else {
-					this.error(
+					logger.error(
 						`Unable to get mesh with the ID ${meshId}. Please check the mesh ID and try again. RequestId: ${global.requestId}`,
 						{ exit: false },
 					);

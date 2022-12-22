@@ -142,20 +142,11 @@ describe('get command tests', () => {
 	test('should fail if mesh id is not found', async () => {
 		getMesh.mockResolvedValueOnce(null);
 
-		const runResult = await GetCommand.run();
-
-		expect(runResult).toMatchInlineSnapshot(`undefined`);
-		expect(logSpy.mock.calls).toMatchInlineSnapshot(`[]`);
-		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
-		[
-		  [
-		    "Unable to get mesh with the ID dummy_meshId. Please check the mesh ID and try again. RequestId: dummy_request_id",
-		    {
-		      "exit": false,
-		    },
-		  ],
-		]
-	`);
+		await GetCommand.run().catch(err => {
+			expect(err.message).toContain(
+				'Unable to get mesh with the ID dummy_meshId. Please check the mesh ID and try again.',
+			);
+		});
 	});
 
 	test('should fail if get mesh method failed', async () => {

@@ -133,22 +133,6 @@ describe('describe command tests', () => {
 				'Unable to get mesh details. Please check the details and try again.',
 			);
 		});
-
-		/*	const runResult = await DescribeCommand.run();
-
-		expect(runResult).toBe(undefined);
-
-		expect(logSpy.mock.calls).toMatchInlineSnapshot(`[]`);
-		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
-		[
-		  [
-		    "Unable to get mesh details. Please check the details and try again. RequestId: dummy_request_id",
-		    {
-		      "exit": false,
-		    },
-		  ],
-		]
-	`); */
 	});
 
 	test('should not fail if api key is missing from mesh details', async () => {
@@ -164,7 +148,7 @@ describe('describe command tests', () => {
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
 		[
 		  [
-		    "Successfully retrieved mesh details 
+		    "Successfully retrieved mesh details
 		",
 		  ],
 		  [
@@ -206,7 +190,7 @@ describe('describe command tests', () => {
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
 		[
 		  [
-		    "Successfully retrieved mesh details 
+		    "Successfully retrieved mesh details
 		",
 		  ],
 		  [
