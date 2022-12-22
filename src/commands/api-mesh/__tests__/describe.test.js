@@ -148,7 +148,7 @@ describe('describe command tests', () => {
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
 		[
 		  [
-		    "Successfully retrieved mesh details
+		    "Successfully retrieved mesh details 
 		",
 		  ],
 		  [
@@ -190,7 +190,7 @@ describe('describe command tests', () => {
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
 		[
 		  [
-		    "Successfully retrieved mesh details
+		    "Successfully retrieved mesh details 
 		",
 		  ],
 		  [
