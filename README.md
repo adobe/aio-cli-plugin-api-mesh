@@ -83,10 +83,9 @@ Create, Update and Delete support `-c` or `--autoConfirmAction` flag that will n
 
 # Sources Registry
 
-Source registry is a collection of predefined sources (API mesh source configurations) that are created to solve specific use cases. The source can be installed for customer-specific API mesh configuration. 
+Source registry is a collection of predefined sources (API mesh source configurations) that are created to solve specific use cases. The source can be installed for customer-specific API mesh configuration.
 
 To submit a new source, please follow the instructions provided in the [Source Registry](https://github.com/adobe/api-mesh-sources/) repository.
-
 
 ## Commands
 
@@ -98,13 +97,14 @@ aio api-mesh:source:install SOURCE_NAME -f PATH_TO_FILE_WITH_VARIABLES
 
 aio api-mesh:source:get SOURCE_NAME
 aio api-mesh:source:get SOURCE_NAME@VERSION_OF_THE_SOURCE
-aio api-mesh:source:get -m 
+aio api-mesh:source:get -m
 aio api-mesh:source:discover
 ```
 
 The "source:get" command accept multiple sources per one call.
 
 Example:
+
 ```
 aio api-mesh:source:get -m <NAME_OF_THE_SOURCE>@<VERSION_OF_THE_SOURC><NAME_OF_THE_SECOND_SOURCE>@<VERSION_OF_THE_SOURC>
 <NAME_OF_THE_THIRD_SOURCE>@<VERSION_OF_THE_SOURC>

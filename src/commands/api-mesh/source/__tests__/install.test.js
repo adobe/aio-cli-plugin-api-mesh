@@ -111,11 +111,8 @@ describe('source:install command tests', () => {
 		});
 	});
 	test('Check executing with invalid variable type', async () => {
-		const invalidPath = '/../__fixtures__/variables-file-invalid.json';
-		const newPath = path.join(__dirname, invalidPath);
+		const newPath = path.join(__dirname, '/../__fixtures__/variables-file-invalid.json');
 		const runPath = `-f=${newPath}`;
-
-		// const oldPath = `-f=${__dirname}/../__fixtures__/variables-file-invalid.json`;
 		await InstallCommand.run(['test-03', runPath]).catch(err => {
 			expect(err.message).toEqual(
 				chalk.red(
