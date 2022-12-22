@@ -93,15 +93,15 @@ describe('create command tests', () => {
 			`"Create a mesh with the given config."`,
 		);
 		expect(CreateCommand.args).toMatchInlineSnapshot(`
-		Array [
-		  Object {
+		[
+		  {
 		    "name": "file",
 		  },
 		]
 	`);
 		expect(CreateCommand.flags).toMatchInlineSnapshot(`
-		Object {
-		  "autoConfirmAction": Object {
+		{
+		  "autoConfirmAction": {
 		    "allowNo": false,
 		    "char": "c",
 		    "default": false,
@@ -109,7 +109,7 @@ describe('create command tests', () => {
 		    "parse": [Function],
 		    "type": "boolean",
 		  },
-		  "ignoreCache": Object {
+		  "ignoreCache": {
 		    "allowNo": false,
 		    "char": "i",
 		    "default": false,
@@ -117,7 +117,7 @@ describe('create command tests', () => {
 		    "parse": [Function],
 		    "type": "boolean",
 		  },
-		  "json": Object {
+		  "json": {
 		    "allowNo": false,
 		    "default": false,
 		    "description": "Output JSON",
@@ -126,7 +126,7 @@ describe('create command tests', () => {
 		  },
 		}
 	`);
-		expect(CreateCommand.aliases).toMatchInlineSnapshot(`Array []`);
+		expect(CreateCommand.aliases).toMatchInlineSnapshot(`[]`);
 	});
 
 	test('should fail if mesh config file arg is missing', async () => {
@@ -142,10 +142,10 @@ describe('create command tests', () => {
 		await expect(runResult).rejects.toEqual(
 			new Error('Missing file path. Run aio api-mesh create --help for more info.'),
 		);
-		expect(logSpy.mock.calls).toMatchInlineSnapshot(`Array []`);
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`[]`);
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
+		[
+		  [
 		    "Missing file path. Run aio api-mesh create --help for more info.",
 		  ],
 		]
@@ -168,15 +168,15 @@ describe('create command tests', () => {
 			),
 		);
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
+		[
+		  [
 		    "ENOENT: no such file or directory, open 'dummy_file_path'",
 		  ],
 		]
 	`);
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
+		[
+		  [
 		    "Unable to read the mesh configuration file provided. Please check the file and try again.",
 		  ],
 		]
@@ -194,15 +194,15 @@ describe('create command tests', () => {
 			),
 		);
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
+		[
+		  [
 		    "create mesh api failed",
 		  ],
 		]
 	`);
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
+		[
+		  [
 		    "Unable to create a mesh. Please check the mesh configuration file and try again. If the error persists please contact support. RequestId: dummy_request_id",
 		  ],
 		]
@@ -220,36 +220,31 @@ describe('create command tests', () => {
 			),
 		);
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
-		    "Successfully created mesh %s",
+		[
+		  [
+		    "******************************************************************************************************",
+		  ],
+		  [
+		    "Your mesh is being provisioned. Wait a few minutes before checking the status of your mesh %s",
 		    "dummy_mesh_id",
 		  ],
-		  Array [
-		    "{
-		  \\"meshId\\": \\"dummy_mesh_id\\",
-		  \\"meshConfig\\": {
-		    \\"sources\\": [
-		      {
-		        \\"name\\": \\"<api_name>\\",
-		        \\"handler\\": {
-		          \\"graphql\\": {
-		            \\"endpoint\\": \\"<gql_endpoint>\\"
-		          }
-		        }
-		      }
-		    ]
-		  }
-		}",
+		  [
+		    "To check the status of your mesh, run:",
 		  ],
-		  Array [
+		  [
+		    "aio api-mesh:status",
+		  ],
+		  [
+		    "******************************************************************************************************",
+		  ],
+		  [
 		    "create api credential api failed",
 		  ],
 		]
 	`);
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
+		[
+		  [
 		    "Unable to create a mesh. Please check the mesh configuration file and try again. If the error persists please contact support. RequestId: dummy_request_id",
 		  ],
 		]
@@ -269,40 +264,35 @@ describe('create command tests', () => {
 			),
 		);
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
-		    "Successfully created mesh %s",
+		[
+		  [
+		    "******************************************************************************************************",
+		  ],
+		  [
+		    "Your mesh is being provisioned. Wait a few minutes before checking the status of your mesh %s",
 		    "dummy_mesh_id",
 		  ],
-		  Array [
-		    "{
-		  \\"meshId\\": \\"dummy_mesh_id\\",
-		  \\"meshConfig\\": {
-		    \\"sources\\": [
-		      {
-		        \\"name\\": \\"<api_name>\\",
-		        \\"handler\\": {
-		          \\"graphql\\": {
-		            \\"endpoint\\": \\"<gql_endpoint>\\"
-		          }
-		        }
-		      }
-		    ]
-		  }
-		}",
+		  [
+		    "To check the status of your mesh, run:",
 		  ],
-		  Array [
+		  [
+		    "aio api-mesh:status",
+		  ],
+		  [
+		    "******************************************************************************************************",
+		  ],
+		  [
 		    "Successfully created API Key %s",
 		    "dummy_api_key",
 		  ],
-		  Array [
+		  [
 		    "subscribe credential to mesh service api failed",
 		  ],
 		]
 	`);
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
+		[
+		  [
 		    "Unable to create a mesh. Please check the mesh configuration file and try again. If the error persists please contact support. RequestId: dummy_request_id",
 		  ],
 		]
@@ -314,16 +304,16 @@ describe('create command tests', () => {
 
 		expect(initRequestId).toHaveBeenCalled();
 		expect(createMesh.mock.calls[0]).toMatchInlineSnapshot(`
-		Array [
+		[
 		  "1234",
 		  "5678",
 		  "123456789",
-		  Object {
-		    "meshConfig": Object {
-		      "sources": Array [
-		        Object {
-		          "handler": Object {
-		            "graphql": Object {
+		  {
+		    "meshConfig": {
+		      "sources": [
+		        {
+		          "handler": {
+		            "graphql": {
 		              "endpoint": "<gql_endpoint>",
 		            },
 		          },
@@ -335,14 +325,14 @@ describe('create command tests', () => {
 		]
 	`);
 		expect(createAPIMeshCredentials.mock.calls[0]).toMatchInlineSnapshot(`
-		Array [
+		[
 		  "1234",
 		  "5678",
 		  "123456789",
 		]
 	`);
 		expect(subscribeCredentialToMeshService.mock.calls[0]).toMatchInlineSnapshot(`
-		Array [
+		[
 		  "1234",
 		  "5678",
 		  "123456789",
@@ -350,17 +340,17 @@ describe('create command tests', () => {
 		]
 	`);
 		expect(runResult).toMatchInlineSnapshot(`
-		Object {
-		  "adobeIdIntegrationsForWorkspace": Object {
+		{
+		  "adobeIdIntegrationsForWorkspace": {
 		    "apiKey": "dummy_api_key",
 		    "id": "dummy_id",
 		  },
-		  "mesh": Object {
-		    "meshConfig": Object {
-		      "sources": Array [
-		        Object {
-		          "handler": Object {
-		            "graphql": Object {
+		  "mesh": {
+		    "meshConfig": {
+		      "sources": [
+		        {
+		          "handler": {
+		            "graphql": {
 		              "endpoint": "<gql_endpoint>",
 		            },
 		          },
@@ -370,50 +360,45 @@ describe('create command tests', () => {
 		    },
 		    "meshId": "dummy_mesh_id",
 		  },
-		  "sdkList": Array [
+		  "sdkList": [
 		    "dummy_service",
 		  ],
 		}
 	`);
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
-		    "Successfully created mesh %s",
+		[
+		  [
+		    "******************************************************************************************************",
+		  ],
+		  [
+		    "Your mesh is being provisioned. Wait a few minutes before checking the status of your mesh %s",
 		    "dummy_mesh_id",
 		  ],
-		  Array [
-		    "{
-		  \\"meshId\\": \\"dummy_mesh_id\\",
-		  \\"meshConfig\\": {
-		    \\"sources\\": [
-		      {
-		        \\"name\\": \\"<api_name>\\",
-		        \\"handler\\": {
-		          \\"graphql\\": {
-		            \\"endpoint\\": \\"<gql_endpoint>\\"
-		          }
-		        }
-		      }
-		    ]
-		  }
-		}",
+		  [
+		    "To check the status of your mesh, run:",
 		  ],
-		  Array [
+		  [
+		    "aio api-mesh:status",
+		  ],
+		  [
+		    "******************************************************************************************************",
+		  ],
+		  [
 		    "Successfully created API Key %s",
 		    "dummy_api_key",
 		  ],
-		  Array [
+		  [
 		    "Successfully subscribed API Key %s to API Mesh service",
 		    "dummy_api_key",
 		  ],
-		  Array [
+		  [
 		    "Mesh Endpoint: %s
 		",
 		    "https://graph.adobe.io/api/dummy_mesh_id/graphql?api_key=dummy_api_key",
 		  ],
 		]
 	`);
-		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`Array []`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`[]`);
 	});
 
 	test('should not ask for confirmation if autoConfirmAction is provided', async () => {
@@ -433,44 +418,39 @@ describe('create command tests', () => {
 			ignoreCache: true,
 		});
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
-		    "Successfully created mesh %s",
+		[
+		  [
+		    "******************************************************************************************************",
+		  ],
+		  [
+		    "Your mesh is being provisioned. Wait a few minutes before checking the status of your mesh %s",
 		    "dummy_mesh_id",
 		  ],
-		  Array [
-		    "{
-		  \\"meshId\\": \\"dummy_mesh_id\\",
-		  \\"meshConfig\\": {
-		    \\"sources\\": [
-		      {
-		        \\"name\\": \\"<api_name>\\",
-		        \\"handler\\": {
-		          \\"graphql\\": {
-		            \\"endpoint\\": \\"<gql_endpoint>\\"
-		          }
-		        }
-		      }
-		    ]
-		  }
-		}",
+		  [
+		    "To check the status of your mesh, run:",
 		  ],
-		  Array [
+		  [
+		    "aio api-mesh:status",
+		  ],
+		  [
+		    "******************************************************************************************************",
+		  ],
+		  [
 		    "Successfully created API Key %s",
 		    "dummy_api_key",
 		  ],
-		  Array [
+		  [
 		    "Successfully subscribed API Key %s to API Mesh service",
 		    "dummy_api_key",
 		  ],
-		  Array [
+		  [
 		    "Mesh Endpoint: %s
 		",
 		    "https://graph.adobe.io/api/dummy_mesh_id/graphql?api_key=dummy_api_key",
 		  ],
 		]
 	`);
-		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`Array []`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`[]`);
 	});
 
 	test('should stop creation if user declines confirmation', async () => {
@@ -484,13 +464,13 @@ describe('create command tests', () => {
 			ignoreCache: true,
 		});
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
+		[
+		  [
 		    "Create cancelled",
 		  ],
 		]
 	`);
-		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`Array []`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`[]`);
 	});
 
 	test('must return proper object structure used by adobe/generator-app-api-mesh', async () => {

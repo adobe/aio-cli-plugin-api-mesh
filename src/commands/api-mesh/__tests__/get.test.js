@@ -80,15 +80,15 @@ describe('get command tests', () => {
 	test('snapshot get command', () => {
 		expect(GetCommand.description).toMatchInlineSnapshot(`"Get the config of a given mesh"`);
 		expect(GetCommand.args).toMatchInlineSnapshot(`
-		Array [
-		  Object {
+		[
+		  {
 		    "name": "file",
 		  },
 		]
 	`);
 		expect(GetCommand.flags).toMatchInlineSnapshot(`
-		Object {
-		  "ignoreCache": Object {
+		{
+		  "ignoreCache": {
 		    "allowNo": false,
 		    "char": "i",
 		    "default": false,
@@ -98,7 +98,7 @@ describe('get command tests', () => {
 		  },
 		}
 	`);
-		expect(GetCommand.aliases).toMatchInlineSnapshot(`Array []`);
+		expect(GetCommand.aliases).toMatchInlineSnapshot(`[]`);
 	});
 
 	test('should fail if mesh id is missing', async () => {
@@ -109,10 +109,10 @@ describe('get command tests', () => {
 			expect(err.message).toMatchInlineSnapshot(
 				`"Unable to get mesh config. No mesh found for Org(1234) -> Project(5678) -> Workspace(123456789). Please check the details and try again."`,
 			);
-			expect(logSpy.mock.calls).toMatchInlineSnapshot(`Array []`);
+			expect(logSpy.mock.calls).toMatchInlineSnapshot(`[]`);
 			expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
-			Array [
-			  Array [
+			[
+			  [
 			    "Unable to get mesh config. No mesh found for Org(1234) -> Project(5678) -> Workspace(123456789). Please check the details and try again.",
 			  ],
 			]
@@ -128,10 +128,10 @@ describe('get command tests', () => {
 			expect(err.message).toMatchInlineSnapshot(
 				`"Unable to get mesh ID. Please check the details and try again. RequestId: dummy_request_id"`,
 			);
-			expect(logSpy.mock.calls).toMatchInlineSnapshot(`Array []`);
+			expect(logSpy.mock.calls).toMatchInlineSnapshot(`[]`);
 			expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
-			Array [
-			  Array [
+			[
+			  [
 			    "Unable to get mesh ID. Please check the details and try again. RequestId: dummy_request_id",
 			  ],
 			]
@@ -145,12 +145,12 @@ describe('get command tests', () => {
 		const runResult = await GetCommand.run();
 
 		expect(runResult).toMatchInlineSnapshot(`undefined`);
-		expect(logSpy.mock.calls).toMatchInlineSnapshot(`Array []`);
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`[]`);
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
+		[
+		  [
 		    "Unable to get mesh with the ID dummy_meshId. Please check the mesh ID and try again. RequestId: dummy_request_id",
-		    Object {
+		    {
 		      "exit": false,
 		    },
 		  ],
@@ -169,15 +169,15 @@ describe('get command tests', () => {
 			),
 		);
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
+		[
+		  [
 		    "get mesh failed",
 		  ],
 		]
 	`);
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
+		[
+		  [
 		    "Unable to get mesh. Please check the details and try again. If the error persists please contact support. RequestId: dummy_request_id",
 		  ],
 		]
@@ -195,19 +195,19 @@ describe('get command tests', () => {
 		expect(initRequestId).toHaveBeenCalled();
 		expect(runResult).toEqual({ meshId: 'dummy_meshId', mesh: mockGetMeshConfig });
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
+		[
+		  [
 		    "Successfully retrieved mesh %s",
 		    "{
-		  \\"meshId\\": \\"dummy_meshId\\",
-		  \\"mesh\\": {
-		    \\"meshConfig\\": {
-		      \\"sources\\": [
+		  "meshId": "dummy_meshId",
+		  "mesh": {
+		    "meshConfig": {
+		      "sources": [
 		        {
-		          \\"name\\": \\"<api_name>\\",
-		          \\"handler\\": {
-		            \\"graphql\\": {
-		              \\"endpoint\\": \\"<gql_endpoint>\\"
+		          "name": "<api_name>",
+		          "handler": {
+		            "graphql": {
+		              "endpoint": "<gql_endpoint>"
 		            }
 		          }
 		        }
@@ -216,13 +216,13 @@ describe('get command tests', () => {
 		  }
 		}",
 		  ],
-		  Array [
+		  [
 		    "Successfully wrote mesh to file %s",
 		    "mesh.json",
 		  ],
 		]
 	`);
-		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`Array []`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`[]`);
 	});
 
 	test('should write to file if file argument is provided', async () => {
@@ -242,27 +242,27 @@ describe('get command tests', () => {
 
 		expect(runResult).toEqual({ meshId: 'dummy_meshId', mesh: mockGetMeshConfig });
 		expect(writeFile.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
+		[
+		  [
 		    "./mesh.json",
 		    "{}",
 		  ],
 		]
 	`);
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
+		[
+		  [
 		    "Successfully retrieved mesh %s",
 		    "{
-		  \\"meshId\\": \\"dummy_meshId\\",
-		  \\"mesh\\": {
-		    \\"meshConfig\\": {
-		      \\"sources\\": [
+		  "meshId": "dummy_meshId",
+		  "mesh": {
+		    "meshConfig": {
+		      "sources": [
 		        {
-		          \\"name\\": \\"<api_name>\\",
-		          \\"handler\\": {
-		            \\"graphql\\": {
-		              \\"endpoint\\": \\"<gql_endpoint>\\"
+		          "name": "<api_name>",
+		          "handler": {
+		            "graphql": {
+		              "endpoint": "<gql_endpoint>"
 		            }
 		          }
 		        }
@@ -271,13 +271,13 @@ describe('get command tests', () => {
 		  }
 		}",
 		  ],
-		  Array [
+		  [
 		    "Successfully wrote mesh to file %s",
 		    "./mesh.json",
 		  ],
 		]
 	`);
-		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`Array []`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`[]`);
 	});
 
 	test('should log error if failed to write to file', async () => {
@@ -296,27 +296,27 @@ describe('get command tests', () => {
 
 		expect(runResult).toEqual({ meshId: 'dummy_meshId', mesh: mockGetMeshConfig });
 		expect(writeFile.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
+		[
+		  [
 		    "./mesh.json",
 		    "{}",
 		  ],
 		]
 	`);
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
+		[
+		  [
 		    "Successfully retrieved mesh %s",
 		    "{
-		  \\"meshId\\": \\"dummy_meshId\\",
-		  \\"mesh\\": {
-		    \\"meshConfig\\": {
-		      \\"sources\\": [
+		  "meshId": "dummy_meshId",
+		  "mesh": {
+		    "meshConfig": {
+		      "sources": [
 		        {
-		          \\"name\\": \\"<api_name>\\",
-		          \\"handler\\": {
-		            \\"graphql\\": {
-		              \\"endpoint\\": \\"<gql_endpoint>\\"
+		          "name": "<api_name>",
+		          "handler": {
+		            "graphql": {
+		              "endpoint": "<gql_endpoint>"
 		            }
 		          }
 		        }
@@ -325,12 +325,12 @@ describe('get command tests', () => {
 		  }
 		}",
 		  ],
-		  Array [
+		  [
 		    "Unable to write mesh to file %s",
 		    "./mesh.json",
 		  ],
 		]
 	`);
-		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`Array []`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`[]`);
 	});
 });

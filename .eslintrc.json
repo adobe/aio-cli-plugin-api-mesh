@@ -22,6 +22,6 @@
 		"no-console": ["warn"],
 		"prettier/prettier": "error",
 		"no-useless-escape": "warn",
-		"n/no-path-concat": "warn"
+		"no-path-concat": ["warn"]
 	}
 }

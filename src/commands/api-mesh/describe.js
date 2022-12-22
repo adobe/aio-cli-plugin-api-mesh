@@ -62,7 +62,7 @@ class DescribeCommand extends Command {
 
 					return meshDetails;
 				} else {
-					this.error(
+					logger.error(
 						`Unable to get mesh details. Please check the details and try again. RequestId: ${global.requestId}`,
 						{ exit: false },
 					);
