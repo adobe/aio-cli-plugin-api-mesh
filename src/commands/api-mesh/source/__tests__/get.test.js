@@ -59,8 +59,8 @@ describe('source:get command tests', () => {
 			`"Command returns the content of a specific source."`,
 		);
 		expect(GetCommand.flags).toMatchInlineSnapshot(`
-		Object {
-		  "confirm": Object {
+		{
+		  "confirm": {
 		    "allowNo": false,
 		    "char": "c",
 		    "default": false,
@@ -68,27 +68,27 @@ describe('source:get command tests', () => {
 		    "parse": [Function],
 		    "type": "boolean",
 		  },
-		  "multiple": Object {
+		  "multiple": {
 		    "allowNo": false,
 		    "char": "m",
 		    "description": "Select multiple sources",
-		    "exclusive": Array [
+		    "exclusive": [
 		      "name",
 		    ],
 		    "parse": [Function],
 		    "type": "boolean",
 		  },
-		  "source": Object {
+		  "source": {
 		    "char": "s",
 		    "description": "Source name",
-		    "input": Array [],
+		    "input": [],
 		    "multiple": true,
 		    "parse": [Function],
 		    "type": "option",
 		  },
 		}
 	`);
-		expect(GetCommand.aliases).toMatchInlineSnapshot(`Array []`);
+		expect(GetCommand.aliases).toMatchInlineSnapshot(`[]`);
 	});
 	test('Check executing without parameters', async () => {
 		await GetCommand.run([]).catch(err => {

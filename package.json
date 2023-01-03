@@ -17,6 +17,7 @@
 		"axios": "^1.2.0",
 		"chalk": "^4.1.0",
 		"dotenv": "^16.0.1",
+		"fs-extra": "^11.1.0",
 		"inquirer": "^8.2.4",
 		"json-interpolate": "^1.0.3",
 		"node-clipboardy": "^1.0.3",
@@ -45,13 +46,14 @@
 		"eslint-plugin-standard": "^5.0.0",
 		"execa": "4.1.0",
 		"husky": "7.0.4",
-		"jest": "26.6.3",
+		"jest": "^29.2.2",
 		"jest-junit": "^6.0.0",
 		"prettier": "2.2.1",
 		"stdout-stderr": "^0.1.9"
 	},
 	"engines": {
-		"node": ">=16.0.0"
+		"npm": ">=8.0.0",
+		"node": ">=18.0.0"
 	},
 	"files": [
 		"/oclif.manifest.json",

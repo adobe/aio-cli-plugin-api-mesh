@@ -37,7 +37,7 @@ describe('source:discover command tests', () => {
 		expect(DiscoverCommand.description).toMatchInlineSnapshot(
 			`"Return the list of avaliable sources"`,
 		);
-		expect(DiscoverCommand.aliases).toMatchInlineSnapshot(`Array []`);
+		expect(DiscoverCommand.aliases).toMatchInlineSnapshot(`[]`);
 	});
 	test('Check table render is executed', async () => {
 		await DiscoverCommand.run([]);

@@ -89,8 +89,8 @@ describe('delete command tests', () => {
 		expect(DeleteCommand.description).toMatchInlineSnapshot(`"Delete the config of a given mesh"`);
 		expect(DeleteCommand.args).toMatchInlineSnapshot(`undefined`);
 		expect(DeleteCommand.flags).toMatchInlineSnapshot(`
-		Object {
-		  "autoConfirmAction": Object {
+		{
+		  "autoConfirmAction": {
 		    "allowNo": false,
 		    "char": "c",
 		    "default": false,
@@ -98,7 +98,7 @@ describe('delete command tests', () => {
 		    "parse": [Function],
 		    "type": "boolean",
 		  },
-		  "ignoreCache": Object {
+		  "ignoreCache": {
 		    "allowNo": false,
 		    "char": "i",
 		    "default": false,
@@ -108,7 +108,7 @@ describe('delete command tests', () => {
 		  },
 		}
 	`);
-		expect(DeleteCommand.aliases).toMatchInlineSnapshot(`Array []`);
+		expect(DeleteCommand.aliases).toMatchInlineSnapshot(`[]`);
 	});
 
 	test('should fail if mesh id is missing', async () => {
@@ -119,10 +119,10 @@ describe('delete command tests', () => {
 			expect(err.message).toMatchInlineSnapshot(
 				`"Unable to delete. No mesh found for Org(1234) -> Project(5678) -> Workspace(123456789). Please check the details and try again."`,
 			);
-			expect(logSpy.mock.calls).toMatchInlineSnapshot(`Array []`);
+			expect(logSpy.mock.calls).toMatchInlineSnapshot(`[]`);
 			expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
-			Array [
-			  Array [
+			[
+			  [
 			    "Unable to delete. No mesh found for Org(1234) -> Project(5678) -> Workspace(123456789). Please check the details and try again.",
 			  ],
 			]
@@ -137,13 +137,13 @@ describe('delete command tests', () => {
 
 		expect(runResult).toBe('Delete cancelled');
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
+		[
+		  [
 		    "Delete cancelled",
 		  ],
 		]
 	`);
-		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`Array []`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`[]`);
 	});
 
 	test('should not ask for prompt if autoConfirmAction is set', async () => {
@@ -158,24 +158,24 @@ describe('delete command tests', () => {
 		const runResult = await DeleteCommand.run();
 
 		expect(runResult).toMatchInlineSnapshot(`
-		Object {
+		{
 		  "status": "success",
 		}
 	`);
 		expect(promptConfirm).not.toHaveBeenCalled();
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
+		[
+		  [
 		    "Successfully deleted mesh %s",
 		    "mesh_id",
 		  ],
-		  Array [
+		  [
 		    "Successfully unsubscribed API Key %s",
 		    "dummy_client_id",
 		  ],
 		]
 	`);
-		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`Array []`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`[]`);
 	});
 
 	test('should fail if mesh delete fails', async () => {
@@ -189,15 +189,15 @@ describe('delete command tests', () => {
 			),
 		);
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
+		[
+		  [
 		    "mesh delete failed",
 		  ],
 		]
 	`);
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
+		[
+		  [
 		    "Unable to delete mesh. Please check the details and try again. If the error persists please contact support. RequestId: dummy_request_id",
 		  ],
 		]
@@ -215,19 +215,19 @@ describe('delete command tests', () => {
 			),
 		);
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
+		[
+		  [
 		    "Successfully deleted mesh %s",
 		    "mesh_id",
 		  ],
-		  Array [
+		  [
 		    "unable to get api key",
 		  ],
 		]
 	`);
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
+		[
+		  [
 		    "Unable to delete mesh. Please check the details and try again. If the error persists please contact support. RequestId: dummy_request_id",
 		  ],
 		]
@@ -245,19 +245,19 @@ describe('delete command tests', () => {
 			),
 		);
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
+		[
+		  [
 		    "Successfully deleted mesh %s",
 		    "mesh_id",
 		  ],
-		  Array [
+		  [
 		    "unsubscribe api failed",
 		  ],
 		]
 	`);
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
+		[
+		  [
 		    "Unable to delete mesh. Please check the details and try again. If the error persists please contact support. RequestId: dummy_request_id",
 		  ],
 		]
@@ -269,13 +269,13 @@ describe('delete command tests', () => {
 
 		expect(initRequestId).toHaveBeenCalled();
 		expect(runResult).toMatchInlineSnapshot(`
-		Object {
+		{
 		  "status": "success",
 		}
 	`);
 		expect(deleteMesh.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
+		[
+		  [
 		    "1234",
 		    "5678",
 		    "123456789",
@@ -284,8 +284,8 @@ describe('delete command tests', () => {
 		]
 	`);
 		expect(getApiKeyCredential.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
+		[
+		  [
 		    "1234",
 		    "5678",
 		    "123456789",
@@ -293,8 +293,8 @@ describe('delete command tests', () => {
 		]
 	`);
 		expect(unsubscribeCredentialFromMeshService.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
+		[
+		  [
 		    "1234",
 		    "5678",
 		    "123456789",
@@ -303,17 +303,17 @@ describe('delete command tests', () => {
 		]
 	`);
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
+		[
+		  [
 		    "Successfully deleted mesh %s",
 		    "mesh_id",
 		  ],
-		  Array [
+		  [
 		    "Successfully unsubscribed API Key %s",
 		    "dummy_client_id",
 		  ],
 		]
 	`);
-		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`Array []`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`[]`);
 	});
 });

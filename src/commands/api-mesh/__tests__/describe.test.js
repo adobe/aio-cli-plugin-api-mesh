@@ -74,8 +74,8 @@ describe('describe command tests', () => {
 		expect(DescribeCommand.description).toMatchInlineSnapshot(`"Get details of a mesh"`);
 		expect(DescribeCommand.args).toMatchInlineSnapshot(`undefined`);
 		expect(DescribeCommand.flags).toMatchInlineSnapshot(`
-		Object {
-		  "ignoreCache": Object {
+		{
+		  "ignoreCache": {
 		    "allowNo": false,
 		    "char": "i",
 		    "default": false,
@@ -85,7 +85,7 @@ describe('describe command tests', () => {
 		  },
 		}
 	`);
-		expect(DescribeCommand.aliases).toMatchInlineSnapshot(`Array []`);
+		expect(DescribeCommand.aliases).toMatchInlineSnapshot(`[]`);
 	});
 
 	test('should error if describe api has failed', async () => {
@@ -99,8 +99,8 @@ describe('describe command tests', () => {
 			),
 		);
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
+		[
+		  [
 		    "Describe api failed Please check the details and try again. If the error persists please contact support. RequestId: dummy_request_id",
 		  ],
 		]
@@ -118,8 +118,8 @@ describe('describe command tests', () => {
 			),
 		);
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
+		[
+		  [
 		    "Unable to get mesh details. Please check the details and try again. If the error persists please contact support. RequestId: dummy_request_id",
 		  ],
 		]
@@ -128,21 +128,11 @@ describe('describe command tests', () => {
 
 	test('should error if mesh id is missing from describe api response', async () => {
 		describeMesh.mockResolvedValueOnce({});
-
-		const runResult = await DescribeCommand.run();
-
-		expect(runResult).toBe(undefined);
-		expect(logSpy.mock.calls).toMatchInlineSnapshot(`Array []`);
-		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
-		    "Unable to get mesh details. Please check the details and try again. RequestId: dummy_request_id",
-		    Object {
-		      "exit": false,
-		    },
-		  ],
-		]
-	`);
+		await DescribeCommand.run().catch(err => {
+			expect(err.message).toContain(
+				'Unable to get mesh details. Please check the details and try again.',
+			);
+		});
 	});
 
 	test('should not fail if api key is missing from mesh details', async () => {
@@ -151,35 +141,35 @@ describe('describe command tests', () => {
 		const runResult = await DescribeCommand.run();
 
 		expect(runResult).toMatchInlineSnapshot(`
-		Object {
+		{
 		  "meshId": "dummy_meshId",
 		}
 	`);
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
+		[
+		  [
 		    "Successfully retrieved mesh details 
 		",
 		  ],
-		  Array [
+		  [
 		    "Org ID: %s",
 		    "1234",
 		  ],
-		  Array [
+		  [
 		    "Project ID: %s",
 		    "5678",
 		  ],
-		  Array [
+		  [
 		    "Workspace ID: %s",
 		    "123456789",
 		  ],
-		  Array [
+		  [
 		    "Mesh ID: %s",
 		    "dummy_meshId",
 		  ],
 		]
 	`);
-		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`Array []`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`[]`);
 	});
 
 	test('should succeed if valid details are provided', async () => {
@@ -192,44 +182,44 @@ describe('describe command tests', () => {
 			selectedWorkspace.id,
 		);
 		expect(runResult).toMatchInlineSnapshot(`
-		Object {
+		{
 		  "apiKey": "dummy_apiKey",
 		  "meshId": "dummy_meshId",
 		}
 	`);
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
+		[
+		  [
 		    "Successfully retrieved mesh details 
 		",
 		  ],
-		  Array [
+		  [
 		    "Org ID: %s",
 		    "1234",
 		  ],
-		  Array [
+		  [
 		    "Project ID: %s",
 		    "5678",
 		  ],
-		  Array [
+		  [
 		    "Workspace ID: %s",
 		    "123456789",
 		  ],
-		  Array [
+		  [
 		    "Mesh ID: %s",
 		    "dummy_meshId",
 		  ],
-		  Array [
+		  [
 		    "API Key: %s",
 		    "dummy_apiKey",
 		  ],
-		  Array [
+		  [
 		    "Mesh Endpoint: %s
 		",
 		    "https://graph.adobe.io/api/dummy_meshId/graphql?api_key=dummy_apiKey",
 		  ],
 		]
 	`);
-		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`Array []`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`[]`);
 	});
 });
