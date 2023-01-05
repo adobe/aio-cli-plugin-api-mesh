@@ -39,7 +39,7 @@
 		"eslint-config-standard": "^17.0.0",
 		"eslint-plugin-import": "^2.21.2",
 		"eslint-plugin-jest": "^23.13.2",
-		"eslint-plugin-jsdoc": "^39",
+		"eslint-plugin-jsdoc": "^37",
 		"eslint-plugin-node": "^11.0.0",
 		"eslint-plugin-prettier": "^4.0.0",
 		"eslint-plugin-promise": "^6.0.0",
@@ -53,7 +53,7 @@
 	},
 	"engines": {
 		"npm": ">=8.0.0",
-		"node": ">=18.0.0"
+		"node": ">=16.0.0"
 	},
 	"files": [
 		"/oclif.manifest.json",
