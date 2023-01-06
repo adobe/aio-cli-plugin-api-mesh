@@ -10,13 +10,10 @@
 	},
 	"env": {
 		"node": true,
-		"es6": true
+		"es6": true,
+		"jest": true
 	},
-	"extends": [
-		"eslint:recommended",
-		"@adobe/eslint-config-aio-lib-config",
-		"plugin:prettier/recommended"
-	],
+	"extends": ["eslint:recommended", "plugin:prettier/recommended"],
 	"plugins": ["prettier"],
 	"rules": {
 		"no-console": ["warn"],
