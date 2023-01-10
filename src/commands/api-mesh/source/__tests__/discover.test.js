@@ -37,7 +37,7 @@ describe('source:discover command tests', () => {
 		expect(DiscoverCommand.description).toMatchInlineSnapshot(
 			`"Return the list of avaliable sources"`,
 		);
-		expect(DiscoverCommand.aliases).toMatchInlineSnapshot(`Array []`);
+		expect(DiscoverCommand.aliases).toMatchInlineSnapshot(`[]`);
 	});
 	test('Check table render is executed', async () => {
 		await DiscoverCommand.run([]);
@@ -46,7 +46,7 @@ describe('source:discover command tests', () => {
 	test('Check that "source:install" command is called', async () => {
 		InstallCommand.run = jest.fn().mockImplementation(() => 'source:install');
 		promptConfirm.mockResolvedValue(true);
-		promptMultiselect.mockResolvedValue([mockMetadataFixture['test-01']])
+		promptMultiselect.mockResolvedValue([mockMetadataFixture['test-01']]);
 		await DiscoverCommand.run([]);
 		expect(InstallCommand.run).toHaveBeenCalledTimes(1);
 	});

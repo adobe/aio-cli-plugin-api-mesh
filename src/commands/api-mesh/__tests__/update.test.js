@@ -84,10 +84,10 @@ describe('update command tests', () => {
 		await expect(runResult).rejects.toMatchInlineSnapshot(
 			`[Error: Unable to update. No mesh found for Org(1234) -> Project(5678) -> Workspace(123456789). Please check the details and try again.]`,
 		);
-		expect(logSpy.mock.calls).toMatchInlineSnapshot(`Array []`);
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`[]`);
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
+		[
+		  [
 		    "Unable to update. No mesh found for Org(1234) -> Project(5678) -> Workspace(123456789). Please check the details and try again.",
 		  ],
 		]
@@ -101,10 +101,10 @@ describe('update command tests', () => {
 		await expect(runResult).rejects.toMatchInlineSnapshot(
 			`[Error: Unable to get mesh ID. Please check the details and try again. RequestId: dummy_request_id]`,
 		);
-		expect(logSpy.mock.calls).toMatchInlineSnapshot(`Array []`);
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`[]`);
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
+		[
+		  [
 		    "Unable to get mesh ID. Please check the details and try again. RequestId: dummy_request_id",
 		  ],
 		]
@@ -124,10 +124,10 @@ describe('update command tests', () => {
 		await expect(runResult).rejects.toEqual(
 			new Error('Missing required args. Run aio api-mesh update --help for more info.'),
 		);
-		expect(logSpy.mock.calls).toMatchInlineSnapshot(`Array []`);
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`[]`);
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
+		[
+		  [
 		    "Missing required args. Run aio api-mesh update --help for more info.",
 		  ],
 		]
@@ -144,15 +144,15 @@ describe('update command tests', () => {
 			),
 		);
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
+		[
+		  [
 		    "File not found",
 		  ],
 		]
 	`);
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
+		[
+		  [
 		    "Unable to read the mesh configuration file provided. Please check the file and try again.",
 		  ],
 		]
@@ -166,13 +166,13 @@ describe('update command tests', () => {
 
 		expect(runResult).toMatchInlineSnapshot(`"Update cancelled"`);
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
+		[
+		  [
 		    "Update cancelled",
 		  ],
 		]
 	`);
-		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`Array []`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`[]`);
 	});
 
 	test('should fail if updateMesh method failed', async () => {
@@ -186,15 +186,15 @@ describe('update command tests', () => {
 			),
 		);
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
+		[
+		  [
 		    "dummy_error",
 		  ],
 		]
 	`);
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
+		[
+		  [
 		    "Unable to update the mesh. Please check the mesh configuration file and try again. If the error persists please contact support. RequestId: dummy_request_id",
 		  ],
 		]
@@ -205,7 +205,7 @@ describe('update command tests', () => {
 		const runResult = await UpdateCommand.run();
 
 		expect(runResult).toMatchInlineSnapshot(`
-		Object {
+		{
 		  "status": "success",
 		}
 	`);
@@ -214,14 +214,26 @@ describe('update command tests', () => {
 			ignoreCache: true,
 		});
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
-		    "Successfully updated the mesh with the id: %s",
+		[
+		  [
+		    "******************************************************************************************************",
+		  ],
+		  [
+		    "Your mesh is being provisioned. Wait a few minutes before checking the status of your mesh %s",
 		    "mesh_id",
+		  ],
+		  [
+		    "To check the status of your mesh, run:",
+		  ],
+		  [
+		    "aio api-mesh:status",
+		  ],
+		  [
+		    "******************************************************************************************************",
 		  ],
 		]
 	`);
-		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`Array []`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`[]`);
 	});
 
 	test('should pass with valid args and ignoreCache flag', async () => {
@@ -236,7 +248,7 @@ describe('update command tests', () => {
 		const runResult = await UpdateCommand.run();
 
 		expect(runResult).toMatchInlineSnapshot(`
-		Object {
+		{
 		  "status": "success",
 		}
 	`);
@@ -245,14 +257,26 @@ describe('update command tests', () => {
 			ignoreCache: true,
 		});
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
-		    "Successfully updated the mesh with the id: %s",
+		[
+		  [
+		    "******************************************************************************************************",
+		  ],
+		  [
+		    "Your mesh is being provisioned. Wait a few minutes before checking the status of your mesh %s",
 		    "mesh_id",
+		  ],
+		  [
+		    "To check the status of your mesh, run:",
+		  ],
+		  [
+		    "aio api-mesh:status",
+		  ],
+		  [
+		    "******************************************************************************************************",
 		  ],
 		]
 	`);
-		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`Array []`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`[]`);
 	});
 
 	test('should pass with valid args if autoConfirmAction flag is set', async () => {
@@ -267,7 +291,7 @@ describe('update command tests', () => {
 		const runResult = await UpdateCommand.run();
 
 		expect(runResult).toMatchInlineSnapshot(`
-		Object {
+		{
 		  "status": "success",
 		}
 	`);
@@ -277,13 +301,25 @@ describe('update command tests', () => {
 			ignoreCache: true,
 		});
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
-		Array [
-		  Array [
-		    "Successfully updated the mesh with the id: %s",
+		[
+		  [
+		    "******************************************************************************************************",
+		  ],
+		  [
+		    "Your mesh is being provisioned. Wait a few minutes before checking the status of your mesh %s",
 		    "mesh_id",
+		  ],
+		  [
+		    "To check the status of your mesh, run:",
+		  ],
+		  [
+		    "aio api-mesh:status",
+		  ],
+		  [
+		    "******************************************************************************************************",
 		  ],
 		]
 	`);
-		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`Array []`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`[]`);
 	});
 });

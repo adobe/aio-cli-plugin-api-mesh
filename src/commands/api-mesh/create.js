@@ -31,10 +31,10 @@ class CreateCommand extends Command {
 	static flags = {
 		ignoreCache: ignoreCacheFlag,
 		autoConfirmAction: autoConfirmActionFlag,
-		json: jsonFlag
+		json: jsonFlag,
 	};
 
-	static enableJsonFlag = true
+	static enableJsonFlag = true;
 
 	async run() {
 		await initRequestId();
@@ -81,8 +81,19 @@ class CreateCommand extends Command {
 				let sdkList = [];
 
 				if (mesh) {
-					this.log('Successfully created mesh %s', mesh.meshId);
-					this.log(JSON.stringify(mesh, null, 2));
+					this.log(
+						'******************************************************************************************************',
+					);
+					this.log(
+						'Your mesh is being provisioned. Wait a few minutes before checking the status of your mesh %s',
+						mesh.meshId,
+					);
+					this.log('To check the status of your mesh, run:');
+					this.log('aio api-mesh:status');
+					this.log(
+						'******************************************************************************************************',
+					);
+
 					// create API key credential
 					const adobeIdIntegrationsForWorkspace = await createAPIMeshCredentials(
 						imsOrgId,
@@ -119,12 +130,12 @@ class CreateCommand extends Command {
 					} else {
 						this.log('Unable to create API Key');
 					}
-                    // Do not remove or rename return values.
+					// Do not remove or rename return values.
 					// Template adobe/generator-app-api-mesh relies on "mesh" & "adobeIdIntegrationsForWorkspace" obj structure
 					return {
 						adobeIdIntegrationsForWorkspace,
 						sdkList,
-						mesh
+						mesh,
 					};
 				} else {
 					this.error(`Unable to create a mesh. Please try again. RequestId: ${global.requestId}`, {

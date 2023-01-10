@@ -11,11 +11,10 @@ governing permissions and limitations under the License.
 */
 
 const mockMetadataFixture = require('../__fixtures__/connectors-metadata.json');
-const mockSourceTest01v1Fixture = require('../__fixtures__/0.0.1-test-01.json');
-const mockSourceTest02v1Fixture = require('../__fixtures__/0.0.1-test-02.json');
 const mockSourceTest03v1Fixture = require('../__fixtures__/0.0.1-test-03.json');
 const mockAdapter = require('source-registry-storage-adapter');
 const chalk = require('chalk');
+const path = require('path');
 const { initSdk, initRequestId, promptInput } = require('../../../../helpers');
 const mockSources = { '0.0.1-test-03': mockSourceTest03v1Fixture };
 jest.mock('source-registry-storage-adapter');
@@ -50,8 +49,8 @@ describe('source:install command tests', () => {
 			`"Command to install the source to your API mesh."`,
 		);
 		expect(InstallCommand.flags).toMatchInlineSnapshot(`
-		Object {
-		  "confirm": Object {
+		{
+		  "confirm": {
 		    "allowNo": false,
 		    "char": "c",
 		    "default": false,
@@ -59,7 +58,7 @@ describe('source:install command tests', () => {
 		    "parse": [Function],
 		    "type": "boolean",
 		  },
-		  "ignoreCache": Object {
+		  "ignoreCache": {
 		    "allowNo": false,
 		    "char": "i",
 		    "default": false,
@@ -67,33 +66,33 @@ describe('source:install command tests', () => {
 		    "parse": [Function],
 		    "type": "boolean",
 		  },
-		  "source": Object {
+		  "source": {
 		    "char": "s",
 		    "description": "Source name",
-		    "input": Array [],
+		    "input": [],
 		    "multiple": true,
 		    "parse": [Function],
 		    "type": "option",
 		  },
-		  "variable": Object {
+		  "variable": {
 		    "char": "v",
 		    "description": "Variables required for the source",
-		    "input": Array [],
+		    "input": [],
 		    "multiple": true,
 		    "parse": [Function],
 		    "type": "option",
 		  },
-		  "variable-file": Object {
+		  "variable-file": {
 		    "char": "f",
 		    "description": "Variables file path",
-		    "input": Array [],
+		    "input": [],
 		    "multiple": false,
 		    "parse": [Function],
 		    "type": "option",
 		  },
 		}
 	`);
-		expect(InstallCommand.aliases).toMatchInlineSnapshot(`Array []`);
+		expect(InstallCommand.aliases).toMatchInlineSnapshot(`[]`);
 	});
 	test('Check executing without parameters', async () => {
 		await InstallCommand.run([]).catch(err => {
@@ -112,8 +111,9 @@ describe('source:install command tests', () => {
 		});
 	});
 	test('Check executing with invalid variable type', async () => {
-		const path = `-f=${__dirname}/../__fixtures__/variables-file-invalid.json`;
-		await InstallCommand.run(['test-03', path]).catch(err => {
+		const newPath = path.join(__dirname, '/../__fixtures__/variables-file-invalid.json');
+		const runPath = `-f=${newPath}`;
+		await InstallCommand.run(['test-03', runPath]).catch(err => {
 			expect(err.message).toEqual(
 				chalk.red(
 					`The next variables has invalid type.\nVariable: ENDPOINT_URL\nRequested type: string`,

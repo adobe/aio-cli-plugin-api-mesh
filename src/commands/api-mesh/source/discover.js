@@ -10,12 +10,16 @@ governing permissions and limitations under the License.
 */
 
 const { Command, CliUx, Flags } = require('@oclif/core');
-const { promptConfirm, initRequestId, promptMultiselect, promptSelect } = require('../../../helpers');
+const {
+	promptConfirm,
+	initRequestId,
+	promptMultiselect,
+	promptSelect,
+} = require('../../../helpers');
 const SourceRegistryStorage = require('source-registry-storage-adapter');
 const config = require('@adobe/aio-lib-core-config');
 const logger = require('../../../classes/logger');
 const InstallCommand = require('./install');
-
 
 class DiscoverCommand extends Command {
 	async run() {
@@ -39,19 +43,18 @@ class DiscoverCommand extends Command {
 			if (flags.confirm) {
 				needInstall = true;
 			} else {
-			    needInstall = await promptConfirm(`Do you want to install sources?`);
+				needInstall = await promptConfirm(`Do you want to install sources?`);
 			}
 
 			if (needInstall) {
-				const toInstall = await this.handleMultiple(list)
+				const toInstall = await this.handleMultiple(list);
 				const params = [];
 				toInstall.forEach(source => {
 					params.push('-s');
-					params.push(source)
-				})
+					params.push(source);
+				});
 				InstallCommand.run(params);
 			}
-			
 		} catch (error) {
 			logger.error(error);
 			this.error(`
@@ -63,17 +66,19 @@ class DiscoverCommand extends Command {
 
 	async handleMultiple(data) {
 		const result = [];
-		let selectedList = await promptMultiselect(
-			'Select sources to install',
-			Object.values(data).map(elem => ({ name: elem.name, value: elem })),
-		) || [];
-		
-		if (!selectedList.length) {			
+		let selectedList =
+			(await promptMultiselect(
+				'Select sources to install',
+				Object.values(data).map(elem => ({ name: elem.name, value: elem })),
+			)) || [];
+
+		if (!selectedList.length) {
 			while (!selectedList.length) {
-				selectedList = await promptMultiselect(
-					'Please choose at least one source',
-					Object.values(data).map(elem => ({ name: elem.name, value: elem })),
-				) || []
+				selectedList =
+					(await promptMultiselect(
+						'Please choose at least one source',
+						Object.values(data).map(elem => ({ name: elem.name, value: elem })),
+					)) || [];
 			}
 		}
 
@@ -113,7 +118,8 @@ class DiscoverCommand extends Command {
 DiscoverCommand.flags = {
 	confirm: Flags.boolean({
 		char: 'c',
-		description:'Auto confirm install action prompt. CLI will not check ask user to install source.',
+		description:
+			'Auto confirm install action prompt. CLI will not check ask user to install source.',
 		default: false,
 	}),
 };
