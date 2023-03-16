@@ -81,9 +81,9 @@ describe('delete command tests', () => {
 		});
 	});
 
-	afterEach(() => {
-		jest.restoreAllMocks();
-	});
+	// afterEach(() => {
+	// 	jest.restoreAllMocks();
+	// });
 
 	test('snapshot delete command description', () => {
 		expect(DeleteCommand.description).toMatchInlineSnapshot(`"Delete the config of a given mesh"`);
