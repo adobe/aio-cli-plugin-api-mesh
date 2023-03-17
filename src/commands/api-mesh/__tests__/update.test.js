@@ -73,10 +73,6 @@ describe('update command tests', () => {
 		});
 	});
 
-	// afterEach(() => {
-	// 	jest.restoreAllMocks();
-	// });
-
 	test('should pass with valid args', async () => {
 		const runResult = await UpdateCommand.run();
 

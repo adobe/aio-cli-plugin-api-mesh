@@ -84,10 +84,6 @@ describe('create command tests', () => {
 		});
 	});
 
-	// afterEach(() => {
-	// 	jest.restoreAllMocks();
-	// });
-
 	test('must return proper object structure used by adobe/generator-app-api-mesh', async () => {
 		parseSpy.mockResolvedValueOnce({
 			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
