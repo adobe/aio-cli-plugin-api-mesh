@@ -20,6 +20,7 @@ const {
 	createAPIMeshCredentials,
 	subscribeCredentialToMeshService,
 } = require('../../../lib/devConsole');
+const logger = require('../../../classes/logger');
 
 const selectedOrg = { id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' };
 
@@ -99,6 +100,7 @@ describe('create command tests', () => {
 		  },
 		]
 	`);
+		logger.info(CreateCommand.flags);
 		expect(CreateCommand.flags).toMatchInlineSnapshot(`
 		{
 		  "autoConfirmAction": {
@@ -123,6 +125,14 @@ describe('create command tests', () => {
 		    "description": "Output JSON",
 		    "parse": [Function],
 		    "type": "boolean",
+		  },
+		  "env": {
+			"char": "e",
+			"description": "Path to env file",
+			"input": [],
+			"multiple": false,
+			"parse": [Function],
+			"type": "option",
 		  },
 		}
 	`);

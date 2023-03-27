@@ -15,23 +15,26 @@ const { readFile } = require('fs/promises');
 const { initSdk, initRequestId, promptConfirm } = require('../../helpers');
 const logger = require('../../classes/logger');
 const CONSTANTS = require('../../constants');
-const { ignoreCacheFlag, autoConfirmActionFlag, jsonFlag } = require('../../utils');
+const { ignoreCacheFlag, autoConfirmActionFlag, jsonFlag, envFileFlag, clearEnv, lintEnvFileContent, loadPupa } = require('../../utils');
 const {
 	createMesh,
 	createAPIMeshCredentials,
 	subscribeCredentialToMeshService,
 } = require('../../lib/devConsole');
 
-require('dotenv').config();
+const dotenv = require('dotenv');
+const { type } = require('os');
+//import { pupa } from 'pupa';
 
 const { MULTITENANT_GRAPHQL_SERVER_BASE_URL } = CONSTANTS;
 
 class CreateCommand extends Command {
-	static args = [{ name: 'file' }];
+	static args = [{ name: 'file'}];
 	static flags = {
 		ignoreCache: ignoreCacheFlag,
 		autoConfirmAction: autoConfirmActionFlag,
 		json: jsonFlag,
+		env : envFileFlag
 	};
 
 	static enableJsonFlag = true;
@@ -40,14 +43,8 @@ class CreateCommand extends Command {
 		await initRequestId();
 
 		logger.info(`RequestId: ${global.requestId}`);
-
+		
 		const { args, flags } = await this.parse(CreateCommand);
-
-		if (!args.file) {
-			this.error('Missing file path. Run aio api-mesh create --help for more info.');
-
-			return;
-		}
 
 		const ignoreCache = await flags.ignoreCache;
 		const autoConfirmAction = await flags.autoConfirmAction;
@@ -56,10 +53,15 @@ class CreateCommand extends Command {
 			ignoreCache,
 		});
 
-		let data;
+		if (!args.file) {
+			this.error('Missing file path. Run aio api-mesh create --help for more info.');
+		}
+		
+		let rawData;
 
+		//Check the rawData from the input file
 		try {
-			data = JSON.parse(await readFile(args.file, 'utf8'));
+			rawData = await readFile(args.file, 'utf8')
 		} catch (error) {
 			logger.error(error);
 
@@ -67,6 +69,79 @@ class CreateCommand extends Command {
 			this.error(
 				'Unable to read the mesh configuration file provided. Please check the file and try again.',
 			);
+		}
+
+		let interpolatedMesh;
+		
+		//flags.env to be passed to envValidator
+		if(flags.env){
+			let envFileContent;
+
+			//Read the environment file
+			try{
+				envFileContent = await readFile(flags.env, 'utf8');
+			}
+			catch(error){
+				this.log(error.message)
+				this.error('Unable to read the env file provided. Please check the file and try again.')
+			}
+
+			//Validate the env file
+			const envFileValidity=lintEnvFileContent(envFileContent);
+			if(envFileValidity.valid){
+				//load env file into the process.env object
+				clearEnv();
+
+				//Added env at start of each environment variable
+				let envObj={env:(dotenv.config({path:flags.env})).parsed};
+				let missingKeys=[];
+				
+				//Interpolate the mesh input file with the data in the environment file
+				await loadPupa().then(pupa => {
+					interpolatedMesh = pupa(rawData, envObj, {
+						ignoreMissing:true, 
+						transform : ({value,key}) => {
+							if (key.startsWith("env.")) {
+							if (value) {
+								return value;
+							} else {
+								// missing value, add to list
+								missingKeys.push(key.split(".")[1]);
+							}
+							} else {
+							//ignore
+							return undefined;
+							}
+							return value;
+					  }
+					});
+					
+				  }).catch(err => {
+					this.error('Failed to load pupa:', err);
+				  });
+
+				
+				  if(missingKeys.length)
+				  {
+					  this.error("The mesh file cannot be interpolated due to missing keys : "+missingKeys.toString())
+				  }
+				  
+			}
+			else{
+				this.error(`Issue in ${flags.env} file - `+envFileValidity.error)
+			}
+		}
+
+		//Load the interpolated string in JSON format
+		let data;
+		
+		try{
+			data=JSON.parse(interpolatedMesh);
+		}
+		catch(err){
+			this.log(err.message);
+			this.log(interpolatedMesh);
+			this.error("Interpolated mesh is not a valid JSON. Please check the generated json file.")
 		}
 
 		let shouldContinue = true;
