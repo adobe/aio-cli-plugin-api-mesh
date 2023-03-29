@@ -107,6 +107,43 @@ async function loadPupa() {
 	}
 };
 
+async function interpolateMesh(data,obj){
+	let missingKeys=[];
+	let interpolatedMesh;
+	await loadPupa().then(pupa => {
+		interpolatedMesh = pupa(data, obj, {
+			ignoreMissing: true,
+			transform: ({ value, key }) => {
+				if (key.startsWith("env.")) {
+					if (value) {
+						return value;
+					} else {
+						// missing value, add to list
+						missingKeys.push(key.split(".")[1]);
+					}
+				} else {
+					//ignore
+					return undefined;
+				}
+				return value;
+			}
+		});
+
+	});
+
+	if(missingKeys.length){
+		return{
+			interpolationStatus : 'failed',
+			missingKeys: missingKeys,
+			interpolatedMesh: ''
+		}
+	}
+	return{
+		interpolationStatus : 'success',
+		missingKeys: [],
+		interpolatedMesh: interpolatedMesh
+	}
+};
 
 const ignoreCacheFlag = Flags.boolean({
 	char: 'i',
@@ -139,5 +176,5 @@ module.exports = {
 	autoConfirmActionFlag,
 	jsonFlag,
 	envFileFlag,
-	loadPupa
+	interpolateMesh
 };

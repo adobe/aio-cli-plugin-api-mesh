@@ -21,6 +21,9 @@ const {
 	subscribeCredentialToMeshService,
 } = require('../../../lib/devConsole');
 const logger = require('../../../classes/logger');
+let {
+	interpolateMesh
+} = require('../../../utils');
 
 const selectedOrg = { id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' };
 
@@ -43,6 +46,9 @@ jest.mock('../../../helpers', () => ({
 	promptConfirm: jest.fn().mockResolvedValue(true),
 }));
 jest.mock('../../../lib/devConsole');
+// jest.mock('../../../utils', () => ({
+// 	interpolateMesh: jest.fn().mockResolvedValue({}),
+// }));
 
 let logSpy = null;
 let errorLogSpy = null;
@@ -111,6 +117,14 @@ describe('create command tests', () => {
 		    "parse": [Function],
 		    "type": "boolean",
 		  },
+		  "env": {
+		    "char": "e",
+		    "description": "Path to env file",
+		    "input": [],
+		    "multiple": false,
+		    "parse": [Function],
+		    "type": "option",
+		  },
 		  "ignoreCache": {
 		    "allowNo": false,
 		    "char": "i",
@@ -125,14 +139,6 @@ describe('create command tests', () => {
 		    "description": "Output JSON",
 		    "parse": [Function],
 		    "type": "boolean",
-		  },
-		  "env": {
-			"char": "e",
-			"description": "Path to env file",
-			"input": [],
-			"multiple": false,
-			"parse": [Function],
-			"type": "option",
 		  },
 		}
 	`);
@@ -498,4 +504,83 @@ describe('create command tests', () => {
 			expect.objectContaining({ apiKey: 'dummy_api_key' }),
 		);
 	});
+
+	test('must return error if env flag is used but the env file provided is not found',async () => {
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
+			flags: {
+				ignoreCache: mockIgnoreCacheFlag,
+				autoConfirmAction: Promise.resolve(true),
+				env: '.env_nonExisting'
+			},
+		});
+		const runResult = CreateCommand.run();
+
+		await expect(runResult).rejects.toEqual(
+			new Error('Unable to read the env file provided. Please check the file and try again.'),
+		);
+
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "ENOENT: no such file or directory, open '.env_nonExisting'",
+		  ],
+		]
+	`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Unable to read the env file provided. Please check the file and try again.",
+		  ],
+		]
+	`);
+	});
+
+	test('must return error if the env flag is provided but the env file is invalid', async()=> {
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
+			flags: {
+				ignoreCache: mockIgnoreCacheFlag,
+				autoConfirmAction: Promise.resolve(true),
+				env: 'src/commands/__fixtures__/.env_invalid'
+			},
+		});
+
+		const runResult = CreateCommand.run();
+
+		await expect(runResult).rejects.toEqual(
+			new Error("Issue in src/commands/__fixtures__/.env_invalid file - Duplicate key << key1 >> on line 3,Invalid format for key/value << key2=='value3' >> on line 5,Invalid format << key3 >> on line 6,Invalid format for key/value << key4='value4 >> on line 7"),
+		);
+		
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+			[
+			  "Issue in src/commands/__fixtures__/.env_invalid file - Duplicate key << key1 >> on line 3,Invalid format for key/value << key2=='value3' >> on line 5,Invalid format << key3 >> on line 6,Invalid format for key/value << key4='value4 >> on line 7",
+			],
+		  ]
+		`);
+
+	});
+
+	test('must return error if env flag is used but there is some missing keys issue',async () => {
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
+			flags: {
+				ignoreCache: mockIgnoreCacheFlag,
+				autoConfirmAction: Promise.resolve(true),
+				env: 'src/commands/__fixtures__/.env_valid'
+			},
+		});
+
+		interpolateMesh=jest.fn().mockResolvedValue({});
+
+		const runResult = CreateCommand.run();
+
+		await expect(runResult).rejects.toEqual(
+			new Error('Unable to read the env file provided. Please check the file and try again.'),
+		);
+
+		
+	});
+
 });
