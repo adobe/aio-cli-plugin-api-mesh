@@ -503,7 +503,7 @@ describe('create command tests', () => {
 		);
 	});
 
-	test('should return error if env flag is used but the env file provided is not found', async () => {
+	test('should return error if the env file provided using --env flag is not found', async () => {
 		parseSpy.mockResolvedValueOnce({
 			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
 			flags: {
@@ -534,7 +534,7 @@ describe('create command tests', () => {
 	`);
 	});
 
-	test('should return error if the env flag is provided but the env file is invalid', async () => {
+	test('should return error if the provided env file is invalid', async () => {
 		parseSpy.mockResolvedValueOnce({
 			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
 			flags: {
@@ -560,7 +560,7 @@ describe('create command tests', () => {
 
 	});
 
-	test('should return error if env file provided is valid but there are missing keys found during mesh interpolation', async () => {
+	test('should return error if the provided env file is valid but there are missing keys found in mesh interpolation', async () => {
 		parseSpy.mockResolvedValueOnce({
 			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
 			flags: {
@@ -587,7 +587,7 @@ describe('create command tests', () => {
 	`);
 	});
 
-	test('should return error if the env file provided is valid and mesh interpolation is successful but generated mesh is not a valid JSON', async () => {
+	test('should return error if the provided env file is valid and mesh interpolation is successful but interpolated mesh is not a valid JSON', async () => {
 		parseSpy.mockResolvedValueOnce({
 			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
 			flags: {
@@ -601,7 +601,7 @@ describe('create command tests', () => {
 		sampleInterpolatedMesh = '{"meshConfig":{"sources":[{"name":"<api-name>","handler":{"graphql":{"endpoint":"<api-url>"}}}],"responseConfig":{"includeHTTPDetails":sample}}}';
 
 		const interpolateMeshFunc = jest.spyOn(meshInterpolation, 'interpolateMesh');
-		interpolateMeshFunc.mockResolvedValueOnce({ interpolationStatus: 'success', missingKeys: [], interpolatedMesh: sampleInterpolatedMesh });
+		interpolateMeshFunc.mockResolvedValueOnce({ interpolationStatus: 'success', missingKeys: [], interpolatedMeshData: sampleInterpolatedMesh });
 
 		const runResult = CreateCommand.run();
 		await expect(runResult).rejects.toEqual(
@@ -617,7 +617,7 @@ describe('create command tests', () => {
 	`);
 	});
 
-	test('should successfully create a mesh if env file is provided, mesh interpolation is successful and generated mesh is a valid JSON', async () => {
+	test('should successfully create a mesh if provided env file is valid, mesh interpolation is successful and interpolated mesh is a valid JSON', async () => {
 		parseSpy.mockResolvedValue({
 			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
 			flags: {
@@ -630,7 +630,7 @@ describe('create command tests', () => {
 		sampleInterpolatedMesh = '{"meshConfig":{"sources":[{"name":"<api-name>","handler":{"graphql":{"endpoint":"<api-url>"}}}],"responseConfig":{"includeHTTPDetails":true}}}';
 
 		const interpolateMeshFunc = jest.spyOn(meshInterpolation, 'interpolateMesh');
-		interpolateMeshFunc.mockResolvedValueOnce({ interpolationStatus: 'success', missingKeys: [], interpolatedMesh: sampleInterpolatedMesh });
+		interpolateMeshFunc.mockResolvedValueOnce({ interpolationStatus: 'success', missingKeys: [], interpolatedMeshData: sampleInterpolatedMesh });
 
 		const runResult = await CreateCommand.run();
 
@@ -660,6 +660,30 @@ describe('create command tests', () => {
 		    "dummy_service",
 		  ],
 		}
+	`);
+	});
+
+	test('should return error if inputMesh is not a valid JSON',async () => {
+		parseSpy.mockResolvedValue({
+			args: { file: 'src/commands/__fixtures__/sample_mesh_with_placeholder' },
+			flags: {
+				ignoreCache: mockIgnoreCacheFlag,
+				autoConfirmAction: mockAutoApproveAction
+			},
+		});
+
+		
+		const runResult=CreateCommand.run();
+		await expect(runResult).rejects.toEqual(
+			new Error('Input mesh file is not a valid JSON. Please check the file provided.'),
+		);
+
+		await expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Input mesh file is not a valid JSON. Please check the file provided.",
+		  ],
+		]
 	`);
 	});
 

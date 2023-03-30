@@ -47,6 +47,12 @@ class CreateCommand extends Command {
 
 		const { args, flags } = await this.parse(CreateCommand);
 
+		if (!args.file) {
+			this.error('Missing file path. Run aio api-mesh create --help for more info.');
+
+			return;
+		}
+
 		const ignoreCache = await flags.ignoreCache;
 		const autoConfirmAction = await flags.autoConfirmAction;
 
@@ -54,15 +60,11 @@ class CreateCommand extends Command {
 			ignoreCache,
 		});
 
-		if (!args.file) {
-			this.error('Missing file path. Run aio api-mesh create --help for more info.');
-		}
+		let inputMeshData;
 
-		let rawData;
-
-		//Check the rawData from the input file
+		//Input the mesh data from the input file
 		try {
-			rawData = await readFile(args.file, 'utf8')
+			inputMeshData = await readFile(args.file, 'utf8')
 		} catch (error) {
 			logger.error(error);
 
@@ -96,7 +98,7 @@ class CreateCommand extends Command {
 				//Added env at start of each environment variable
 				const envObj = { env: (dotenv.config({ path: flags.env })).parsed };
 
-				let {interpolationStatus, missingKeys, interpolatedMesh}=await meshInterpolation.interpolateMesh(rawData, envObj);
+				let {interpolationStatus, missingKeys, interpolatedMeshData}=await meshInterpolation.interpolateMesh(inputMeshData, envObj);
 				
 				//De-duplicate the missing keys array
 				 missingKeys = missingKeys.filter( function( item, index, inputArray ) {
@@ -108,11 +110,11 @@ class CreateCommand extends Command {
 				}
 
 				try {
-					data = JSON.parse(interpolatedMesh);
+					data = JSON.parse(interpolatedMeshData);
 				}
 				catch (err) {
 					this.log(err.message);
-					this.log(interpolatedMesh);
+					this.log(interpolatedMeshData);
 					this.error("Interpolated mesh is not a valid JSON. Please check the generated json file.")
 				}
 
@@ -124,11 +126,11 @@ class CreateCommand extends Command {
 		else
 		{
 			try {
-				data = JSON.parse(rawData);
+				data = JSON.parse(inputMeshData);
 			}
 			catch (err) {
 				this.log(err.message);
-				this.error("Input mesh is not a valid JSON. Please check the input file provided.")
+				this.error("Input mesh file is not a valid JSON. Please check the file provided.")
 			}
 		}
 

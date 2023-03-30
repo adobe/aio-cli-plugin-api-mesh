@@ -82,13 +82,13 @@ describe('update command tests', () => {
 		const runResult = UpdateCommand.run();
 
 		await expect(runResult).rejects.toMatchInlineSnapshot(
-			`[Error: Unable to update. No mesh found for Org(1234) -> Project(5678) -> Workspace(123456789). Please check the details and try again.]`,
+			`[Error: Unable to get mesh ID. Please check the details and try again. RequestId: dummy_request_id]`,
 		);
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`[]`);
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
 		[
 		  [
-		    "Unable to update. No mesh found for Org(1234) -> Project(5678) -> Workspace(123456789). Please check the details and try again.",
+		    "Unable to get mesh ID. Please check the details and try again. RequestId: dummy_request_id",
 		  ],
 		]
 	`);

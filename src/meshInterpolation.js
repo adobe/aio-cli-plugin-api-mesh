@@ -114,7 +114,7 @@ async function interpolateMesh(data, obj) {
 	return {
 		interpolationStatus: 'success',
 		missingKeys: [],
-		interpolatedMesh: interpolatedMesh
+		interpolatedMeshData: interpolatedMesh
 	}
 };
 
