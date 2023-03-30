@@ -12,15 +12,17 @@ governing permissions and limitations under the License.
 const { Command } = require('@oclif/core');
 const { readFile } = require('fs/promises');
 
-const { initSdk, initRequestId, promptConfirm } = require('../../helpers');
+const { initSdk, initRequestId, promptConfirm  } = require('../../helpers');
 const logger = require('../../classes/logger');
 const CONSTANTS = require('../../constants');
-const { ignoreCacheFlag, autoConfirmActionFlag, jsonFlag, envFileFlag, clearEnv, lintEnvFileContent, interpolateMesh } = require('../../utils');
+const { ignoreCacheFlag, autoConfirmActionFlag, jsonFlag, envFileFlag } = require('../../utils');
 const {
 	createMesh,
 	createAPIMeshCredentials,
 	subscribeCredentialToMeshService,
 } = require('../../lib/devConsole');
+
+const meshInterpolation = require('../../meshInterpolation');
 
 const dotenv = require('dotenv');
 const { type } = require('os');
@@ -72,7 +74,7 @@ class CreateCommand extends Command {
 
 		let data;
 
-		//flags.env to be passed to envValidator
+		//flags.env contains the filepath
 		if (flags.env) {
 			let envFileContent;
 
@@ -86,18 +88,17 @@ class CreateCommand extends Command {
 			}
 
 			//Validate the env file
-			const envFileValidity = lintEnvFileContent(envFileContent);
+			const envFileValidity = meshInterpolation.validateEnvFileFormat(envFileContent);
 			if (envFileValidity.valid) {
 				//load env file into the process.env object
-				clearEnv();
+				meshInterpolation.clearEnv();
 
 				//Added env at start of each environment variable
 				const envObj = { env: (dotenv.config({ path: flags.env })).parsed };
 
-			 	const result=await interpolateMesh(rawData, envObj);
-				let {interpolationStatus, missingKeys, interpolatedMesh}=result;
+				let {interpolationStatus, missingKeys, interpolatedMesh}=await meshInterpolation.interpolateMesh(rawData, envObj);
 				
-				//Deduplicate the missing keys array
+				//De-duplicate the missing keys array
 				 missingKeys = missingKeys.filter( function( item, index, inputArray ) {
 					return inputArray.indexOf(item) == index;
 			 	 });

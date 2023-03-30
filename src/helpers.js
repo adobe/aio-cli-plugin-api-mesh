@@ -459,6 +459,120 @@ async function promptInput(message) {
 	return selected.item;
 }
 
+function clearEnv() {
+	for (const key in process.env) {
+		delete process.env[key]
+	}
+}
+
+
+function lintEnvFileContent(envContent) {
+
+	//Key should start with a underscore or an alphabet followed by underscore/alphanumeric characters
+	const envKeyRegex = /^[a-zA-Z_]+[a-zA-Z0-9_]*$/;
+
+
+	const envValueRegex = /^(?:"(?:\\.|[^\\"])*"|'(?:\\.|[^\\'])*'|[^'"\s])+$/;
+
+	/*
+	The above regex matches one or more of below :
+	(?:"(?:\\.|[^\\"])*"|'(?:\\.|[^\\'])*'|[^'"\s])
+	which is 
+	1. ?:"(?:\\.|[^\\"])*" : Non capturing group starts and ends with '"'
+	*/
+	const envDict = {};
+	const lines = envContent.split(/\r?\n/);
+	const errors = [];
+
+	for (let index = 0; index < lines.length; index++) {
+		const line=lines[index];
+		const trimmedLine = line.trim();
+		if (trimmedLine.startsWith('#') || trimmedLine === '') {
+			// ignore comment or empty lines
+			continue;
+		}
+		
+		if(!trimmedLine.includes('=')){
+			errors.push(`Invalid format << ${trimmedLine} >> on line ${index+1}`)
+		}
+		else{
+			const [key, value] = trimmedLine.split('=', 2);
+			if (!envKeyRegex.test(key) || !envValueRegex.test(value)) {
+				// invalid format: key or value does not match regex
+				errors.push(`Invalid format for key/value << ${trimmedLine} >> on line ${index+1}`);
+			}
+			if (key in envDict) {
+				// duplicate key found
+				errors.push(`Duplicate key << ${key} >> on line ${index+1}`);
+			}
+			envDict[key] = value;
+		}
+		
+	}
+	if(errors.length){
+		return {
+			valid: false,
+			error: errors.toString()
+		};
+	}
+	return {
+		valid:true
+	};
+}
+
+async function loadPupa() {
+	try {
+		const pupa = (await import('pupa')).default;
+		return pupa;
+	}
+	catch {
+		console.log("Error while loading pupa module")
+	}
+};
+
+async function interpolateMesh(data,obj){
+	let missingKeys=[];
+	let interpolatedMesh;
+	await loadPupa().then(pupa => {
+		interpolatedMesh = pupa(data, obj, {
+			ignoreMissing: true,
+			transform: ({ value, key }) => {
+				if (key.startsWith("env.")) {
+					if (value) {
+						return value;
+					} else {
+						// missing value, add to list
+						missingKeys.push(key.split(".")[1]);
+					}
+				} else {
+					//ignore
+					return undefined;
+				}
+				return value;
+			}
+		});
+
+	});
+
+	if(missingKeys.length){
+		return{
+			interpolationStatus : 'failed',
+			missingKeys: missingKeys,
+			interpolatedMesh: ''
+		}
+	}
+	return{
+		interpolationStatus : 'success',
+		missingKeys: [],
+		interpolatedMesh: interpolatedMesh
+	}
+};
+
+
+async function getname(name, length){
+	return {name: name, length:length};
+};
+
 module.exports = {
 	promptInput,
 	promptConfirm,
@@ -468,4 +582,8 @@ module.exports = {
 	initRequestId,
 	promptSelect,
 	promptMultiselect,
+	clearEnv,
+	lintEnvFileContent,
+	interpolateMesh,
+	getname
 };

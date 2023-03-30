@@ -14,16 +14,15 @@ const mockConsoleCLIInstance = {};
 
 const CreateCommand = require('../create');
 const sampleCreateMeshConfig = require('../../__fixtures__/sample_mesh.json');
-const { initSdk, initRequestId, promptConfirm } = require('../../../helpers');
+const { initSdk, initRequestId, promptConfirm, getname, interpolateMesh } = require('../../../helpers');
 const {
 	createMesh,
 	createAPIMeshCredentials,
 	subscribeCredentialToMeshService,
 } = require('../../../lib/devConsole');
 const logger = require('../../../classes/logger');
-let {
-	interpolateMesh
-} = require('../../../utils');
+
+const meshInterpolation = require('../../../meshInterpolation');
 
 const selectedOrg = { id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' };
 
@@ -44,11 +43,10 @@ jest.mock('../../../helpers', () => ({
 	initSdk: jest.fn().mockResolvedValue({}),
 	initRequestId: jest.fn().mockResolvedValue({}),
 	promptConfirm: jest.fn().mockResolvedValue(true),
+	getname: jest.fn().mockResolvedValue({}),
 }));
 jest.mock('../../../lib/devConsole');
-// jest.mock('../../../utils', () => ({
-// 	interpolateMesh: jest.fn().mockResolvedValue({}),
-// }));
+
 
 let logSpy = null;
 let errorLogSpy = null;
@@ -505,13 +503,13 @@ describe('create command tests', () => {
 		);
 	});
 
-	test('must return error if env flag is used but the env file provided is not found',async () => {
+	test('should return error if env flag is used but the env file provided is not found', async () => {
 		parseSpy.mockResolvedValueOnce({
 			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
 			flags: {
 				ignoreCache: mockIgnoreCacheFlag,
 				autoConfirmAction: Promise.resolve(true),
-				env: '.env_nonExisting'
+				env: 'src/commands/__fixtures__/.env_nonExisting'
 			},
 		});
 		const runResult = CreateCommand.run();
@@ -523,7 +521,7 @@ describe('create command tests', () => {
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
 		[
 		  [
-		    "ENOENT: no such file or directory, open '.env_nonExisting'",
+		    "ENOENT: no such file or directory, open 'src/commands/__fixtures__/.env_nonExisting'",
 		  ],
 		]
 	`);
@@ -536,7 +534,7 @@ describe('create command tests', () => {
 	`);
 	});
 
-	test('must return error if the env flag is provided but the env file is invalid', async()=> {
+	test('should return error if the env flag is provided but the env file is invalid', async () => {
 		parseSpy.mockResolvedValueOnce({
 			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
 			flags: {
@@ -551,18 +549,18 @@ describe('create command tests', () => {
 		await expect(runResult).rejects.toEqual(
 			new Error("Issue in src/commands/__fixtures__/.env_invalid file - Duplicate key << key1 >> on line 3,Invalid format for key/value << key2=='value3' >> on line 5,Invalid format << key3 >> on line 6,Invalid format for key/value << key4='value4 >> on line 7"),
 		);
-		
+
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
 		[
-			[
-			  "Issue in src/commands/__fixtures__/.env_invalid file - Duplicate key << key1 >> on line 3,Invalid format for key/value << key2=='value3' >> on line 5,Invalid format << key3 >> on line 6,Invalid format for key/value << key4='value4 >> on line 7",
-			],
-		  ]
-		`);
+		  [
+		    "Issue in src/commands/__fixtures__/.env_invalid file - Duplicate key << key1 >> on line 3,Invalid format for key/value << key2=='value3' >> on line 5,Invalid format << key3 >> on line 6,Invalid format for key/value << key4='value4 >> on line 7",
+		  ],
+		]
+	`);
 
 	});
 
-	test('must return error if env flag is used but there is some missing keys issue',async () => {
+	test('should return error if env file provided is valid but there are missing keys found during mesh interpolation', async () => {
 		parseSpy.mockResolvedValueOnce({
 			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
 			flags: {
@@ -572,15 +570,97 @@ describe('create command tests', () => {
 			},
 		});
 
-		interpolateMesh=jest.fn().mockResolvedValue({});
+		const interpolateMeshFunc = jest.spyOn(meshInterpolation, 'interpolateMesh');
+		interpolateMeshFunc.mockResolvedValueOnce({ interpolationStatus: 'failed', missingKeys: ['newKey1', 'newKey2', 'newKey1'], interpolatedMesh: '' });
 
 		const runResult = CreateCommand.run();
-
 		await expect(runResult).rejects.toEqual(
-			new Error('Unable to read the env file provided. Please check the file and try again.'),
+			new Error('The mesh file cannot be interpolated due to missing keys : newKey1,newKey2'),
 		);
 
-		
+		await expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "The mesh file cannot be interpolated due to missing keys : newKey1,newKey2",
+		  ],
+		]
+	`);
+	});
+
+	test('should return error if the env file provided is valid and mesh interpolation is successful but generated mesh is not a valid JSON', async () => {
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
+			flags: {
+				ignoreCache: mockIgnoreCacheFlag,
+				autoConfirmAction: Promise.resolve(true),
+				env: 'src/commands/__fixtures__/.env_valid'
+			},
+		});
+
+		//sampleInterpolated mesh where value of responseConfig.includeHTTPDetails is invalid i.e. non-boolean
+		sampleInterpolatedMesh = '{"meshConfig":{"sources":[{"name":"<api-name>","handler":{"graphql":{"endpoint":"<api-url>"}}}],"responseConfig":{"includeHTTPDetails":sample}}}';
+
+		const interpolateMeshFunc = jest.spyOn(meshInterpolation, 'interpolateMesh');
+		interpolateMeshFunc.mockResolvedValueOnce({ interpolationStatus: 'success', missingKeys: [], interpolatedMesh: sampleInterpolatedMesh });
+
+		const runResult = CreateCommand.run();
+		await expect(runResult).rejects.toEqual(
+			new Error('Interpolated mesh is not a valid JSON. Please check the generated json file.'),
+		);
+
+		await expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Interpolated mesh is not a valid JSON. Please check the generated json file.",
+		  ],
+		]
+	`);
+	});
+
+	test('should successfully create a mesh if env file is provided, mesh interpolation is successful and generated mesh is a valid JSON', async () => {
+		parseSpy.mockResolvedValue({
+			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
+			flags: {
+				ignoreCache: mockIgnoreCacheFlag,
+				autoConfirmAction: mockAutoApproveAction,
+				env: 'src/commands/__fixtures__/.env_valid'
+			},
+		});
+
+		sampleInterpolatedMesh = '{"meshConfig":{"sources":[{"name":"<api-name>","handler":{"graphql":{"endpoint":"<api-url>"}}}],"responseConfig":{"includeHTTPDetails":true}}}';
+
+		const interpolateMeshFunc = jest.spyOn(meshInterpolation, 'interpolateMesh');
+		interpolateMeshFunc.mockResolvedValueOnce({ interpolationStatus: 'success', missingKeys: [], interpolatedMesh: sampleInterpolatedMesh });
+
+		const runResult = await CreateCommand.run();
+
+		expect(promptConfirm).toHaveBeenCalledWith('Are you sure you want to create a mesh?');
+		expect(runResult).toMatchInlineSnapshot(`
+		{
+		  "adobeIdIntegrationsForWorkspace": {
+		    "apiKey": "dummy_api_key",
+		    "id": "dummy_id",
+		  },
+		  "mesh": {
+		    "meshConfig": {
+		      "sources": [
+		        {
+		          "handler": {
+		            "graphql": {
+		              "endpoint": "<gql_endpoint>",
+		            },
+		          },
+		          "name": "<api_name>",
+		        },
+		      ],
+		    },
+		    "meshId": "dummy_mesh_id",
+		  },
+		  "sdkList": [
+		    "dummy_service",
+		  ],
+		}
+	`);
 	});
 
 });
