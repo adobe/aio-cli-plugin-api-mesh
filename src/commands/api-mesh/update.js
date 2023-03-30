@@ -25,8 +25,8 @@ class UpdateCommand extends Command {
 	static flags = {
 		ignoreCache: ignoreCacheFlag,
 		autoConfirmAction: autoConfirmActionFlag,
-		env: envFileFlag
-		};
+		env: envFileFlag,
+	};
 
 	async run() {
 		await initRequestId();
@@ -52,7 +52,7 @@ class UpdateCommand extends Command {
 
 		//Input the mesh data from the input file
 		try {
-			inputMeshData = await readFile(args.file, 'utf8')
+			inputMeshData = await readFile(args.file, 'utf8');
 		} catch (error) {
 			logger.error(error);
 
@@ -62,8 +62,7 @@ class UpdateCommand extends Command {
 			);
 		}
 
-		let data;
-		
+		let meshId;
 
 		try {
 			meshId = await getMeshId(imsOrgId, projectId, workspaceId);
@@ -73,6 +72,8 @@ class UpdateCommand extends Command {
 			);
 		}
 
+		let data;
+
 		//flags.env contains the filepath
 		if (flags.env) {
 			let envFileContent;
@@ -80,10 +81,9 @@ class UpdateCommand extends Command {
 			//Read the environment file
 			try {
 				envFileContent = await readFile(flags.env, 'utf8');
-			}
-			catch (error) {
-				this.log(error.message)
-				this.error('Unable to read the env file provided. Please check the file and try again.')
+			} catch (error) {
+				this.log(error.message);
+				this.error('Unable to read the env file provided. Please check the file and try again.');
 			}
 
 			//Validate the env file
@@ -93,44 +93,45 @@ class UpdateCommand extends Command {
 				meshInterpolation.clearEnv();
 
 				//Added env at start of each environment variable
-				const envObj = { env: (dotenv.config({ path: flags.env })).parsed };
+				const envObj = { env: dotenv.config({ path: flags.env }).parsed };
 
-				let {interpolationStatus, missingKeys, interpolatedMeshData}=await meshInterpolation.interpolateMesh(inputMeshData, envObj);
-				
+				let {
+					interpolationStatus,
+					missingKeys,
+					interpolatedMeshData,
+				} = await meshInterpolation.interpolateMesh(inputMeshData, envObj);
+
 				//De-duplicate the missing keys array
-				 missingKeys = missingKeys.filter( function( item, index, inputArray ) {
+				missingKeys = missingKeys.filter(function (item, index, inputArray) {
 					return inputArray.indexOf(item) == index;
-			 	 });
+				});
 
-				if (interpolationStatus=='failed') {
-					this.error("The mesh file cannot be interpolated due to missing keys : " + missingKeys.toString())
+				if (interpolationStatus == 'failed') {
+					this.error(
+						'The mesh file cannot be interpolated due to missing keys : ' + missingKeys.toString(),
+					);
 				}
 
 				try {
 					data = JSON.parse(interpolatedMeshData);
-				}
-				catch (err) {
+				} catch (err) {
 					this.log(err.message);
 					this.log(interpolatedMeshData);
-					this.error("Interpolated mesh is not a valid JSON. Please check the generated json file.")
+					this.error(
+						'Interpolated mesh is not a valid JSON. Please check the generated json file.',
+					);
 				}
-
+			} else {
+				this.error(`Issue in ${flags.env} file - ` + envFileValidity.error);
 			}
-			else {
-				this.error(`Issue in ${flags.env} file - ` + envFileValidity.error)
-			}
-		}
-		else
-		{
+		} else {
 			try {
 				data = JSON.parse(inputMeshData);
-			}
-			catch (err) {
+			} catch (err) {
 				this.log(err.message);
-				this.error("Input mesh file is not a valid JSON. Please check the input file provided.")
+				this.error('Input mesh file is not a valid JSON. Please check the input file provided.');
 			}
 		}
-
 
 		if (meshId) {
 			let shouldContinue = true;

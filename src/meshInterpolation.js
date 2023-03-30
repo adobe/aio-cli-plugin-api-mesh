@@ -4,21 +4,19 @@
 
 function clearEnv() {
 	for (const key in process.env) {
-		delete process.env[key]
+		delete process.env[key];
 	}
-};
+}
 
 /**
  *validates the environment file content
- * @param {envContent} 
+ * @param {envContent}
  * @returns {object} containing the status of validation . If validation is failed then the error property including the formatting errors is returned.
  */
 
 function validateEnvFileFormat(envContent) {
-
 	//Key should start with a underscore or an alphabet followed by underscore/alphanumeric characters
 	const envKeyRegex = /^[a-zA-Z_]+[a-zA-Z0-9_]*$/;
-
 
 	const envValueRegex = /^(?:"(?:\\.|[^\\"])*"|'(?:\\.|[^\\'])*'|[^'"\s])+$/;
 
@@ -41,9 +39,8 @@ function validateEnvFileFormat(envContent) {
 		}
 
 		if (!trimmedLine.includes('=')) {
-			errors.push(`Invalid format << ${trimmedLine} >> on line ${index + 1}`)
-		}
-		else {
+			errors.push(`Invalid format << ${trimmedLine} >> on line ${index + 1}`);
+		} else {
 			const [key, value] = trimmedLine.split('=', 2);
 			if (!envKeyRegex.test(key) || !envValueRegex.test(value)) {
 				// invalid format: key or value does not match regex
@@ -55,18 +52,17 @@ function validateEnvFileFormat(envContent) {
 			}
 			envDict[key] = value;
 		}
-
 	}
 	if (errors.length) {
 		return {
 			valid: false,
-			error: errors.toString()
+			error: errors.toString(),
 		};
 	}
 	return {
-		valid: true
+		valid: true,
 	};
-};
+}
 
 /**
  *loads the pupa module dynamically and then interpolates the raw data from mesh file with object data
@@ -81,45 +77,44 @@ async function interpolateMesh(data, obj) {
 	let pupa;
 	try {
 		pupa = (await import('pupa')).default;
-	}
-	catch {
-		this.error("Error while loading pupa module")
+	} catch {
+		this.error('Error while loading pupa module');
 	}
 
 	interpolatedMesh = pupa(data, obj, {
 		ignoreMissing: true,
 		transform: ({ value, key }) => {
-			if (key.startsWith("env.")) {
+			if (key.startsWith('env.')) {
 				if (value) {
 					return value;
 				} else {
 					// missing value, add to list
-					missingKeys.push(key.split(".")[1]);
+					missingKeys.push(key.split('.')[1]);
 				}
 			} else {
 				//ignore
 				return undefined;
 			}
 			return value;
-		}
+		},
 	});
 
 	if (missingKeys.length) {
 		return {
 			interpolationStatus: 'failed',
 			missingKeys: missingKeys,
-			interpolatedMesh: ''
-		}
+			interpolatedMesh: '',
+		};
 	}
 	return {
 		interpolationStatus: 'success',
 		missingKeys: [],
-		interpolatedMeshData: interpolatedMesh
-	}
-};
+		interpolatedMeshData: interpolatedMesh,
+	};
+}
 
 module.exports = {
 	interpolateMesh,
 	clearEnv,
-	validateEnvFileFormat
+	validateEnvFileFormat,
 };

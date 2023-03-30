@@ -1,4 +1,3 @@
-const fs = require('fs');
 const { Flags } = require('@oclif/core');
 const { servicePropertiesToNames } = require('@adobe/aio-cli-lib-console/lib/pure-helpers');
 
@@ -40,7 +39,7 @@ function objToString(obj, path = [], defaultString = '') {
 const ignoreCacheFlag = Flags.boolean({
 	char: 'i',
 	description: 'Ignore cache and force manual org -> project -> workspace selection',
-	default: false
+	default: false,
 });
 
 const autoConfirmActionFlag = Flags.boolean({
@@ -57,13 +56,13 @@ const jsonFlag = Flags.boolean({
 
 const envFileFlag = Flags.string({
 	char: 'e',
-	description: 'Path to env file'
-})
+	description: 'Path to env file',
+});
 
 module.exports = {
 	objToString,
 	ignoreCacheFlag,
 	autoConfirmActionFlag,
 	jsonFlag,
-	envFileFlag
+	envFileFlag,
 };

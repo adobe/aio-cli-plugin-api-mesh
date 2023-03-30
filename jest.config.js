@@ -5,7 +5,7 @@ const config = {
 	collectCoverage: true,
 	testEnvironment: 'node',
 	reporters: ['default', 'jest-junit'],
-	setupFilesAfterEnv: ['./jest.setup.js']
+	setupFilesAfterEnv: ['./jest.setup.js'],
 };
 
 module.exports = config;

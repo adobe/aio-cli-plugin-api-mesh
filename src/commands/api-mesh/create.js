@@ -12,7 +12,7 @@ governing permissions and limitations under the License.
 const { Command } = require('@oclif/core');
 const { readFile } = require('fs/promises');
 
-const { initSdk, initRequestId, promptConfirm  } = require('../../helpers');
+const { initSdk, initRequestId, promptConfirm } = require('../../helpers');
 const logger = require('../../classes/logger');
 const CONSTANTS = require('../../constants');
 const { ignoreCacheFlag, autoConfirmActionFlag, jsonFlag, envFileFlag } = require('../../utils');
@@ -25,7 +25,6 @@ const {
 const meshInterpolation = require('../../meshInterpolation');
 
 const dotenv = require('dotenv');
-const { type } = require('os');
 
 const { MULTITENANT_GRAPHQL_SERVER_BASE_URL } = CONSTANTS;
 
@@ -35,7 +34,7 @@ class CreateCommand extends Command {
 		ignoreCache: ignoreCacheFlag,
 		autoConfirmAction: autoConfirmActionFlag,
 		json: jsonFlag,
-		env: envFileFlag
+		env: envFileFlag,
 	};
 
 	static enableJsonFlag = true;
@@ -64,7 +63,7 @@ class CreateCommand extends Command {
 
 		//Input the mesh data from the input file
 		try {
-			inputMeshData = await readFile(args.file, 'utf8')
+			inputMeshData = await readFile(args.file, 'utf8');
 		} catch (error) {
 			logger.error(error);
 
@@ -83,10 +82,9 @@ class CreateCommand extends Command {
 			//Read the environment file
 			try {
 				envFileContent = await readFile(flags.env, 'utf8');
-			}
-			catch (error) {
-				this.log(error.message)
-				this.error('Unable to read the env file provided. Please check the file and try again.')
+			} catch (error) {
+				this.log(error.message);
+				this.error('Unable to read the env file provided. Please check the file and try again.');
 			}
 
 			//Validate the env file
@@ -96,41 +94,43 @@ class CreateCommand extends Command {
 				meshInterpolation.clearEnv();
 
 				//Added env at start of each environment variable
-				const envObj = { env: (dotenv.config({ path: flags.env })).parsed };
+				const envObj = { env: dotenv.config({ path: flags.env }).parsed };
 
-				let {interpolationStatus, missingKeys, interpolatedMeshData}=await meshInterpolation.interpolateMesh(inputMeshData, envObj);
-				
+				let {
+					interpolationStatus,
+					missingKeys,
+					interpolatedMeshData,
+				} = await meshInterpolation.interpolateMesh(inputMeshData, envObj);
+
 				//De-duplicate the missing keys array
-				 missingKeys = missingKeys.filter( function( item, index, inputArray ) {
+				missingKeys = missingKeys.filter(function (item, index, inputArray) {
 					return inputArray.indexOf(item) == index;
-			 	 });
+				});
 
-				if (interpolationStatus=='failed') {
-					this.error("The mesh file cannot be interpolated due to missing keys : " + missingKeys.toString())
+				if (interpolationStatus == 'failed') {
+					this.error(
+						'The mesh file cannot be interpolated due to missing keys : ' + missingKeys.toString(),
+					);
 				}
 
 				try {
 					data = JSON.parse(interpolatedMeshData);
-				}
-				catch (err) {
+				} catch (err) {
 					this.log(err.message);
 					this.log(interpolatedMeshData);
-					this.error("Interpolated mesh is not a valid JSON. Please check the generated json file.")
+					this.error(
+						'Interpolated mesh is not a valid JSON. Please check the generated json file.',
+					);
 				}
-
+			} else {
+				this.error(`Issue in ${flags.env} file - ` + envFileValidity.error);
 			}
-			else {
-				this.error(`Issue in ${flags.env} file - ` + envFileValidity.error)
-			}
-		}
-		else
-		{
+		} else {
 			try {
 				data = JSON.parse(inputMeshData);
-			}
-			catch (err) {
+			} catch (err) {
 				this.log(err.message);
-				this.error("Input mesh file is not a valid JSON. Please check the file provided.")
+				this.error('Input mesh file is not a valid JSON. Please check the file provided.');
 			}
 		}
 
