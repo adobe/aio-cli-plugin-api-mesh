@@ -88,8 +88,20 @@ describe('create command tests', () => {
 		});
 	});
 
-	afterEach(() => {
-		jest.restoreAllMocks();
+	test('must return proper object structure used by adobe/generator-app-api-mesh', async () => {
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
+			flags: {
+				json: Promise.resolve(true),
+			},
+		});
+		const output = await CreateCommand.run();
+		expect(output).toHaveProperty('mesh');
+		expect(output).toHaveProperty('adobeIdIntegrationsForWorkspace');
+		expect(output.mesh).toEqual(expect.objectContaining({ meshId: 'dummy_mesh_id' }));
+		expect(output.adobeIdIntegrationsForWorkspace).toEqual(
+			expect.objectContaining({ apiKey: 'dummy_api_key' }),
+		);
 	});
 
 	test('snapshot create command description', () => {
@@ -141,66 +153,10 @@ describe('create command tests', () => {
 	`);
 		expect(CreateCommand.aliases).toMatchInlineSnapshot(`[]`);
 	});
-
-	test('should fail if mesh config file arg is missing', async () => {
-		parseSpy.mockResolvedValueOnce({
-			args: {},
-			flags: {
-				ignoreCache: mockIgnoreCacheFlag,
-				autoConfirmAction: mockAutoApproveAction,
-			},
-		});
-		const runResult = CreateCommand.run();
-
-		await expect(runResult).rejects.toEqual(
-			new Error('Missing file path. Run aio api-mesh create --help for more info.'),
-		);
-		expect(logSpy.mock.calls).toMatchInlineSnapshot(`[]`);
-		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
-		[
-		  [
-		    "Missing file path. Run aio api-mesh create --help for more info.",
-		  ],
-		]
-	`);
-	});
-
-	test('should fail if mesh file is invalid', async () => {
-		parseSpy.mockResolvedValueOnce({
-			args: { file: 'dummy_file_path' },
-			flags: {
-				ignoreCache: mockIgnoreCacheFlag,
-				autoConfirmAction: mockAutoApproveAction,
-			},
-		});
-		const runResult = CreateCommand.run();
-
-		await expect(runResult).rejects.toEqual(
-			new Error(
-				'Unable to read the mesh configuration file provided. Please check the file and try again.',
-			),
-		);
-		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
-		[
-		  [
-		    "ENOENT: no such file or directory, open 'dummy_file_path'",
-		  ],
-		]
-	`);
-		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
-		[
-		  [
-		    "Unable to read the mesh configuration file provided. Please check the file and try again.",
-		  ],
-		]
-	`);
-	});
-
 	test('should fail if create mesh api has failed', async () => {
 		createMesh.mockRejectedValueOnce(new Error('create mesh api failed'));
 
 		const runResult = CreateCommand.run();
-
 		await expect(runResult).rejects.toEqual(
 			new Error(
 				'Unable to create a mesh. Please check the mesh configuration file and try again. If the error persists please contact support. RequestId: dummy_request_id',
@@ -221,97 +177,6 @@ describe('create command tests', () => {
 		]
 	`);
 	});
-
-	test('should fail if create api credential api has failed', async () => {
-		createAPIMeshCredentials.mockRejectedValueOnce(new Error('create api credential api failed'));
-
-		const runResult = CreateCommand.run();
-
-		await expect(runResult).rejects.toEqual(
-			new Error(
-				'Unable to create a mesh. Please check the mesh configuration file and try again. If the error persists please contact support. RequestId: dummy_request_id',
-			),
-		);
-		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
-		[
-		  [
-		    "******************************************************************************************************",
-		  ],
-		  [
-		    "Your mesh is being provisioned. Wait a few minutes before checking the status of your mesh %s",
-		    "dummy_mesh_id",
-		  ],
-		  [
-		    "To check the status of your mesh, run:",
-		  ],
-		  [
-		    "aio api-mesh:status",
-		  ],
-		  [
-		    "******************************************************************************************************",
-		  ],
-		  [
-		    "create api credential api failed",
-		  ],
-		]
-	`);
-		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
-		[
-		  [
-		    "Unable to create a mesh. Please check the mesh configuration file and try again. If the error persists please contact support. RequestId: dummy_request_id",
-		  ],
-		]
-	`);
-	});
-
-	test('should fail if subscribe credential to mesh service api has failed', async () => {
-		subscribeCredentialToMeshService.mockRejectedValueOnce(
-			new Error('subscribe credential to mesh service api failed'),
-		);
-
-		const runResult = CreateCommand.run();
-
-		await expect(runResult).rejects.toEqual(
-			new Error(
-				'Unable to create a mesh. Please check the mesh configuration file and try again. If the error persists please contact support. RequestId: dummy_request_id',
-			),
-		);
-		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
-		[
-		  [
-		    "******************************************************************************************************",
-		  ],
-		  [
-		    "Your mesh is being provisioned. Wait a few minutes before checking the status of your mesh %s",
-		    "dummy_mesh_id",
-		  ],
-		  [
-		    "To check the status of your mesh, run:",
-		  ],
-		  [
-		    "aio api-mesh:status",
-		  ],
-		  [
-		    "******************************************************************************************************",
-		  ],
-		  [
-		    "Successfully created API Key %s",
-		    "dummy_api_key",
-		  ],
-		  [
-		    "subscribe credential to mesh service api failed",
-		  ],
-		]
-	`);
-		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
-		[
-		  [
-		    "Unable to create a mesh. Please check the mesh configuration file and try again. If the error persists please contact support. RequestId: dummy_request_id",
-		  ],
-		]
-	`);
-	});
-
 	test('should create if a valid mesh config file is provided', async () => {
 		const runResult = await CreateCommand.run();
 
@@ -412,6 +277,150 @@ describe('create command tests', () => {
 		]
 	`);
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`[]`);
+	});
+
+	test('should fail if mesh config file arg is missing', async () => {
+		parseSpy.mockResolvedValueOnce({
+			args: {},
+			flags: {
+				ignoreCache: mockIgnoreCacheFlag,
+				autoConfirmAction: mockAutoApproveAction,
+			},
+		});
+		const runResult = CreateCommand.run();
+
+		await expect(runResult).rejects.toEqual(
+			new Error('Missing file path. Run aio api-mesh create --help for more info.'),
+		);
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`[]`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Missing file path. Run aio api-mesh create --help for more info.",
+		  ],
+		]
+	`);
+	});
+
+	test('should fail if mesh file is invalid', async () => {
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'dummy_file_path' },
+			flags: {
+				ignoreCache: mockIgnoreCacheFlag,
+				autoConfirmAction: mockAutoApproveAction,
+			},
+		});
+		const runResult = CreateCommand.run();
+
+		await expect(runResult).rejects.toEqual(
+			new Error(
+				'Unable to read the mesh configuration file provided. Please check the file and try again.',
+			),
+		);
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "ENOENT: no such file or directory, open 'dummy_file_path'",
+		  ],
+		]
+	`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Unable to read the mesh configuration file provided. Please check the file and try again.",
+		  ],
+		]
+	`);
+	});
+
+	test('should fail if create api credential api has failed', async () => {
+		createAPIMeshCredentials.mockRejectedValue(new Error('create api credential api failed'));
+
+		const runResult = CreateCommand.run();
+
+		await expect(runResult).rejects.toEqual(
+			new Error(
+				'Unable to create a mesh. Please check the mesh configuration file and try again. If the error persists please contact support. RequestId: dummy_request_id',
+			),
+		);
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "******************************************************************************************************",
+		  ],
+		  [
+		    "Your mesh is being provisioned. Wait a few minutes before checking the status of your mesh %s",
+		    "dummy_mesh_id",
+		  ],
+		  [
+		    "To check the status of your mesh, run:",
+		  ],
+		  [
+		    "aio api-mesh:status",
+		  ],
+		  [
+		    "******************************************************************************************************",
+		  ],
+		  [
+		    "create api credential api failed",
+		  ],
+		]
+	`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Unable to create a mesh. Please check the mesh configuration file and try again. If the error persists please contact support. RequestId: dummy_request_id",
+		  ],
+		]
+	`);
+	});
+
+	test('should fail if subscribe credential to mesh service api has failed', async () => {
+		subscribeCredentialToMeshService.mockRejectedValueOnce(
+			new Error('subscribe credential to mesh service api failed'),
+		);
+
+		const runResult = CreateCommand.run();
+
+		await expect(runResult).rejects.toEqual(
+			new Error(
+				'Unable to create a mesh. Please check the mesh configuration file and try again. If the error persists please contact support. RequestId: dummy_request_id',
+			),
+		);
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "******************************************************************************************************",
+		  ],
+		  [
+		    "Your mesh is being provisioned. Wait a few minutes before checking the status of your mesh %s",
+		    "dummy_mesh_id",
+		  ],
+		  [
+		    "To check the status of your mesh, run:",
+		  ],
+		  [
+		    "aio api-mesh:status",
+		  ],
+		  [
+		    "******************************************************************************************************",
+		  ],
+		  [
+		    "Successfully created API Key %s",
+		    "dummy_api_key",
+		  ],
+		  [
+		    "subscribe credential to mesh service api failed",
+		  ],
+		]
+	`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Unable to create a mesh. Please check the mesh configuration file and try again. If the error persists please contact support. RequestId: dummy_request_id",
+		  ],
+		]
+	`);
 	});
 
 	test('should not ask for confirmation if autoConfirmAction is provided', async () => {
