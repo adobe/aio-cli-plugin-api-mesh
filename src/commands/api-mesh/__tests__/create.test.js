@@ -115,7 +115,7 @@ describe('create command tests', () => {
 		  },
 		]
 	`);
-		logger.info(CreateCommand.flags);
+	
 		expect(CreateCommand.flags).toMatchInlineSnapshot(`
 		{
 		  "autoConfirmAction": {
