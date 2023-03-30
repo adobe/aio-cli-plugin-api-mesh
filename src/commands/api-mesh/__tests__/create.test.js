@@ -14,7 +14,7 @@ const mockConsoleCLIInstance = {};
 
 const CreateCommand = require('../create');
 const sampleCreateMeshConfig = require('../../__fixtures__/sample_mesh.json');
-const { initSdk, initRequestId, promptConfirm, getname, interpolateMesh } = require('../../../helpers');
+const { initSdk, initRequestId, promptConfirm } = require('../../../helpers');
 const {
 	createMesh,
 	createAPIMeshCredentials,
