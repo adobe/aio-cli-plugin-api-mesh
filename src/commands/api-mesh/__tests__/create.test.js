@@ -547,7 +547,7 @@ describe('create command tests', () => {
 			flags: {
 				ignoreCache: mockIgnoreCacheFlag,
 				autoConfirmAction: Promise.resolve(true),
-				env: 'src/commands/__fixtures__/.env_invalid',
+				env: 'src/commands/__fixtures__/env_invalid',
 			},
 		});
 
@@ -555,14 +555,14 @@ describe('create command tests', () => {
 
 		await expect(runResult).rejects.toEqual(
 			new Error(
-				"Issue in src/commands/__fixtures__/.env_invalid file - Duplicate key << key1 >> on line 3,Invalid format for key/value << key2=='value3' >> on line 5,Invalid format << key3 >> on line 6,Invalid format for key/value << key4='value4 >> on line 7",
+				"Issue in src/commands/__fixtures__/env_invalid file - Duplicate key << key1 >> on line 3,Invalid format for key/value << key2=='value3' >> on line 5,Invalid format << key3 >> on line 6,Invalid format for key/value << key4='value4 >> on line 7",
 			),
 		);
 
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
 		[
 		  [
-		    "Issue in src/commands/__fixtures__/.env_invalid file - Duplicate key << key1 >> on line 3,Invalid format for key/value << key2=='value3' >> on line 5,Invalid format << key3 >> on line 6,Invalid format for key/value << key4='value4 >> on line 7",
+		    "Issue in src/commands/__fixtures__/env_invalid file - Duplicate key << key1 >> on line 3,Invalid format for key/value << key2=='value3' >> on line 5,Invalid format << key3 >> on line 6,Invalid format for key/value << key4='value4 >> on line 7",
 		  ],
 		]
 	`);
@@ -574,7 +574,7 @@ describe('create command tests', () => {
 			flags: {
 				ignoreCache: mockIgnoreCacheFlag,
 				autoConfirmAction: Promise.resolve(true),
-				env: 'src/commands/__fixtures__/.env_valid',
+				env: 'src/commands/__fixtures__/env_valid',
 			},
 		});
 
@@ -605,7 +605,7 @@ describe('create command tests', () => {
 			flags: {
 				ignoreCache: mockIgnoreCacheFlag,
 				autoConfirmAction: Promise.resolve(true),
-				env: 'src/commands/__fixtures__/.env_valid',
+				env: 'src/commands/__fixtures__/env_valid',
 			},
 		});
 
@@ -640,7 +640,7 @@ describe('create command tests', () => {
 			flags: {
 				ignoreCache: mockIgnoreCacheFlag,
 				autoConfirmAction: mockAutoApproveAction,
-				env: 'src/commands/__fixtures__/.env_valid',
+				env: 'src/commands/__fixtures__/env_valid',
 			},
 		});
 

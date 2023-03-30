@@ -54,7 +54,7 @@ class CreateCommand extends Command {
 
 		const ignoreCache = await flags.ignoreCache;
 		const autoConfirmAction = await flags.autoConfirmAction;
-
+		const envFilePath=await flags.env;
 		const { imsOrgId, projectId, workspaceId } = await initSdk({
 			ignoreCache,
 		});
@@ -75,13 +75,12 @@ class CreateCommand extends Command {
 
 		let data;
 
-		//flags.env contains the filepath
-		if (flags.env) {
+		if (envFilePath) {
 			let envFileContent;
 
 			//Read the environment file
 			try {
-				envFileContent = await readFile(flags.env, 'utf8');
+				envFileContent = await readFile(envFilePath, 'utf8');
 			} catch (error) {
 				this.log(error.message);
 				this.error('Unable to read the env file provided. Please check the file and try again.');
@@ -94,7 +93,7 @@ class CreateCommand extends Command {
 				meshInterpolation.clearEnv();
 
 				//Added env at start of each environment variable
-				const envObj = { env: dotenv.config({ path: flags.env }).parsed };
+				const envObj = { env: dotenv.config({ path: envFilePath }).parsed };
 
 				let {
 					interpolationStatus,
@@ -123,7 +122,7 @@ class CreateCommand extends Command {
 					);
 				}
 			} else {
-				this.error(`Issue in ${flags.env} file - ` + envFileValidity.error);
+				this.error(`Issue in ${envFilePath} file - ` + envFileValidity.error);
 			}
 		} else {
 			try {
