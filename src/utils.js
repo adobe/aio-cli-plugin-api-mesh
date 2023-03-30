@@ -1,5 +1,4 @@
 const { Flags } = require('@oclif/core');
-const { servicePropertiesToNames } = require('@adobe/aio-cli-lib-console/lib/pure-helpers');
 
 /**
  * Returns the string representation of the object's path.
