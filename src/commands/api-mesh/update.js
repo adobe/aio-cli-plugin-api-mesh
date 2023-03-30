@@ -43,7 +43,7 @@ class UpdateCommand extends Command {
 
 		const ignoreCache = await flags.ignoreCache;
 		const autoConfirmAction = await flags.autoConfirmAction;
-		const envFilePath=await flags.env;
+		const envFilePath = await flags.env;
 
 		const { imsOrgId, projectId, workspaceId } = await initSdk({
 			ignoreCache,
