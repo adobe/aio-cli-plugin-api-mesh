@@ -1,3 +1,17 @@
+const fs = require('fs');
+const path = require('path');
+
+/**
+ * @returns returns the root directory of the project
+ */
+function getAppRootDir() {
+	let currentDir = __dirname;
+	while (!fs.existsSync(path.join(currentDir, 'package.json'))) {
+		currentDir = path.join(currentDir, '..');
+	}
+	return currentDir;
+}
+
 /**
  * Returns the string representation of the object's path.
  * If the path evaluates to false, the default string is returned.
@@ -58,4 +72,5 @@ module.exports = {
 	ignoreCacheFlag,
 	autoConfirmActionFlag,
 	jsonFlag,
+	getAppRootDir,
 };
