@@ -20,7 +20,6 @@ const {
 	createAPIMeshCredentials,
 	subscribeCredentialToMeshService,
 } = require('../../../lib/devConsole');
-const logger = require('../../../classes/logger');
 
 const meshInterpolation = require('../../../meshInterpolation');
 
@@ -115,7 +114,7 @@ describe('create command tests', () => {
 		  },
 		]
 	`);
-	
+
 		expect(CreateCommand.flags).toMatchInlineSnapshot(`
 		{
 		  "autoConfirmAction": {
