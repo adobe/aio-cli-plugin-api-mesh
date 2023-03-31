@@ -10,118 +10,127 @@ governing permissions and limitations under the License.
 */
 
 const { Command, Flags } = require('@oclif/core');
-const { readFile } = require('fs/promises');
-const resolve = require('path').resolve
+const resolve = require('path').resolve;
 
-const { initSdk, initRequestId, promptConfirm } = require('../../helpers');
-const logger = require('../../classes/logger');
-const CONSTANTS = require('../../constants');
-const { getAppRootDir, autoConfirmActionFlag, jsonFlag } = require('../../utils');
+const { promptConfirm } = require('../../helpers');
+const { getAppRootDir } = require('../../utils');
 
 const fs = require('fs');
-const util = require('util');
-const child = require('child_process');
-const { stdout } = require('process');
-
-const templatesDirectory = `${getAppRootDir()}/src/templates/package.json`; 
+const { exec } = require('child_process');
+const { stdout, stderr } = require('process');
 
 require('dotenv').config();
 
-const { MULTITENANT_GRAPHQL_SERVER_BASE_URL } = CONSTANTS;
-
 class InitCommand extends Command {
-    static summary = 'Initiate API Mesh workspace';
-    static description = 'This command will create a workspace where you can organise your API mesh configuration and other files';
-    
-    static args = [{
-        name: 'path',
-        required: false,
-        default: '.',
-        description: 'Workspace directory path'
-    }];
+	static summary = 'Initiate API Mesh workspace';
+	static description =
+		'This command will create a workspace where you can organise your API mesh configuration and other files';
+
+	static args = [
+		{
+			name: 'path',
+			required: false,
+			default: '.',
+			description: 'Workspace directory path',
+		},
+	];
 
 	static flags = {
 		packageManager: Flags.string({
-            char: 'p',
-            summary: 'select yarn or npm for package management',
-            helpGroup: 'THE BEST FLAGS',
-            default: 'npm',
-            options: ['npm', 'yarn']
-        }),
-        git: Flags.boolean({
-            default: false,
-            char: 'g',
-            summary: 'Should the workspace be initiated as a git project.',
-            helpGroup: 'THE BEST FLAGS',
-        })
+			char: 'p',
+			summary: 'select yarn or npm for package management',
+			helpGroup: 'THE BEST FLAGS',
+			default: 'npm',
+			options: ['npm', 'yarn'],
+		}),
+		git: Flags.boolean({
+			default: false,
+			char: 'g',
+			summary: 'Should the workspace be initiated as a git project.',
+			helpGroup: 'THE BEST FLAGS',
+		}),
 	};
 
 	static enableJsonFlag = true;
 
-    static examples = [
-        {
-            description: 'API mesh workspace init',
-            command: 'aio api-mesh init ./mesh_projects/test_mesh --git --packageManager yarn',
-        }
-    ];
+	static examples = [
+		{
+			description: 'API mesh workspace init',
+			command: 'aio api-mesh init ./mesh_projects/test_mesh --git --packageManager yarn',
+		},
+	];
 
-    const  = util.promisify(child.exec);
+	runCommand(command, workingDirectory = '.') {
+		return new Promise((resolve, reject) => {
+			const childProcess = exec(command, { cwd: workingDirectory });
+			childProcess.stdout.pipe(stdout);
+			childProcess.stdin.pipe(stderr);
+			childProcess.on('exit', code => {
+				if (code === 0) {
+					resolve();
+				} else {
+					reject(new Error(`${command} exection failed`));
+				}
+			});
+		});
+	}
 
 	async run() {
-        const {args, flags} = await this.parse(InitCommand);
-        const absolutePath = resolve(args.path);
-        const shouldCreateWorkspace = await promptConfirm(`Do you want to create the workspace in ${absolutePath}`);
-        const exec = util.promisify(child.exec);
-        if (shouldCreateWorkspace) {
-            this.log(`Creating workspace in ${absolutePath}`);
-            
-            if (flags.git) {
-                this.log('Initiating git in workspace')
-                try {
-                    await exec(`git init ${absolutePath}`);
-                } catch(error) {
-                    this.error(error);
-                }
-            } else {
-                fs.access(absolutePath, (error) => {
-                    if (error) {
-                        fs.mkdirSync(absolutePath, (error) => {
-                            if (error) {
-                                this.error("Workspace couldn`t be created at the directory, please verify your permissions");
-                            }
-                        })
-                    } else {
-                        this.error("Directory already exists. Delete the directory or change the directory");
-                    }
-                });
-            }
+		const { args, flags } = await this.parse(InitCommand);
+		const absolutePath = resolve(args.path);
+		const templatesDirectory = `${getAppRootDir()}/src/templates/package.json`;
+		const shouldCreateWorkspace = await promptConfirm(
+			`Do you want to create the workspace in ${absolutePath}`,
+		);
 
-            this.log(`Installing package managers`);
-            fs.closeSync(fs.openSync(absolutePath + '/.env', 'w'));
-            fs.copyFileSync(templatesDirectory, absolutePath + '/package.json');
+		if (shouldCreateWorkspace) {
+			this.log(`Creating workspace in ${absolutePath}`);
 
-            if (flags.packageManager === 'npm') {
-                try {
-                    const {stdout, stderr} = await exec(`npm install`, {cwd: absolutePath});
-                    this.log(stdout);
-                    this.log(stderr);
-                } catch (error) {
-                    this.error(error);
-                }
-            }
-            
-            if (flags.packageManager === 'yarn') {
-                try {
-                    const {stdout, stderr} = await exec(`yarn install`, {cwd: absolutePath});
-                    this.log(stdout);
-                    this.log(stderr);
-                } catch (error) {
-                    this.error(error);
-                }
-            }
+			if (flags.git) {
+				this.log('Initiating git in workspace');
+				try {
+					await this.runCommand(`git init ${absolutePath}`);
+				} catch (error) {
+					this.error(error);
+				}
+			} else {
+				fs.access(absolutePath, error => {
+					if (error) {
+						fs.mkdirSync(absolutePath, error => {
+							if (error) {
+								this.error(
+									'Workspace couldn`t be created at the directory, please verify your permissions',
+								);
+							}
+						});
+					} else {
+						this.error('Directory already exists. Delete the directory or change the directory');
+					}
+				});
+			}
 
-            this.log('workspace setup done successfully');
-        }
+			this.log(`Installing package managers`);
+			fs.closeSync(fs.openSync(absolutePath + '/.env', 'w'));
+			fs.copyFileSync(templatesDirectory, absolutePath + '/package.json');
+
+			if (flags.packageManager === 'npm') {
+				try {
+					await this.runCommand(`npm install`, absolutePath);
+				} catch (error) {
+					this.error(error);
+				}
+			}
+
+			if (flags.packageManager === 'yarn') {
+				try {
+					await this.runCommand(`yarn install`, absolutePath);
+				} catch (error) {
+					this.error(error);
+				}
+			}
+
+			this.log('workspace setup done successfully');
+		}
 	}
 }
 
