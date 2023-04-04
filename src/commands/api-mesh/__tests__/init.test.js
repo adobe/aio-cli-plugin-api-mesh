@@ -1,5 +1,15 @@
 const InitCommand = require('../init');
 
+jest.mock('../../../helpers', () => ({
+	promptConfirm: jest.fn().mockResolvedValue(true),
+	loadPupa: jest.fn().mockResolvedValue({}),
+	runCliCommand: jest.fn(),
+}));
+
+const { promptConfirm, loadPupa, runCliCommand } = require('../../../helpers');
+
+const fs = require('fs/promises');
+
 const mockProjectName = 'sample mesh test workspace';
 
 const mockGitDefaultFlag = false;
@@ -8,20 +18,35 @@ const mockPMDefaultFlag = 'npm';
 
 const mockPathDefaultFlag = '.';
 
+let logSpy = null;
+
+let errorLogSpy = null;
+
+let createPackageJsonSpy = null;
+
+let parseSpy = null;
+
+let readFile,
+	writeFile,
+	access,
+	mkdir = null;
+
 describe('Workspace init command tests', () => {
-
-    beforeEach(() => {
-        logSpy = jest.spyOn(InitCommand.prototype, 'log');
+	beforeEach(() => {
+		logSpy = jest.spyOn(InitCommand.prototype, 'log');
 		errorLogSpy = jest.spyOn(InitCommand.prototype, 'error');
-
 		parseSpy = jest.spyOn(InitCommand.prototype, 'parse');
-        createPackageJsonSpy = jest.spyOn(InitCommand.prototype, 'createPackageJson');
-        createPackageJsonSpy.mockResolvedValue({});
-    });
+		createPackageJsonSpy = jest.spyOn(InitCommand.prototype, 'createPackageJson');
+		createPackageJsonSpy.mockResolvedValue({});
+		access = jest.spyOn(fs, 'access').mockRejectedValue(new Error());
+		writeFile = jest.spyOn(fs, 'writeFile').mockResolvedValue({});
+		access = jest.spyOn(fs, 'access').mockResolvedValue({});
+		mkdir = jest.spyOn(fs, 'mkdir').mockResolvedValue({});
+	});
 
-    afterEach(() => {
-        jest.restoreAllMocks();
-    });
+	afterEach(() => {
+		jest.restoreAllMocks();
+	});
 
 	test('Snapshot of Init command', () => {
 		expect(InitCommand.description).toMatchInlineSnapshot(
@@ -75,18 +100,84 @@ describe('Workspace init command tests', () => {
 	`);
 	});
 
-    test('Command should pass with no flags using default arguments', async () => {
-        parseSpy.mockResolvedValue({
-            args: {
-                projectName: mockProjectName
-            },
-            flags: {
-                path: mockPathDefaultFlag,
-                git: mockGitDefaultFlag,
-                packageManager: mockPMDefaultFlag
-            }
+	test('Command should pass with no flags using default arguments', async () => {
+		parseSpy.mockResolvedValue({
+			args: {
+				projectName: mockProjectName,
+			},
+			flags: {
+				path: mockPathDefaultFlag,
+				git: mockGitDefaultFlag,
+				packageManager: mockPMDefaultFlag,
+			},
 		});
-        const output = await InitCommand.run();
-        console.log(output);
-    })
+		await InitCommand.run();
+		expect(promptConfirm).toHaveBeenCalled();
+		expect(access).toHaveBeenCalled();
+		expect(writeFile).toHaveBeenCalled();
+		expect(mkdir).toHaveBeenCalled();
+		expect(createPackageJsonSpy).toHaveBeenCalled();
+		expect(runCliCommand.mock.calls[0][0]).toBe('npm install');
+	});
+
+	test('Command should exit if prompt input is no', async () => {
+		promptConfirm.mockReturnValue(false);
+		parseSpy.mockResolvedValue({
+			args: {
+				projectName: mockProjectName,
+			},
+			flags: {
+				path: mockPathDefaultFlag,
+				git: mockGitDefaultFlag,
+				packageManager: mockPMDefaultFlag,
+			},
+		});
+		await InitCommand.run();
+		expect(runCliCommand).not.toHaveBeenCalled();
+		expect(access).not.toHaveBeenCalled();
+		expect(writeFile).not.toHaveBeenCalled();
+		expect(mkdir).not.toHaveBeenCalled();
+		expect(createPackageJsonSpy).not.toHaveBeenCalled();
+	});
+
+	test('Command should pass and create git project if git flag is provided', async () => {
+		parseSpy.mockResolvedValue({
+			args: {
+				projectName: mockProjectName,
+			},
+			flags: {
+				path: mockPathDefaultFlag,
+				git: true,
+				packageManager: mockPMDefaultFlag,
+			},
+		});
+		await InitCommand.run();
+		expect(runCliCommand.mock.calls[0][0]).toBe('git init');
+		expect(access).not.toHaveBeenCalled();
+		expect(writeFile).toHaveBeenCalled();
+		expect(mkdir).not.toHaveBeenCalled();
+		expect(promptConfirm).toHaveBeenCalled();
+		expect(createPackageJsonSpy).toHaveBeenCalled();
+		expect(runCliCommand.mock.calls[1][0]).toBe('npm install');
+	});
+
+	test('Command should pass and create yarn project if yarn is package manager', async () => {
+		parseSpy.mockResolvedValue({
+			args: {
+				projectName: mockProjectName,
+			},
+			flags: {
+				path: mockPathDefaultFlag,
+				git: mockGitDefaultFlag,
+				packageManager: 'yarn',
+			},
+		});
+		await InitCommand.run();
+		expect(access).toHaveBeenCalled();
+		expect(writeFile).toHaveBeenCalled();
+		expect(mkdir).toHaveBeenCalled();
+		expect(promptConfirm).toHaveBeenCalled();
+		expect(createPackageJsonSpy).toHaveBeenCalled();
+		expect(runCliCommand.mock.calls[0][0]).toBe('yarn install');
+	});
 });

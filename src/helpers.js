@@ -23,6 +23,8 @@ const logger = require('../src/classes/logger');
 const { UUID } = require('./classes/UUID');
 const CONSTANTS = require('./constants');
 const { objToString } = require('./utils');
+const { exec } = require('child_process');
+const { stdout, stderr } = require('process');
 
 const { DEV_CONSOLE_BASE_URL, DEV_CONSOLE_API_KEY, AIO_CLI_API_KEY } = CONSTANTS;
 
@@ -460,11 +462,11 @@ async function promptInput(message) {
 }
 
 /**
- * Function to run cli command 
- * 
+ * Function to run cli command
+ *
  * @param command Ocliff/Command
  * @param workingDirectory string
- * 
+ *
  * @returns Promise<void>
  */
 function runCliCommand(command, workingDirectory = '.') {
@@ -485,7 +487,7 @@ function runCliCommand(command, workingDirectory = '.') {
 async function loadPupa() {
 	try {
 		return (await import('pupa')).default;
-	} catch(error) {
+	} catch (error) {
 		throw new Error('Could not load pupa');
 	}
 }

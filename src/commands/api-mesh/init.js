@@ -15,9 +15,7 @@ const resolve = require('path').resolve;
 const { promptConfirm, loadPupa, runCliCommand } = require('../../helpers');
 const { getAppRootDir } = require('../../utils');
 
-const fs = require('fs');
-const { exec } = require('child_process');
-const { stdout, stderr } = require('process');
+const fs = require('fs/promises');
 
 class InitCommand extends Command {
 	static summary = 'Initiate API Mesh workspace';
@@ -28,7 +26,7 @@ class InitCommand extends Command {
 		{
 			name: 'projectName',
 			required: true,
-			description: 'Project name'
+			description: 'Project name',
 		},
 	];
 
@@ -36,7 +34,7 @@ class InitCommand extends Command {
 		path: Flags.string({
 			char: 'p',
 			summary: 'workspace path',
-			default: '.'
+			default: '.',
 		}),
 		packageManager: Flags.string({
 			char: 'm',
@@ -62,18 +60,18 @@ class InitCommand extends Command {
 		},
 	];
 
-    async createPackageJson(templatePath, filePath, projectTitle = 'api-mesh-starter') {
-        const template = fs.readFileSync(templatePath, 'utf8');
-        const pupa = await loadPupa();
-        const fileContents = pupa(template, {projectTitle});
-        fs.writeFileSync(filePath, fileContents);
-    }
+	async createPackageJson(templatePath, filePath, projectTitle = 'api-mesh-starter') {
+		const template = await fs.readFile(templatePath, 'utf8');
+		const pupa = await loadPupa();
+		const fileContents = pupa(template, { projectTitle });
+		await fs.writeFile(filePath, fileContents);
+	}
 
 	async run() {
 		const { args, flags } = await this.parse(InitCommand);
 		const absolutePath = resolve(flags.path);
 		const packageJsonTemplate = `${getAppRootDir()}/src/templates/package.json`;
-		const shouldCreateWorkspace = await promptConfirm(
+		let shouldCreateWorkspace = await promptConfirm(
 			`Do you want to create the workspace in ${absolutePath}`,
 		);
 
@@ -83,33 +81,38 @@ class InitCommand extends Command {
 			if (flags.git) {
 				this.log('Initiating git in workspace');
 				try {
-					await runCliCommand(`git init ${absolutePath}`);
+					await runCliCommand('git init', absolutePath);
 				} catch (error) {
 					this.error(error);
 				}
 			} else {
-				fs.access(absolutePath, error => {
-					if (error) {
-						fs.mkdirSync(absolutePath, error => {
-							if (error) {
-								this.error(
-									'Workspace couldn`t be created at the directory, please verify your permissions',
-								);
-							}
-						});
-					} else {
-						this.error('Directory already exists. Delete the directory or change the directory');
+				shouldCreateWorkspace = false;
+				try {
+					await fs.access(absolutePath);
+					this.error('Directory already exists. Delete the directory or change the directory');
+				} catch (e) {
+					shouldCreateWorkspace = true;
+				}
+				if (shouldCreateWorkspace) {
+					try {
+						await fs.mkdir(absolutePath);
+					} catch (error) {
+						this.log(`Could not create directory ${error.message}`);
 					}
-				});
+				}
 			}
 
 			this.log(`Installing package managers`);
-			fs.closeSync(fs.openSync(absolutePath + '/.env', 'w'));
-			await this.createPackageJson(packageJsonTemplate , absolutePath + '/package.json', args.projectName);
+			fs.writeFile(`${absolutePath}/.env`, '', 'utf8', { mode: 'w' });
+			await this.createPackageJson(
+				packageJsonTemplate,
+				`${absolutePath}/package.json`,
+				args.projectName,
+			);
 
 			if (flags.packageManager === 'npm') {
 				try {
-					await this.runCliCommand(`npm install`, absolutePath);
+					await runCliCommand(`npm install`, absolutePath);
 				} catch (error) {
 					this.error(error);
 				}
@@ -117,7 +120,7 @@ class InitCommand extends Command {
 
 			if (flags.packageManager === 'yarn') {
 				try {
-					await this.runCliCommand(`yarn install`, absolutePath);
+					await runCliCommand(`yarn install`, absolutePath);
 				} catch (error) {
 					this.error(error);
 				}
