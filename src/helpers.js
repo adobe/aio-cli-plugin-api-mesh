@@ -520,12 +520,11 @@ function getFilesInMeshConfig(data, meshConfigName) {
 		});
 	});
 
-	if (filesList) {
+	if (filesList.length) {
 		validateFileName(filesList, data);
 		validateFilePaths(filesList, meshConfigName);
 		validateFileType(filesList);
 	}
-	// console.log('sdvdfb');
 
 	return filesList;
 }

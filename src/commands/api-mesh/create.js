@@ -67,8 +67,9 @@ class CreateCommand extends Command {
 		try {
 			data = JSON.parse(await readFile(args.file, 'utf8'));
 
-			const filesList = getFilesInMeshConfig(data, args.file);
-			// console.log(filesList);
+			let filesList = [];
+			filesList = getFilesInMeshConfig(data, args.file);
+	
 			// if local files are present, import them in files array in meshConfig
 			if (filesList.length) {
 				await importFiles(data, filesList, args.file, flags.autoConfirmAction);
