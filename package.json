@@ -23,6 +23,7 @@
 		"node-clipboardy": "^1.0.3",
 		"pino": "^7.9.2",
 		"pino-pretty": "^7.6.0",
+		"pupa": "^3.1.0",
 		"source-registry-storage-adapter": "github:devx-services/source-registry-storage-adapter#main",
 		"uuid": "^8.3.2"
 	},

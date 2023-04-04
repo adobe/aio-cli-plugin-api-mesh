@@ -12,14 +12,12 @@ governing permissions and limitations under the License.
 const { Command, Flags } = require('@oclif/core');
 const resolve = require('path').resolve;
 
-const { promptConfirm } = require('../../helpers');
+const { promptConfirm, loadPupa, runCliCommand } = require('../../helpers');
 const { getAppRootDir } = require('../../utils');
 
 const fs = require('fs');
 const { exec } = require('child_process');
 const { stdout, stderr } = require('process');
-
-require('dotenv').config();
 
 class InitCommand extends Command {
 	static summary = 'Initiate API Mesh workspace';
@@ -28,16 +26,20 @@ class InitCommand extends Command {
 
 	static args = [
 		{
-			name: 'path',
-			required: false,
-			default: '.',
-			description: 'Workspace directory path',
+			name: 'projectName',
+			required: true,
+			description: 'Project name'
 		},
 	];
 
 	static flags = {
-		packageManager: Flags.string({
+		path: Flags.string({
 			char: 'p',
+			summary: 'workspace path',
+			default: '.'
+		}),
+		packageManager: Flags.string({
+			char: 'm',
 			summary: 'select yarn or npm for package management',
 			helpGroup: 'THE BEST FLAGS',
 			default: 'npm',
@@ -60,25 +62,17 @@ class InitCommand extends Command {
 		},
 	];
 
-	runCommand(command, workingDirectory = '.') {
-		return new Promise((resolve, reject) => {
-			const childProcess = exec(command, { cwd: workingDirectory });
-			childProcess.stdout.pipe(stdout);
-			childProcess.stdin.pipe(stderr);
-			childProcess.on('exit', code => {
-				if (code === 0) {
-					resolve();
-				} else {
-					reject(new Error(`${command} exection failed`));
-				}
-			});
-		});
-	}
+    async createPackageJson(templatePath, filePath, projectTitle = 'api-mesh-starter') {
+        const template = fs.readFileSync(templatePath, 'utf8');
+        const pupa = await loadPupa();
+        const fileContents = pupa(template, {projectTitle});
+        fs.writeFileSync(filePath, fileContents);
+    }
 
 	async run() {
 		const { args, flags } = await this.parse(InitCommand);
-		const absolutePath = resolve(args.path);
-		const templatesDirectory = `${getAppRootDir()}/src/templates/package.json`;
+		const absolutePath = resolve(flags.path);
+		const packageJsonTemplate = `${getAppRootDir()}/src/templates/package.json`;
 		const shouldCreateWorkspace = await promptConfirm(
 			`Do you want to create the workspace in ${absolutePath}`,
 		);
@@ -89,7 +83,7 @@ class InitCommand extends Command {
 			if (flags.git) {
 				this.log('Initiating git in workspace');
 				try {
-					await this.runCommand(`git init ${absolutePath}`);
+					await runCliCommand(`git init ${absolutePath}`);
 				} catch (error) {
 					this.error(error);
 				}
@@ -111,11 +105,11 @@ class InitCommand extends Command {
 
 			this.log(`Installing package managers`);
 			fs.closeSync(fs.openSync(absolutePath + '/.env', 'w'));
-			fs.copyFileSync(templatesDirectory, absolutePath + '/package.json');
+			await this.createPackageJson(packageJsonTemplate , absolutePath + '/package.json', args.projectName);
 
 			if (flags.packageManager === 'npm') {
 				try {
-					await this.runCommand(`npm install`, absolutePath);
+					await this.runCliCommand(`npm install`, absolutePath);
 				} catch (error) {
 					this.error(error);
 				}
@@ -123,7 +117,7 @@ class InitCommand extends Command {
 
 			if (flags.packageManager === 'yarn') {
 				try {
-					await this.runCommand(`yarn install`, absolutePath);
+					await this.runCliCommand(`yarn install`, absolutePath);
 				} catch (error) {
 					this.error(error);
 				}

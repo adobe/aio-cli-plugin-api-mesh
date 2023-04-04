@@ -1,5 +1,5 @@
 {
-	"name": "api-mesh-starter",
+	"name": "{projectTitle}",
 	"version": "0.0.1",
 	"publishConfig": {
 		"access": "public"
@@ -10,8 +10,6 @@
 		"@graphql-mesh/json-schema": "^0.35.28",
 		"@graphql-mesh/openapi": "^0.33.39",
 		"@graphql-mesh/plugin-http-details-extensions": "^0.0.12",
-		"@graphql-mesh/plugin-newrelic": "^0.2.32",
-		"@graphql-mesh/plugin-prometheus": "^0.2.15",
 		"@graphql-mesh/runtime": "^0.44.37",
 		"@graphql-mesh/transform-encapsulate": "^0.3.114",
 		"@graphql-mesh/transform-federation": "^0.9.60",

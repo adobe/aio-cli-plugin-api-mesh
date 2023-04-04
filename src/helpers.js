@@ -459,6 +459,37 @@ async function promptInput(message) {
 	return selected.item;
 }
 
+/**
+ * Function to run cli command 
+ * 
+ * @param command Ocliff/Command
+ * @param workingDirectory string
+ * 
+ * @returns Promise<void>
+ */
+function runCliCommand(command, workingDirectory = '.') {
+	return new Promise((resolve, reject) => {
+		const childProcess = exec(command, { cwd: workingDirectory });
+		childProcess.stdout.pipe(stdout);
+		childProcess.stdin.pipe(stderr);
+		childProcess.on('exit', code => {
+			if (code === 0) {
+				resolve();
+			} else {
+				reject(new Error(`${command} exection failed`));
+			}
+		});
+	});
+}
+
+async function loadPupa() {
+	try {
+		return (await import('pupa')).default;
+	} catch(error) {
+		throw new Error('Could not load pupa');
+	}
+}
+
 module.exports = {
 	promptInput,
 	promptConfirm,
@@ -468,4 +499,6 @@ module.exports = {
 	initRequestId,
 	promptSelect,
 	promptMultiselect,
+	runCliCommand,
+	loadPupa,
 };
