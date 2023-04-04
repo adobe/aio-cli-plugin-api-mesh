@@ -13,7 +13,13 @@ const { Command } = require('@oclif/command');
 const { readFile } = require('fs/promises');
 
 const logger = require('../../classes/logger');
-const { initSdk, initRequestId, promptConfirm } = require('../../helpers');
+const {
+	initSdk,
+	initRequestId,
+	promptConfirm,
+	getFilesInMeshConfig,
+	importFiles,
+} = require('../../helpers');
 const { ignoreCacheFlag, autoConfirmActionFlag } = require('../../utils');
 const { getMeshId, updateMesh } = require('../../lib/devConsole');
 
@@ -50,6 +56,13 @@ class UpdateCommand extends Command {
 
 		try {
 			data = JSON.parse(await readFile(args.file, 'utf8'));
+
+			const filesList = getFilesInMeshConfig(data, args.file);
+
+			//if local files are present, import them in files array in meshConfig
+			if (filesList) {
+				await importFiles(data, filesList, args.file, flags.autoConfirmAction);
+			}
 		} catch (error) {
 			logger.error(error);
 

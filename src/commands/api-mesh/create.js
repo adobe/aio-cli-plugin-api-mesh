@@ -12,7 +12,13 @@ governing permissions and limitations under the License.
 const { Command } = require('@oclif/core');
 const { readFile } = require('fs/promises');
 
-const { initSdk, initRequestId, promptConfirm } = require('../../helpers');
+const {
+	initSdk,
+	initRequestId,
+	promptConfirm,
+	getFilesInMeshConfig,
+	importFiles,
+} = require('../../helpers');
 const logger = require('../../classes/logger');
 const CONSTANTS = require('../../constants');
 const { ignoreCacheFlag, autoConfirmActionFlag, jsonFlag } = require('../../utils');
@@ -60,10 +66,18 @@ class CreateCommand extends Command {
 
 		try {
 			data = JSON.parse(await readFile(args.file, 'utf8'));
+
+			const filesList = getFilesInMeshConfig(data, args.file);
+			// console.log(filesList);
+			// if local files are present, import them in files array in meshConfig
+			if (filesList.length) {
+				await importFiles(data, filesList, args.file, flags.autoConfirmAction);
+			}
 		} catch (error) {
 			logger.error(error);
 
 			this.log(error.message);
+			// this.log(`ENOENT: no such file or directory, open \'${args.file}\'`);
 			this.error(
 				'Unable to read the mesh configuration file provided. Please check the file and try again.',
 			);
@@ -78,6 +92,7 @@ class CreateCommand extends Command {
 		if (shouldContinue) {
 			try {
 				const mesh = await createMesh(imsOrgId, projectId, workspaceId, data);
+
 				let sdkList = [];
 
 				if (mesh) {
