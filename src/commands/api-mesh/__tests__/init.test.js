@@ -2,8 +2,8 @@ const InitCommand = require('../init');
 
 jest.mock('../../../helpers', () => ({
 	promptConfirm: jest.fn().mockResolvedValue(true),
-	loadPupa: jest.fn().mockResolvedValue({}),
-	runCliCommand: jest.fn(),
+	loadPupa: jest.fn(),
+	runCliCommand: jest.fn().mockResolvedValue({}),
 }));
 
 const { promptConfirm, loadPupa, runCliCommand } = require('../../../helpers');
@@ -18,34 +18,27 @@ const mockPMDefaultFlag = 'npm';
 
 const mockPathDefaultFlag = '.';
 
-let logSpy = null;
-
 let errorLogSpy = null;
 
 let createPackageJsonSpy = null;
 
 let parseSpy = null;
 
-let readFile,
-	writeFile,
+let writeFile,
 	access,
 	mkdir = null;
 
 describe('Workspace init command tests', () => {
 	beforeEach(() => {
-		logSpy = jest.spyOn(InitCommand.prototype, 'log');
+		promptConfirm.mockResolvedValue(true);
+		runCliCommand.mockResolvedValue({});
 		errorLogSpy = jest.spyOn(InitCommand.prototype, 'error');
 		parseSpy = jest.spyOn(InitCommand.prototype, 'parse');
 		createPackageJsonSpy = jest.spyOn(InitCommand.prototype, 'createPackageJson');
 		createPackageJsonSpy.mockResolvedValue({});
 		access = jest.spyOn(fs, 'access').mockRejectedValue(new Error());
 		writeFile = jest.spyOn(fs, 'writeFile').mockResolvedValue({});
-		access = jest.spyOn(fs, 'access').mockResolvedValue({});
 		mkdir = jest.spyOn(fs, 'mkdir').mockResolvedValue({});
-	});
-
-	afterEach(() => {
-		jest.restoreAllMocks();
 	});
 
 	test('Snapshot of Init command', () => {
@@ -113,15 +106,20 @@ describe('Workspace init command tests', () => {
 		});
 		await InitCommand.run();
 		expect(promptConfirm).toHaveBeenCalled();
+		// workspace directory creation
 		expect(access).toHaveBeenCalled();
-		expect(writeFile).toHaveBeenCalled();
 		expect(mkdir).toHaveBeenCalled();
+		// env file creation
+		expect(writeFile).toHaveBeenCalled();
+		// package json file creation
 		expect(createPackageJsonSpy).toHaveBeenCalled();
+		// npm install
 		expect(runCliCommand.mock.calls[0][0]).toBe('npm install');
 	});
 
 	test('Command should exit if prompt input is no', async () => {
 		promptConfirm.mockReturnValue(false);
+		runCliCommand.mockResolvedValue({});
 		parseSpy.mockResolvedValue({
 			args: {
 				projectName: mockProjectName,
@@ -133,10 +131,16 @@ describe('Workspace init command tests', () => {
 			},
 		});
 		await InitCommand.run();
+		// prompt flag not set
+		expect(promptConfirm).toHaveBeenCalled();
+		// no git project
 		expect(runCliCommand).not.toHaveBeenCalled();
+		// no workspace directory creation
 		expect(access).not.toHaveBeenCalled();
-		expect(writeFile).not.toHaveBeenCalled();
 		expect(mkdir).not.toHaveBeenCalled();
+		// no env file creation
+		expect(writeFile).not.toHaveBeenCalled();
+		// not creating package json
 		expect(createPackageJsonSpy).not.toHaveBeenCalled();
 	});
 
@@ -151,14 +155,48 @@ describe('Workspace init command tests', () => {
 				packageManager: mockPMDefaultFlag,
 			},
 		});
+
 		await InitCommand.run();
-		expect(runCliCommand.mock.calls[0][0]).toBe('git init');
-		expect(access).not.toHaveBeenCalled();
-		expect(writeFile).toHaveBeenCalled();
-		expect(mkdir).not.toHaveBeenCalled();
 		expect(promptConfirm).toHaveBeenCalled();
+		// initiate git repo
+		expect(runCliCommand.mock.calls[0][0]).toBe('git init');
+		// no workspace directory creation
+		expect(access).not.toHaveBeenCalled();
+		expect(mkdir).not.toHaveBeenCalled();
+		// creating env file
+		expect(writeFile).toHaveBeenCalled();
+		// creating package json
 		expect(createPackageJsonSpy).toHaveBeenCalled();
+		// run npm install
 		expect(runCliCommand.mock.calls[1][0]).toBe('npm install');
+	});
+
+	test('Command should fail if git flag is provided and git init fails', async () => {
+		parseSpy.mockResolvedValue({
+			args: {
+				projectName: mockProjectName,
+			},
+			flags: {
+				path: mockPathDefaultFlag,
+				git: true,
+				packageManager: mockPMDefaultFlag,
+			},
+		});
+
+		runCliCommand.mockRejectedValue('');
+
+		await expect(InitCommand.run()).rejects.toThrow();
+		// prompt flag not set
+		expect(promptConfirm).toHaveBeenCalled();
+		// git project
+		expect(runCliCommand).toHaveBeenCalled();
+		// no workspace directory creation
+		expect(access).not.toHaveBeenCalled();
+		expect(mkdir).not.toHaveBeenCalled();
+		// no env file creation
+		expect(writeFile).not.toHaveBeenCalled();
+		// not creating package json
+		expect(createPackageJsonSpy).not.toHaveBeenCalled();
 	});
 
 	test('Command should pass and create yarn project if yarn is package manager', async () => {
@@ -172,12 +210,157 @@ describe('Workspace init command tests', () => {
 				packageManager: 'yarn',
 			},
 		});
+
 		await InitCommand.run();
-		expect(access).toHaveBeenCalled();
-		expect(writeFile).toHaveBeenCalled();
-		expect(mkdir).toHaveBeenCalled();
 		expect(promptConfirm).toHaveBeenCalled();
+		// workspace directory creation
+		expect(access).toHaveBeenCalled();
+		expect(mkdir).toHaveBeenCalled();
+		// env file
+		expect(writeFile).toHaveBeenCalled();
+		// creating package json
+		expect(createPackageJsonSpy).toHaveBeenCalled();
+		// yarn install
+		expect(runCliCommand.mock.calls[0][0]).toBe('yarn install');
+	});
+
+	test('Command should pass and create yarn + git project if yarn is package manager and git flag is set', async () => {
+		parseSpy.mockResolvedValue({
+			args: {
+				projectName: mockProjectName,
+			},
+			flags: {
+				path: mockPathDefaultFlag,
+				git: true,
+				packageManager: 'yarn',
+			},
+		});
+		await InitCommand.run();
+		expect(promptConfirm).toHaveBeenCalled();
+		// git initalization
+		expect(runCliCommand.mock.calls[0][0]).toBe('git init');
+		// no directory creation
+		expect(access).not.toHaveBeenCalled();
+		expect(mkdir).not.toHaveBeenCalled();
+		// env file
+		expect(writeFile).toHaveBeenCalled();
+		// creating package json
+		expect(createPackageJsonSpy).toHaveBeenCalled();
+		// yarn install
+		expect(runCliCommand.mock.calls[1][0]).toBe('yarn install');
+	});
+
+	test('Command should fail if directory already exists', async () => {
+		parseSpy.mockResolvedValue({
+			args: {
+				projectName: mockProjectName,
+			},
+			flags: {
+				path: mockPathDefaultFlag,
+				git: mockGitDefaultFlag,
+				packageManager: mockPMDefaultFlag,
+			},
+		});
+		access.mockResolvedValue({});
+
+		await expect(InitCommand.run()).rejects.toThrow();
+
+		expect(errorLogSpy.mock.calls[0][0]).toBe(
+			'Directory already exists. Delete the directory or change the directory',
+		);
+
+		expect(promptConfirm).toHaveBeenCalled();
+		// no directory creation
+		expect(access).toHaveBeenCalled();
+		expect(mkdir).not.toHaveBeenCalled();
+		// env file
+		expect(writeFile).not.toHaveBeenCalled();
+		// creating package json
+		expect(createPackageJsonSpy).not.toHaveBeenCalled();
+	});
+
+	test('Command should fail if directory creation fails', async () => {
+		parseSpy.mockResolvedValue({
+			args: {
+				projectName: mockProjectName,
+			},
+			flags: {
+				path: mockPathDefaultFlag,
+				git: mockGitDefaultFlag,
+				packageManager: mockPMDefaultFlag,
+			},
+		});
+		mkdir.mockRejectedValue(new Error());
+		await expect(InitCommand.run()).rejects.toThrow();
+
+		expect(errorLogSpy.mock.calls[0][0]).toMatch(/Could not create directory/);
+
+		expect(promptConfirm).toHaveBeenCalled();
+		// no directory creation
+		expect(access).toHaveBeenCalled();
+		expect(mkdir).toHaveBeenCalled();
+		// env file
+		expect(writeFile).not.toHaveBeenCalled();
+		// creating package json
+		expect(createPackageJsonSpy).not.toHaveBeenCalled();
+	});
+
+	test('Command should fail if npm install fails', async () => {
+		parseSpy.mockResolvedValue({
+			args: {
+				projectName: mockProjectName,
+			},
+			flags: {
+				path: mockPathDefaultFlag,
+				git: mockGitDefaultFlag,
+				packageManager: mockPMDefaultFlag,
+			},
+		});
+		runCliCommand.mockRejectedValue('');
+
+		await expect(InitCommand.run()).rejects.toThrow();
+
+		expect(promptConfirm).toHaveBeenCalled();
+		// no directory creation
+		expect(access).toHaveBeenCalled();
+		expect(mkdir).toHaveBeenCalled();
+		// env file
+		expect(writeFile).toHaveBeenCalled();
+		// creating package json
+		expect(createPackageJsonSpy).toHaveBeenCalled();
+		expect(runCliCommand.mock.calls[0][0]).toBe('npm install');
+	});
+
+	test('Command should fail if yarn install fails', async () => {
+		parseSpy.mockResolvedValue({
+			args: {
+				projectName: mockProjectName,
+			},
+			flags: {
+				path: mockPathDefaultFlag,
+				git: mockGitDefaultFlag,
+				packageManager: 'yarn',
+			},
+		});
+		runCliCommand.mockRejectedValue('');
+
+		await expect(InitCommand.run()).rejects.toThrow();
+
+		expect(promptConfirm).toHaveBeenCalled();
+		// no directory creation
+		expect(access).toHaveBeenCalled();
+		expect(mkdir).toHaveBeenCalled();
+		// env file
+		expect(writeFile).toHaveBeenCalled();
+		// creating package json
 		expect(createPackageJsonSpy).toHaveBeenCalled();
 		expect(runCliCommand.mock.calls[0][0]).toBe('yarn install');
 	});
+});
+
+test('test createPackageJson', async () => {
+	jest.spyOn(fs, 'readFile').mockResolvedValue({});
+	jest.spyOn(fs, 'writeFile').mockResolvedValue({});
+	loadPupa.mockResolvedValue(jest.fn());
+	await expect(InitCommand.prototype.createPackageJson()).resolves;
 });

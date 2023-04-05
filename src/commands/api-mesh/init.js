@@ -89,7 +89,6 @@ class InitCommand extends Command {
 				shouldCreateWorkspace = false;
 				try {
 					await fs.access(absolutePath);
-					this.error('Directory already exists. Delete the directory or change the directory');
 				} catch (e) {
 					shouldCreateWorkspace = true;
 				}
@@ -97,8 +96,10 @@ class InitCommand extends Command {
 					try {
 						await fs.mkdir(absolutePath);
 					} catch (error) {
-						this.log(`Could not create directory ${error.message}`);
+						this.error(`Could not create directory ${error.message}`);
 					}
+				} else {
+					this.error('Directory already exists. Delete the directory or change the directory');
 				}
 			}
 
