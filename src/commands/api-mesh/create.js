@@ -66,22 +66,34 @@ class CreateCommand extends Command {
 
 		try {
 			data = JSON.parse(await readFile(args.file, 'utf8'));
-
-			let filesList = [];
-			filesList = getFilesInMeshConfig(data, args.file);
-	
-			// if local files are present, import them in files array in meshConfig
-			if (filesList.length) {
-				await importFiles(data, filesList, args.file, flags.autoConfirmAction);
-			}
 		} catch (error) {
 			logger.error(error);
 
 			this.log(error.message);
-			// this.log(`ENOENT: no such file or directory, open \'${args.file}\'`);
 			this.error(
 				'Unable to read the mesh configuration file provided. Please check the file and try again.',
 			);
+		}
+
+		let filesList = [];
+
+		try {
+			filesList = getFilesInMeshConfig(data, args.file);
+		} catch (err) {
+			this.log(err.message);
+			this.error('Input mesh config is not valid');
+		}
+
+		// if local files are present, import them in files array in meshConfig
+		if (filesList.length) {
+			try {
+				data = await importFiles(data, filesList, args.file, flags.autoConfirmAction);
+			} catch (err) {
+				this.log(err.message);
+				this.error(
+					'Unable to import the files in the mesh config. Please check the file and try again.',
+				);
+			}
 		}
 
 		let shouldContinue = true;

@@ -520,10 +520,15 @@ function getFilesInMeshConfig(data, meshConfigName) {
 		});
 	});
 
-	if (filesList.length) {
-		validateFileName(filesList, data);
-		validateFilePaths(filesList, meshConfigName);
-		validateFileType(filesList);
+	try {
+		if (filesList.length) {
+			validateFileType(filesList);
+			validateFileName(filesList, data);
+			validateFilePaths(filesList, meshConfigName);
+		}
+	} catch (err) {
+		logger.error(err.message);
+		throw new Error(err.message);
 	}
 
 	return filesList;
@@ -571,7 +576,9 @@ function validateFileType(filesList) {
 
 	if (filesWithInvalidTypes.length) {
 		throw new Error(
-			`Mesh files must be JavaScript or JSON. Other file types are not supported. The following files are invalid: ${filesWithInvalidTypes}`,
+			`Mesh files must be JavaScript or JSON. Other file types are not supported. The following file(s) are invalid: ${path.basename(
+				filesWithInvalidTypes[0],
+			)}`,
 		);
 	}
 }
@@ -662,6 +669,7 @@ async function importFiles(data, filesList, meshConfigName, autoConfirmActionFla
 			updateFilesArray(data, file, meshConfigName, -1);
 		}
 	}
+	return data;
 }
 
 /**
@@ -673,33 +681,44 @@ async function importFiles(data, filesList, meshConfigName, autoConfirmActionFla
  * @param index Append operation if index is -1, else override, it is the index where the override takes place
  */
 function updateFilesArray(data, file, meshConfigName, index) {
-	const readFileData = fs.readFileSync(path.resolve(file), { encoding: 'utf-8' });
+	try {
+		const readFileData = fs.readFileSync(path.resolve(file), { encoding: 'utf-8' }, err => {
+			if (err) {
+				throw new Error(err);
+			}
+		});
 
-	//data to be overridden or appended
-	const dataInFilesArray = jsmin(readFileData);
+		//data to be overridden or appended
+		const dataInFilesArray = jsmin(readFileData);
 
-	if (index >= 0) {
-		data.meshConfig.files[index] = {
-			path: `${file}`,
-			content: `${dataInFilesArray}`,
-		};
-	} else {
-		//if the files array does not exist
-		if (!data.meshConfig.files) {
-			data.meshConfig.files = [];
+		if (index >= 0) {
+			data.meshConfig.files[index] = {
+				path: `${file}`,
+				content: `${dataInFilesArray}`,
+			};
+		} else {
+			//if the files array does not exist
+			if (!data.meshConfig.files) {
+				data.meshConfig.files = [];
+			}
+
+			//if the files arrray exists, we append the file path and content in meshConfig
+			data.meshConfig.files.push({
+				path: `./${path.basename(file)}`,
+				content: `${dataInFilesArray}`,
+			});
 		}
 
-		//if the files arrray exists, we append the file path and content in meshConfig
-		data.meshConfig.files.push({
-			path: `./${path.basename(file)}`,
-			content: `${dataInFilesArray}`,
+		fs.writeFileSync(path.resolve(meshConfigName), JSON.stringify(data, null, 2), err => {
+			if (err) {
+				throw new Error(err);
+			}
+			logger.debug(`${file} appended to the meshConfig`);
 		});
+	} catch (err) {
+		logger.error(err.message);
+		throw new Error(err.message);
 	}
-
-	fs.writeFileSync(path.resolve(meshConfigName), JSON.stringify(data, null, 2), err => {
-		if (err) throw err;
-		this.log(`${file} appended to the meshConfig`);
-	});
 }
 
 module.exports = {
