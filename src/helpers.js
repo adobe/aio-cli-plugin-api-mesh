@@ -612,9 +612,7 @@ function validateFileName(filesList, data) {
 		for (let i = 0; i < data.meshConfig.files.length; i++) {
 			if (filesList.indexOf(data.meshConfig.files[i].path) == -1) {
 				throw new Error(
-					`Please make sure the file ${path.basename(
-						data.meshConfig.files[i].path,
-					)} is matching in both places in meshConfig`,
+					`Please make sure the file names are matching in both places in meshConfig`,
 				);
 			}
 		}

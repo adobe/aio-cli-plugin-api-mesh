@@ -17,6 +17,8 @@ jest.mock('../../../helpers', () => ({
 	initSdk: jest.fn().mockResolvedValue({}),
 	initRequestId: jest.fn().mockResolvedValue({}),
 	promptConfirm: jest.fn().mockResolvedValue(true),
+	getFilesInMeshConfig: jest.fn().mockReturnValue([]),
+	importFiles: jest.fn().mockResolvedValue(),
 }));
 jest.mock('@adobe/aio-cli-lib-console', () => ({
 	init: jest.fn().mockResolvedValue(mockConsoleCLIInstance),
@@ -34,7 +36,13 @@ const selectedWorkspace = { id: '123456789', title: 'Workspace01' };
 const { readFile } = require('fs/promises');
 
 const UpdateCommand = require('../update');
-const { initSdk, initRequestId, promptConfirm } = require('../../../helpers');
+const {
+	initSdk,
+	initRequestId,
+	promptConfirm,
+	getFilesInMeshConfig,
+	importFiles,
+} = require('../../../helpers');
 const { getMeshId, updateMesh } = require('../../../lib/devConsole');
 
 let logSpy = null;
@@ -321,5 +329,263 @@ describe('update command tests', () => {
 		]
 	`);
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`[]`);
+	});
+
+	test('should pass if there are local files in meshConfig i.e., the file is appended in files array', async () => {
+		let meshConfig = {
+			sources: [
+				{
+					name: '<json_source_name>',
+					handler: {
+						JsonSchema: {
+							baseUrl: '<json_source__baseurl>',
+							operations: [
+								{
+									type: 'Query',
+									field: '<query>',
+									path: '<query_path>',
+									method: 'POST',
+									requestSchema: './requestParams.json',
+								},
+							],
+						},
+					},
+				},
+			],
+			files: [
+				{
+					path: './requestParams.json',
+					content: '{"type":"dummyContent"}',
+				},
+			],
+		};
+
+		updateMesh.mockResolvedValue({
+			meshId: 'dummy_mesh_id',
+			meshConfig: meshConfig,
+		});
+
+		parseSpy.mockResolvedValue({
+			args: { file: 'src/commands/__fixtures__/sample_mesh_files.json' },
+			flags: {
+				autoConfirmAction: Promise.resolve(false),
+			},
+		});
+
+		getFilesInMeshConfig.mockReturnValue(['./requestParams.json']);
+
+		importFiles.mockResolvedValueOnce({
+			meshConfig,
+		});
+
+		const output = await UpdateCommand.run();
+
+		expect(initRequestId).toHaveBeenCalled();
+		expect(updateMesh.mock.calls[0]).toMatchInlineSnapshot(`
+		[
+		  "1234",
+		  "5678",
+		  "123456789",
+		  "mesh_id",
+		  {
+		    "meshConfig": {
+		      "files": [
+		        {
+		          "content": "{"type":"dummyContent"}",
+		          "path": "./requestParams.json",
+		        },
+		      ],
+		      "sources": [
+		        {
+		          "handler": {
+		            "JsonSchema": {
+		              "baseUrl": "<json_source__baseurl>",
+		              "operations": [
+		                {
+		                  "field": "<query>",
+		                  "method": "POST",
+		                  "path": "<query_path>",
+		                  "requestSchema": "./requestParams.json",
+		                  "type": "Query",
+		                },
+		              ],
+		            },
+		          },
+		          "name": "<json_source_name>",
+		        },
+		      ],
+		    },
+		  },
+		]
+	`);
+		expect(output).toMatchInlineSnapshot(`
+		{
+		  "meshConfig": {
+		    "files": [
+		      {
+		        "content": "{"type":"dummyContent"}",
+		        "path": "./requestParams.json",
+		      },
+		    ],
+		    "sources": [
+		      {
+		        "handler": {
+		          "JsonSchema": {
+		            "baseUrl": "<json_source__baseurl>",
+		            "operations": [
+		              {
+		                "field": "<query>",
+		                "method": "POST",
+		                "path": "<query_path>",
+		                "requestSchema": "./requestParams.json",
+		                "type": "Query",
+		              },
+		            ],
+		          },
+		        },
+		        "name": "<json_source_name>",
+		      },
+		    ],
+		  },
+		  "meshId": "dummy_mesh_id",
+		}
+	`);
+	});
+
+	test('should fail if the file name is more than 25 characters', async () => {
+		parseSpy.mockResolvedValue({
+			args: { file: 'src/commands/__fixtures__/sample_mesh_invalid_file_name.json' },
+			flags: {
+				autoConfirmAction: Promise.resolve(false),
+			},
+		});
+
+		getFilesInMeshConfig.mockImplementation(() => {
+			throw new Error(
+				'Mesh file names must be less than 25 characters. The following file(s) are invalid: requestJSONParameters.json',
+			);
+		});
+
+		const output = UpdateCommand.run();
+
+		await expect(output).rejects.toEqual(new Error('Input mesh config is not valid'));
+
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Mesh file names must be less than 25 characters. The following file(s) are invalid: requestJSONParameters.json",
+		  ],
+		]
+	`);
+
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Input mesh config is not valid",
+		  ],
+		]
+	`);
+	});
+
+	test('should fail if the file paths in files array and filenames in sources, transforms, additionalResolvers do not match in mesh config', async () => {
+		parseSpy.mockResolvedValue({
+			args: { file: 'src/commands/__fixtures__/sample_mesh_mismatching_path.json' },
+			flags: {
+				autoConfirmAction: Promise.resolve(false),
+			},
+		});
+
+		getFilesInMeshConfig.mockImplementation(() => {
+			throw new Error('Please make sure the file names are matching in both places in meshConfig');
+		});
+
+		const output = UpdateCommand.run();
+
+		await expect(output).rejects.toEqual(new Error('Input mesh config is not valid'));
+
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Please make sure the file names are matching in both places in meshConfig",
+		  ],
+		]
+	`);
+
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Input mesh config is not valid",
+		  ],
+		]
+	`);
+	});
+
+	test('should fail if the file is of type other than js, json extension', async () => {
+		parseSpy.mockResolvedValue({
+			args: { file: 'src/commands/__fixtures__/sample_mesh_invalid_type.json' },
+			flags: {
+				autoConfirmAction: Promise.resolve(false),
+			},
+		});
+
+		getFilesInMeshConfig.mockImplementation(() => {
+			throw new Error(
+				'Mesh files must be JavaScript or JSON. Other file types are not supported. The following files are invalid: requestParams.txt',
+			);
+		});
+
+		const output = UpdateCommand.run();
+
+		await expect(output).rejects.toEqual(new Error('Input mesh config is not valid'));
+
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Mesh files must be JavaScript or JSON. Other file types are not supported. The following files are invalid: requestParams.txt",
+		  ],
+		]
+	`);
+
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Input mesh config is not valid",
+		  ],
+		]
+	`);
+	});
+
+	test('should fail if the meshConfig and the file are not in the same directory', async () => {
+		parseSpy.mockResolvedValue({
+			args: { file: 'src/commands/__fixtures__/sample_mesh_files.json' },
+			flags: {
+				autoConfirmAction: Promise.resolve(false),
+			},
+		});
+
+		getFilesInMeshConfig.mockImplementation(() => {
+			throw new Error(
+				'Please make sure the files and requestParams.json and sample_mesh_files.json are in the same directory',
+			);
+		});
+
+		const output = UpdateCommand.run();
+		await expect(output).rejects.toEqual(new Error('Input mesh config is not valid'));
+
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Please make sure the files and requestParams.json and sample_mesh_files.json are in the same directory",
+		  ],
+		]
+	`);
+
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Input mesh config is not valid",
+		  ],
+		]
+	`);
 	});
 });

@@ -679,9 +679,7 @@ describe('create command tests', () => {
 		});
 
 		getFilesInMeshConfig.mockImplementation(() => {
-			throw new Error(
-				'Please make sure the file requestPaams.json is matching in both places in meshConfig',
-			);
+			throw new Error('Please make sure the file names are matching in both places in meshConfig');
 		});
 
 		const output = CreateCommand.run();
@@ -691,7 +689,7 @@ describe('create command tests', () => {
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
 		[
 		  [
-		    "Please make sure the file requestPaams.json is matching in both places in meshConfig",
+		    "Please make sure the file names are matching in both places in meshConfig",
 		  ],
 		]
 	`);
