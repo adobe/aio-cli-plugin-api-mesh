@@ -10,21 +10,24 @@ governing permissions and limitations under the License.
 */
 
 const { Command } = require('@oclif/core');
-const { readFile } = require('fs/promises');
 
 const { initSdk, initRequestId, promptConfirm } = require('../../helpers');
 const logger = require('../../classes/logger');
 const CONSTANTS = require('../../constants');
-const { ignoreCacheFlag, autoConfirmActionFlag, jsonFlag, envFileFlag } = require('../../utils');
+const {
+	ignoreCacheFlag,
+	autoConfirmActionFlag,
+	jsonFlag,
+	envFileFlag,
+	checkPlaceholders,
+	readFileContents,
+	validateAndInterpolateMesh,
+} = require('../../utils');
 const {
 	createMesh,
 	createAPIMeshCredentials,
 	subscribeCredentialToMeshService,
 } = require('../../lib/devConsole');
-
-const meshInterpolation = require('../../meshInterpolation');
-
-const dotenv = require('dotenv');
 
 const { MULTITENANT_GRAPHQL_SERVER_BASE_URL } = CONSTANTS;
 
@@ -59,71 +62,14 @@ class CreateCommand extends Command {
 			ignoreCache,
 		});
 
-		let inputMeshData;
-
 		//Input the mesh data from the input file
-		try {
-			inputMeshData = await readFile(args.file, 'utf8');
-		} catch (error) {
-			logger.error(error);
-
-			this.log(error.message);
-			this.error(
-				'Unable to read the mesh configuration file provided. Please check the file and try again.',
-			);
-		}
+		let inputMeshData = await readFileContents(args.file, this, 'mesh');
 
 		let data;
 
-		if (envFilePath) {
-			let envFileContent;
-
-			//Read the environment file
-			try {
-				envFileContent = await readFile(envFilePath, 'utf8');
-			} catch (error) {
-				this.log(error.message);
-				this.error('Unable to read the env file provided. Please check the file and try again.');
-			}
-
-			//Validate the env file
-			const envFileValidity = meshInterpolation.validateEnvFileFormat(envFileContent);
-			if (envFileValidity.valid) {
-				//load env file into the process.env object
-				meshInterpolation.clearEnv();
-
-				//Added env at start of each environment variable
-				const envObj = { env: dotenv.config({ path: envFilePath }).parsed };
-
-				let {
-					interpolationStatus,
-					missingKeys,
-					interpolatedMeshData,
-				} = await meshInterpolation.interpolateMesh(inputMeshData, envObj);
-
-				//De-duplicate the missing keys array
-				missingKeys = missingKeys.filter(function (item, index, inputArray) {
-					return inputArray.indexOf(item) == index;
-				});
-
-				if (interpolationStatus == 'failed') {
-					this.error(
-						'The mesh file cannot be interpolated due to missing keys : ' + missingKeys.toString(),
-					);
-				}
-
-				try {
-					data = JSON.parse(interpolatedMeshData);
-				} catch (err) {
-					this.log(err.message);
-					this.log(interpolatedMeshData);
-					this.error(
-						'Interpolated mesh is not a valid JSON. Please check the generated json file.',
-					);
-				}
-			} else {
-				this.error(`Issue in ${envFilePath} file - ` + envFileValidity.error);
-			}
+		if (checkPlaceholders(inputMeshData)) {
+			this.log('The provided mesh contains placeholders. Starting mesh interpolation process.');
+			data = await validateAndInterpolateMesh(inputMeshData, envFilePath, this);
 		} else {
 			try {
 				data = JSON.parse(inputMeshData);

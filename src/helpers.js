@@ -22,9 +22,43 @@ const { getCliEnv } = require('@adobe/aio-lib-env');
 const logger = require('../src/classes/logger');
 const { UUID } = require('./classes/UUID');
 const CONSTANTS = require('./constants');
-const { objToString } = require('./utils');
 
 const { DEV_CONSOLE_BASE_URL, DEV_CONSOLE_API_KEY, AIO_CLI_API_KEY } = CONSTANTS;
+
+/**
+ * Returns the string representation of the object's path.
+ * If the path evaluates to false, the default string is returned.
+ *
+ * @param {object} obj
+ * @param {Array<string>} path
+ * @param {string} defaultString
+ * @returns {string}
+ */
+function objToString(obj, path = [], defaultString = '') {
+	try {
+		// Cache the current object
+		let current = obj;
+
+		// For each item in the path, dig into the object
+		for (let i = 0; i < path.length; i++) {
+			// If the item isn't found, return the default (or null)
+			if (!current[path[i]]) return defaultString;
+
+			// Otherwise, update the current  value
+			current = current[path[i]];
+		}
+
+		if (typeof current === 'string') {
+			return current;
+		} else if (typeof current === 'object') {
+			return JSON.stringify(current, null, 2);
+		} else {
+			return defaultString;
+		}
+	} catch (error) {
+		return defaultString;
+	}
+}
 
 /**
  * @param configFilePath
@@ -459,113 +493,57 @@ async function promptInput(message) {
 	return selected.item;
 }
 
-function clearEnv() {
-	for (const key in process.env) {
-		delete process.env[key];
-	}
-}
-
-function lintEnvFileContent(envContent) {
-	//Key should start with a underscore or an alphabet followed by underscore/alphanumeric characters
-	const envKeyRegex = /^[a-zA-Z_]+[a-zA-Z0-9_]*$/;
-
-	const envValueRegex = /^(?:"(?:\\.|[^\\"])*"|'(?:\\.|[^\\'])*'|[^'"\s])+$/;
-
-	/*
-	The above regex matches one or more of below :
-	(?:"(?:\\.|[^\\"])*"|'(?:\\.|[^\\'])*'|[^'"\s])
-	which is 
-	1. ?:"(?:\\.|[^\\"])*" : Non capturing group starts and ends with '"'
-	*/
-	const envDict = {};
-	const lines = envContent.split(/\r?\n/);
-	const errors = [];
-
-	for (let index = 0; index < lines.length; index++) {
-		const line = lines[index];
-		const trimmedLine = line.trim();
-		if (trimmedLine.startsWith('#') || trimmedLine === '') {
-			// ignore comment or empty lines
-			continue;
-		}
-
-		if (!trimmedLine.includes('=')) {
-			errors.push(`Invalid format << ${trimmedLine} >> on line ${index + 1}`);
-		} else {
-			const [key, value] = trimmedLine.split('=', 2);
-			if (!envKeyRegex.test(key) || !envValueRegex.test(value)) {
-				// invalid format: key or value does not match regex
-				errors.push(`Invalid format for key/value << ${trimmedLine} >> on line ${index + 1}`);
-			}
-			if (key in envDict) {
-				// duplicate key found
-				errors.push(`Duplicate key << ${key} >> on line ${index + 1}`);
-			}
-			envDict[key] = value;
-		}
-	}
-	if (errors.length) {
-		return {
-			valid: false,
-			error: errors.toString(),
-		};
-	}
-	return {
-		valid: true,
-	};
-}
-
-async function loadPupa() {
-	try {
-		const pupa = (await import('pupa')).default;
-		return pupa;
-	} catch {
-		console.log('Error while loading pupa module');
-	}
-}
+/**
+ *loads the pupa module dynamically and then interpolates the raw data from mesh file with object data
+ * @param {data}
+ * @param {obj}
+ * @returns {object} having interpolationStatus, missingKeys and interpolatedMesh
+ */
 
 async function interpolateMesh(data, obj) {
-	let missingKeys = [];
+	let missingKeys = new Set();
 	let interpolatedMesh;
-	await loadPupa().then(pupa => {
-		interpolatedMesh = pupa(data, obj, {
-			ignoreMissing: true,
-			transform: ({ value, key }) => {
-				if (key.startsWith('env.')) {
-					if (value) {
-						return value;
-					} else {
-						// missing value, add to list
-						missingKeys.push(key.split('.')[1]);
-					}
+	let pupa;
+	try {
+		pupa = (await import('pupa')).default;
+	} catch {
+		throw new Error('Error while loading pupa module');
+	}
+
+	interpolatedMesh = pupa(data, obj, {
+		ignoreMissing: true,
+		transform: ({ value, key }) => {
+			if (key.startsWith('env.')) {
+				if (value) {
+					return value;
 				} else {
-					//ignore
-					return undefined;
+					// missing value, add to list
+					missingKeys.add(key.split('.')[1]);
 				}
-				return value;
-			},
-		});
+			} else {
+				//ignore
+				return undefined;
+			}
+			return value;
+		},
 	});
 
-	if (missingKeys.length) {
+	if (missingKeys.size) {
 		return {
 			interpolationStatus: 'failed',
-			missingKeys: missingKeys,
+			missingKeys: Array.from(missingKeys),
 			interpolatedMesh: '',
 		};
 	}
 	return {
 		interpolationStatus: 'success',
 		missingKeys: [],
-		interpolatedMesh: interpolatedMesh,
+		interpolatedMeshData: interpolatedMesh,
 	};
 }
 
-async function getname(name, length) {
-	return { name: name, length: length };
-}
-
 module.exports = {
+	objToString,
 	promptInput,
 	promptConfirm,
 	getLibConsoleCLI,
@@ -574,8 +552,5 @@ module.exports = {
 	initRequestId,
 	promptSelect,
 	promptMultiselect,
-	clearEnv,
-	lintEnvFileContent,
 	interpolateMesh,
-	getname,
 };
