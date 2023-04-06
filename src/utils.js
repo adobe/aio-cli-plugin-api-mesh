@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const jsmin = require('jsmin').jsmin;
 const logger = require('../src/classes/logger');
-const promptConfirm = require('./helpers');
+
 /**
  * Returns the string representation of the object's path.
  * If the path evaluates to false, the default string is returned.
