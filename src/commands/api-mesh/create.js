@@ -12,16 +12,15 @@ governing permissions and limitations under the License.
 const { Command } = require('@oclif/core');
 const { readFile } = require('fs/promises');
 
-const {
-	initSdk,
-	initRequestId,
-	promptConfirm,
-	getFilesInMeshConfig,
-	importFiles,
-} = require('../../helpers');
+const { initSdk, initRequestId, promptConfirm, importFiles } = require('../../helpers');
 const logger = require('../../classes/logger');
 const CONSTANTS = require('../../constants');
-const { ignoreCacheFlag, autoConfirmActionFlag, jsonFlag } = require('../../utils');
+const {
+	ignoreCacheFlag,
+	autoConfirmActionFlag,
+	jsonFlag,
+	getFilesInMeshConfig,
+} = require('../../utils');
 const {
 	createMesh,
 	createAPIMeshCredentials,
@@ -81,7 +80,7 @@ class CreateCommand extends Command {
 			filesList = getFilesInMeshConfig(data, args.file);
 		} catch (err) {
 			this.log(err.message);
-			this.error('Input mesh config is not valid');
+			this.error('Input mesh config is not valid.');
 		}
 
 		// if local files are present, import them in files array in meshConfig

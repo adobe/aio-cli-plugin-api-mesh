@@ -13,14 +13,8 @@ const { Command } = require('@oclif/command');
 const { readFile } = require('fs/promises');
 
 const logger = require('../../classes/logger');
-const {
-	initSdk,
-	initRequestId,
-	promptConfirm,
-	getFilesInMeshConfig,
-	importFiles,
-} = require('../../helpers');
-const { ignoreCacheFlag, autoConfirmActionFlag } = require('../../utils');
+const { initSdk, initRequestId, promptConfirm, importFiles } = require('../../helpers');
+const { ignoreCacheFlag, autoConfirmActionFlag, getFilesInMeshConfig } = require('../../utils');
 const { getMeshId, updateMesh } = require('../../lib/devConsole');
 
 require('dotenv').config();
@@ -71,7 +65,7 @@ class UpdateCommand extends Command {
 			filesList = getFilesInMeshConfig(data, args.file);
 		} catch (err) {
 			this.log(err.message);
-			this.error('Input mesh config is not valid');
+			this.error('Input mesh config is not valid.');
 		}
 
 		// if local files are present, import them in files array in meshConfig
