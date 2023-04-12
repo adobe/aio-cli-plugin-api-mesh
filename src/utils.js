@@ -143,15 +143,13 @@ function validateFileType(filesList) {
 		const isValidFileType = ['.js', '.json'].includes(extension);
 
 		if (!isValidFileType) {
-			filesWithInvalidTypes.push(file);
+			filesWithInvalidTypes.push(path.basename(file));
 		}
 	});
 
 	if (filesWithInvalidTypes.length) {
 		throw new Error(
-			`Mesh files must be JavaScript or JSON. Other file types are not supported. The following file(s) are invalid: ${path.basename(
-				filesWithInvalidTypes[0],
-			)}.`,
+			`Mesh files must be JavaScript or JSON. Other file types are not supported. The following file(s) are invalid: ${filesWithInvalidTypes}.`,
 		);
 	}
 }

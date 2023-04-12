@@ -517,7 +517,7 @@ async function importFiles(data, filesListArray, meshConfigName, autoConfirmActi
 		}
 
 		throw new Error(
-			`Please make sure the file(s): ${filesNotFound.join(', ')} and ${path.basename(
+			`Please make sure the files: ${filesNotFound.join(', ')} and ${path.basename(
 				meshConfigName,
 			)} are in the same directory`,
 		);

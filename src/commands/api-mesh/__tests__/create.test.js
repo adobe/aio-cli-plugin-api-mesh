@@ -721,7 +721,7 @@ describe('create command tests', () => {
 
 		importFiles.mockImplementation(() => {
 			throw new Error(
-				'Please make sure the file(s): schemaBody.json and sample_mesh_invalid_paths.json are in the same directory.',
+				'Please make sure the files: schemaBody.json and sample_mesh_invalid_paths.json are in the same directory.',
 			);
 		});
 
@@ -735,7 +735,7 @@ describe('create command tests', () => {
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
 		[
 		  [
-		    "Please make sure the file(s): schemaBody.json and sample_mesh_invalid_paths.json are in the same directory.",
+		    "Please make sure the files: schemaBody.json and sample_mesh_invalid_paths.json are in the same directory.",
 		  ],
 		]
 	`);
