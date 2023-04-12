@@ -63,7 +63,7 @@ const jsonFlag = Flags.boolean({
  *
  * @param data MeshConfig
  */
-function getFilesInMeshConfig(data, meshConfigName) {
+function getFilesInMeshConfig(data) {
 	//ignore if the file names start with http or https
 	const fileURLRegex = /^(http|s:\/\/)/;
 
@@ -121,7 +121,6 @@ function getFilesInMeshConfig(data, meshConfigName) {
 		if (filesList.length) {
 			validateFileType(filesList);
 			validateFileName(filesList, data);
-			validateFilePaths(filesList, meshConfigName);
 		}
 	} catch (err) {
 		logger.error(err.message);
@@ -129,29 +128,6 @@ function getFilesInMeshConfig(data, meshConfigName) {
 	}
 
 	return filesList;
-}
-
-/**
- * Validate if the meshConfig file and other (js, json) files are in same directory
- *
- * @param filesList List of files in meshConfig
- * @param meshConfigName MeshConfig file name
- */
-function validateFilePaths(filesList, meshConfigName) {
-	try {
-		for (let file of filesList) {
-			// throw error, if the meshConfig and the file are not in the same directory
-			if (!fs.existsSync(path.resolve(path.dirname(meshConfigName), file))) {
-				throw new Error(
-					`Please make sure the files ${path.basename(file)} and ${path.basename(
-						meshConfigName,
-					)} are in the same directory.`,
-				);
-			}
-		}
-	} catch (err) {
-		throw new Error(err.message);
-	}
 }
 
 /**
@@ -205,12 +181,11 @@ function validateFileName(filesList, data) {
 
 	// check if the the filePaths in the files array match
 	// the fileNames in sources, transforms or additionalResolvers
+
 	if (data.meshConfig.files) {
 		for (let i = 0; i < data.meshConfig.files.length; i++) {
 			if (filesList.indexOf(data.meshConfig.files[i].path) == -1) {
-				throw new Error(
-					`Please make sure the file names are matching in both places in meshConfig.`,
-				);
+				throw new Error(`Please make sure the file names are matching in meshConfig.`);
 			}
 		}
 	}
@@ -257,12 +232,7 @@ function updateFilesArray(data, file, meshConfigName, index) {
 			});
 		}
 
-		fs.writeFileSync(path.resolve(meshConfigName), JSON.stringify(data, null, 2), err => {
-			if (err) {
-				throw new Error(err);
-			}
-			logger.debug(`${file} appended to the meshConfig`);
-		});
+		return data;
 	} catch (err) {
 		logger.error(err.message);
 		throw new Error(err.message);

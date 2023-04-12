@@ -22,6 +22,7 @@ const logger = require('../src/classes/logger');
 const { UUID } = require('./classes/UUID');
 const CONSTANTS = require('./constants');
 const { objToString, updateFilesArray } = require('./utils');
+const path = require('path');
 
 const { DEV_CONSOLE_BASE_URL, DEV_CONSOLE_API_KEY, AIO_CLI_API_KEY } = CONSTANTS;
 
@@ -466,47 +467,63 @@ async function promptInput(message) {
  * @param meshConfigName MeshConfigName
  * @param autoConfirmActionFlag The user won't be prompted any questions, if this flag is set
  */
-async function importFiles(data, filesList, meshConfigName, autoConfirmActionFlag) {
+async function importFiles(data, filesListArray, meshConfigName, autoConfirmActionFlag) {
+	//if autoConfirmActionFlag is passed in the command, it should override by default
 	let shouldOverride = true;
+	let filesNotFound = [];
+	let filesPathMap = new Map();
+	let filesListMap = new Map(
+		filesListArray.map(ele => {
+			return [ele];
+		}),
+	);
+	let resultData = data;
 
-	/**
-	 * Map of <fileName, <index, isVisited>>
-	 */
-	let visitedMap = new Map();
-
-	// initialize values for fileName keys as false
-	for (let i = 0; i < data.meshConfig.files?.length; i++) {
-		visitedMap.set(data.meshConfig.files[i].path, { index: i, isVisited: false });
+	if (data.meshConfig.files) {
+		for (let i = 0; i < data.meshConfig.files?.length; i++) {
+			filesPathMap.set(data.meshConfig.files[i].path, i);
+		}
 	}
 
-	for (let file of filesList) {
-		if (data.meshConfig.files) {
-			// if the file exists in the files array and is not visited, override it?
-			if (visitedMap.has(file) && !visitedMap.get(file).isVisited) {
-				let index = visitedMap.get(file).index;
-
-				visitedMap.set(file, { index: index, isVisited: true });
-
+	for (let file of filesListMap.keys()) {
+		//if file exists in files array
+		if (filesPathMap.has(file)) {
+			//if file exists in files array, then override
+			if (fs.existsSync(path.resolve(path.dirname(meshConfigName), file))) {
 				if (!autoConfirmActionFlag) {
-					shouldOverride = await promptConfirm(`Do you want to override the ${file} file?`);
+					shouldOverride = await promptConfirm(
+						`Do you want to override the ${path.basename(file)} file?`,
+					);
 				}
 
 				if (shouldOverride) {
-					updateFilesArray(data, file, meshConfigName, index);
+					let index = filesPathMap.get(file);
+					resultData = updateFilesArray(data, file, meshConfigName, index);
 				}
 			}
-
-			// if the files array exists, but the file does not exist in the array, append it
-			if (!visitedMap.get(file)) {
-				visitedMap.set(file, { index: visitedMap.size, isVisited: true });
-				updateFilesArray(data, file, meshConfigName, -1);
-			}
 		} else {
-			// if the files array does not exist in meshConfig, append it
-			updateFilesArray(data, file, meshConfigName, -1);
+			//if file does not exist in files array, but exists in filesystem, we append
+			if (fs.existsSync(path.resolve(path.dirname(meshConfigName), file))) {
+				resultData = updateFilesArray(data, file, meshConfigName, -1);
+			} else {
+				filesNotFound.push(file);
+			}
 		}
 	}
-	return data;
+
+	if (filesNotFound.length) {
+		for (let i = 0; i < filesNotFound.length; i++) {
+			filesNotFound[i] = path.basename(filesNotFound[i]);
+		}
+
+		throw new Error(
+			`Please make sure the file(s): ${filesNotFound.join(', ')} and ${path.basename(
+				meshConfigName,
+			)} are in the same directory`,
+		);
+	}
+
+	return resultData;
 }
 
 module.exports = {

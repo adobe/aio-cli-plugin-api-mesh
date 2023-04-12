@@ -670,7 +670,7 @@ describe('create command tests', () => {
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
 		[
 		  [
-		    "Please make sure the file names are matching in both places in meshConfig.",
+		    "Please make sure the file names are matching in meshConfig.",
 		  ],
 		]
 	`);
@@ -719,13 +719,23 @@ describe('create command tests', () => {
 			},
 		});
 
+		importFiles.mockImplementation(() => {
+			throw new Error(
+				'Please make sure the file(s): schemaBody.json and sample_mesh_invalid_paths.json are in the same directory.',
+			);
+		});
+
 		const output = CreateCommand.run();
-		await expect(output).rejects.toEqual(new Error('Input mesh config is not valid.'));
+		await expect(output).rejects.toEqual(
+			new Error(
+				'Unable to import the files in the mesh config. Please check the file and try again.',
+			),
+		);
 
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
 		[
 		  [
-		    "Please make sure the files schemaBody.json and sample_mesh_invalid_paths.json are in the same directory.",
+		    "Please make sure the file(s): schemaBody.json and sample_mesh_invalid_paths.json are in the same directory.",
 		  ],
 		]
 	`);
@@ -733,7 +743,7 @@ describe('create command tests', () => {
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
 		[
 		  [
-		    "Input mesh config is not valid.",
+		    "Unable to import the files in the mesh config. Please check the file and try again.",
 		  ],
 		]
 	`);
@@ -1043,6 +1053,144 @@ describe('create command tests', () => {
 		                  "method": "POST",
 		                  "path": "<query_path>",
 		                  "requestSchema": "./requestParams.json",
+		                  "type": "Query",
+		                },
+		              ],
+		            },
+		          },
+		          "name": "<json_source_name>",
+		        },
+		      ],
+		    },
+		    "meshId": "dummy_mesh_id",
+		  },
+		  "sdkList": [
+		    "dummy_service",
+		  ],
+		}
+	`);
+	});
+
+	test('should pass for a full-qualified meshConfig even if the file does not exist in fileSystem', async () => {
+		let meshConfig = {
+			sources: [
+				{
+					name: '<json_source_name>',
+					handler: {
+						JsonSchema: {
+							baseUrl: '<json_source__baseurl>',
+							operations: [
+								{
+									type: 'Query',
+									field: '<query>',
+									path: '<query_path>',
+									method: 'POST',
+									requestSchema: './schemaBody.json',
+								},
+							],
+						},
+					},
+				},
+			],
+			files: [
+				{
+					path: './schemaBody.json',
+					content: '{"type":"dummyContent"}',
+				},
+			],
+		};
+
+		parseSpy.mockResolvedValue({
+			args: { file: 'src/commands/__fixtures__/sample_fully_qualified_mesh.json' },
+			flags: {
+				autoConfirmAction: Promise.resolve(false),
+			},
+		});
+
+		promptConfirm.mockResolvedValue(true);
+
+		createMesh.mockResolvedValue({
+			meshId: 'dummy_mesh_id',
+			meshConfig: meshConfig,
+		});
+
+		const output = await CreateCommand.run();
+
+		expect(initRequestId).toHaveBeenCalled();
+		expect(createMesh.mock.calls[0]).toMatchInlineSnapshot(`
+		[
+		  "1234",
+		  "5678",
+		  "123456789",
+		  {
+		    "files": [
+		      {
+		        "content": "{"type":"dummyContent"}",
+		        "path": "./requestParams.json",
+		      },
+		    ],
+		    "sources": [
+		      {
+		        "handler": {
+		          "JsonSchema": {
+		            "baseUrl": "<json_source__baseurl>",
+		            "operations": [
+		              {
+		                "field": "<query>",
+		                "method": "POST",
+		                "path": "<query_path>",
+		                "requestSchema": "./requestParams.json",
+		                "type": "Query",
+		              },
+		            ],
+		          },
+		        },
+		        "name": "<json_source_name>",
+		      },
+		    ],
+		  },
+		]
+	`);
+		expect(createAPIMeshCredentials.mock.calls[0]).toMatchInlineSnapshot(`
+		[
+		  "1234",
+		  "5678",
+		  "123456789",
+		]
+	`);
+		expect(subscribeCredentialToMeshService.mock.calls[0]).toMatchInlineSnapshot(`
+		[
+		  "1234",
+		  "5678",
+		  "123456789",
+		  "dummy_id",
+		]
+	`);
+		expect(output).toMatchInlineSnapshot(`
+		{
+		  "adobeIdIntegrationsForWorkspace": {
+		    "apiKey": "dummy_api_key",
+		    "id": "dummy_id",
+		  },
+		  "mesh": {
+		    "meshConfig": {
+		      "files": [
+		        {
+		          "content": "{"type":"dummyContent"}",
+		          "path": "./schemaBody.json",
+		        },
+		      ],
+		      "sources": [
+		        {
+		          "handler": {
+		            "JsonSchema": {
+		              "baseUrl": "<json_source__baseurl>",
+		              "operations": [
+		                {
+		                  "field": "<query>",
+		                  "method": "POST",
+		                  "path": "<query_path>",
+		                  "requestSchema": "./schemaBody.json",
 		                  "type": "Query",
 		                },
 		              ],
