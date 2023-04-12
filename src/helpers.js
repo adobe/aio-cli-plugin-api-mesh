@@ -477,7 +477,12 @@ async function importFiles(data, filesListArray, meshConfigName, autoConfirmActi
 			return [ele];
 		}),
 	);
+
+	//copy the meshConfig data
 	let resultData = data;
+
+	//array of {file to be overridden, overrideIndex}
+	let overrideArr = [];
 
 	if (data.meshConfig.files) {
 		for (let i = 0; i < data.meshConfig.files?.length; i++) {
@@ -491,14 +496,8 @@ async function importFiles(data, filesListArray, meshConfigName, autoConfirmActi
 			//if file exists in files array, then override
 			if (fs.existsSync(path.resolve(path.dirname(meshConfigName), file))) {
 				if (!autoConfirmActionFlag) {
-					shouldOverride = await promptConfirm(
-						`Do you want to override the ${path.basename(file)} file?`,
-					);
-				}
-
-				if (shouldOverride) {
 					let index = filesPathMap.get(file);
-					resultData = updateFilesArray(resultData, file, meshConfigName, index);
+					overrideArr.push({ fileName: file, index: index });
 				}
 			}
 		} else {
@@ -521,6 +520,21 @@ async function importFiles(data, filesListArray, meshConfigName, autoConfirmActi
 				meshConfigName,
 			)} are in the same directory`,
 		);
+	}
+
+	for (let i = 0; i < overrideArr.length; i++) {
+		shouldOverride = await promptConfirm(
+			`Do you want to override the ${path.basename(overrideArr[i].fileName)} file?`,
+		);
+
+		if (shouldOverride) {
+			resultData = updateFilesArray(
+				resultData,
+				overrideArr[i].fileName,
+				meshConfigName,
+				overrideArr[i].index,
+			);
+		}
 	}
 
 	return resultData;

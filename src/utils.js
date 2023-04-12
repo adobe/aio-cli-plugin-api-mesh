@@ -214,8 +214,8 @@ function updateFilesArray(data, file, meshConfigName, index) {
 
 		if (index >= 0) {
 			data.meshConfig.files[index] = {
-				path: `${file}`,
-				content: `${dataInFilesArray}`,
+				path: file,
+				content: dataInFilesArray,
 			};
 		} else {
 			//if the files array does not exist
@@ -225,8 +225,8 @@ function updateFilesArray(data, file, meshConfigName, index) {
 
 			//if the files arrray exists, we append the file path and content in meshConfig
 			data.meshConfig.files.push({
-				path: `./${path.basename(file)}`,
-				content: `${dataInFilesArray}`,
+				path: file,
+				content: dataInFilesArray,
 			});
 		}
 
