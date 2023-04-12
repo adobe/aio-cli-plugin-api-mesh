@@ -498,13 +498,13 @@ async function importFiles(data, filesListArray, meshConfigName, autoConfirmActi
 
 				if (shouldOverride) {
 					let index = filesPathMap.get(file);
-					resultData = updateFilesArray(data, file, meshConfigName, index);
+					resultData = updateFilesArray(resultData, file, meshConfigName, index);
 				}
 			}
 		} else {
 			//if file does not exist in files array, but exists in filesystem, we append
 			if (fs.existsSync(path.resolve(path.dirname(meshConfigName), file))) {
-				resultData = updateFilesArray(data, file, meshConfigName, -1);
+				resultData = updateFilesArray(resultData, file, meshConfigName, -1);
 			} else {
 				filesNotFound.push(file);
 			}
@@ -517,7 +517,7 @@ async function importFiles(data, filesListArray, meshConfigName, autoConfirmActi
 		}
 
 		throw new Error(
-			`Please make sure the files: ${filesNotFound.join(', ')} and ${path.basename(
+			`Please make sure the file(s): ${filesNotFound.join(', ')} and ${path.basename(
 				meshConfigName,
 			)} are in the same directory`,
 		);

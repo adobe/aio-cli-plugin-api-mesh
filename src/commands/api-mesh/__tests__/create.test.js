@@ -817,12 +817,12 @@ describe('create command tests', () => {
 
 		promptConfirm.mockResolvedValue(false).mockResolvedValue(true);
 
+		importFiles.mockResolvedValue(meshConfig);
+
 		createMesh.mockResolvedValue({
 			meshId: 'dummy_mesh_id',
 			meshConfig: meshConfig,
 		});
-
-		importFiles.mockResolvedValue(meshConfig);
 
 		parseSpy.mockResolvedValue({
 			args: { file: 'src/commands/__fixtures__/sample_mesh_with_files_array.json' },
@@ -957,11 +957,6 @@ describe('create command tests', () => {
 
 		promptConfirm.mockResolvedValue(true).mockResolvedValue(true);
 
-		createMesh.mockResolvedValue({
-			meshId: 'dummy_mesh_id',
-			meshConfig: meshConfig,
-		});
-
 		parseSpy.mockResolvedValue({
 			args: { file: 'src/commands/__fixtures__/sample_mesh_with_files_array.json' },
 			flags: {
@@ -971,6 +966,11 @@ describe('create command tests', () => {
 
 		importFiles.mockResolvedValueOnce({
 			meshConfig,
+		});
+
+		createMesh.mockResolvedValue({
+			meshId: 'dummy_mesh_id',
+			meshConfig: meshConfig,
 		});
 
 		const output = await CreateCommand.run();
@@ -1071,7 +1071,7 @@ describe('create command tests', () => {
 	`);
 	});
 
-	test('should pass for a full-qualified meshConfig even if the file does not exist in fileSystem', async () => {
+	test('should pass for a fully-qualified meshConfig even if the file does not exist in fileSystem', async () => {
 		let meshConfig = {
 			sources: [
 				{
@@ -1109,6 +1109,10 @@ describe('create command tests', () => {
 
 		promptConfirm.mockResolvedValue(true);
 
+		importFiles.mockResolvedValueOnce({
+			meshConfig,
+		});
+
 		createMesh.mockResolvedValue({
 			meshId: 'dummy_mesh_id',
 			meshConfig: meshConfig,
@@ -1123,31 +1127,33 @@ describe('create command tests', () => {
 		  "5678",
 		  "123456789",
 		  {
-		    "files": [
-		      {
-		        "content": "{"type":"dummyContent"}",
-		        "path": "./requestParams.json",
-		      },
-		    ],
-		    "sources": [
-		      {
-		        "handler": {
-		          "JsonSchema": {
-		            "baseUrl": "<json_source__baseurl>",
-		            "operations": [
-		              {
-		                "field": "<query>",
-		                "method": "POST",
-		                "path": "<query_path>",
-		                "requestSchema": "./requestParams.json",
-		                "type": "Query",
-		              },
-		            ],
-		          },
+		    "meshConfig": {
+		      "files": [
+		        {
+		          "content": "{"type":"dummyContent"}",
+		          "path": "./schemaBody.json",
 		        },
-		        "name": "<json_source_name>",
-		      },
-		    ],
+		      ],
+		      "sources": [
+		        {
+		          "handler": {
+		            "JsonSchema": {
+		              "baseUrl": "<json_source__baseurl>",
+		              "operations": [
+		                {
+		                  "field": "<query>",
+		                  "method": "POST",
+		                  "path": "<query_path>",
+		                  "requestSchema": "./schemaBody.json",
+		                  "type": "Query",
+		                },
+		              ],
+		            },
+		          },
+		          "name": "<json_source_name>",
+		        },
+		      ],
+		    },
 		  },
 		]
 	`);
