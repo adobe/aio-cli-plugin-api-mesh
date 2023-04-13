@@ -77,7 +77,7 @@ class CreateCommand extends Command {
 		let filesList = [];
 
 		try {
-			filesList = getFilesInMeshConfig(data);
+			filesList = getFilesInMeshConfig(data, args.file);
 		} catch (err) {
 			this.log(err.message);
 			this.error('Input mesh config is not valid.');

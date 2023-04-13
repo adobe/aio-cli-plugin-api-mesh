@@ -711,7 +711,7 @@ describe('create command tests', () => {
 	`);
 	});
 
-	test('should fail if the meshConfig and the file are not in the same directory', async () => {
+	test('should fail if the files do not exist in the mesh directory or subdirectory', async () => {
 		parseSpy.mockResolvedValue({
 			args: { file: 'src/commands/__fixtures__/sample_mesh_invalid_paths.json' },
 			flags: {
@@ -721,7 +721,7 @@ describe('create command tests', () => {
 
 		importFiles.mockImplementation(() => {
 			throw new Error(
-				'Please make sure the files: schemaBody.json and sample_mesh_invalid_paths.json are in the same directory.',
+				'Please make sure the files: schemaBody.json and sample_mesh_invalid_paths.json are in the same directory/subdirectory.',
 			);
 		});
 
@@ -735,7 +735,7 @@ describe('create command tests', () => {
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
 		[
 		  [
-		    "Please make sure the files: schemaBody.json and sample_mesh_invalid_paths.json are in the same directory.",
+		    "Please make sure the files: schemaBody.json and sample_mesh_invalid_paths.json are in the same directory/subdirectory.",
 		  ],
 		]
 	`);
@@ -1212,6 +1212,213 @@ describe('create command tests', () => {
 		    "dummy_service",
 		  ],
 		}
+	`);
+	});
+
+	test('should pass if the file is located in subdirectory of mesh directory', async () => {
+		let meshConfig = {
+			sources: [
+				{
+					name: '<json_source_name>',
+					handler: {
+						JsonSchema: {
+							baseUrl: '<json_source__baseurl>',
+							operations: [
+								{
+									type: 'Query',
+									field: '<query>',
+									path: '<query_path>',
+									method: 'POST',
+									requestSchema: './files/requestParams.json',
+								},
+							],
+						},
+					},
+				},
+			],
+			files: [
+				{
+					path: './files/requestParams.json',
+					content: '{"type":"updatedContent"}',
+				},
+			],
+		};
+
+		createMesh.mockResolvedValue({
+			meshId: 'dummy_mesh_id',
+			meshConfig: meshConfig,
+		});
+
+		parseSpy.mockResolvedValue({
+			args: { file: 'src/commands/__fixtures__/sample_mesh_subdirectory.json' },
+			flags: {
+				autoConfirmAction: Promise.resolve(false),
+			},
+		});
+
+		importFiles.mockResolvedValueOnce({
+			meshConfig,
+		});
+
+		const output = await CreateCommand.run();
+
+		expect(initRequestId).toHaveBeenCalled();
+		expect(createMesh.mock.calls[0]).toMatchInlineSnapshot(`
+		[
+		  "1234",
+		  "5678",
+		  "123456789",
+		  {
+		    "meshConfig": {
+		      "files": [
+		        {
+		          "content": "{"type":"updatedContent"}",
+		          "path": "./files/requestParams.json",
+		        },
+		      ],
+		      "sources": [
+		        {
+		          "handler": {
+		            "JsonSchema": {
+		              "baseUrl": "<json_source__baseurl>",
+		              "operations": [
+		                {
+		                  "field": "<query>",
+		                  "method": "POST",
+		                  "path": "<query_path>",
+		                  "requestSchema": "./files/requestParams.json",
+		                  "type": "Query",
+		                },
+		              ],
+		            },
+		          },
+		          "name": "<json_source_name>",
+		        },
+		      ],
+		    },
+		  },
+		]
+	`);
+		expect(createAPIMeshCredentials.mock.calls[0]).toMatchInlineSnapshot(`
+		[
+		  "1234",
+		  "5678",
+		  "123456789",
+		]
+		`);
+
+		expect(subscribeCredentialToMeshService.mock.calls[0]).toMatchInlineSnapshot(`
+		[
+		  "1234",
+		  "5678",
+		  "123456789",
+		  "dummy_id",
+		]
+		`);
+		expect(output).toMatchInlineSnapshot(`
+		{
+		  "adobeIdIntegrationsForWorkspace": {
+		    "apiKey": "dummy_api_key",
+		    "id": "dummy_id",
+		  },
+		  "mesh": {
+		    "meshConfig": {
+		      "files": [
+		        {
+		          "content": "{"type":"updatedContent"}",
+		          "path": "./files/requestParams.json",
+		        },
+		      ],
+		      "sources": [
+		        {
+		          "handler": {
+		            "JsonSchema": {
+		              "baseUrl": "<json_source__baseurl>",
+		              "operations": [
+		                {
+		                  "field": "<query>",
+		                  "method": "POST",
+		                  "path": "<query_path>",
+		                  "requestSchema": "./files/requestParams.json",
+		                  "type": "Query",
+		                },
+		              ],
+		            },
+		          },
+		          "name": "<json_source_name>",
+		        },
+		      ],
+		    },
+		    "meshId": "dummy_mesh_id",
+		  },
+		  "sdkList": [
+		    "dummy_service",
+		  ],
+		}
+	`);
+	});
+
+	test('should fail if the file is outside the workspace directory', async () => {
+		parseSpy.mockResolvedValue({
+			args: { file: 'src/commands/__fixtures__/sample_mesh_outside_workspace_dir.json' },
+			flags: {
+				autoConfirmAction: Promise.resolve(false),
+			},
+		});
+
+		const output = CreateCommand.run();
+
+		await expect(output).rejects.toEqual(new Error('Input mesh config is not valid.'));
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "File(s): requestParams.json is outside the mesh directory.",
+		  ],
+		]
+	`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Input mesh config is not valid.",
+		  ],
+		]
+	`);
+	});
+
+	test('should fail if the file has invalid JSON content', async () => {
+		parseSpy.mockResolvedValue({
+			args: { file: 'src/commands/__fixtures__/sample_mesh_invalid_file_content.json' },
+			flags: {
+				autoConfirmAction: Promise.resolve(false),
+			},
+		});
+
+		importFiles.mockImplementation(() => {
+			throw new Error('Invalid JSON content in openapi-schema.json');
+		});
+
+		const output = CreateCommand.run();
+
+		await expect(output).rejects.toEqual(
+			new Error(
+				'Unable to import the files in the mesh config. Please check the file and try again.',
+			),
+		);
+
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Invalid JSON content in openapi-schema.json",
+		  ],
+		]
+	`);
+
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Unable to import the files in the mesh config. Please check the file and try again.",
+		  ],
+		]
 	`);
 	});
 });

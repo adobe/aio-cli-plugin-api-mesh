@@ -62,8 +62,10 @@ const jsonFlag = Flags.boolean({
  * Parse the meshConfig and get the list of (local) files to be imported
  *
  * @param data MeshConfig
+ * @param meshConfigName MeshConfig
+ * @returns files[] files present in meshConfig
  */
-function getFilesInMeshConfig(data) {
+function getFilesInMeshConfig(data, meshConfigName) {
 	//ignore if the file names start with http or https
 	const fileURLRegex = /^(http|s:\/\/)/;
 
@@ -119,6 +121,7 @@ function getFilesInMeshConfig(data) {
 
 	try {
 		if (filesList.length) {
+			checkFilesAreUnderMeshDirectory(filesList, meshConfigName);
 			validateFileType(filesList);
 			validateFileName(filesList, data);
 		}
@@ -128,6 +131,39 @@ function getFilesInMeshConfig(data) {
 	}
 
 	return filesList;
+}
+
+/**
+ * Checks if files are in the same directory or subdirectories of mesh
+ *
+ * @param data MeshConfig
+ * @param meshConfigName MeshConfig
+ */
+function checkFilesAreUnderMeshDirectory(filesList, meshConfigName) {
+	//handle files that are outside to the directory and subdirectories of meshConfig
+	let invalidPaths = [];
+	for (let i = 0; i < filesList.length; i++) {
+		if (
+			!path
+				.resolve(path.dirname(meshConfigName), filesList[i])
+				.includes(path.resolve(path.dirname(meshConfigName)))
+		) {
+			invalidPaths.push(path.basename(filesList[i]));
+		}
+	}
+
+	filesOutsideRootDir(invalidPaths);
+}
+
+/**
+ * Error out if the files are outside the mesh directory
+ *
+ * @param invalidPaths Array
+ */
+function filesOutsideRootDir(invalidPaths) {
+	if (invalidPaths.length) {
+		throw new Error(`File(s): ${invalidPaths.join(', ')} is outside the mesh directory.`);
+	}
 }
 
 /**
@@ -199,7 +235,7 @@ function validateFileName(filesList, data) {
  */
 function updateFilesArray(data, file, meshConfigName, index) {
 	try {
-		const readFileData = fs.readFileSync(
+		let readFileData = fs.readFileSync(
 			path.resolve(path.dirname(meshConfigName), file),
 			{ encoding: 'utf-8' },
 			err => {
@@ -208,6 +244,18 @@ function updateFilesArray(data, file, meshConfigName, index) {
 				}
 			},
 		);
+
+		try {
+			//validate JSON file
+			if (path.extname(file) === '.json') {
+				readFileData = JSON.parse(readFileData);
+			}
+
+			//JS file validation/Lint is to be done
+		} catch (err) {
+			logger.error(err.message);
+			throw new Error(`Invalid JSON content in ${path.basename(file)}`);
+		}
 
 		//data to be overridden or appended
 		const dataInFilesArray = jsmin(readFileData);
