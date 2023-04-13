@@ -11,7 +11,7 @@ governing permissions and limitations under the License.
 */
 
 const mockConsoleCLIInstance = {};
-
+const path = require('node:path');
 const CreateCommand = require('../create');
 const sampleCreateMeshConfig = require('../../__fixtures__/sample_mesh.json');
 const { initSdk, initRequestId, promptConfirm } = require('../../../helpers');
@@ -170,7 +170,7 @@ describe('create command tests', () => {
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
 		[
 		  [
-		    "ENOENT: no such file or directory, open 'dummy_file_path'",
+		    "ENOENT: no such file or directory, open '${path.resolve('dummy_file_path')}'",
 		  ],
 		]
 	`);

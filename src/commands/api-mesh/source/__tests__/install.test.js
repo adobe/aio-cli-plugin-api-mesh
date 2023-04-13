@@ -106,7 +106,7 @@ describe('source:install command tests', () => {
 		await InstallCommand.run(['test-03', '-f=notexist.json']).catch(err => {
 			expect(err.message).toEqual(
 				`Something went wrong trying to read the variables file.` +
-					`\nENOENT: no such file or directory, open 'notexist.json'`,
+					`\nENOENT: no such file or directory, open '${path.resolve('notexist.json')}'`,
 			);
 		});
 	});
