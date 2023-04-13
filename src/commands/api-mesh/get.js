@@ -14,7 +14,7 @@ const { writeFile } = require('fs/promises');
 
 const logger = require('../../classes/logger');
 const { initSdk, initRequestId } = require('../../helpers');
-const { ignoreCacheFlag } = require('../../utils');
+const { ignoreCacheFlag, jsonFlag } = require('../../utils');
 const { getMeshId, getMesh } = require('../../lib/devConsole');
 
 require('dotenv').config();
@@ -23,6 +23,7 @@ class GetCommand extends Command {
 	static args = [{ name: 'file' }];
 	static flags = {
 		ignoreCache: ignoreCacheFlag,
+		json: jsonFlag
 	};
 
 	async run() {
@@ -33,9 +34,11 @@ class GetCommand extends Command {
 		const { args, flags } = await this.parse(GetCommand);
 
 		const ignoreCache = await flags.ignoreCache;
+		const json = await flags.json
 
 		const { imsOrgId, projectId, workspaceId } = await initSdk({
 			ignoreCache,
+			verbose: !json
 		});
 
 		let meshId = null;
@@ -53,7 +56,8 @@ class GetCommand extends Command {
 				const mesh = await getMesh(imsOrgId, projectId, workspaceId, meshId);
 
 				if (mesh) {
-					this.log('Successfully retrieved mesh %s', JSON.stringify(mesh, null, 2));
+					const jsonString = JSON.stringify(mesh, null, 2)
+					this.log(json ? jsonString : `Successfully retrieved mesh ${jsonString}`)
 
 					if (args.file) {
 						try {
