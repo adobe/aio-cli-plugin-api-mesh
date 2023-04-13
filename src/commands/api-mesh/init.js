@@ -12,7 +12,7 @@ governing permissions and limitations under the License.
 const { Command, Flags } = require('@oclif/core');
 const resolve = require('path').resolve;
 
-const { promptConfirm, loadPupa, runCliCommand } = require('../../helpers');
+const { promptConfirm, promptSelect, loadPupa, runCliCommand } = require('../../helpers');
 const { getAppRootDir } = require('../../utils');
 
 const fs = require('fs/promises');
@@ -39,15 +39,11 @@ class InitCommand extends Command {
 		packageManager: Flags.string({
 			char: 'm',
 			summary: 'select yarn or npm for package management',
-			helpGroup: 'THE BEST FLAGS',
-			default: 'npm',
 			options: ['npm', 'yarn'],
 		}),
 		git: Flags.boolean({
-			default: false,
 			char: 'g',
 			summary: 'Should the workspace be initiated as a git project.',
-			helpGroup: 'THE BEST FLAGS',
 		}),
 	};
 
@@ -56,7 +52,12 @@ class InitCommand extends Command {
 	static examples = [
 		{
 			description: 'API mesh workspace init',
-			command: 'aio api-mesh init ./mesh_projects/test_mesh --git --packageManager yarn',
+			command: 'aio api-mesh init commerce-mesh',
+		},
+		{
+			description: 'API mesh workspace init with flags',
+			command:
+				'aio api-mesh init commerce-mesh --path ./mesh_projects/test_mesh --git --packageManager yarn',
 		},
 	];
 
@@ -69,49 +70,68 @@ class InitCommand extends Command {
 
 	async run() {
 		const { args, flags } = await this.parse(InitCommand);
-		const absolutePath = resolve(flags.path);
+		let absolutePath = resolve(flags.path);
+		let shouldCreateGit = flags.git;
+		let packageManagerChoice = flags.packageManager;
 		const packageJsonTemplate = `${getAppRootDir()}/src/templates/package.json`;
-		let shouldCreateWorkspace = await promptConfirm(
+		const shouldCreateWorkspace = await promptConfirm(
 			`Do you want to create the workspace in ${absolutePath}`,
 		);
 
 		if (shouldCreateWorkspace) {
+			if (!shouldCreateGit) {
+				shouldCreateGit = await promptConfirm(`Do you want to initiate git in your workspace?`);
+			}
+
+			if (packageManagerChoice === undefined) {
+				packageManagerChoice = await promptSelect(`Select a package manager`, [
+					{ name: 'npm', value: 'npm' },
+					{ name: 'yarn', value: 'yarn' },
+				]);
+			}
+
+			try {
+				await fs.access(absolutePath);
+				if (
+					!(await promptConfirm(
+						'The directory is not empty. Do you want to create a sub directory with project name',
+					))
+				) {
+					return;
+				}
+				absolutePath += '/' + args.projectName;
+			} catch (err) {
+				// No action needed
+			}
+
 			this.log(`Creating workspace in ${absolutePath}`);
 
-			if (flags.git) {
+			try {
+				await fs.mkdir(absolutePath);
+			} catch (error) {
+				this.error(`Could not create directory ${error.message}`);
+			}
+
+			if (shouldCreateGit) {
 				this.log('Initiating git in workspace');
 				try {
 					await runCliCommand('git init', absolutePath);
 				} catch (error) {
 					this.error(error);
 				}
-			} else {
-				shouldCreateWorkspace = false;
-				try {
-					await fs.access(absolutePath);
-				} catch (e) {
-					shouldCreateWorkspace = true;
-				}
-				if (shouldCreateWorkspace) {
-					try {
-						await fs.mkdir(absolutePath);
-					} catch (error) {
-						this.error(`Could not create directory ${error.message}`);
-					}
-				} else {
-					this.error('Directory already exists. Delete the directory or change the directory');
-				}
 			}
 
-			this.log(`Installing package managers`);
 			fs.writeFile(`${absolutePath}/.env`, '', 'utf8', { mode: 'w' });
+
+			this.log(`Installing dependencies`);
+
 			await this.createPackageJson(
 				packageJsonTemplate,
 				`${absolutePath}/package.json`,
 				args.projectName,
 			);
 
-			if (flags.packageManager === 'npm') {
+			if (packageManagerChoice === 'npm') {
 				try {
 					await runCliCommand(`npm install`, absolutePath);
 				} catch (error) {
@@ -119,7 +139,7 @@ class InitCommand extends Command {
 				}
 			}
 
-			if (flags.packageManager === 'yarn') {
+			if (packageManagerChoice === 'yarn') {
 				try {
 					await runCliCommand(`yarn install`, absolutePath);
 				} catch (error) {

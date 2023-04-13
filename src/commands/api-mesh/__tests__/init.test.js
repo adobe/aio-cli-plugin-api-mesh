@@ -60,16 +60,12 @@ describe('Workspace init command tests', () => {
 		  "git": {
 		    "allowNo": false,
 		    "char": "g",
-		    "default": false,
-		    "helpGroup": "THE BEST FLAGS",
 		    "parse": [Function],
 		    "summary": "Should the workspace be initiated as a git project.",
 		    "type": "boolean",
 		  },
 		  "packageManager": {
 		    "char": "m",
-		    "default": "npm",
-		    "helpGroup": "THE BEST FLAGS",
 		    "input": [],
 		    "multiple": false,
 		    "options": [
