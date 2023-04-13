@@ -226,7 +226,13 @@ async function getProject(imsOrgId, imsOrgTitle, options = { verbose: true }) {
  * @param imsOrgTitle
  * @param projectTitle
  */
-async function getWorkspace(orgId, projectId, imsOrgTitle, projectTitle, options = { verbose: true }) {
+async function getWorkspace(
+	orgId,
+	projectId,
+	imsOrgTitle,
+	projectTitle,
+	options = { verbose: true },
+) {
 	logger.info(`Initializing workspace selection for ${orgId} -> ${projectId}`);
 
 	const { consoleCLI } = await getLibConsoleCLI();
@@ -359,7 +365,9 @@ async function initSdk(options) {
 	if (!ignoreCache) {
 		org = await getAuthorizedOrganization({ verbose: options.verbose });
 		project = await getProject(org.id, org.name, { verbose: options.verbose });
-		workspace = await getWorkspace(org.id, project.id, org.name, project.title, { verbose: options.verbose });
+		workspace = await getWorkspace(org.id, project.id, org.name, project.title, {
+			verbose: options.verbose,
+		});
 	} else {
 		org = await selectAuthorizedOrganization();
 		project = await selectProject(org.id, org.name);
