@@ -23,7 +23,7 @@ class GetCommand extends Command {
 	static args = [{ name: 'file' }];
 	static flags = {
 		ignoreCache: ignoreCacheFlag,
-		json: jsonFlag
+		json: jsonFlag,
 	};
 
 	async run() {
@@ -34,11 +34,11 @@ class GetCommand extends Command {
 		const { args, flags } = await this.parse(GetCommand);
 
 		const ignoreCache = await flags.ignoreCache;
-		const json = await flags.json
+		const json = await flags.json;
 
 		const { imsOrgId, projectId, workspaceId } = await initSdk({
 			ignoreCache,
-			verbose: !json
+			verbose: !json,
 		});
 
 		let meshId = null;
@@ -56,8 +56,8 @@ class GetCommand extends Command {
 				const mesh = await getMesh(imsOrgId, projectId, workspaceId, meshId);
 
 				if (mesh) {
-					const jsonString = JSON.stringify(mesh, null, 2)
-					this.log(json ? jsonString : `Successfully retrieved mesh ${jsonString}`)
+					const jsonString = JSON.stringify(mesh, null, 2);
+					this.log(json ? '' : 'Successfully retrieved mesh %s', jsonString);
 
 					if (args.file) {
 						try {

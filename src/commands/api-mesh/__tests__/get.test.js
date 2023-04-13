@@ -96,6 +96,13 @@ describe('get command tests', () => {
 		    "parse": [Function],
 		    "type": "boolean",
 		  },
+		  "json": {
+		    "allowNo": false,
+		    "default": false,
+		    "description": "Output JSON",
+		    "parse": [Function],
+		    "type": "boolean",
+		  },
 		}
 	`);
 		expect(GetCommand.aliases).toMatchInlineSnapshot(`[]`);
@@ -182,6 +189,7 @@ describe('get command tests', () => {
 
 		expect(initSdk).toHaveBeenCalledWith({
 			ignoreCache: true,
+			verbose: true,
 		});
 		expect(initRequestId).toHaveBeenCalled();
 		expect(runResult).toEqual({ meshId: 'dummy_meshId', mesh: mockGetMeshConfig });
