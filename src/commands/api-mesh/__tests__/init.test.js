@@ -3,11 +3,10 @@ const InitCommand = require('../init');
 jest.mock('../../../helpers', () => ({
 	promptConfirm: jest.fn().mockResolvedValue(true),
 	promptSelect: jest.fn(),
-	loadPupa: jest.fn(),
 	runCliCommand: jest.fn().mockResolvedValue({}),
 }));
 
-const { promptConfirm, loadPupa, runCliCommand, promptSelect } = require('../../../helpers');
+const { promptConfirm, runCliCommand, promptSelect } = require('../../../helpers');
 
 const fs = require('fs/promises');
 
@@ -386,6 +385,6 @@ describe('Workspace init command tests', () => {
 test('test createPackageJson', async () => {
 	jest.spyOn(fs, 'readFile').mockResolvedValue({});
 	jest.spyOn(fs, 'writeFile').mockResolvedValue({});
-	loadPupa.mockResolvedValue(jest.fn());
+
 	await expect(InitCommand.prototype.createPackageJson()).resolves;
 });
