@@ -12,7 +12,7 @@ governing permissions and limitations under the License.
 const { Command, Flags } = require('@oclif/core');
 const resolve = require('path').resolve;
 
-const { promptConfirm, promptSelect, loadPupa, runCliCommand } = require('../../helpers');
+const { promptConfirm, promptSelect, runCliCommand } = require('../../helpers');
 const { getAppRootDir } = require('../../utils');
 
 const fs = require('fs/promises');
@@ -64,9 +64,10 @@ class InitCommand extends Command {
 
 	async createPackageJson(templatePath, filePath, projectTitle = 'api-mesh-starter') {
 		const template = await fs.readFile(templatePath, 'utf8');
-		const pupa = await loadPupa();
-		const fileContents = pupa(template, { projectTitle });
-		await fs.writeFile(filePath, fileContents);
+
+		const pkgJSON = { ...JSON.parse(template), name: projectTitle };
+
+		await fs.writeFile(filePath, JSON.stringify(pkgJSON, null, 2), 'utf8', { mode: 'w' });
 	}
 
 	async run() {
@@ -122,12 +123,16 @@ class InitCommand extends Command {
 				this.log('Initiating git in workspace');
 				try {
 					await runCliCommand('git init', absolutePath);
+
+					const gitIgnoreTemplate = `${getAppRootDir()}/src/templates/gitignore`;
+
+					await fs.writeFile(`${absolutePath}/.gitignore`, gitIgnoreTemplate, 'utf8', { mode: 'w' });
 				} catch (error) {
 					this.error(error);
 				}
 			}
 
-			fs.writeFile(`${absolutePath}/.env`, '', 'utf8', { mode: 'w' });
+			await fs.writeFile(`${absolutePath}/.env`, '', 'utf8', { mode: 'w' });
 
 			this.log(`Installing dependencies`);
 

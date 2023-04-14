@@ -1,5 +1,5 @@
 {
-	"name": "{projectTitle}",
+	"name": "",
 	"version": "0.0.1",
 	"publishConfig": {
 		"access": "public"
@@ -32,20 +32,7 @@
 		"api-mesh"
 	],
 	"license": "Apache-2.0",
-	"main": "src/index.js",
-	"scripts": {
-		"test": "jest",
-		"test:ci": "jest --ci",
-		"unit-tests": "jest --ci",
-		"prepack": "oclif-dev manifest && oclif-dev readme",
-		"postpack": "rm -f oclif.manifest.json",
-		"version": "oclif-dev readme && git add README.md",
-		"e2e": "jest --collectCoverage=false --testRegex './e2e/e2e.js'",
-		"lint": "eslint .",
-		"lint:fix": "eslint --fix .",
-		"format": "prettier --check \"./**/*.{ts,tsx,js,css,json,md}\"",
-		"format:fix": "prettier --write  \"./**/*.{ts,tsx,js,css,json,md}\""
-	},
+	"scripts": {},
 	"description": "API mesh starter template",
 	"author": "Adobe Inc."
 }

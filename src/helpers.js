@@ -484,14 +484,6 @@ function runCliCommand(command, workingDirectory = '.') {
 	});
 }
 
-async function loadPupa() {
-	try {
-		return (await import('pupa')).default;
-	} catch (error) {
-		throw new Error('Could not load pupa');
-	}
-}
-
 module.exports = {
 	promptInput,
 	promptConfirm,
@@ -502,5 +494,4 @@ module.exports = {
 	promptSelect,
 	promptMultiselect,
 	runCliCommand,
-	loadPupa,
 };
