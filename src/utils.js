@@ -251,8 +251,6 @@ function updateFilesArray(data, file, meshConfigName, index) {
 			if (path.extname(file) === '.json') {
 				readFileData = JSON.stringify(JSON.parse(readFileData));
 			}
-
-			//JS file validation/Lint is to be done
 		} catch (err) {
 			logger.error(err.message);
 			throw new Error(`Invalid JSON content in ${path.basename(file)}`);
