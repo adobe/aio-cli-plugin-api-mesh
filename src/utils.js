@@ -249,7 +249,7 @@ function updateFilesArray(data, file, meshConfigName, index) {
 		try {
 			//validate JSON file
 			if (path.extname(file) === '.json') {
-				readFileData = JSON.parse(readFileData);
+				readFileData = JSON.stringify(JSON.parse(readFileData));
 			}
 
 			//JS file validation/Lint is to be done

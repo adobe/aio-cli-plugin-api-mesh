@@ -46,9 +46,9 @@
 		"husky": "7.0.4",
 		"jest": "^29.2.2",
 		"jest-junit": "^6.0.0",
+		"jsmin": "1.0.1",
 		"prettier": "2.2.1",
-		"stdout-stderr": "^0.1.9",
-		"jsmin": "1.0.1"
+		"stdout-stderr": "^0.1.9"
 	},
 	"engines": {
 		"npm": ">=8.0.0",
