@@ -146,7 +146,8 @@ function checkFilesAreUnderMeshDirectory(filesList, meshConfigName) {
 		if (
 			!path
 				.resolve(path.dirname(meshConfigName), filesList[i])
-				.includes(path.resolve(path.dirname(meshConfigName)))
+				.includes(path.resolve(path.dirname(meshConfigName))) ||
+			filesList[i].includes('~')
 		) {
 			invalidPaths.push(path.basename(filesList[i]));
 		}

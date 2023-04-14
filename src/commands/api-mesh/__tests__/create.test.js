@@ -1421,4 +1421,31 @@ describe('create command tests', () => {
 		]
 	`);
 	});
+
+	test('should fail if the file path starts from home directory i.e., path starts with ~/', async () => {
+		parseSpy.mockResolvedValue({
+			args: { file: 'src/commands/__fixtures__/sample_mesh_path_from_home.json' },
+			flags: {
+				autoConfirmAction: Promise.resolve(false),
+			},
+		});
+
+		const output = CreateCommand.run();
+
+		await expect(output).rejects.toEqual(new Error('Input mesh config is not valid.'));
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "File(s): venia-openapi-schema.json is outside the mesh directory.",
+		  ],
+		]
+	`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Input mesh config is not valid.",
+		  ],
+		]
+	`);
+	});
 });
