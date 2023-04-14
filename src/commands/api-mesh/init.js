@@ -41,9 +41,10 @@ class InitCommand extends Command {
 			summary: 'select yarn or npm for package management',
 			options: ['npm', 'yarn'],
 		}),
-		git: Flags.boolean({
+		git: Flags.string({
 			char: 'g',
 			summary: 'Should the workspace be initiated as a git project.',
+			options: ['y', 'n'],
 		}),
 	};
 
@@ -57,7 +58,7 @@ class InitCommand extends Command {
 		{
 			description: 'API mesh workspace init with flags',
 			command:
-				'aio api-mesh init commerce-mesh --path ./mesh_projects/test_mesh --git --packageManager yarn',
+				'aio api-mesh init commerce-mesh --path ./mesh_projects/test_mesh --git y --packageManager yarn',
 		},
 	];
 
@@ -70,8 +71,13 @@ class InitCommand extends Command {
 
 	async run() {
 		const { args, flags } = await this.parse(InitCommand);
+		const gitFlagOptions = {
+			y: true,
+			n: false,
+		};
+
 		let absolutePath = resolve(flags.path);
-		let shouldCreateGit = flags.git;
+		let shouldCreateGit = gitFlagOptions[flags.git];
 		let packageManagerChoice = flags.packageManager;
 		const packageJsonTemplate = `${getAppRootDir()}/src/templates/package.json`;
 		const shouldCreateWorkspace = await promptConfirm(
@@ -79,7 +85,7 @@ class InitCommand extends Command {
 		);
 
 		if (shouldCreateWorkspace) {
-			if (!shouldCreateGit) {
+			if (shouldCreateGit === undefined) {
 				shouldCreateGit = await promptConfirm(`Do you want to initiate git in your workspace?`);
 			}
 

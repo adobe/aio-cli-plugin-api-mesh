@@ -9,15 +9,11 @@ jest.mock('../../../helpers', () => ({
 
 const { promptConfirm, loadPupa, runCliCommand, promptSelect } = require('../../../helpers');
 
-const createWorkspacePromptText = 'Do you want to initiate git in your workspace?';
-
-const createGitDirPromptText = 'Do you want to initiate git in your workspace?';
-
 const fs = require('fs/promises');
 
 const mockProjectName = 'sample mesh test workspace';
 
-const mockGitDefaultFlag = false;
+const mockGitDefaultFlag = 'n';
 
 const mockPMDefaultFlag = 'npm';
 
@@ -63,11 +59,16 @@ describe('Workspace init command tests', () => {
 		expect(InitCommand.flags).toMatchInlineSnapshot(`
 		{
 		  "git": {
-		    "allowNo": false,
 		    "char": "g",
+		    "input": [],
+		    "multiple": false,
+		    "options": [
+		      "y",
+		      "n",
+		    ],
 		    "parse": [Function],
 		    "summary": "Should the workspace be initiated as a git project.",
-		    "type": "boolean",
+		    "type": "option",
 		  },
 		  "packageManager": {
 		    "char": "m",
@@ -105,8 +106,7 @@ describe('Workspace init command tests', () => {
 		});
 		promptSelect.mockResolvedValue('yarn');
 		await InitCommand.run();
-		expect(promptConfirm).toHaveBeenCalledWith(createWorkspacePromptText);
-		expect(promptConfirm).toHaveBeenCalledWith(createGitDirPromptText);
+		expect(promptConfirm).toHaveBeenCalled();
 		expect(promptSelect).toHaveBeenCalled();
 
 		// workspace directory creation
@@ -191,9 +191,7 @@ describe('Workspace init command tests', () => {
 		});
 
 		await InitCommand.run();
-		expect(promptConfirm).toHaveBeenCalledWith(createWorkspacePromptText);
-		expect(promptConfirm).toHaveBeenCalledWith(createGitDirPromptText);
-		expect(runCliCommand.mock.calls[0][0]).toBe('git init');
+
 		// workspace directory creation
 		expect(access).toHaveBeenCalled();
 		expect(mkdir).toHaveBeenCalled();
@@ -202,7 +200,7 @@ describe('Workspace init command tests', () => {
 		// creating package json
 		expect(createPackageJsonSpy).toHaveBeenCalled();
 		// yarn install
-		expect(runCliCommand.mock.calls[1][0]).toBe('yarn install');
+		expect(runCliCommand.mock.calls[0][0]).toBe('yarn install');
 	});
 
 	test('Command should pass and create yarn + git project if yarn is package manager and git flag is set', async () => {
@@ -218,9 +216,7 @@ describe('Workspace init command tests', () => {
 		});
 		await InitCommand.run();
 		expect(promptConfirm).toHaveBeenCalled();
-		// git initalization
-		expect(runCliCommand.mock.calls[0][0]).toBe('git init');
-		// no directory creation
+		// create directory
 		expect(access).toHaveBeenCalled();
 		expect(mkdir).toHaveBeenCalled();
 		// env file
@@ -321,21 +317,20 @@ describe('Workspace init command tests', () => {
 				packageManager: mockPMDefaultFlag,
 			},
 		});
-		runCliCommand.mockResolvedValueOnce({});
 
 		runCliCommand.mockRejectedValueOnce('');
 
 		await expect(InitCommand.run()).rejects.toThrow();
 
 		expect(promptConfirm).toHaveBeenCalled();
-		// no directory creation
+		// create directory
 		expect(access).toHaveBeenCalled();
 		expect(mkdir).toHaveBeenCalled();
 		// env file
 		expect(writeFile).toHaveBeenCalled();
 		// creating package json
 		expect(createPackageJsonSpy).toHaveBeenCalled();
-		expect(runCliCommand.mock.calls[1][0]).toBe('npm install');
+		expect(runCliCommand.mock.calls[0][0]).toBe('npm install');
 	});
 
 	test('Command should fail if yarn install fails', async () => {
@@ -349,7 +344,7 @@ describe('Workspace init command tests', () => {
 				packageManager: 'yarn',
 			},
 		});
-		runCliCommand.mockResolvedValueOnce({});
+		// npm command will fail
 		runCliCommand.mockRejectedValueOnce('');
 
 		await expect(InitCommand.run()).rejects.toThrow();
@@ -362,7 +357,29 @@ describe('Workspace init command tests', () => {
 		expect(writeFile).toHaveBeenCalled();
 		// creating package json
 		expect(createPackageJsonSpy).toHaveBeenCalled();
-		expect(runCliCommand.mock.calls[1][0]).toBe('yarn install');
+		expect(runCliCommand.mock.calls[0][0]).toBe('yarn install');
+	});
+
+	test('Command should exit if sub directory prompt is provided with no', async () => {
+		parseSpy.mockResolvedValue({
+			args: {
+				projectName: mockProjectName,
+			},
+			flags: {
+				path: mockPathDefaultFlag,
+				git: mockGitDefaultFlag,
+				packageManager: mockPMDefaultFlag,
+			},
+		});
+		// create workspace prompt
+		promptConfirm.mockResolvedValueOnce(true);
+		// access passes
+		access.mockResolvedValue({});
+		// create in sub directory prompt
+		promptConfirm.mockResolvedValueOnce(false);
+		await InitCommand.run();
+		expect(access).toHaveBeenCalled();
+		expect(mkdir).not.toHaveBeenCalled();
 	});
 });
 
