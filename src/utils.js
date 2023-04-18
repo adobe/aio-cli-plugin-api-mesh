@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const logger = require('../src/classes/logger');
 const { Flags } = require('@oclif/core');
 const { readFile } = require('fs/promises');
 const { interpolateMesh } = require('./helpers');
@@ -41,6 +42,115 @@ const envFileFlag = Flags.string({
 });
 
 /**
+ * Parse the meshConfig and get the list of (local) files to be imported
+ *
+ * @param data MeshConfig
+ * @param meshConfigName MeshConfig
+ * @returns files[] files present in meshConfig
+ */
+function getFilesInMeshConfig(data, meshConfigName) {
+	//ignore if the file names start with http or https
+	const fileURLRegex = /^(http|s:\/\/)/;
+
+	let filesList = [];
+
+	data.meshConfig.sources.forEach(source => {
+		// JSONSchema handler
+		source.handler.JsonSchema?.operations.forEach(operation => {
+			if (operation.requestSchema && !fileURLRegex.test(operation.requestSchema)) {
+				filesList.push(operation.requestSchema);
+			}
+			if (operation.responseSchema && !fileURLRegex.test(operation.responseSchema)) {
+				filesList.push(operation.responseSchema);
+			}
+			if (operation.requestSample && !fileURLRegex.test(operation.requestSample)) {
+				filesList.push(operation.requestSample);
+			}
+			if (operation.responseSample && !fileURLRegex.test(operation.responseSample)) {
+				filesList.push(operation.responseSample);
+			}
+		});
+
+		// OpenAPI handler
+		if (source.handler.openapi && !fileURLRegex.test(source.handler.openapi.source)) {
+			filesList.push(source.handler.openapi.source);
+		}
+	});
+
+	// Additional Resolvers
+	data.meshConfig.additionalResolvers?.forEach(additionalResolver => {
+		if (!fileURLRegex.test(additionalResolver)) {
+			filesList.push(additionalResolver);
+		}
+	});
+
+	// ReplaceField Transform - source level
+	data.meshConfig.sources.transforms?.forEach(transform => {
+		transform.replaceField?.replacements.forEach(replacement => {
+			if (replacement.composer && !fileURLRegex.test(replacement.composer)) {
+				filesList.push(replacement.composer);
+			}
+		});
+	});
+
+	// ReplaceField Transform - mesh level
+	data.meshConfig.transforms?.forEach(transform => {
+		transform.replaceField?.replacements.forEach(replacement => {
+			if (replacement.composer && !fileURLRegex.test(replacement.composer)) {
+				filesList.push(replacement.composer);
+			}
+		});
+	});
+
+	try {
+		if (filesList.length) {
+			checkFilesAreUnderMeshDirectory(filesList, meshConfigName);
+			validateFileType(filesList);
+			validateFileName(filesList, data);
+		}
+	} catch (err) {
+		logger.error(err.message);
+		throw new Error(err.message);
+	}
+
+	return filesList;
+}
+
+/**
+ * Checks if files are in the same directory or subdirectories of mesh
+ *
+ * @param data MeshConfig
+ * @param meshConfigName MeshConfig
+ */
+function checkFilesAreUnderMeshDirectory(filesList, meshConfigName) {
+	//handle files that are outside to the directory and subdirectories of meshConfig
+	let invalidPaths = [];
+	for (let i = 0; i < filesList.length; i++) {
+		if (
+			!path
+				.resolve(path.dirname(meshConfigName), filesList[i])
+				.includes(path.resolve(path.dirname(meshConfigName))) ||
+			filesList[i].includes('~')
+		) {
+			invalidPaths.push(path.basename(filesList[i]));
+		}
+	}
+
+	filesOutsideRootDir(invalidPaths);
+}
+
+/**
+ * Error out if the files are outside the mesh directory
+ *
+ * @param invalidPaths Array
+ */
+function filesOutsideRootDir(invalidPaths) {
+	if (invalidPaths.length) {
+		throw new Error(`File(s): ${invalidPaths.join(', ')} is outside the mesh directory.`);
+	}
+}
+
+/**
  * Check if there are any placeholders in the input mesh file
  * The below regular expressions are part of pupa string interpolation
  * doubleBraceRegex = /{{(\d+|[a-z$_][\w\-$]*?(?:\.[\w\-$]*?)*?)}}/gi
@@ -74,7 +184,6 @@ function checkPlaceholders(mesh) {
  * @param {string} filetype
  * @returns {string}
  */
-
 async function readFileContents(file, command, filetype) {
 	try {
 		return await readFile(file, 'utf8');
@@ -90,7 +199,65 @@ async function readFileContents(file, command, filetype) {
 }
 
 /**
- *validates the environment file content
+ * Check if the files are of valid types .js, .json
+ *
+ * @param filesList List of files in mesh config
+ */
+function validateFileType(filesList) {
+	const filesWithInvalidTypes = [];
+
+	filesList.forEach(file => {
+		const extension = path.extname(file);
+		const isValidFileType = ['.js', '.json'].includes(extension);
+
+		if (!isValidFileType) {
+			filesWithInvalidTypes.push(path.basename(file));
+		}
+	});
+
+	if (filesWithInvalidTypes.length) {
+		throw new Error(
+			`Mesh files must be JavaScript or JSON. Other file types are not supported. The following file(s) are invalid: ${filesWithInvalidTypes}.`,
+		);
+	}
+}
+
+/**
+ * Validate the filenames
+ *
+ * @param filesList Files in sources, tranforms or additionalResolvers in the meshConfig
+ * @param data MeshConfig
+ */
+function validateFileName(filesList, data) {
+	const filesWithInvalidNames = [];
+
+	// Check if the file names are less than 25 characters
+	filesList.forEach(file => {
+		const fileName = path.basename(file);
+		if (fileName.length > 25) {
+			filesWithInvalidNames.push(fileName);
+		}
+	});
+
+	if (filesWithInvalidNames.length) {
+		throw new Error(
+			`Mesh file names must be less than 25 characters. The following file(s) are invalid: ${filesWithInvalidNames}.`,
+		);
+	}
+
+	// check if the the filePaths in the files array match
+	// the fileNames in sources, transforms or additionalResolvers
+
+	if (data.meshConfig.files) {
+		for (let i = 0; i < data.meshConfig.files.length; i++) {
+			if (filesList.indexOf(data.meshConfig.files[i].path) == -1) {
+				throw new Error(`Please make sure the file names are matching in meshConfig.`);
+			}
+		}
+	}
+}
+
+/**validates the environment file content
  * @param {string} envContent
  * @returns {object} containing the status of validation
  * If validation is failed then the error property including the formatting errors is returned.
@@ -152,7 +319,6 @@ function validateEnvFileFormat(envContent) {
  * @param {object} command
  * @returns {string}
  */
-
 async function validateAndInterpolateMesh(inputMeshData, envFilePath, command) {
 	//Read the environment file
 	const envFileContent = await readFileContents(envFilePath, command, 'env');
@@ -189,6 +355,7 @@ module.exports = {
 	ignoreCacheFlag,
 	autoConfirmActionFlag,
 	jsonFlag,
+	getFilesInMeshConfig,
 	envFileFlag,
 	checkPlaceholders,
 	readFileContents,
