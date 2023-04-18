@@ -543,8 +543,7 @@ async function interpolateMesh(data, obj) {
 		interpolatedMeshData: interpolatedMesh,
 	};
 }
- 
-	
+
 /** Function to run cli command
  *
  * @param command Ocliff/Command

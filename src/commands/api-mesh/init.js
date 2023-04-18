@@ -126,7 +126,9 @@ class InitCommand extends Command {
 
 					const gitIgnoreTemplate = `${getAppRootDir()}/src/templates/gitignore`;
 
-					await fs.writeFile(`${absolutePath}/.gitignore`, gitIgnoreTemplate, 'utf8', { mode: 'w' });
+					await fs.writeFile(`${absolutePath}/.gitignore`, gitIgnoreTemplate, 'utf8', {
+						mode: 'w',
+					});
 				} catch (error) {
 					this.error(error);
 				}
