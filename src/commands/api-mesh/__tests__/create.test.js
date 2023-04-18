@@ -14,7 +14,13 @@ const mockConsoleCLIInstance = {};
 
 const CreateCommand = require('../create');
 const sampleCreateMeshConfig = require('../../__fixtures__/sample_mesh.json');
-const { initSdk, initRequestId, promptConfirm, importFiles } = require('../../../helpers');
+const {
+	initSdk,
+	initRequestId,
+	promptConfirm,
+	interpolateMesh,
+	importFiles,
+} = require('../../../helpers');
 const {
 	createMesh,
 	createAPIMeshCredentials,
@@ -40,6 +46,7 @@ jest.mock('../../../helpers', () => ({
 	initSdk: jest.fn().mockResolvedValue({}),
 	initRequestId: jest.fn().mockResolvedValue({}),
 	promptConfirm: jest.fn().mockResolvedValue(true),
+	interpolateMesh: jest.fn().mockResolvedValue({}),
 	importFiles: jest.fn().mockResolvedValue(),
 }));
 jest.mock('../../../lib/devConsole');
@@ -112,6 +119,7 @@ describe('create command tests', () => {
 		  },
 		]
 	`);
+
 		expect(CreateCommand.flags).toMatchInlineSnapshot(`
 		{
 		  "autoConfirmAction": {
@@ -121,6 +129,15 @@ describe('create command tests', () => {
 		    "description": "Auto confirm action prompt. CLI will not check for user approval before executing the action.",
 		    "parse": [Function],
 		    "type": "boolean",
+		  },
+		  "env": {
+		    "char": "e",
+		    "default": ".env",
+		    "description": "Path to env file",
+		    "input": [],
+		    "multiple": false,
+		    "parse": [Function],
+		    "type": "option",
 		  },
 		  "ignoreCache": {
 		    "allowNo": false,
@@ -481,6 +498,223 @@ describe('create command tests', () => {
 		]
 	`);
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`[]`);
+	});
+
+	test('must return proper object structure used by adobe/generator-app-api-mesh', async () => {
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
+			flags: {
+				json: Promise.resolve(true),
+			},
+		});
+		const output = await CreateCommand.run();
+		expect(output).toHaveProperty('mesh');
+		expect(output).toHaveProperty('adobeIdIntegrationsForWorkspace');
+		expect(output.mesh).toEqual(expect.objectContaining({ meshId: 'dummy_mesh_id' }));
+		expect(output.adobeIdIntegrationsForWorkspace).toEqual(
+			expect.objectContaining({ apiKey: 'dummy_api_key' }),
+		);
+	});
+
+	test('should return error if the mesh has placeholders and env file provided using --env flag is not found', async () => {
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_mesh_with_placeholder' },
+			flags: {
+				ignoreCache: mockIgnoreCacheFlag,
+				autoConfirmAction: Promise.resolve(true),
+				env: 'src/commands/__fixtures__/.env_nonExisting',
+			},
+		});
+		const runResult = CreateCommand.run();
+
+		await expect(runResult).rejects.toEqual(
+			new Error(
+				'Unable to read the file src/commands/__fixtures__/.env_nonExisting. Please check the file and try again.',
+			),
+		);
+
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "The provided mesh contains placeholders. Starting mesh interpolation process.",
+		  ],
+		  [
+		    "ENOENT: no such file or directory, open 'src/commands/__fixtures__/.env_nonExisting'",
+		  ],
+		]
+	`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Unable to read the file src/commands/__fixtures__/.env_nonExisting. Please check the file and try again.",
+		  ],
+		]
+	`);
+	});
+
+	test('should return error if mesh has placeholders and the provided env file is invalid', async () => {
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_mesh_with_placeholder' },
+			flags: {
+				ignoreCache: mockIgnoreCacheFlag,
+				autoConfirmAction: Promise.resolve(true),
+				env: 'src/commands/__fixtures__/env_invalid',
+			},
+		});
+
+		const runResult = CreateCommand.run();
+
+		await expect(runResult).rejects.toEqual(
+			new Error(
+				"Issue in src/commands/__fixtures__/env_invalid file - Duplicate key << key1 >> on line 3,Invalid format for key/value << key2=='value3' >> on line 5,Invalid format << key3 >> on line 6,Invalid format for key/value << key4='value4 >> on line 7",
+			),
+		);
+
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Issue in src/commands/__fixtures__/env_invalid file - Duplicate key << key1 >> on line 3,Invalid format for key/value << key2=='value3' >> on line 5,Invalid format << key3 >> on line 6,Invalid format for key/value << key4='value4 >> on line 7",
+		  ],
+		]
+	`);
+	});
+
+	test('should return error if the mesh has placeholders and the provided env file is valid but there are missing keys found in mesh interpolation', async () => {
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_mesh_with_placeholder' },
+			flags: {
+				ignoreCache: mockIgnoreCacheFlag,
+				autoConfirmAction: Promise.resolve(true),
+				env: 'src/commands/__fixtures__/env_valid',
+			},
+		});
+
+		interpolateMesh.mockResolvedValueOnce({
+			interpolationStatus: 'failed',
+			missingKeys: ['newKey1', 'newKey2'],
+			interpolatedMesh: '',
+		});
+
+		const runResult = CreateCommand.run();
+		await expect(runResult).rejects.toEqual(
+			new Error('The mesh file cannot be interpolated due to missing keys : newKey1 , newKey2'),
+		);
+
+		await expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "The mesh file cannot be interpolated due to missing keys : newKey1 , newKey2",
+		  ],
+		]
+	`);
+	});
+
+	test('should return error if the provided env file is valid and mesh interpolation is successful but interpolated mesh is not a valid JSON', async () => {
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_mesh_with_placeholder' },
+			flags: {
+				ignoreCache: mockIgnoreCacheFlag,
+				autoConfirmAction: Promise.resolve(true),
+				env: 'src/commands/__fixtures__/env_valid',
+			},
+		});
+
+		//sampleInterpolated mesh where value of responseConfig.includeHTTPDetails is invalid i.e. non-boolean
+		const sampleInterpolatedMesh =
+			'{"meshConfig":{"sources":[{"name":"<api-name>","handler":{"graphql":{"endpoint":"<api-url>"}}}],"responseConfig":{"includeHTTPDetails":sample}}}';
+
+		interpolateMesh.mockResolvedValueOnce({
+			interpolationStatus: 'success',
+			missingKeys: [],
+			interpolatedMeshData: sampleInterpolatedMesh,
+		});
+
+		const runResult = CreateCommand.run();
+		await expect(runResult).rejects.toEqual(
+			new Error('Interpolated mesh is not a valid JSON. Please check the generated json file.'),
+		);
+
+		await expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Interpolated mesh is not a valid JSON. Please check the generated json file.",
+		  ],
+		]
+	`);
+	});
+
+	test('should successfully create a mesh if provided env file is valid, mesh interpolation is successful and interpolated mesh is a valid JSON', async () => {
+		parseSpy.mockResolvedValue({
+			args: { file: 'src/commands/__fixtures__/sample_mesh_with_placeholder' },
+			flags: {
+				ignoreCache: mockIgnoreCacheFlag,
+				autoConfirmAction: mockAutoApproveAction,
+				env: 'src/commands/__fixtures__/env_valid',
+			},
+		});
+
+		//sampleInterpolated mesh where the mesh string is a valid JSON
+		const sampleInterpolatedMesh =
+			'{"meshConfig":{"sources":[{"name":"<api-name>","handler":{"graphql":{"endpoint":"<api-url>"}}}],"responseConfig":{"includeHTTPDetails":true}}}';
+
+		interpolateMesh.mockResolvedValueOnce({
+			interpolationStatus: 'success',
+			missingKeys: [],
+			interpolatedMeshData: sampleInterpolatedMesh,
+		});
+
+		const runResult = await CreateCommand.run();
+
+		expect(promptConfirm).toHaveBeenCalledWith('Are you sure you want to create a mesh?');
+		expect(runResult).toMatchInlineSnapshot(`
+		{
+		  "adobeIdIntegrationsForWorkspace": {
+		    "apiKey": "dummy_api_key",
+		    "id": "dummy_id",
+		  },
+		  "mesh": {
+		    "meshConfig": {
+		      "sources": [
+		        {
+		          "handler": {
+		            "graphql": {
+		              "endpoint": "<gql_endpoint>",
+		            },
+		          },
+		          "name": "<api_name>",
+		        },
+		      ],
+		    },
+		    "meshId": "dummy_mesh_id",
+		  },
+		  "sdkList": [
+		    "dummy_service",
+		  ],
+		}
+	`);
+	});
+
+	test('should return error if inputMesh is not a valid JSON', async () => {
+		parseSpy.mockResolvedValue({
+			args: { file: 'src/commands/__fixtures__/sample_invalid_mesh.txt' },
+			flags: {
+				ignoreCache: mockIgnoreCacheFlag,
+				autoConfirmAction: mockAutoApproveAction,
+			},
+		});
+
+		const runResult = CreateCommand.run();
+		await expect(runResult).rejects.toEqual(
+			new Error('Input mesh file is not a valid JSON. Please check the file provided.'),
+		);
+
+		await expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Input mesh file is not a valid JSON. Please check the file provided.",
+		  ],
+		]
+	`);
 	});
 
 	test('should pass if there are local files in meshConfig i.e., the file is appended in files array', async () => {

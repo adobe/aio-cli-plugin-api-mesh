@@ -21,10 +21,47 @@ const { getCliEnv } = require('@adobe/aio-lib-env');
 const logger = require('../src/classes/logger');
 const { UUID } = require('./classes/UUID');
 const CONSTANTS = require('./constants');
-const { objToString, updateFilesArray } = require('./utils');
 const path = require('path');
+const { exec } = require('child_process');
+const { stdout, stderr } = require('process');
+const jsmin = require('jsmin').jsmin;
 
 const { DEV_CONSOLE_BASE_URL, DEV_CONSOLE_API_KEY, AIO_CLI_API_KEY } = CONSTANTS;
+
+/**
+ * Returns the string representation of the object's path.
+ * If the path evaluates to false, the default string is returned.
+ *
+ * @param {object} obj
+ * @param {Array<string>} path
+ * @param {string} defaultString
+ * @returns {string}
+ */
+function objToString(obj, path = [], defaultString = '') {
+	try {
+		// Cache the current object
+		let current = obj;
+
+		// For each item in the path, dig into the object
+		for (let i = 0; i < path.length; i++) {
+			// If the item isn't found, return the default (or null)
+			if (!current[path[i]]) return defaultString;
+
+			// Otherwise, update the current  value
+			current = current[path[i]];
+		}
+
+		if (typeof current === 'string') {
+			return current;
+		} else if (typeof current === 'object') {
+			return JSON.stringify(current, null, 2);
+		} else {
+			return defaultString;
+		}
+	} catch (error) {
+		return defaultString;
+	}
+}
 
 /**
  * @param configFilePath
@@ -540,7 +577,136 @@ async function importFiles(data, filesListArray, meshConfigName, autoConfirmActi
 	return resultData;
 }
 
+/**loads the pupa module dynamically and then interpolates the raw data from mesh file with object data
+ * @param {data}
+ * @param {obj}
+ * @returns {object} having interpolationStatus, missingKeys and interpolatedMesh
+ */
+
+async function interpolateMesh(data, obj) {
+	let missingKeys = new Set();
+	let interpolatedMesh;
+	let pupa;
+	try {
+		pupa = (await import('pupa')).default;
+	} catch {
+		throw new Error('Error while loading pupa module');
+	}
+
+	interpolatedMesh = pupa(data, obj, {
+		ignoreMissing: true,
+		transform: ({ value, key }) => {
+			if (key.startsWith('env.')) {
+				if (value) {
+					return value;
+				} else {
+					// missing value, add to list
+					missingKeys.add(key.split('.')[1]);
+				}
+			} else {
+				//ignore
+				return undefined;
+			}
+			return value;
+		},
+	});
+
+	if (missingKeys.size) {
+		return {
+			interpolationStatus: 'failed',
+			missingKeys: Array.from(missingKeys),
+			interpolatedMesh: '',
+		};
+	}
+	return {
+		interpolationStatus: 'success',
+		missingKeys: [],
+		interpolatedMeshData: interpolatedMesh,
+	};
+}
+
+/** Function to run cli command
+ *
+ * @param command Ocliff/Command
+ * @param workingDirectory string
+ *
+ * @returns Promise<void>
+ */
+function runCliCommand(command, workingDirectory = '.') {
+	return new Promise((resolve, reject) => {
+		const childProcess = exec(command, { cwd: workingDirectory });
+		childProcess.stdout.pipe(stdout);
+		childProcess.stdin.pipe(stderr);
+		childProcess.on('exit', code => {
+			if (code === 0) {
+				resolve();
+			} else {
+				reject(new Error(`${command} exection failed`));
+			}
+		});
+	});
+}
+
+/**
+ * Append/override files to the files array in meshConfig
+ *
+ * @param data MeshConfig
+ * @param file File to append or override
+ * @param meshConfigName MeshConfig name
+ * @param index Append operation if index is -1, else override, it is the index where the override takes place
+ */
+function updateFilesArray(data, file, meshConfigName, index) {
+	try {
+		let readFileData = fs.readFileSync(
+			path.resolve(path.dirname(meshConfigName), file),
+			{ encoding: 'utf-8' },
+			err => {
+				if (err) {
+					throw new Error(err);
+				}
+			},
+		);
+
+		try {
+			//validate JSON file
+			if (path.extname(file) === '.json') {
+				readFileData = JSON.stringify(JSON.parse(readFileData));
+			}
+		} catch (err) {
+			logger.error(err.message);
+			throw new Error(`Invalid JSON content in ${path.basename(file)}`);
+		}
+
+		//data to be overridden or appended
+		const dataInFilesArray = jsmin(readFileData);
+
+		if (index >= 0) {
+			data.meshConfig.files[index] = {
+				path: file,
+				content: dataInFilesArray,
+			};
+		} else {
+			//if the files array does not exist
+			if (!data.meshConfig.files) {
+				data.meshConfig.files = [];
+			}
+
+			//if the files arrray exists, we append the file path and content in meshConfig
+			data.meshConfig.files.push({
+				path: file,
+				content: dataInFilesArray,
+			});
+		}
+
+		return data;
+	} catch (err) {
+		logger.error(err.message);
+		throw new Error(err.message);
+	}
+}
+
 module.exports = {
+	objToString,
 	promptInput,
 	promptConfirm,
 	getLibConsoleCLI,
@@ -550,4 +716,7 @@ module.exports = {
 	promptSelect,
 	promptMultiselect,
 	importFiles,
+	interpolateMesh,
+	runCliCommand,
+	updateFilesArray,
 };
