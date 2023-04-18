@@ -1,0 +1,17 @@
+{
+	"meshConfig": {
+		"sources": [
+			{
+				"name": "<api-name>",
+				"handler": {
+					"graphql": {
+						"endpoint": "<api-url>"
+					}
+				}
+			}
+		],
+        "responseConfig":{
+            "includeHTTPDetails":true1
+        }
+	}
+}

@@ -22,11 +22,45 @@ const { getCliEnv } = require('@adobe/aio-lib-env');
 const logger = require('../src/classes/logger');
 const { UUID } = require('./classes/UUID');
 const CONSTANTS = require('./constants');
-const { objToString } = require('./utils');
 const { exec } = require('child_process');
 const { stdout, stderr } = require('process');
 
 const { DEV_CONSOLE_BASE_URL, DEV_CONSOLE_API_KEY, AIO_CLI_API_KEY } = CONSTANTS;
+
+/**
+ * Returns the string representation of the object's path.
+ * If the path evaluates to false, the default string is returned.
+ *
+ * @param {object} obj
+ * @param {Array<string>} path
+ * @param {string} defaultString
+ * @returns {string}
+ */
+function objToString(obj, path = [], defaultString = '') {
+	try {
+		// Cache the current object
+		let current = obj;
+
+		// For each item in the path, dig into the object
+		for (let i = 0; i < path.length; i++) {
+			// If the item isn't found, return the default (or null)
+			if (!current[path[i]]) return defaultString;
+
+			// Otherwise, update the current  value
+			current = current[path[i]];
+		}
+
+		if (typeof current === 'string') {
+			return current;
+		} else if (typeof current === 'object') {
+			return JSON.stringify(current, null, 2);
+		} else {
+			return defaultString;
+		}
+	} catch (error) {
+		return defaultString;
+	}
+}
 
 /**
  * @param configFilePath
@@ -462,7 +496,55 @@ async function promptInput(message) {
 }
 
 /**
- * Function to run cli command
+ *loads the pupa module dynamically and then interpolates the raw data from mesh file with object data
+ * @param {data}
+ * @param {obj}
+ * @returns {object} having interpolationStatus, missingKeys and interpolatedMesh
+ */
+
+async function interpolateMesh(data, obj) {
+	let missingKeys = new Set();
+	let interpolatedMesh;
+	let pupa;
+	try {
+		pupa = (await import('pupa')).default;
+	} catch {
+		throw new Error('Error while loading pupa module');
+	}
+
+	interpolatedMesh = pupa(data, obj, {
+		ignoreMissing: true,
+		transform: ({ value, key }) => {
+			if (key.startsWith('env.')) {
+				if (value) {
+					return value;
+				} else {
+					// missing value, add to list
+					missingKeys.add(key.split('.')[1]);
+				}
+			} else {
+				//ignore
+				return undefined;
+			}
+			return value;
+		},
+	});
+
+	if (missingKeys.size) {
+		return {
+			interpolationStatus: 'failed',
+			missingKeys: Array.from(missingKeys),
+			interpolatedMesh: '',
+		};
+	}
+	return {
+		interpolationStatus: 'success',
+		missingKeys: [],
+		interpolatedMeshData: interpolatedMesh,
+	};
+}
+
+/** Function to run cli command
  *
  * @param command Ocliff/Command
  * @param workingDirectory string
@@ -485,6 +567,7 @@ function runCliCommand(command, workingDirectory = '.') {
 }
 
 module.exports = {
+	objToString,
 	promptInput,
 	promptConfirm,
 	getLibConsoleCLI,
@@ -493,5 +576,6 @@ module.exports = {
 	initRequestId,
 	promptSelect,
 	promptMultiselect,
+	interpolateMesh,
 	runCliCommand,
 };

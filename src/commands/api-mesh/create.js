@@ -10,19 +10,24 @@ governing permissions and limitations under the License.
 */
 
 const { Command } = require('@oclif/core');
-const { readFile } = require('fs/promises');
 
 const { initSdk, initRequestId, promptConfirm } = require('../../helpers');
 const logger = require('../../classes/logger');
 const CONSTANTS = require('../../constants');
-const { ignoreCacheFlag, autoConfirmActionFlag, jsonFlag } = require('../../utils');
+const {
+	ignoreCacheFlag,
+	autoConfirmActionFlag,
+	jsonFlag,
+	envFileFlag,
+	checkPlaceholders,
+	readFileContents,
+	validateAndInterpolateMesh,
+} = require('../../utils');
 const {
 	createMesh,
 	createAPIMeshCredentials,
 	subscribeCredentialToMeshService,
 } = require('../../lib/devConsole');
-
-require('dotenv').config();
 
 const { MULTITENANT_GRAPHQL_SERVER_BASE_URL } = CONSTANTS;
 
@@ -32,6 +37,7 @@ class CreateCommand extends Command {
 		ignoreCache: ignoreCacheFlag,
 		autoConfirmAction: autoConfirmActionFlag,
 		json: jsonFlag,
+		env: envFileFlag,
 	};
 
 	static enableJsonFlag = true;
@@ -51,22 +57,26 @@ class CreateCommand extends Command {
 
 		const ignoreCache = await flags.ignoreCache;
 		const autoConfirmAction = await flags.autoConfirmAction;
-
+		const envFilePath = await flags.env;
 		const { imsOrgId, projectId, workspaceId } = await initSdk({
 			ignoreCache,
 		});
 
+		//Input the mesh data from the input file
+		let inputMeshData = await readFileContents(args.file, this, 'mesh');
+
 		let data;
 
-		try {
-			data = JSON.parse(await readFile(args.file, 'utf8'));
-		} catch (error) {
-			logger.error(error);
-
-			this.log(error.message);
-			this.error(
-				'Unable to read the mesh configuration file provided. Please check the file and try again.',
-			);
+		if (checkPlaceholders(inputMeshData)) {
+			this.log('The provided mesh contains placeholders. Starting mesh interpolation process.');
+			data = await validateAndInterpolateMesh(inputMeshData, envFilePath, this);
+		} else {
+			try {
+				data = JSON.parse(inputMeshData);
+			} catch (err) {
+				this.log(err.message);
+				this.error('Input mesh file is not a valid JSON. Please check the file provided.');
+			}
 		}
 
 		let shouldContinue = true;

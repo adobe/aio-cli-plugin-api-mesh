@@ -4,12 +4,11 @@
 const axios = require('axios');
 
 const logger = require('../classes/logger');
-const { objToString } = require('../utils');
 const CONSTANTS = require('../constants');
 
 const { DEV_CONSOLE_TRANSPORTER_API_KEY } = CONSTANTS;
 
-const { getDevConsoleConfig } = require('../helpers');
+const { objToString, getDevConsoleConfig } = require('../helpers');
 
 const getApiKeyCredential = async (organizationId, projectId, workspaceId) => {
 	const { baseUrl: devConsoleUrl, accessToken } = await getDevConsoleConfig();

@@ -58,7 +58,7 @@ describe('update command tests', () => {
 		logSpy = jest.spyOn(UpdateCommand.prototype, 'log');
 		errorLogSpy = jest.spyOn(UpdateCommand.prototype, 'error');
 
-		readFile.mockResolvedValue(true);
+		readFile.mockResolvedValue('{}');
 
 		getMeshId.mockResolvedValue('mesh_id');
 		updateMesh.mockResolvedValue({ status: 'success' });
