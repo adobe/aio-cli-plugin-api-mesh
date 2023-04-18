@@ -22,6 +22,8 @@ const { getCliEnv } = require('@adobe/aio-lib-env');
 const logger = require('../src/classes/logger');
 const { UUID } = require('./classes/UUID');
 const CONSTANTS = require('./constants');
+const { exec } = require('child_process');
+const { stdout, stderr } = require('process');
 
 const { DEV_CONSOLE_BASE_URL, DEV_CONSOLE_API_KEY, AIO_CLI_API_KEY } = CONSTANTS;
 
@@ -541,6 +543,29 @@ async function interpolateMesh(data, obj) {
 		interpolatedMeshData: interpolatedMesh,
 	};
 }
+ 
+	
+/** Function to run cli command
+ *
+ * @param command Ocliff/Command
+ * @param workingDirectory string
+ *
+ * @returns Promise<void>
+ */
+function runCliCommand(command, workingDirectory = '.') {
+	return new Promise((resolve, reject) => {
+		const childProcess = exec(command, { cwd: workingDirectory });
+		childProcess.stdout.pipe(stdout);
+		childProcess.stdin.pipe(stderr);
+		childProcess.on('exit', code => {
+			if (code === 0) {
+				resolve();
+			} else {
+				reject(new Error(`${command} exection failed`));
+			}
+		});
+	});
+}
 
 module.exports = {
 	objToString,
@@ -553,4 +578,5 @@ module.exports = {
 	promptSelect,
 	promptMultiselect,
 	interpolateMesh,
+	runCliCommand,
 };

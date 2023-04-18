@@ -1,7 +1,20 @@
+const fs = require('fs');
+const path = require('path');
 const { Flags } = require('@oclif/core');
 const { readFile } = require('fs/promises');
 const { interpolateMesh } = require('./helpers');
 const dotenv = require('dotenv');
+
+/**
+ * @returns returns the root directory of the project
+ */
+function getAppRootDir() {
+	let currentDir = __dirname;
+	while (!fs.existsSync(path.join(currentDir, 'package.json'))) {
+		currentDir = path.join(currentDir, '..');
+	}
+	return currentDir;
+}
 
 const ignoreCacheFlag = Flags.boolean({
 	char: 'i',
@@ -181,4 +194,5 @@ module.exports = {
 	readFileContents,
 	validateEnvFileFormat,
 	validateAndInterpolateMesh,
+	getAppRootDir,
 };
