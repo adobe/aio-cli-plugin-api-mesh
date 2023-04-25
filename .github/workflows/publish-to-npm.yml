@@ -1,9 +1,10 @@
 name: publish-to-npm
 on:
-    pull_request:
-        types: [closed]
-        branches:
-            - main
+    push:
+    # pull_request:
+    #     types: [closed]
+    #     branches:
+    #         - main
 jobs:
     publish:
         if: github.repository == 'adobe/aio-cli-plugin-api-mesh'
