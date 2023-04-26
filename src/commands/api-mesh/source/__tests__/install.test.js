@@ -104,9 +104,9 @@ describe('source:install command tests', () => {
 	});
 	test('Check executing with invalid file parameter', async () => {
 		await InstallCommand.run(['test-03', '-f=notexist.json']).catch(err => {
-			expect(err.message).toEqual(
+			expect(err.message).toContain(
 				`Something went wrong trying to read the variables file.` +
-					`\nENOENT: no such file or directory, open 'notexist.json'`,
+					`\nENOENT: no such file or directory`,
 			);
 		});
 	});

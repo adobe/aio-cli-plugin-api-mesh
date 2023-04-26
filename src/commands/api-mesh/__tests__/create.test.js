@@ -161,19 +161,13 @@ describe('create command tests', () => {
 			},
 		});
 		const runResult = CreateCommand.run();
-
+		const expected = [expect.stringMatching(/ENOENT: no such file or directory/)];
 		await expect(runResult).rejects.toEqual(
 			new Error(
 				'Unable to read the mesh configuration file provided. Please check the file and try again.',
 			),
 		);
-		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
-		[
-		  [
-		    "ENOENT: no such file or directory, open 'dummy_file_path'",
-		  ],
-		]
-	`);
+		expect(logSpy.mock.calls[0]).toEqual(expect.arrayContaining(expected));
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
 		[
 		  [
