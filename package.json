@@ -1,6 +1,6 @@
 {
 	"name": "@adobe/aio-cli-plugin-api-mesh",
-	"version": "1.4.0",
+	"version": "2.1.0",
 	"publishConfig": {
 		"access": "public"
 	},
@@ -51,7 +51,7 @@
 	},
 	"engines": {
 		"npm": ">=8.0.0",
-		"node": ">=18.0.0"
+		"node": "^16.13 || >=18.0.0"
 	},
 	"files": [
 		"/oclif.manifest.json",

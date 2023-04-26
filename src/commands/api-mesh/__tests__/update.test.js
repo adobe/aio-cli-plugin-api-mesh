@@ -73,134 +73,6 @@ describe('update command tests', () => {
 		});
 	});
 
-	afterEach(() => {
-		jest.restoreAllMocks();
-	});
-
-	test('should fail if mesh id is missing', async () => {
-		getMeshId.mockResolvedValue(null);
-		const runResult = UpdateCommand.run();
-
-		await expect(runResult).rejects.toMatchInlineSnapshot(
-			`[Error: Unable to update. No mesh found for Org(1234) -> Project(5678) -> Workspace(123456789). Please check the details and try again.]`,
-		);
-		expect(logSpy.mock.calls).toMatchInlineSnapshot(`[]`);
-		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
-		[
-		  [
-		    "Unable to update. No mesh found for Org(1234) -> Project(5678) -> Workspace(123456789). Please check the details and try again.",
-		  ],
-		]
-	`);
-	});
-
-	test('should fail if getMeshId api failed', async () => {
-		getMeshId.mockRejectedValue(new Error('getMeshId api failed'));
-		const runResult = UpdateCommand.run();
-
-		await expect(runResult).rejects.toMatchInlineSnapshot(
-			`[Error: Unable to get mesh ID. Please check the details and try again. RequestId: dummy_request_id]`,
-		);
-		expect(logSpy.mock.calls).toMatchInlineSnapshot(`[]`);
-		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
-		[
-		  [
-		    "Unable to get mesh ID. Please check the details and try again. RequestId: dummy_request_id",
-		  ],
-		]
-	`);
-	});
-
-	test('should fail if update file path is missing', async () => {
-		parseSpy.mockResolvedValueOnce({
-			args: { file: null },
-			flags: {
-				ignoreCache: mockIgnoreCacheFlag,
-				autoConfirmAction: mockAutoApproveAction,
-			},
-		});
-		const runResult = UpdateCommand.run();
-
-		await expect(runResult).rejects.toEqual(
-			new Error('Missing required args. Run aio api-mesh update --help for more info.'),
-		);
-		expect(logSpy.mock.calls).toMatchInlineSnapshot(`[]`);
-		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
-		[
-		  [
-		    "Missing required args. Run aio api-mesh update --help for more info.",
-		  ],
-		]
-	`);
-	});
-
-	test('should fail if dummy file path is provided', async () => {
-		readFile.mockRejectedValueOnce(new Error('File not found'));
-		const runResult = UpdateCommand.run();
-
-		await expect(runResult).rejects.toEqual(
-			new Error(
-				'Unable to read the mesh configuration file provided. Please check the file and try again.',
-			),
-		);
-		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
-		[
-		  [
-		    "File not found",
-		  ],
-		]
-	`);
-		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
-		[
-		  [
-		    "Unable to read the mesh configuration file provided. Please check the file and try again.",
-		  ],
-		]
-	`);
-	});
-
-	test('should not update if user prompt returns false', async () => {
-		promptConfirm.mockResolvedValueOnce(false);
-
-		const runResult = await UpdateCommand.run();
-
-		expect(runResult).toMatchInlineSnapshot(`"Update cancelled"`);
-		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
-		[
-		  [
-		    "Update cancelled",
-		  ],
-		]
-	`);
-		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`[]`);
-	});
-
-	test('should fail if updateMesh method failed', async () => {
-		updateMesh.mockRejectedValueOnce(new Error('dummy_error'));
-
-		const runResult = UpdateCommand.run();
-
-		await expect(runResult).rejects.toEqual(
-			new Error(
-				'Unable to update the mesh. Please check the mesh configuration file and try again. If the error persists please contact support. RequestId: dummy_request_id',
-			),
-		);
-		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
-		[
-		  [
-		    "dummy_error",
-		  ],
-		]
-	`);
-		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
-		[
-		  [
-		    "Unable to update the mesh. Please check the mesh configuration file and try again. If the error persists please contact support. RequestId: dummy_request_id",
-		  ],
-		]
-	`);
-	});
-
 	test('should pass with valid args', async () => {
 		const runResult = await UpdateCommand.run();
 
@@ -317,6 +189,134 @@ describe('update command tests', () => {
 		  ],
 		  [
 		    "******************************************************************************************************",
+		  ],
+		]
+	`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`[]`);
+	});
+
+	test('should fail if mesh id is missing', async () => {
+		getMeshId.mockResolvedValue(null);
+		const runResult = UpdateCommand.run();
+
+		await expect(runResult).rejects.toMatchInlineSnapshot(
+			`[Error: Unable to update. No mesh found for Org(1234) -> Project(5678) -> Workspace(123456789). Please check the details and try again.]`,
+		);
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`[]`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Unable to update. No mesh found for Org(1234) -> Project(5678) -> Workspace(123456789). Please check the details and try again.",
+		  ],
+		]
+	`);
+	});
+
+	test('should fail if getMeshId api failed', async () => {
+		getMeshId.mockRejectedValue(new Error('getMeshId api failed'));
+		const runResult = UpdateCommand.run();
+
+		await expect(runResult).rejects.toMatchInlineSnapshot(
+			`[Error: Unable to get mesh ID. Please check the details and try again. RequestId: dummy_request_id]`,
+		);
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`[]`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Unable to get mesh ID. Please check the details and try again. RequestId: dummy_request_id",
+		  ],
+		]
+	`);
+	});
+
+	test('should fail if updateMesh method failed', async () => {
+		updateMesh.mockRejectedValueOnce(new Error('dummy_error'));
+
+		const runResult = UpdateCommand.run();
+
+		// await expect(runResult).rejects.toEqual(
+		// 	new Error(
+		// 		'Unable to update the mesh. Please check the mesh configuration file and try again. If the error persists please contact support. RequestId: dummy_request_id',
+		// 	),
+		// );
+
+		await expect(runResult).rejects.toMatchInlineSnapshot(
+			`[Error: Unable to update the mesh. Please check the mesh configuration file and try again. If the error persists please contact support. RequestId: dummy_request_id]`,
+		);
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "dummy_error",
+		  ],
+		]
+	`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Unable to update the mesh. Please check the mesh configuration file and try again. If the error persists please contact support. RequestId: dummy_request_id",
+		  ],
+		]
+	`);
+	});
+
+	test('should fail if update file path is missing', async () => {
+		parseSpy.mockResolvedValueOnce({
+			args: { file: null },
+			flags: {
+				ignoreCache: mockIgnoreCacheFlag,
+				autoConfirmAction: mockAutoApproveAction,
+			},
+		});
+		const runResult = UpdateCommand.run();
+
+		await expect(runResult).rejects.toEqual(
+			new Error('Missing required args. Run aio api-mesh update --help for more info.'),
+		);
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`[]`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Missing required args. Run aio api-mesh update --help for more info.",
+		  ],
+		]
+	`);
+	});
+
+	test('should fail if dummy file path is provided', async () => {
+		readFile.mockRejectedValueOnce(new Error('File not found'));
+		const runResult = UpdateCommand.run();
+
+		await expect(runResult).rejects.toEqual(
+			new Error(
+				'Unable to read the mesh configuration file provided. Please check the file and try again.',
+			),
+		);
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "File not found",
+		  ],
+		]
+	`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Unable to read the mesh configuration file provided. Please check the file and try again.",
+		  ],
+		]
+	`);
+	});
+
+	test('should not update if user prompt returns false', async () => {
+		promptConfirm.mockResolvedValueOnce(false);
+
+		const runResult = await UpdateCommand.run();
+
+		expect(runResult).toMatchInlineSnapshot(`"Update cancelled"`);
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Update cancelled",
 		  ],
 		]
 	`);
