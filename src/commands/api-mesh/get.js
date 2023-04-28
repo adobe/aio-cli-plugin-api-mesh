@@ -9,12 +9,12 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const { Command } = require('@oclif/command');
+const { Command } = require('@oclif/core');
 const { writeFile } = require('fs/promises');
 
 const logger = require('../../classes/logger');
 const { initSdk, initRequestId } = require('../../helpers');
-const { ignoreCacheFlag } = require('../../utils');
+const { ignoreCacheFlag, jsonFlag } = require('../../utils');
 const { getMeshId, getMesh } = require('../../lib/devConsole');
 
 require('dotenv').config();
@@ -23,7 +23,10 @@ class GetCommand extends Command {
 	static args = [{ name: 'file' }];
 	static flags = {
 		ignoreCache: ignoreCacheFlag,
+		json: jsonFlag,
 	};
+
+	static enableJsonFlag = true;
 
 	async run() {
 		await initRequestId();
@@ -33,9 +36,11 @@ class GetCommand extends Command {
 		const { args, flags } = await this.parse(GetCommand);
 
 		const ignoreCache = await flags.ignoreCache;
+		const json = await flags.json;
 
 		const { imsOrgId, projectId, workspaceId } = await initSdk({
 			ignoreCache,
+			verbose: !json,
 		});
 
 		let meshId = null;
