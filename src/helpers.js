@@ -134,6 +134,7 @@ async function getDevConsoleConfig() {
 }
 
 /**
+ * @param options
  * @returns {string} Returns organizations the user belongs to
  */
 async function getAuthorizedOrganization(options = { verbose: true }) {
@@ -177,6 +178,7 @@ async function getAuthorizedOrganization(options = { verbose: true }) {
 /**
  * @param imsOrgId
  * @param imsOrgTitle
+ * @param options
  */
 async function getProject(imsOrgId, imsOrgTitle, options = { verbose: true }) {
 	logger.info(`Initializing project selection for ${imsOrgId}`);
@@ -225,6 +227,7 @@ async function getProject(imsOrgId, imsOrgTitle, options = { verbose: true }) {
  * @param projectId
  * @param imsOrgTitle
  * @param projectTitle
+ * @param options
  */
 async function getWorkspace(
 	orgId,
@@ -356,17 +359,17 @@ async function getLibConsoleCLI() {
  * @returns {any} Returns an object with properties ready for consumption
  */
 async function initSdk(options) {
-	const { ignoreCache = false } = options;
+	const { ignoreCache = false, verbose = true } = options;
 
 	let org;
 	let project;
 	let workspace;
 
 	if (!ignoreCache) {
-		org = await getAuthorizedOrganization({ verbose: options.verbose });
-		project = await getProject(org.id, org.name, { verbose: options.verbose });
+		org = await getAuthorizedOrganization({ verbose: verbose });
+		project = await getProject(org.id, org.name, { verbose: verbose });
 		workspace = await getWorkspace(org.id, project.id, org.name, project.title, {
-			verbose: options.verbose,
+			verbose: verbose,
 		});
 	} else {
 		org = await selectAuthorizedOrganization();

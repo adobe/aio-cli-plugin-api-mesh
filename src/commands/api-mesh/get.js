@@ -9,7 +9,7 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const { Command } = require('@oclif/command');
+const { Command } = require('@oclif/core');
 const { writeFile } = require('fs/promises');
 
 const logger = require('../../classes/logger');
@@ -25,6 +25,8 @@ class GetCommand extends Command {
 		ignoreCache: ignoreCacheFlag,
 		json: jsonFlag,
 	};
+
+	static enableJsonFlag = true;
 
 	async run() {
 		await initRequestId();
@@ -56,8 +58,7 @@ class GetCommand extends Command {
 				const mesh = await getMesh(imsOrgId, projectId, workspaceId, meshId);
 
 				if (mesh) {
-					const jsonString = JSON.stringify(mesh, null, 2);
-					this.log(json ? '' : 'Successfully retrieved mesh %s', jsonString);
+					this.log('Successfully retrieved mesh %s', JSON.stringify(mesh, null, 2));
 
 					if (args.file) {
 						try {
