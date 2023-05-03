@@ -160,7 +160,7 @@ class InitCommand extends Command {
 				}
 			}
 
-			this.log('Local Workspace Created Successfully');
+			this.log('Local workspace created successfully');
 		}
 	}
 }
