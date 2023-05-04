@@ -171,9 +171,10 @@ async function getDevConsoleConfig() {
 }
 
 /**
+ * @param options
  * @returns {string} Returns organizations the user belongs to
  */
-async function getAuthorizedOrganization() {
+async function getAuthorizedOrganization(options = { verbose: true }) {
 	logger.info(`Initializing organization selection for`);
 
 	const { consoleCLI } = await getLibConsoleCLI();
@@ -203,7 +204,9 @@ async function getAuthorizedOrganization() {
 		}
 	} else {
 		logger.debug(`Selected organization config ${objToString(consoleConfigOrg)}`);
-		console.log(`Selected organization: ${consoleConfigOrg.name}`);
+		if (options.verbose) {
+			console.log(`Selected organization: ${consoleConfigOrg.name}`);
+		}
 
 		return Object.assign({}, consoleConfigOrg);
 	}
@@ -212,8 +215,9 @@ async function getAuthorizedOrganization() {
 /**
  * @param imsOrgId
  * @param imsOrgTitle
+ * @param options
  */
-async function getProject(imsOrgId, imsOrgTitle) {
+async function getProject(imsOrgId, imsOrgTitle, options = { verbose: true }) {
 	logger.info(`Initializing project selection for ${imsOrgId}`);
 
 	const { consoleCLI } = await getLibConsoleCLI();
@@ -247,7 +251,9 @@ async function getProject(imsOrgId, imsOrgTitle) {
 		}
 	} else {
 		logger.debug(`Selected project config ${objToString(consoleConfigProject)}`);
-		console.log(`Selected project: ${consoleConfigProject.title}`);
+		if (options.verbose) {
+			console.log(`Selected project: ${consoleConfigProject.title}`);
+		}
 
 		return consoleConfigProject;
 	}
@@ -258,8 +264,15 @@ async function getProject(imsOrgId, imsOrgTitle) {
  * @param projectId
  * @param imsOrgTitle
  * @param projectTitle
+ * @param options
  */
-async function getWorkspace(orgId, projectId, imsOrgTitle, projectTitle) {
+async function getWorkspace(
+	orgId,
+	projectId,
+	imsOrgTitle,
+	projectTitle,
+	options = { verbose: true },
+) {
 	logger.info(`Initializing workspace selection for ${orgId} -> ${projectId}`);
 
 	const { consoleCLI } = await getLibConsoleCLI();
@@ -292,7 +305,9 @@ async function getWorkspace(orgId, projectId, imsOrgTitle, projectTitle) {
 		}
 	} else {
 		logger.debug(`Selected workspace config ${objToString(consoleConfigWorkspace)}`);
-		console.log(`Select workspace: ${consoleConfigWorkspace.name}`);
+		if (options.verbose) {
+			console.log(`Select workspace: ${consoleConfigWorkspace.name}`);
+		}
 
 		return {
 			id: consoleConfigWorkspace.id,
@@ -381,16 +396,18 @@ async function getLibConsoleCLI() {
  * @returns {any} Returns an object with properties ready for consumption
  */
 async function initSdk(options) {
-	const { ignoreCache = false } = options;
+	const { ignoreCache = false, verbose = true } = options;
 
 	let org;
 	let project;
 	let workspace;
 
 	if (!ignoreCache) {
-		org = await getAuthorizedOrganization();
-		project = await getProject(org.id, org.name);
-		workspace = await getWorkspace(org.id, project.id, org.name, project.title);
+		org = await getAuthorizedOrganization({ verbose: verbose });
+		project = await getProject(org.id, org.name, { verbose: verbose });
+		workspace = await getWorkspace(org.id, project.id, org.name, project.title, {
+			verbose: verbose,
+		});
 	} else {
 		org = await selectAuthorizedOrganization();
 		project = await selectProject(org.id, org.name);
