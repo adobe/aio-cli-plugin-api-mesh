@@ -1,0 +1,17 @@
+{
+	"meshConfig": {
+		"sources": [
+			{
+				"name": "{env.magentoAPIName}",
+				"handler": {
+					"graphql": {
+						"endpoint": "{env.magentoURL}"
+					}
+				}
+			}
+		],
+        "responseConfig":{
+            "includeHTTPDetails":{env.includeHTTPDetailsValue}
+        }
+	}
+}

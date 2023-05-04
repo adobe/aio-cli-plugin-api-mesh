@@ -10,20 +10,26 @@ governing permissions and limitations under the License.
 */
 
 const { Command } = require('@oclif/command');
-const { readFile } = require('fs/promises');
 
 const logger = require('../../classes/logger');
-const { initSdk, initRequestId, promptConfirm } = require('../../helpers');
-const { ignoreCacheFlag, autoConfirmActionFlag } = require('../../utils');
+const { initSdk, initRequestId, promptConfirm, importFiles } = require('../../helpers');
+const {
+	ignoreCacheFlag,
+	autoConfirmActionFlag,
+	envFileFlag,
+	checkPlaceholders,
+	readFileContents,
+	validateAndInterpolateMesh,
+	getFilesInMeshConfig,
+} = require('../../utils');
 const { getMeshId, updateMesh } = require('../../lib/devConsole');
-
-require('dotenv').config();
 
 class UpdateCommand extends Command {
 	static args = [{ name: 'file' }];
 	static flags = {
 		ignoreCache: ignoreCacheFlag,
 		autoConfirmAction: autoConfirmActionFlag,
+		env: envFileFlag,
 	};
 
 	async run() {
@@ -41,23 +47,14 @@ class UpdateCommand extends Command {
 
 		const ignoreCache = await flags.ignoreCache;
 		const autoConfirmAction = await flags.autoConfirmAction;
+		const envFilePath = await flags.env;
 
 		const { imsOrgId, projectId, workspaceId } = await initSdk({
 			ignoreCache,
 		});
 
-		let data;
-
-		try {
-			data = JSON.parse(await readFile(args.file, 'utf8'));
-		} catch (error) {
-			logger.error(error);
-
-			this.log(error.message);
-			this.error(
-				'Unable to read the mesh configuration file provided. Please check the file and try again.',
-			);
-		}
+		//Input the mesh data from the input file
+		let inputMeshData = await readFileContents(args.file, this, 'mesh');
 
 		let meshId = null;
 
@@ -67,6 +64,41 @@ class UpdateCommand extends Command {
 			this.error(
 				`Unable to get mesh ID. Please check the details and try again. RequestId: ${global.requestId}`,
 			);
+		}
+
+		let data;
+
+		if (checkPlaceholders(inputMeshData)) {
+			this.log('The provided mesh contains placeholders. Starting mesh interpolation process.');
+			data = await validateAndInterpolateMesh(inputMeshData, envFilePath, this);
+		} else {
+			try {
+				data = JSON.parse(inputMeshData);
+			} catch (err) {
+				this.log(err.message);
+				this.error('Input mesh file is not a valid JSON. Please check the file provided.');
+			}
+		}
+
+		let filesList = [];
+
+		try {
+			filesList = getFilesInMeshConfig(data, args.file);
+		} catch (err) {
+			this.log(err.message);
+			this.error('Input mesh config is not valid.');
+		}
+
+		// if local files are present, import them in files array in meshConfig
+		if (filesList.length) {
+			try {
+				data = await importFiles(data, filesList, args.file, flags.autoConfirmAction);
+			} catch (err) {
+				this.log(err.message);
+				this.error(
+					'Unable to import the files in the mesh config. Please check the file and try again.',
+				);
+			}
 		}
 
 		if (meshId) {

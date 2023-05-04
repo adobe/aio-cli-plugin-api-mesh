@@ -1,0 +1,14 @@
+{
+    "meshConfig":{
+       "sources":[
+          {
+            "name": "CurrencyAPI",
+            "handler": {
+              "openapi": {
+                "source": "~/venia-openapi-schema.json"
+              }
+            }
+          }
+       ]
+    }
+ }
