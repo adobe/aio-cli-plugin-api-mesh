@@ -122,7 +122,7 @@ describe('source:get command tests', () => {
 		const version = '1.1.1';
 		await GetCommand.run([`-s=${name}@${version}`]).catch(err => {
 			expect(err.message).toContain(
-				chalk.red(`The version \"1.1.1\" for source name \"test-01\" doesn't exist.`),
+				chalk.red(`The version "1.1.1" for source name "test-01" doesn't exist.`),
 			);
 		});
 	});

@@ -1,6 +1,6 @@
 {
 	"name": "@adobe/aio-cli-plugin-api-mesh",
-	"version": "2.1.0",
+	"version": "2.3.0",
 	"publishConfig": {
 		"access": "public"
 	},
@@ -16,13 +16,15 @@
 		"@oclif/errors": "^1.1.2",
 		"axios": "^1.2.0",
 		"chalk": "^4.1.0",
-		"dotenv": "^16.0.1",
+		"dotenv": "^16.0.3",
 		"fs-extra": "^11.1.0",
 		"inquirer": "^8.2.4",
 		"json-interpolate": "^1.0.3",
 		"node-clipboardy": "^1.0.3",
 		"pino": "^7.9.2",
 		"pino-pretty": "^7.6.0",
+		"pupa": "^3.1.0",
+		"jsmin": "1.0.1",
 		"source-registry-storage-adapter": "github:devx-services/source-registry-storage-adapter#main",
 		"uuid": "^8.3.2"
 	},

@@ -12,7 +12,6 @@ governing permissions and limitations under the License.
 
 const fs = require('fs');
 const inquirer = require('inquirer');
-
 const Config = require('@adobe/aio-lib-core-config');
 const { getToken, context } = require('@adobe/aio-lib-ims');
 const { CLI } = require('@adobe/aio-lib-ims/src/context');
@@ -22,9 +21,47 @@ const { getCliEnv } = require('@adobe/aio-lib-env');
 const logger = require('../src/classes/logger');
 const { UUID } = require('./classes/UUID');
 const CONSTANTS = require('./constants');
-const { objToString } = require('./utils');
+const path = require('path');
+const { exec } = require('child_process');
+const { stdout, stderr } = require('process');
+const jsmin = require('jsmin').jsmin;
 
 const { DEV_CONSOLE_BASE_URL, DEV_CONSOLE_API_KEY, AIO_CLI_API_KEY } = CONSTANTS;
+
+/**
+ * Returns the string representation of the object's path.
+ * If the path evaluates to false, the default string is returned.
+ *
+ * @param {object} obj
+ * @param {Array<string>} path
+ * @param {string} defaultString
+ * @returns {string}
+ */
+function objToString(obj, path = [], defaultString = '') {
+	try {
+		// Cache the current object
+		let current = obj;
+
+		// For each item in the path, dig into the object
+		for (let i = 0; i < path.length; i++) {
+			// If the item isn't found, return the default (or null)
+			if (!current[path[i]]) return defaultString;
+
+			// Otherwise, update the current  value
+			current = current[path[i]];
+		}
+
+		if (typeof current === 'string') {
+			return current;
+		} else if (typeof current === 'object') {
+			return JSON.stringify(current, null, 2);
+		} else {
+			return defaultString;
+		}
+	} catch (error) {
+		return defaultString;
+	}
+}
 
 /**
  * @param configFilePath
@@ -134,9 +171,10 @@ async function getDevConsoleConfig() {
 }
 
 /**
+ * @param options
  * @returns {string} Returns organizations the user belongs to
  */
-async function getAuthorizedOrganization() {
+async function getAuthorizedOrganization(options = { verbose: true }) {
 	logger.info(`Initializing organization selection for`);
 
 	const { consoleCLI } = await getLibConsoleCLI();
@@ -166,7 +204,9 @@ async function getAuthorizedOrganization() {
 		}
 	} else {
 		logger.debug(`Selected organization config ${objToString(consoleConfigOrg)}`);
-		console.log(`Selected organization: ${consoleConfigOrg.name}`);
+		if (options.verbose) {
+			console.log(`Selected organization: ${consoleConfigOrg.name}`);
+		}
 
 		return Object.assign({}, consoleConfigOrg);
 	}
@@ -175,8 +215,9 @@ async function getAuthorizedOrganization() {
 /**
  * @param imsOrgId
  * @param imsOrgTitle
+ * @param options
  */
-async function getProject(imsOrgId, imsOrgTitle) {
+async function getProject(imsOrgId, imsOrgTitle, options = { verbose: true }) {
 	logger.info(`Initializing project selection for ${imsOrgId}`);
 
 	const { consoleCLI } = await getLibConsoleCLI();
@@ -210,7 +251,9 @@ async function getProject(imsOrgId, imsOrgTitle) {
 		}
 	} else {
 		logger.debug(`Selected project config ${objToString(consoleConfigProject)}`);
-		console.log(`Selected project: ${consoleConfigProject.title}`);
+		if (options.verbose) {
+			console.log(`Selected project: ${consoleConfigProject.title}`);
+		}
 
 		return consoleConfigProject;
 	}
@@ -221,8 +264,15 @@ async function getProject(imsOrgId, imsOrgTitle) {
  * @param projectId
  * @param imsOrgTitle
  * @param projectTitle
+ * @param options
  */
-async function getWorkspace(orgId, projectId, imsOrgTitle, projectTitle) {
+async function getWorkspace(
+	orgId,
+	projectId,
+	imsOrgTitle,
+	projectTitle,
+	options = { verbose: true },
+) {
 	logger.info(`Initializing workspace selection for ${orgId} -> ${projectId}`);
 
 	const { consoleCLI } = await getLibConsoleCLI();
@@ -255,7 +305,9 @@ async function getWorkspace(orgId, projectId, imsOrgTitle, projectTitle) {
 		}
 	} else {
 		logger.debug(`Selected workspace config ${objToString(consoleConfigWorkspace)}`);
-		console.log(`Select workspace: ${consoleConfigWorkspace.name}`);
+		if (options.verbose) {
+			console.log(`Select workspace: ${consoleConfigWorkspace.name}`);
+		}
 
 		return {
 			id: consoleConfigWorkspace.id,
@@ -311,7 +363,7 @@ const selectWorkspace = async (orgId, projectId, imsOrgTitle, projectTitle) => {
 			throw new Error('No workspace selected');
 		}
 	} else {
-		this.error(
+		throw new Error(
 			'No workspaces found for the selected organization: ' +
 				imsOrgTitle +
 				' and project: ' +
@@ -344,16 +396,18 @@ async function getLibConsoleCLI() {
  * @returns {any} Returns an object with properties ready for consumption
  */
 async function initSdk(options) {
-	const { ignoreCache = false } = options;
+	const { ignoreCache = false, verbose = true } = options;
 
 	let org;
 	let project;
 	let workspace;
 
 	if (!ignoreCache) {
-		org = await getAuthorizedOrganization();
-		project = await getProject(org.id, org.name);
-		workspace = await getWorkspace(org.id, project.id, org.name, project.title);
+		org = await getAuthorizedOrganization({ verbose: verbose });
+		project = await getProject(org.id, org.name, { verbose: verbose });
+		workspace = await getWorkspace(org.id, project.id, org.name, project.title, {
+			verbose: verbose,
+		});
 	} else {
 		org = await selectAuthorizedOrganization();
 		project = await selectProject(org.id, org.name);
@@ -459,7 +513,217 @@ async function promptInput(message) {
 	return selected.item;
 }
 
+/**
+ * Import the files in the files array in meshConfig
+ *
+ * @param data MeshConfig
+ * @param filesList List of files in meshConfig
+ * @param meshConfigName MeshConfigName
+ * @param autoConfirmActionFlag The user won't be prompted any questions, if this flag is set
+ */
+async function importFiles(data, filesListArray, meshConfigName, autoConfirmActionFlag) {
+	//if autoConfirmActionFlag is passed in the command, it should override by default
+	let shouldOverride = true;
+	let filesNotFound = [];
+	let filesPathMap = new Map();
+	let filesListMap = new Map(
+		filesListArray.map(ele => {
+			return [ele];
+		}),
+	);
+
+	//copy the meshConfig data
+	let resultData = data;
+
+	//array of {file to be overridden, overrideIndex}
+	let overrideArr = [];
+
+	if (data.meshConfig.files) {
+		for (let i = 0; i < data.meshConfig.files?.length; i++) {
+			filesPathMap.set(data.meshConfig.files[i].path, i);
+		}
+	}
+
+	for (let file of filesListMap.keys()) {
+		//if file exists in files array
+		if (filesPathMap.has(file)) {
+			//if file exists in files array, then override
+			if (fs.existsSync(path.resolve(path.dirname(meshConfigName), file))) {
+				if (!autoConfirmActionFlag) {
+					let index = filesPathMap.get(file);
+					overrideArr.push({ fileName: file, index: index });
+				}
+			}
+		} else {
+			//if file does not exist in files array, but exists in filesystem, we append
+			if (fs.existsSync(path.resolve(path.dirname(meshConfigName), file))) {
+				resultData = updateFilesArray(resultData, file, meshConfigName, -1);
+			} else {
+				filesNotFound.push(file);
+			}
+		}
+	}
+
+	if (filesNotFound.length) {
+		for (let i = 0; i < filesNotFound.length; i++) {
+			filesNotFound[i] = path.basename(filesNotFound[i]);
+		}
+
+		throw new Error(
+			`Please make sure the file(s): ${filesNotFound.join(', ')} and ${path.basename(
+				meshConfigName,
+			)} are in the same directory/subdirectory`,
+		);
+	}
+
+	for (let i = 0; i < overrideArr.length; i++) {
+		shouldOverride = await promptConfirm(
+			`Do you want to override the ${path.basename(overrideArr[i].fileName)} file?`,
+		);
+
+		if (shouldOverride) {
+			resultData = updateFilesArray(
+				resultData,
+				overrideArr[i].fileName,
+				meshConfigName,
+				overrideArr[i].index,
+			);
+		}
+	}
+
+	return resultData;
+}
+
+/**loads the pupa module dynamically and then interpolates the raw data from mesh file with object data
+ * @param {data}
+ * @param {obj}
+ * @returns {object} having interpolationStatus, missingKeys and interpolatedMesh
+ */
+
+async function interpolateMesh(data, obj) {
+	let missingKeys = new Set();
+	let interpolatedMesh;
+	let pupa;
+	try {
+		pupa = (await import('pupa')).default;
+	} catch {
+		throw new Error('Error while loading pupa module');
+	}
+
+	interpolatedMesh = pupa(data, obj, {
+		ignoreMissing: true,
+		transform: ({ value, key }) => {
+			if (key.startsWith('env.')) {
+				if (value) {
+					return value;
+				} else {
+					// missing value, add to list
+					missingKeys.add(key.split('.')[1]);
+				}
+			} else {
+				//ignore
+				return undefined;
+			}
+			return value;
+		},
+	});
+
+	if (missingKeys.size) {
+		return {
+			interpolationStatus: 'failed',
+			missingKeys: Array.from(missingKeys),
+			interpolatedMesh: '',
+		};
+	}
+	return {
+		interpolationStatus: 'success',
+		missingKeys: [],
+		interpolatedMeshData: interpolatedMesh,
+	};
+}
+
+/** Function to run cli command
+ *
+ * @param command Ocliff/Command
+ * @param workingDirectory string
+ *
+ * @returns Promise<void>
+ */
+function runCliCommand(command, workingDirectory = '.') {
+	return new Promise((resolve, reject) => {
+		const childProcess = exec(command, { cwd: workingDirectory });
+		childProcess.stdout.pipe(stdout);
+		childProcess.stdin.pipe(stderr);
+		childProcess.on('exit', code => {
+			if (code === 0) {
+				resolve();
+			} else {
+				reject(new Error(`${command} exection failed`));
+			}
+		});
+	});
+}
+
+/**
+ * Append/override files to the files array in meshConfig
+ *
+ * @param data MeshConfig
+ * @param file File to append or override
+ * @param meshConfigName MeshConfig name
+ * @param index Append operation if index is -1, else override, it is the index where the override takes place
+ */
+function updateFilesArray(data, file, meshConfigName, index) {
+	try {
+		let readFileData = fs.readFileSync(
+			path.resolve(path.dirname(meshConfigName), file),
+			{ encoding: 'utf-8' },
+			err => {
+				if (err) {
+					throw new Error(err);
+				}
+			},
+		);
+
+		try {
+			//validate JSON file
+			if (path.extname(file) === '.json') {
+				readFileData = JSON.stringify(JSON.parse(readFileData));
+			}
+		} catch (err) {
+			logger.error(err.message);
+			throw new Error(`Invalid JSON content in ${path.basename(file)}`);
+		}
+
+		//data to be overridden or appended
+		const dataInFilesArray = jsmin(readFileData);
+
+		if (index >= 0) {
+			data.meshConfig.files[index] = {
+				path: file,
+				content: dataInFilesArray,
+			};
+		} else {
+			//if the files array does not exist
+			if (!data.meshConfig.files) {
+				data.meshConfig.files = [];
+			}
+
+			//if the files arrray exists, we append the file path and content in meshConfig
+			data.meshConfig.files.push({
+				path: file,
+				content: dataInFilesArray,
+			});
+		}
+
+		return data;
+	} catch (err) {
+		logger.error(err.message);
+		throw new Error(err.message);
+	}
+}
+
 module.exports = {
+	objToString,
 	promptInput,
 	promptConfirm,
 	getLibConsoleCLI,
@@ -468,4 +732,8 @@ module.exports = {
 	initRequestId,
 	promptSelect,
 	promptMultiselect,
+	importFiles,
+	interpolateMesh,
+	runCliCommand,
+	updateFilesArray,
 };
