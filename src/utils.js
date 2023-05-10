@@ -41,6 +41,12 @@ const envFileFlag = Flags.string({
 	default: '.env',
 });
 
+const debugFlag = Flags.boolean({
+	char: 'd',
+	description: 'Debug mode',
+	default: false,
+});
+
 /**
  * Parse the meshConfig and get the list of (local) files to be imported
  *
@@ -357,6 +363,7 @@ module.exports = {
 	jsonFlag,
 	getFilesInMeshConfig,
 	envFileFlag,
+	debugFlag,
 	checkPlaceholders,
 	readFileContents,
 	validateEnvFileFormat,

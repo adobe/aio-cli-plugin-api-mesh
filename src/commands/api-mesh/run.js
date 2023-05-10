@@ -10,87 +10,54 @@ governing permissions and limitations under the License.
 */
 
 const { Command } = require('@oclif/core');
-const fastify = require('fastify');
-const { createYoga } = require('graphql-yoga');
+const { exec } = require('child_process');
 
 const logger = require('../../classes/logger');
 const { initRequestId } = require('../../helpers');
+const { debugFlag } = require('../../utils');
 
 require('dotenv').config();
 
-function startGraphqlServer() {
-	const getCORSOptions = () => {
-		try {
-			const meshConfig = require(`../../../mesh-artifact/.meshrc.json`);
-			const { responseConfig } = meshConfig;
-			const { CORS } = responseConfig;
+function startGraphqlServer(debug = false) {
+	const command = debug ? 'node --inspect-brk src/server.js' : 'node src/server.js';
 
-			return CORS;
-		} catch (e) {
-			return {};
-		}
-	};
+	const server = exec(command);
 
-	const getYogaServer = async () => {
-		const meshArtifacts = require(`../../../mesh-artifact`);
-		const { getBuiltMesh } = meshArtifacts;
-
-		const tenantMesh = await getBuiltMesh();
-		const corsOptions = getCORSOptions();
-
-		const yogaServer = createYoga({
-			plugins: tenantMesh.plugins,
-			graphqlEndpoint: `/graphql`,
-			graphiql: false,
-			cors: corsOptions,
-		});
-
-		return yogaServer;
-	};
-
-	const app = fastify();
-
-	app.get('/', (req, res) => {
-		res.send('Hello World!');
+	server.stdout.on('data', data => {
+		console.log('Data from server - ', data);
 	});
 
-	app.route({
-		method: ['GET', 'POST'],
-		url: '/graphql',
-		handler: async (req, res) => {
-			const yogaServer = await getYogaServer();
-
-			console.log('Request received: ', req.body);
-
-			const response = await yogaServer.handleNodeRequest(req, {
-				req,
-				reply: res,
-			});
-
-			response.headers.forEach((value, key) => {
-				res.header(key, value);
-			});
-
-			res.status(response.status);
-
-			res.send(response.body);
-
-			return res;
-		},
+	server.stderr.on('data', data => {
+		console.log('Error from server - ', data);
 	});
 
-	app.listen(3000, () => {
-		console.log('Server is running on http://localhost:3000/graphql');
+	server.on('close', code => {
+		console.log(`Server exited with code ${code}`);
+	});
+
+	server.on('exit', code => {
+		console.log(`Server exited with code ${code}`);
+	});
+
+	server.on('error', err => {
+		console.log(`Server exited with error ${err}`);
 	});
 }
 
 class RunCommand extends Command {
+	static flags = {
+		debug: debugFlag,
+	};
+
 	async run() {
 		await initRequestId();
 
 		logger.info(`RequestId: ${global.requestId}`);
 
-		startGraphqlServer();
+		const { flags } = await this.parse(RunCommand);
+		const debug = await flags.debug;
+
+		startGraphqlServer(debug);
 	}
 }
 
