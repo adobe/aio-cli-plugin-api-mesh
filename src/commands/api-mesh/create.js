@@ -151,8 +151,11 @@ class CreateCommand extends Command {
 								adobeIdIntegrationsForWorkspace.apiKey,
 							);
 
-							const { meshConfig }  = await getMesh(imsOrgId, projectId, workspaceId, mesh.meshId);
-							const meshUrl = meshConfig.meshURL === '' ? MULTITENANT_GRAPHQL_SERVER_BASE_URL : meshConfig.meshURL;
+							const { meshConfig } = await getMesh(imsOrgId, projectId, workspaceId, mesh.meshId);
+							const meshUrl =
+								meshConfig.meshURL === ''
+									? MULTITENANT_GRAPHQL_SERVER_BASE_URL
+									: meshConfig.meshURL;
 
 							this.log(
 								'Mesh Endpoint: %s\n',

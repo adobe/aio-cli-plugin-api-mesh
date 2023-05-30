@@ -52,15 +52,13 @@ class DescribeCommand extends Command {
 					this.log('Workspace ID: %s', workspaceId);
 					this.log('Mesh ID: %s', meshId);
 
-					const { meshConfig }  = await getMesh(imsOrgId, projectId, workspaceId, meshId);
-					const meshUrl = meshConfig.meshURL === '' ? MULTITENANT_GRAPHQL_SERVER_BASE_URL : meshConfig.meshURL;
+					const { meshConfig } = await getMesh(imsOrgId, projectId, workspaceId, meshId);
+					const meshUrl =
+						meshConfig.meshURL === '' ? MULTITENANT_GRAPHQL_SERVER_BASE_URL : meshConfig.meshURL;
 
 					if (apiKey) {
 						this.log('API Key: %s', apiKey);
-						this.log(
-							'Mesh Endpoint: %s\n',
-							`${meshUrl}/${meshId}/graphql?api_key=${apiKey}`,
-						);
+						this.log('Mesh Endpoint: %s\n', `${meshUrl}/${meshId}/graphql?api_key=${apiKey}`);
 					}
 
 					return meshDetails;
