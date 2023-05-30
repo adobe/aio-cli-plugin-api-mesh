@@ -25,6 +25,7 @@ const {
 	validateAndInterpolateMesh,
 } = require('../../utils');
 const {
+	getMesh,
 	createMesh,
 	createAPIMeshCredentials,
 	subscribeCredentialToMeshService,
@@ -150,9 +151,12 @@ class CreateCommand extends Command {
 								adobeIdIntegrationsForWorkspace.apiKey,
 							);
 
+							const { meshConfig }  = await getMesh(imsOrgId, projectId, workspaceId, mesh.meshId);
+							const meshUrl = meshConfig.meshURL === '' ? MULTITENANT_GRAPHQL_SERVER_BASE_URL : meshConfig.meshURL;
+
 							this.log(
 								'Mesh Endpoint: %s\n',
-								`${MULTITENANT_GRAPHQL_SERVER_BASE_URL}/${mesh.meshId}/graphql?api_key=${adobeIdIntegrationsForWorkspace.apiKey}`,
+								`${meshUrl}/${mesh.meshId}/graphql?api_key=${adobeIdIntegrationsForWorkspace.apiKey}`,
 							);
 						} else {
 							this.log(

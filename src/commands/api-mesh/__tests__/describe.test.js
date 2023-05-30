@@ -28,7 +28,8 @@ jest.mock('../../../lib/devConsole');
 
 const DescribeCommand = require('../describe');
 const { initSdk, initRequestId } = require('../../../helpers');
-const { describeMesh } = require('../../../lib/devConsole');
+const { describeMesh, getMesh } = require('../../../lib/devConsole');
+const sampleCreateMeshConfig = require('../../__fixtures__/sample_mesh.json');
 
 const selectedOrg = { id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' };
 const selectedProject = { id: '5678', title: 'Project01' };
@@ -64,6 +65,12 @@ describe('describe command tests', () => {
 				ignoreCache: mockIgnoreCacheFlag,
 			},
 		});
+
+		let fetchedMeshConfig = sampleCreateMeshConfig;
+		fetchedMeshConfig.meshConfig.meshId = 'dummy_id';
+		fetchedMeshConfig.meshConfig.meshURL = '';
+
+		getMesh.mockResolvedValue(fetchedMeshConfig);
 	});
 
 	afterEach(() => {

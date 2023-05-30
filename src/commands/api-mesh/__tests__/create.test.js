@@ -22,6 +22,7 @@ const {
 	importFiles,
 } = require('../../../helpers');
 const {
+	getMesh,
 	createMesh,
 	createAPIMeshCredentials,
 	subscribeCredentialToMeshService,
@@ -81,6 +82,12 @@ describe('create command tests', () => {
 			id: 'dummy_id',
 		});
 		subscribeCredentialToMeshService.mockResolvedValue(['dummy_service']);
+
+		let fetchedMeshConfig = sampleCreateMeshConfig;
+		fetchedMeshConfig.meshConfig.meshId = 'dummy_id';
+		fetchedMeshConfig.meshConfig.meshURL = '';
+
+		getMesh.mockResolvedValue(fetchedMeshConfig);
 
 		parseSpy = jest.spyOn(CreateCommand.prototype, 'parse');
 		parseSpy.mockResolvedValue({
@@ -230,6 +237,8 @@ describe('create command tests', () => {
 		  },
 		  "mesh": {
 		    "meshConfig": {
+		      "meshId": "dummy_id",
+		      "meshURL": "",
 		      "sources": [
 		        {
 		          "handler": {
@@ -669,6 +678,8 @@ describe('create command tests', () => {
 		  },
 		  "mesh": {
 		    "meshConfig": {
+		      "meshId": "dummy_id",
+		      "meshURL": "",
 		      "sources": [
 		        {
 		          "handler": {

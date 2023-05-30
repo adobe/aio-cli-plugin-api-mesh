@@ -15,7 +15,7 @@ const logger = require('../../classes/logger');
 const { initSdk, initRequestId } = require('../../helpers');
 const CONSTANTS = require('../../constants');
 const { ignoreCacheFlag } = require('../../utils');
-const { describeMesh } = require('../../lib/devConsole');
+const { describeMesh, getMesh } = require('../../lib/devConsole');
 
 require('dotenv').config();
 
@@ -52,11 +52,14 @@ class DescribeCommand extends Command {
 					this.log('Workspace ID: %s', workspaceId);
 					this.log('Mesh ID: %s', meshId);
 
+					const { meshConfig }  = await getMesh(imsOrgId, projectId, workspaceId, meshId);
+					const meshUrl = meshConfig.meshURL === '' ? MULTITENANT_GRAPHQL_SERVER_BASE_URL : meshConfig.meshURL;
+
 					if (apiKey) {
 						this.log('API Key: %s', apiKey);
 						this.log(
 							'Mesh Endpoint: %s\n',
-							`${MULTITENANT_GRAPHQL_SERVER_BASE_URL}/${meshId}/graphql?api_key=${apiKey}`,
+							`${meshUrl}/${meshId}/graphql?api_key=${apiKey}`,
 						);
 					}
 
