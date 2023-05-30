@@ -293,6 +293,115 @@ describe('create command tests', () => {
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`[]`);
 	});
 
+	test('should create and return Ti mesh url if a valid mesh config file for TI client is provided', async () => {
+		let fetchedMeshConfig = sampleCreateMeshConfig;
+		fetchedMeshConfig.meshConfig.meshId = 'dummy_id';
+		fetchedMeshConfig.meshConfig.meshURL = 'https://tigraph.adobe.io';
+		getMesh.mockResolvedValue(fetchedMeshConfig);
+
+		const runResult = await CreateCommand.run();
+
+		expect(initRequestId).toHaveBeenCalled();
+		expect(createMesh.mock.calls[0]).toMatchInlineSnapshot(`
+		[
+		  "1234",
+		  "5678",
+		  "123456789",
+		  {
+		    "meshConfig": {
+		      "sources": [
+		        {
+		          "handler": {
+		            "graphql": {
+		              "endpoint": "<gql_endpoint>",
+		            },
+		          },
+		          "name": "<api_name>",
+		        },
+		      ],
+		    },
+		  },
+		]
+	`);
+		expect(createAPIMeshCredentials.mock.calls[0]).toMatchInlineSnapshot(`
+		[
+		  "1234",
+		  "5678",
+		  "123456789",
+		]
+	`);
+		expect(subscribeCredentialToMeshService.mock.calls[0]).toMatchInlineSnapshot(`
+		[
+		  "1234",
+		  "5678",
+		  "123456789",
+		  "dummy_id",
+		]
+	`);
+		expect(runResult).toMatchInlineSnapshot(`
+		{
+		  "adobeIdIntegrationsForWorkspace": {
+		    "apiKey": "dummy_api_key",
+		    "id": "dummy_id",
+		  },
+		  "mesh": {
+		    "meshConfig": {
+		      "meshId": "dummy_id",
+		      "meshURL": "https://tigraph.adobe.io",
+		      "sources": [
+		        {
+		          "handler": {
+		            "graphql": {
+		              "endpoint": "<gql_endpoint>",
+		            },
+		          },
+		          "name": "<api_name>",
+		        },
+		      ],
+		    },
+		    "meshId": "dummy_mesh_id",
+		  },
+		  "sdkList": [
+		    "dummy_service",
+		  ],
+		}
+	`);
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "******************************************************************************************************",
+		  ],
+		  [
+		    "Your mesh is being provisioned. Wait a few minutes before checking the status of your mesh %s",
+		    "dummy_mesh_id",
+		  ],
+		  [
+		    "To check the status of your mesh, run:",
+		  ],
+		  [
+		    "aio api-mesh:status",
+		  ],
+		  [
+		    "******************************************************************************************************",
+		  ],
+		  [
+		    "Successfully created API Key %s",
+		    "dummy_api_key",
+		  ],
+		  [
+		    "Successfully subscribed API Key %s to API Mesh service",
+		    "dummy_api_key",
+		  ],
+		  [
+		    "Mesh Endpoint: %s
+		",
+		    "https://tigraph.adobe.io/dummy_mesh_id/graphql?api_key=dummy_api_key",
+		  ],
+		]
+	`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`[]`);
+	});
+
 	test('should fail if mesh config file arg is missing', async () => {
 		parseSpy.mockResolvedValueOnce({
 			args: {},
