@@ -53,8 +53,7 @@ class DescribeCommand extends Command {
 					this.log('Mesh ID: %s', meshId);
 
 					const { meshURL } = await getMesh(imsOrgId, projectId, workspaceId, meshId);
-					const meshUrl =
-						meshURL === '' ? MULTITENANT_GRAPHQL_SERVER_BASE_URL : meshURL;
+					const meshUrl = meshURL === '' ? MULTITENANT_GRAPHQL_SERVER_BASE_URL : meshURL;
 
 					if (apiKey) {
 						this.log('API Key: %s', apiKey);
