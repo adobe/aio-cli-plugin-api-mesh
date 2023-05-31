@@ -295,8 +295,8 @@ describe('create command tests', () => {
 
 	test('should create and return Ti mesh url if a valid mesh config file for TI client is provided', async () => {
 		let fetchedMeshConfig = sampleCreateMeshConfig;
-		fetchedMeshConfig.meshConfig.meshId = 'dummy_id';
-		fetchedMeshConfig.meshConfig.meshURL = 'https://tigraph.adobe.io';
+		fetchedMeshConfig.meshId = 'dummy_id';
+		fetchedMeshConfig.meshURL = 'https://tigraph.adobe.io';
 		getMesh.mockResolvedValue(fetchedMeshConfig);
 
 		const runResult = await CreateCommand.run();
@@ -347,7 +347,7 @@ describe('create command tests', () => {
 		  "mesh": {
 		    "meshConfig": {
 		      "meshId": "dummy_id",
-		      "meshURL": "https://tigraph.adobe.io",
+		      "meshURL": "",
 		      "sources": [
 		        {
 		          "handler": {
@@ -586,7 +586,7 @@ describe('create command tests', () => {
 		  [
 		    "Mesh Endpoint: %s
 		",
-		    "https://graph.adobe.io/api/dummy_mesh_id/graphql?api_key=dummy_api_key",
+		    "https://tigraph.adobe.io/dummy_mesh_id/graphql?api_key=dummy_api_key",
 		  ],
 		]
 	`);

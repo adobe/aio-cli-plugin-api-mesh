@@ -67,8 +67,8 @@ describe('describe command tests', () => {
 		});
 
 		let fetchedMeshConfig = sampleCreateMeshConfig;
-		fetchedMeshConfig.meshConfig.meshId = 'dummy_id';
-		fetchedMeshConfig.meshConfig.meshURL = '';
+		fetchedMeshConfig.meshId = 'dummy_id';
+		fetchedMeshConfig.meshURL = '';
 
 		getMesh.mockResolvedValue(fetchedMeshConfig);
 	});
@@ -179,10 +179,60 @@ describe('describe command tests', () => {
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`[]`);
 	});
 
-	test('should succeed if valid details are provided', async () => {
+	test('should return Non TI url if request is Non Ti', async () => {
+		const runResult = await DescribeCommand.run();
+
+		expect(initRequestId).toHaveBeenCalled();
+		expect(describeMesh).toHaveBeenCalledWith(
+			selectedOrg.id,
+			selectedProject.id,
+			selectedWorkspace.id,
+		);
+		expect(runResult).toMatchInlineSnapshot(`
+		{
+		  "apiKey": "dummy_apiKey",
+		  "meshId": "dummy_meshId",
+		}
+	`);
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Successfully retrieved mesh details 
+		",
+		  ],
+		  [
+		    "Org ID: %s",
+		    "1234",
+		  ],
+		  [
+		    "Project ID: %s",
+		    "5678",
+		  ],
+		  [
+		    "Workspace ID: %s",
+		    "123456789",
+		  ],
+		  [
+		    "Mesh ID: %s",
+		    "dummy_meshId",
+		  ],
+		  [
+		    "API Key: %s",
+		    "dummy_apiKey",
+		  ],
+		  [
+		    "Mesh Endpoint: %s
+		",
+		    "https://graph.adobe.io/api/dummy_meshId/graphql?api_key=dummy_apiKey",
+		  ],
+		]
+	`);
+	});
+
+	test('should return Ti URL if api return TI url', async () => {
 		let fetchedMeshConfig = sampleCreateMeshConfig;
-		fetchedMeshConfig.meshConfig.meshId = 'dummy_id';
-		fetchedMeshConfig.meshConfig.meshURL = 'https://tigraph.adobe.io';
+		fetchedMeshConfig.meshId = 'dummy_id';
+		fetchedMeshConfig.meshURL = 'https://tigraph.adobe.io';
 
 		getMesh.mockResolvedValue(fetchedMeshConfig);
 		const runResult = await DescribeCommand.run();
@@ -233,55 +283,5 @@ describe('describe command tests', () => {
 		]
 	`);
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`[]`);
-	});
-
-	test('should return TI url if request is Ti', async () => {
-		const runResult = await DescribeCommand.run();
-
-		expect(initRequestId).toHaveBeenCalled();
-		expect(describeMesh).toHaveBeenCalledWith(
-			selectedOrg.id,
-			selectedProject.id,
-			selectedWorkspace.id,
-		);
-		expect(runResult).toMatchInlineSnapshot(`
-		{
-		  "apiKey": "dummy_apiKey",
-		  "meshId": "dummy_meshId",
-		}
-	`);
-		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
-		[
-		  [
-		    "Successfully retrieved mesh details 
-		",
-		  ],
-		  [
-		    "Org ID: %s",
-		    "1234",
-		  ],
-		  [
-		    "Project ID: %s",
-		    "5678",
-		  ],
-		  [
-		    "Workspace ID: %s",
-		    "123456789",
-		  ],
-		  [
-		    "Mesh ID: %s",
-		    "dummy_meshId",
-		  ],
-		  [
-		    "API Key: %s",
-		    "dummy_apiKey",
-		  ],
-		  [
-		    "Mesh Endpoint: %s
-		",
-		    "https://graph.adobe.io/api/dummy_meshId/graphql?api_key=dummy_apiKey",
-		  ],
-		]
-	`);
 	});
 });
