@@ -28,7 +28,8 @@ jest.mock('../../../lib/devConsole');
 
 const DescribeCommand = require('../describe');
 const { initSdk, initRequestId } = require('../../../helpers');
-const { describeMesh } = require('../../../lib/devConsole');
+const { describeMesh, getMesh } = require('../../../lib/devConsole');
+const sampleCreateMeshConfig = require('../../__fixtures__/sample_mesh.json');
 
 const selectedOrg = { id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' };
 const selectedProject = { id: '5678', title: 'Project01' };
@@ -64,6 +65,12 @@ describe('describe command tests', () => {
 				ignoreCache: mockIgnoreCacheFlag,
 			},
 		});
+
+		let fetchedMeshConfig = sampleCreateMeshConfig;
+		fetchedMeshConfig.meshId = 'dummy_id';
+		fetchedMeshConfig.meshURL = '';
+
+		getMesh.mockResolvedValue(fetchedMeshConfig);
 	});
 
 	afterEach(() => {
@@ -172,7 +179,7 @@ describe('describe command tests', () => {
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`[]`);
 	});
 
-	test('should succeed if valid details are provided', async () => {
+	test('should return Non TI url if request is Non Ti', async () => {
 		const runResult = await DescribeCommand.run();
 
 		expect(initRequestId).toHaveBeenCalled();
@@ -217,6 +224,61 @@ describe('describe command tests', () => {
 		    "Mesh Endpoint: %s
 		",
 		    "https://graph.adobe.io/api/dummy_meshId/graphql?api_key=dummy_apiKey",
+		  ],
+		]
+	`);
+	});
+
+	test('should return Ti URL if api return TI url', async () => {
+		let fetchedMeshConfig = sampleCreateMeshConfig;
+		fetchedMeshConfig.meshId = 'dummy_id';
+		fetchedMeshConfig.meshURL = 'https://tigraph.adobe.io';
+
+		getMesh.mockResolvedValue(fetchedMeshConfig);
+		const runResult = await DescribeCommand.run();
+
+		expect(initRequestId).toHaveBeenCalled();
+		expect(describeMesh).toHaveBeenCalledWith(
+			selectedOrg.id,
+			selectedProject.id,
+			selectedWorkspace.id,
+		);
+		expect(runResult).toMatchInlineSnapshot(`
+		{
+		  "apiKey": "dummy_apiKey",
+		  "meshId": "dummy_meshId",
+		}
+	`);
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Successfully retrieved mesh details 
+		",
+		  ],
+		  [
+		    "Org ID: %s",
+		    "1234",
+		  ],
+		  [
+		    "Project ID: %s",
+		    "5678",
+		  ],
+		  [
+		    "Workspace ID: %s",
+		    "123456789",
+		  ],
+		  [
+		    "Mesh ID: %s",
+		    "dummy_meshId",
+		  ],
+		  [
+		    "API Key: %s",
+		    "dummy_apiKey",
+		  ],
+		  [
+		    "Mesh Endpoint: %s
+		",
+		    "https://tigraph.adobe.io/dummy_meshId/graphql?api_key=dummy_apiKey",
 		  ],
 		]
 	`);
