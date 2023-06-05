@@ -84,8 +84,8 @@ describe('create command tests', () => {
 		subscribeCredentialToMeshService.mockResolvedValue(['dummy_service']);
 
 		let fetchedMeshConfig = sampleCreateMeshConfig;
-		fetchedMeshConfig.meshConfig.meshId = 'dummy_id';
-		fetchedMeshConfig.meshConfig.meshURL = '';
+		fetchedMeshConfig.meshId = 'dummy_id';
+		fetchedMeshConfig.meshURL = '';
 
 		getMesh.mockResolvedValue(fetchedMeshConfig);
 
@@ -237,8 +237,6 @@ describe('create command tests', () => {
 		  },
 		  "mesh": {
 		    "meshConfig": {
-		      "meshId": "dummy_id",
-		      "meshURL": "",
 		      "sources": [
 		        {
 		          "handler": {
@@ -346,8 +344,6 @@ describe('create command tests', () => {
 		  },
 		  "mesh": {
 		    "meshConfig": {
-		      "meshId": "dummy_id",
-		      "meshURL": "",
 		      "sources": [
 		        {
 		          "handler": {
@@ -586,7 +582,7 @@ describe('create command tests', () => {
 		  [
 		    "Mesh Endpoint: %s
 		",
-		    "https://tigraph.adobe.io/dummy_mesh_id/graphql?api_key=dummy_api_key",
+		    "https://graph.adobe.io/api/dummy_mesh_id/graphql?api_key=dummy_api_key",
 		  ],
 		]
 	`);
@@ -787,8 +783,6 @@ describe('create command tests', () => {
 		  },
 		  "mesh": {
 		    "meshConfig": {
-		      "meshId": "dummy_id",
-		      "meshURL": "",
 		      "sources": [
 		        {
 		          "handler": {
