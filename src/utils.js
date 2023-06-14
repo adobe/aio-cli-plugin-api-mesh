@@ -281,17 +281,6 @@ function validateFileName(filesList, data) {
 			`Mesh file names must be less than 25 characters. The following file(s) are invalid: ${filesWithInvalidNames}.`,
 		);
 	}
-
-	// check if the the filePaths in the files array match
-	// the fileNames in sources, transforms or additionalResolvers
-
-	if (data.meshConfig.files) {
-		for (let i = 0; i < data.meshConfig.files.length; i++) {
-			if (filesList.indexOf(data.meshConfig.files[i].path) == -1) {
-				throw new Error(`Please make sure the file names are matching in meshConfig.`);
-			}
-		}
-	}
 }
 
 /**validates the environment file content
