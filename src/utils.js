@@ -88,7 +88,9 @@ function getFilesInMeshConfig(data, meshConfigName) {
 	data.meshConfig.sources.transforms?.forEach(transform => {
 		transform.replaceField?.replacements.forEach(replacement => {
 			if (replacement.composer && !fileURLRegex.test(replacement.composer)) {
-				filesList.push(replacement.composer);
+				const [filename] = replacement.composer.split('#');
+
+				filesList.push(filename);
 			}
 		});
 	});
@@ -97,10 +99,45 @@ function getFilesInMeshConfig(data, meshConfigName) {
 	data.meshConfig.transforms?.forEach(transform => {
 		transform.replaceField?.replacements.forEach(replacement => {
 			if (replacement.composer && !fileURLRegex.test(replacement.composer)) {
-				filesList.push(replacement.composer);
+				const [filename] = replacement.composer.split('#');
+
+				filesList.push(filename);
 			}
 		});
 	});
+
+	// Hooks Plugin - mesh level
+	data.meshConfig.plugins?.forEach(plugin => {
+		if (plugin.hooks) {
+			if (plugin.hooks.beforeAll) {
+				const composer = plugin.hooks.beforeAll.composer;
+
+				if (composer && !fileURLRegex.test(composer)) {
+					const [filename] = composer.split('#');
+
+					filesList.push(filename);
+				}
+			}
+		}
+	});
+
+	// OnFetch plugin - mesh level
+	data.meshConfig.plugins?.forEach(plugin => {
+		if (plugin.onFetch) {
+			plugin.onFetch.forEach(onFetchConfig => {
+				const handler = onFetchConfig.handler;
+
+				if (handler) {
+					filesList.push(handler);
+				}
+			});
+		}
+	});
+
+	// remove duplicate files
+	filesList = [...new Set(filesList)];
+
+	logger.info(`Files to be imported: ${filesList.join(', ')}`);
 
 	try {
 		if (filesList.length) {
