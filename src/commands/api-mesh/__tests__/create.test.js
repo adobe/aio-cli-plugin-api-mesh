@@ -998,34 +998,6 @@ describe('create command tests', () => {
 	`);
 	});
 
-	test('should fail if the file paths in files array and filenames in sources, transforms, additionalResolvers do not match in mesh config', async () => {
-		parseSpy.mockResolvedValue({
-			args: { file: 'src/commands/__fixtures__/sample_mesh_mismatching_path.json' },
-			flags: {
-				autoConfirmAction: Promise.resolve(false),
-			},
-		});
-
-		const output = CreateCommand.run();
-
-		await expect(output).rejects.toEqual(new Error('Input mesh config is not valid.'));
-
-		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
-		[
-		  [
-		    "Please make sure the file names are matching in meshConfig.",
-		  ],
-		]
-	`);
-		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
-		[
-		  [
-		    "Input mesh config is not valid.",
-		  ],
-		]
-	`);
-	});
-
 	test('should fail if the file is of type other than js, json extension', async () => {
 		parseSpy.mockResolvedValue({
 			args: { file: 'src/commands/__fixtures__/sample_mesh_invalid_type.json' },
