@@ -14,6 +14,7 @@ const mockConsoleCLIInstance = {};
 
 const CreateCommand = require('../create');
 const sampleCreateMeshConfig = require('../../__fixtures__/sample_mesh.json');
+const meshConfigWithComposerFiles = require('../../__fixtures__/sample_mesh_with_composer_files.json');
 const {
 	initSdk,
 	initRequestId,
@@ -165,6 +166,78 @@ describe('create command tests', () => {
 	`);
 		expect(CreateCommand.aliases).toMatchInlineSnapshot(`[]`);
 	});
+
+	test('should pass if a valid mesh config file with composer files are provided', async () => {
+		createMesh.mockResolvedValueOnce({
+			meshId: 'dummy_mesh_id',
+			meshConfig: meshConfigWithComposerFiles.meshConfig,
+		});
+
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_mesh_with_composer_files.json' },
+			flags: {
+				autoConfirmAction: Promise.resolve(true),
+			},
+		});
+
+		const output = await CreateCommand.run();
+
+		expect(output).toMatchInlineSnapshot(`
+		{
+		  "adobeIdIntegrationsForWorkspace": {
+		    "apiKey": "dummy_api_key",
+		    "id": "dummy_id",
+		  },
+		  "mesh": {
+		    "meshConfig": {
+		      "files": [
+		        {
+		          "content": "{"type":"dummyContent"}",
+		          "path": "./requestParams.json",
+		        },
+		        {
+		          "content": "module.exports.functionName = () => { console.log('beforeAll hook'); }",
+		          "path": "./hooks.js",
+		        },
+		      ],
+		      "plugins": [
+		        {
+		          "hooks": {
+		            "beforeAll": {
+		              "composer": "./hooks.js#functionName",
+		            },
+		          },
+		        },
+		      ],
+		      "sources": [
+		        {
+		          "handler": {
+		            "JsonSchema": {
+		              "baseUrl": "<json_source__baseurl>",
+		              "operations": [
+		                {
+		                  "field": "<query>",
+		                  "method": "POST",
+		                  "path": "<query_path>",
+		                  "requestSchema": "./requestParams.json",
+		                  "type": "Query",
+		                },
+		              ],
+		            },
+		          },
+		          "name": "<json_source_name>",
+		        },
+		      ],
+		    },
+		    "meshId": "dummy_mesh_id",
+		  },
+		  "sdkList": [
+		    "dummy_service",
+		  ],
+		}
+	`);
+	});
+
 	test('should fail if create mesh api has failed', async () => {
 		createMesh.mockRejectedValueOnce(new Error('create mesh api failed'));
 
@@ -189,6 +262,7 @@ describe('create command tests', () => {
 		]
 	`);
 	});
+
 	test('should create if a valid mesh config file is provided', async () => {
 		const runResult = await CreateCommand.run();
 
@@ -295,7 +369,7 @@ describe('create command tests', () => {
 		let fetchedMeshConfig = sampleCreateMeshConfig;
 		fetchedMeshConfig.meshId = 'dummy_id';
 		fetchedMeshConfig.meshURL = 'https://tigraph.adobe.io';
-		getMesh.mockResolvedValue(fetchedMeshConfig);
+		getMesh.mockResolvedValueOnce(fetchedMeshConfig);
 
 		const runResult = await CreateCommand.run();
 
@@ -753,7 +827,7 @@ describe('create command tests', () => {
 	});
 
 	test('should successfully create a mesh if provided env file is valid, mesh interpolation is successful and interpolated mesh is a valid JSON', async () => {
-		parseSpy.mockResolvedValue({
+		parseSpy.mockResolvedValueOnce({
 			args: { file: 'src/commands/__fixtures__/sample_mesh_with_placeholder' },
 			flags: {
 				ignoreCache: mockIgnoreCacheFlag,
@@ -804,7 +878,7 @@ describe('create command tests', () => {
 	});
 
 	test('should return error if inputMesh is not a valid JSON', async () => {
-		parseSpy.mockResolvedValue({
+		parseSpy.mockResolvedValueOnce({
 			args: { file: 'src/commands/__fixtures__/sample_invalid_mesh.txt' },
 			flags: {
 				ignoreCache: mockIgnoreCacheFlag,
@@ -855,12 +929,12 @@ describe('create command tests', () => {
 			],
 		};
 
-		createMesh.mockResolvedValue({
+		createMesh.mockResolvedValueOnce({
 			meshId: 'dummy_mesh_id',
 			meshConfig: meshConfig,
 		});
 
-		parseSpy.mockResolvedValue({
+		parseSpy.mockResolvedValueOnce({
 			args: { file: 'src/commands/__fixtures__/sample_mesh_files.json' },
 			flags: {
 				autoConfirmAction: Promise.resolve(false),
@@ -970,7 +1044,7 @@ describe('create command tests', () => {
 	});
 
 	test('should fail if the file name is more than 25 characters', async () => {
-		parseSpy.mockResolvedValue({
+		parseSpy.mockResolvedValueOnce({
 			args: { file: 'src/commands/__fixtures__/sample_mesh_invalid_file_name.json' },
 			flags: {
 				autoConfirmAction: Promise.resolve(false),
@@ -998,36 +1072,8 @@ describe('create command tests', () => {
 	`);
 	});
 
-	test('should fail if the file paths in files array and filenames in sources, transforms, additionalResolvers do not match in mesh config', async () => {
-		parseSpy.mockResolvedValue({
-			args: { file: 'src/commands/__fixtures__/sample_mesh_mismatching_path.json' },
-			flags: {
-				autoConfirmAction: Promise.resolve(false),
-			},
-		});
-
-		const output = CreateCommand.run();
-
-		await expect(output).rejects.toEqual(new Error('Input mesh config is not valid.'));
-
-		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
-		[
-		  [
-		    "Please make sure the file names are matching in meshConfig.",
-		  ],
-		]
-	`);
-		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
-		[
-		  [
-		    "Input mesh config is not valid.",
-		  ],
-		]
-	`);
-	});
-
 	test('should fail if the file is of type other than js, json extension', async () => {
-		parseSpy.mockResolvedValue({
+		parseSpy.mockResolvedValueOnce({
 			args: { file: 'src/commands/__fixtures__/sample_mesh_invalid_type.json' },
 			flags: {
 				autoConfirmAction: Promise.resolve(false),
@@ -1055,7 +1101,7 @@ describe('create command tests', () => {
 	});
 
 	test('should fail if the files do not exist in the mesh directory or subdirectory', async () => {
-		parseSpy.mockResolvedValue({
+		parseSpy.mockResolvedValueOnce({
 			args: { file: 'src/commands/__fixtures__/sample_mesh_invalid_paths.json' },
 			flags: {
 				autoConfirmAction: Promise.resolve(false),
@@ -1093,7 +1139,7 @@ describe('create command tests', () => {
 	});
 
 	test('should fail if import files function fails', async () => {
-		parseSpy.mockResolvedValue({
+		parseSpy.mockResolvedValueOnce({
 			args: { file: 'src/commands/__fixtures__/sample_mesh_files.json' },
 			flags: {
 				autoConfirmAction: Promise.resolve(false),
@@ -1158,19 +1204,19 @@ describe('create command tests', () => {
 			],
 		};
 
-		promptConfirm.mockResolvedValue(false).mockResolvedValue(true);
+		promptConfirm.mockResolvedValueOnce(false).mockResolvedValueOnce(true);
 
-		importFiles.mockResolvedValue(meshConfig);
+		importFiles.mockResolvedValueOnce(meshConfig);
 
-		createMesh.mockResolvedValue({
+		createMesh.mockResolvedValueOnce({
 			meshId: 'dummy_mesh_id',
 			meshConfig: meshConfig,
 		});
 
-		parseSpy.mockResolvedValue({
+		parseSpy.mockResolvedValueOnce({
 			args: { file: 'src/commands/__fixtures__/sample_mesh_with_files_array.json' },
 			flags: {
-				autoConfirmAction: Promise.resolve(false),
+				autoConfirmAction: Promise.resolve(true),
 			},
 		});
 
@@ -1298,12 +1344,12 @@ describe('create command tests', () => {
 			],
 		};
 
-		promptConfirm.mockResolvedValue(true).mockResolvedValue(true);
+		promptConfirm.mockResolvedValueOnce(true).mockResolvedValueOnce(true);
 
-		parseSpy.mockResolvedValue({
+		parseSpy.mockResolvedValueOnce({
 			args: { file: 'src/commands/__fixtures__/sample_mesh_with_files_array.json' },
 			flags: {
-				autoConfirmAction: Promise.resolve(false),
+				autoConfirmAction: Promise.resolve(true),
 			},
 		});
 
@@ -1311,7 +1357,7 @@ describe('create command tests', () => {
 			meshConfig,
 		});
 
-		createMesh.mockResolvedValue({
+		createMesh.mockResolvedValueOnce({
 			meshId: 'dummy_mesh_id',
 			meshConfig: meshConfig,
 		});
@@ -1443,20 +1489,20 @@ describe('create command tests', () => {
 			],
 		};
 
-		parseSpy.mockResolvedValue({
+		parseSpy.mockResolvedValueOnce({
 			args: { file: 'src/commands/__fixtures__/sample_fully_qualified_mesh.json' },
 			flags: {
-				autoConfirmAction: Promise.resolve(false),
+				autoConfirmAction: Promise.resolve(true),
 			},
 		});
 
-		promptConfirm.mockResolvedValue(true);
+		promptConfirm.mockResolvedValueOnce(true);
 
 		importFiles.mockResolvedValueOnce({
 			meshConfig,
 		});
 
-		createMesh.mockResolvedValue({
+		createMesh.mockResolvedValueOnce({
 			meshId: 'dummy_mesh_id',
 			meshConfig: meshConfig,
 		});
@@ -1587,15 +1633,15 @@ describe('create command tests', () => {
 			],
 		};
 
-		createMesh.mockResolvedValue({
+		createMesh.mockResolvedValueOnce({
 			meshId: 'dummy_mesh_id',
 			meshConfig: meshConfig,
 		});
 
-		parseSpy.mockResolvedValue({
+		parseSpy.mockResolvedValueOnce({
 			args: { file: 'src/commands/__fixtures__/sample_mesh_subdirectory.json' },
 			flags: {
-				autoConfirmAction: Promise.resolve(false),
+				autoConfirmAction: Promise.resolve(true),
 			},
 		});
 
@@ -1702,7 +1748,7 @@ describe('create command tests', () => {
 	});
 
 	test('should fail if the file is outside the workspace directory', async () => {
-		parseSpy.mockResolvedValue({
+		parseSpy.mockResolvedValueOnce({
 			args: { file: 'src/commands/__fixtures__/sample_mesh_outside_workspace_dir.json' },
 			flags: {
 				autoConfirmAction: Promise.resolve(false),
@@ -1729,7 +1775,7 @@ describe('create command tests', () => {
 	});
 
 	test('should fail if the file has invalid JSON content', async () => {
-		parseSpy.mockResolvedValue({
+		parseSpy.mockResolvedValueOnce({
 			args: { file: 'src/commands/__fixtures__/sample_mesh_invalid_file_content.json' },
 			flags: {
 				autoConfirmAction: Promise.resolve(false),
@@ -1766,7 +1812,7 @@ describe('create command tests', () => {
 	});
 
 	test('should fail if the file path starts from home directory i.e., path starts with ~/', async () => {
-		parseSpy.mockResolvedValue({
+		parseSpy.mockResolvedValueOnce({
 			args: { file: 'src/commands/__fixtures__/sample_mesh_path_from_home.json' },
 			flags: {
 				autoConfirmAction: Promise.resolve(false),

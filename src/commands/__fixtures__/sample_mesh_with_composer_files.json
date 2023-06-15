@@ -1,0 +1,42 @@
+{
+	"meshConfig": {
+		"sources": [
+			{
+				"name": "<json_source_name>",
+				"handler": {
+					"JsonSchema": {
+						"baseUrl": "<json_source__baseurl>",
+						"operations": [
+							{
+								"type": "Query",
+								"field": "<query>",
+								"path": "<query_path>",
+								"method": "POST",
+								"requestSchema": "./requestParams.json"
+							}
+						]
+					}
+				}
+			}
+		],
+		"plugins": [
+			{
+				"hooks": {
+					"beforeAll": {
+						"composer": "./hooks.js#functionName"
+					}
+				}
+			}
+		],
+		"files": [
+			{
+				"path": "./requestParams.json",
+				"content": "{\"type\":\"dummyContent\"}"
+			},
+			{
+				"path": "./hooks.js",
+				"content": "module.exports.functionName = () => { console.log('beforeAll hook'); }"
+			}
+		]
+	}
+}
