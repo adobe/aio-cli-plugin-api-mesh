@@ -143,7 +143,7 @@ function getFilesInMeshConfig(data, meshConfigName) {
 		if (filesList.length) {
 			checkFilesAreUnderMeshDirectory(filesList, meshConfigName);
 			validateFileType(filesList);
-			validateFileName(filesList, data);
+			validateFileName(filesList);
 		}
 	} catch (err) {
 		logger.error(err.message);
@@ -263,9 +263,8 @@ function validateFileType(filesList) {
  * Validate the filenames
  *
  * @param filesList Files in sources, tranforms or additionalResolvers in the meshConfig
- * @param data MeshConfig
  */
-function validateFileName(filesList, data) {
+function validateFileName(filesList) {
 	const filesWithInvalidNames = [];
 
 	// Check if the file names are less than 25 characters
