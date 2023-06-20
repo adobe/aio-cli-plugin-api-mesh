@@ -19,7 +19,8 @@ const { debugFlag } = require('../../utils');
 require('dotenv').config();
 
 function startGraphqlServer(debug = false) {
-	const command = debug ? 'node --inspect-brk src/server.js' : 'node src/server.js';
+	const serverPath = `${__dirname}/../../server.js`;
+	const command = debug ? `node --inspect-brk ${serverPath}` : `node ${serverPath}`;
 
 	const server = exec(command);
 

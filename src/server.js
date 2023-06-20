@@ -3,7 +3,10 @@ const { createYoga } = require('graphql-yoga');
 
 const getCORSOptions = () => {
 	try {
-		const meshConfig = require(`../mesh-artifact/.meshrc.json`);
+		const currentWorkingDirectory = process.cwd();
+		const meshConfigPath = `${currentWorkingDirectory}/mesh-artifact/.meshrc.json`;
+
+		const meshConfig = require(meshConfigPath);
 		const { responseConfig } = meshConfig;
 		const { CORS } = responseConfig;
 
@@ -14,7 +17,10 @@ const getCORSOptions = () => {
 };
 
 const getYogaServer = async () => {
-	const meshArtifacts = require(`../mesh-artifact`);
+	const currentWorkingDirectory = process.cwd();
+	const meshArtifactsPath = `${currentWorkingDirectory}/mesh-artifact`;
+
+	const meshArtifacts = require(meshArtifactsPath);
 	const { getBuiltMesh } = meshArtifacts;
 
 	const tenantMesh = await getBuiltMesh();
