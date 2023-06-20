@@ -1,6 +1,8 @@
 const fastify = require('fastify');
 const { createYoga } = require('graphql-yoga');
 
+let yogaServer = null;
+
 const getCORSOptions = () => {
 	try {
 		const currentWorkingDirectory = process.cwd();
@@ -17,23 +19,27 @@ const getCORSOptions = () => {
 };
 
 const getYogaServer = async () => {
-	const currentWorkingDirectory = process.cwd();
-	const meshArtifactsPath = `${currentWorkingDirectory}/mesh-artifact`;
+	if (yogaServer) {
+		return yogaServer;
+	} else {
+		const currentWorkingDirectory = process.cwd();
+		const meshArtifactsPath = `${currentWorkingDirectory}/mesh-artifact`;
 
-	const meshArtifacts = require(meshArtifactsPath);
-	const { getBuiltMesh } = meshArtifacts;
+		const meshArtifacts = require(meshArtifactsPath);
+		const { getBuiltMesh } = meshArtifacts;
 
-	const tenantMesh = await getBuiltMesh();
-	const corsOptions = getCORSOptions();
+		const tenantMesh = await getBuiltMesh();
+		const corsOptions = getCORSOptions();
 
-	const yogaServer = createYoga({
-		plugins: tenantMesh.plugins,
-		graphqlEndpoint: `/graphql`,
-		graphiql: false,
-		cors: corsOptions,
-	});
+		yogaServer = createYoga({
+			plugins: tenantMesh.plugins,
+			graphqlEndpoint: `/graphql`,
+			graphiql: false,
+			cors: corsOptions,
+		});
 
-	return yogaServer;
+		return yogaServer;
+	}
 };
 
 const app = fastify();
