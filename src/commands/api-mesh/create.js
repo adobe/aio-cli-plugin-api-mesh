@@ -13,7 +13,6 @@ const { Command } = require('@oclif/core');
 const { initSdk, initRequestId, promptConfirm, importFiles } = require('../../helpers');
 const logger = require('../../classes/logger');
 const CONSTANTS = require('../../constants');
-const { TMOConstants } = require('../../constants');
 const {
 	ignoreCacheFlag,
 	autoConfirmActionFlag,
@@ -31,7 +30,7 @@ const {
 	subscribeCredentialToMeshService,
 } = require('../../lib/devConsole');
 
-const { MULTITENANT_GRAPHQL_SERVER_BASE_URL } = CONSTANTS;
+const { MULTITENANT_GRAPHQL_SERVER_BASE_URL, TMOConstants } = CONSTANTS;
 
 class CreateCommand extends Command {
 	static args = [{ name: 'file' }];

@@ -16,11 +16,10 @@ const { initSdk, initRequestId } = require('../../helpers');
 const CONSTANTS = require('../../constants');
 const { ignoreCacheFlag } = require('../../utils');
 const { describeMesh, getMesh } = require('../../lib/devConsole');
-const { TMOConstants } = require('../../constants');
 
 require('dotenv').config();
 
-const { MULTITENANT_GRAPHQL_SERVER_BASE_URL } = CONSTANTS;
+const { MULTITENANT_GRAPHQL_SERVER_BASE_URL, TMOConstants } = CONSTANTS;
 
 class DescribeCommand extends Command {
 	static flags = {
