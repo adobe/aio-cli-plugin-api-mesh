@@ -13,6 +13,7 @@ const { Command } = require('@oclif/core');
 const { initSdk, initRequestId, promptConfirm, importFiles } = require('../../helpers');
 const logger = require('../../classes/logger');
 const CONSTANTS = require('../../constants');
+const { TMOConstants } = require('../../constants');
 const {
 	ignoreCacheFlag,
 	autoConfirmActionFlag,
@@ -30,12 +31,7 @@ const {
 	subscribeCredentialToMeshService,
 } = require('../../lib/devConsole');
 
-const {
-	MULTITENANT_GRAPHQL_SERVER_BASE_URL,
-	TMO_STAGE_URL,
-	TMO_SANDBOX_URL,
-	TMO_PROD_URL,
-} = CONSTANTS;
+const { MULTITENANT_GRAPHQL_SERVER_BASE_URL } = CONSTANTS;
 
 class CreateCommand extends Command {
 	static args = [{ name: 'file' }];
@@ -162,9 +158,9 @@ class CreateCommand extends Command {
 									: meshURL;
 
 							if (
-								meshUrl === TMO_STAGE_URL ||
-								meshUrl === TMO_SANDBOX_URL ||
-								meshUrl === TMO_PROD_URL
+								meshUrl === TMOConstants.TMO_STAGE_URL ||
+								meshUrl === TMOConstants.TMO_SANDBOX_URL ||
+								meshUrl === TMOConstants.TMO_PROD_URL
 							) {
 								this.log('Mesh Endpoint: %s\n', `${meshUrl}/${mesh.meshId}/graphql`);
 							} else {
