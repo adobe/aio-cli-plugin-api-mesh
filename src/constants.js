@@ -24,5 +24,5 @@ const TMOConstants = {
 	TMO_SANDBOX_URL: 'https://tigraph-sandbox.adobe.io/api',
 	TMO_PROD_URL: 'https://tigraph.adobe.io/api',
 };
-module.exports = clientEnv === 'stage' ? StageConstants : ProdConstants;
-module.exports = { ...module.exports, TMOConstants };
+const envConstants = clientEnv === 'stage' ? StageConstants : ProdConstants;
+module.exports = { ...envConstants, TMOConstants };
