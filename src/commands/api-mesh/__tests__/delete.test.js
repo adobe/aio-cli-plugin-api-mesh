@@ -112,7 +112,7 @@ describe('delete command tests', () => {
 	});
 
 	test('should fail if mesh id is missing', async () => {
-		getMeshId.mockResolvedValue(null);
+		getMeshId.mockResolvedValueOnce(null);
 		const runResult = DeleteCommand.run();
 
 		return runResult.catch(err => {
@@ -147,7 +147,7 @@ describe('delete command tests', () => {
 	});
 
 	test('should not ask for prompt if autoConfirmAction is set', async () => {
-		parseSpy.mockResolvedValue({
+		parseSpy.mockResolvedValueOnce({
 			args: {},
 			flags: {
 				ignoreCache: mockIgnoreCacheFlag,
