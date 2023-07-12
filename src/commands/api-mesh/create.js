@@ -10,7 +10,6 @@ governing permissions and limitations under the License.
 */
 
 const { Command } = require('@oclif/core');
-
 const { initSdk, initRequestId, promptConfirm, importFiles } = require('../../helpers');
 const logger = require('../../classes/logger');
 const CONSTANTS = require('../../constants');
@@ -31,7 +30,7 @@ const {
 	subscribeCredentialToMeshService,
 } = require('../../lib/devConsole');
 
-const { MULTITENANT_GRAPHQL_SERVER_BASE_URL } = CONSTANTS;
+const { MULTITENANT_GRAPHQL_SERVER_BASE_URL, TMOConstants } = CONSTANTS;
 
 class CreateCommand extends Command {
 	static args = [{ name: 'file' }];
@@ -157,10 +156,18 @@ class CreateCommand extends Command {
 									? MULTITENANT_GRAPHQL_SERVER_BASE_URL
 									: meshURL;
 
-							this.log(
-								'Mesh Endpoint: %s\n',
-								`${meshUrl}/${mesh.meshId}/graphql?api_key=${adobeIdIntegrationsForWorkspace.apiKey}`,
-							);
+							if (
+								meshUrl === TMOConstants.TMO_STAGE_URL ||
+								meshUrl === TMOConstants.TMO_SANDBOX_URL ||
+								meshUrl === TMOConstants.TMO_PROD_URL
+							) {
+								this.log('Mesh Endpoint: %s\n', `${meshUrl}/${mesh.meshId}/graphql`);
+							} else {
+								this.log(
+									'Mesh Endpoint: %s\n',
+									`${meshUrl}/${mesh.meshId}/graphql?api_key=${adobeIdIntegrationsForWorkspace.apiKey}`,
+								);
+							}
 						} else {
 							this.log(
 								'Unable to subscribe API Key %s to API Mesh service',
