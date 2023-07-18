@@ -109,7 +109,7 @@ describe('get command tests', () => {
 	});
 
 	test('should fail if mesh id is missing', async () => {
-		getMeshId.mockResolvedValue(null);
+		getMeshId.mockResolvedValueOnce(null);
 		const runResult = GetCommand.run();
 
 		return runResult.catch(err => {
@@ -128,7 +128,7 @@ describe('get command tests', () => {
 	});
 
 	test('should fail if getMeshId failed', async () => {
-		getMeshId.mockRejectedValue(new Error('getMeshId failed'));
+		getMeshId.mockRejectedValueOnce(new Error('getMeshId failed'));
 		const runResult = GetCommand.run();
 
 		return runResult.catch(err => {

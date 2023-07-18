@@ -79,7 +79,7 @@ function getFilesInMeshConfig(data, meshConfigName) {
 
 	// Additional Resolvers
 	data.meshConfig.additionalResolvers?.forEach(additionalResolver => {
-		if (!fileURLRegex.test(additionalResolver)) {
+		if (typeof additionalResolver === 'string' && !fileURLRegex.test(additionalResolver)) {
 			filesList.push(additionalResolver);
 		}
 	});

@@ -89,7 +89,7 @@ describe('update command tests', () => {
 				],
 			},
 		};
-		readFile.mockResolvedValue(JSON.stringify(sampleMesh));
+		readFile.mockResolvedValueOnce(JSON.stringify(sampleMesh));
 
 		parseSpy.mockResolvedValueOnce({
 			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
@@ -148,7 +148,7 @@ describe('update command tests', () => {
 				],
 			},
 		};
-		readFile.mockResolvedValue(JSON.stringify(sampleMesh));
+		readFile.mockResolvedValueOnce(JSON.stringify(sampleMesh));
 
 		parseSpy.mockResolvedValueOnce({
 			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
@@ -207,7 +207,7 @@ describe('update command tests', () => {
 				],
 			},
 		};
-		readFile.mockResolvedValue(JSON.stringify(sampleMesh));
+		readFile.mockResolvedValueOnce(JSON.stringify(sampleMesh));
 
 		parseSpy.mockResolvedValueOnce({
 			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
@@ -267,7 +267,7 @@ describe('update command tests', () => {
 				],
 			},
 		};
-		readFile.mockResolvedValue(JSON.stringify(sampleMesh));
+		readFile.mockResolvedValueOnce(JSON.stringify(sampleMesh));
 
 		parseSpy.mockResolvedValueOnce({
 			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
@@ -277,7 +277,7 @@ describe('update command tests', () => {
 			},
 		});
 
-		getMeshId.mockResolvedValue(null);
+		getMeshId.mockResolvedValueOnce(null);
 		const runResult = UpdateCommand.run();
 
 		await expect(runResult).rejects.toMatchInlineSnapshot(
@@ -308,7 +308,7 @@ describe('update command tests', () => {
 				],
 			},
 		};
-		readFile.mockResolvedValue(JSON.stringify(sampleMesh));
+		readFile.mockResolvedValueOnce(JSON.stringify(sampleMesh));
 
 		parseSpy.mockResolvedValueOnce({
 			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
@@ -349,7 +349,7 @@ describe('update command tests', () => {
 				],
 			},
 		};
-		readFile.mockResolvedValue(JSON.stringify(sampleMesh));
+		readFile.mockResolvedValueOnce(JSON.stringify(sampleMesh));
 
 		parseSpy.mockResolvedValueOnce({
 			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
@@ -451,7 +451,7 @@ describe('update command tests', () => {
 				],
 			},
 		};
-		readFile.mockResolvedValue(JSON.stringify(sampleMesh));
+		readFile.mockResolvedValueOnce(JSON.stringify(sampleMesh));
 
 		parseSpy.mockResolvedValueOnce({
 			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
@@ -500,7 +500,7 @@ describe('update command tests', () => {
 				],
 			},
 		};
-		readFile.mockResolvedValue(JSON.stringify(sampleMesh));
+		readFile.mockResolvedValueOnce(JSON.stringify(sampleMesh));
 
 		let meshConfig = {
 			sources: [
@@ -530,12 +530,12 @@ describe('update command tests', () => {
 			],
 		};
 
-		updateMesh.mockResolvedValue({
+		updateMesh.mockResolvedValueOnce({
 			meshId: 'dummy_mesh_id',
 			meshConfig: meshConfig,
 		});
 
-		parseSpy.mockResolvedValue({
+		parseSpy.mockResolvedValueOnce({
 			args: { file: 'src/commands/__fixtures__/sample_mesh_files.json' },
 			flags: {
 				autoConfirmAction: mockAutoApproveAction,
@@ -645,9 +645,9 @@ describe('update command tests', () => {
 				],
 			},
 		};
-		readFile.mockResolvedValue(JSON.stringify(sampleMesh));
+		readFile.mockResolvedValueOnce(JSON.stringify(sampleMesh));
 
-		parseSpy.mockResolvedValue({
+		parseSpy.mockResolvedValueOnce({
 			args: { file: 'src/commands/__fixtures__/sample_mesh_invalid_file_name.json' },
 			flags: {
 				ignoreCache: mockIgnoreCacheFlag,
@@ -700,9 +700,9 @@ describe('update command tests', () => {
 				],
 			},
 		};
-		readFile.mockResolvedValue(JSON.stringify(sampleMesh));
+		readFile.mockResolvedValueOnce(JSON.stringify(sampleMesh));
 
-		parseSpy.mockResolvedValue({
+		parseSpy.mockResolvedValueOnce({
 			args: { file: 'src/commands/__fixtures__/sample_mesh_files.json' },
 			flags: {
 				ignoreCache: mockIgnoreCacheFlag,

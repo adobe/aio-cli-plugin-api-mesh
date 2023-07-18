@@ -19,7 +19,7 @@ const { describeMesh, getMesh } = require('../../lib/devConsole');
 
 require('dotenv').config();
 
-const { MULTITENANT_GRAPHQL_SERVER_BASE_URL } = CONSTANTS;
+const { MULTITENANT_GRAPHQL_SERVER_BASE_URL, TMOConstants } = CONSTANTS;
 
 class DescribeCommand extends Command {
 	static flags = {
@@ -55,11 +55,17 @@ class DescribeCommand extends Command {
 					const { meshURL } = await getMesh(imsOrgId, projectId, workspaceId, meshId);
 					const meshUrl = meshURL === '' ? MULTITENANT_GRAPHQL_SERVER_BASE_URL : meshURL;
 
-					if (apiKey) {
+					if (
+						apiKey &&
+						(meshUrl === TMOConstants.TMO_STAGE_URL ||
+							meshUrl === TMOConstants.TMO_SANDBOX_URL ||
+							meshUrl === TMOConstants.TMO_PROD_URL)
+					) {
+						this.log('Mesh Endpoint: %s\n', `${meshUrl}/${meshId}/graphql`);
+					} else if (apiKey) {
 						this.log('API Key: %s', apiKey);
 						this.log('Mesh Endpoint: %s\n', `${meshUrl}/${meshId}/graphql?api_key=${apiKey}`);
 					}
-
 					return meshDetails;
 				} else {
 					logger.error(
