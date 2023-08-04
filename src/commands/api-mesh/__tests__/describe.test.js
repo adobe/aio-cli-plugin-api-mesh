@@ -52,6 +52,7 @@ describe('describe command tests', () => {
 			imsOrgId: selectedOrg.id,
 			projectId: selectedProject.id,
 			workspaceId: selectedWorkspace.id,
+			workspaceName: selectedWorkspace.title,
 		});
 
 		global.requestId = 'dummy_request_id';
@@ -187,6 +188,7 @@ describe('describe command tests', () => {
 			selectedOrg.id,
 			selectedProject.id,
 			selectedWorkspace.id,
+			selectedWorkspace.title,
 		);
 		expect(runResult).toMatchInlineSnapshot(`
 		{
@@ -242,6 +244,7 @@ describe('describe command tests', () => {
 			selectedOrg.id,
 			selectedProject.id,
 			selectedWorkspace.id,
+			selectedWorkspace.title,
 		);
 		expect(runResult).toMatchInlineSnapshot(`
 		{

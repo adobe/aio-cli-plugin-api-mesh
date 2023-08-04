@@ -76,11 +76,11 @@ const getApiKeyCredential = async (organizationId, projectId, workspaceId) => {
 	}
 };
 
-const describeMesh = async (organizationId, projectId, workspaceId) => {
+const describeMesh = async (organizationId, projectId, workspaceId, workspaceName) => {
 	logger.info('Initiating Describe Mesh');
 
 	try {
-		const meshId = await getMeshId(organizationId, projectId, workspaceId);
+		const meshId = await getMeshId(organizationId, projectId, workspaceId, workspaceName);
 
 		logger.info('Response from getMeshId %s', meshId);
 
@@ -106,7 +106,7 @@ const describeMesh = async (organizationId, projectId, workspaceId) => {
 	}
 };
 
-const getMesh = async (organizationId, projectId, workspaceId, meshId) => {
+const getMesh = async (organizationId, projectId, workspaceId, workspaceName, meshId) => {
 	const { baseUrl: devConsoleUrl, accessToken, apiKey } = await getDevConsoleConfig();
 	const config = {
 		method: 'get',
@@ -114,6 +114,7 @@ const getMesh = async (organizationId, projectId, workspaceId, meshId) => {
 		headers: {
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
+			'workspaceName': workspaceName,
 		},
 	};
 
@@ -187,7 +188,7 @@ const getMesh = async (organizationId, projectId, workspaceId, meshId) => {
 	}
 };
 
-const createMesh = async (organizationId, projectId, workspaceId, data) => {
+const createMesh = async (organizationId, projectId, workspaceId, workspaceName, data) => {
 	const { baseUrl: devConsoleUrl, accessToken, apiKey } = await getDevConsoleConfig();
 	const config = {
 		method: 'post',
@@ -443,7 +444,7 @@ const deleteMesh = async (organizationId, projectId, workspaceId, meshId) => {
 	}
 };
 
-const getMeshId = async (organizationId, projectId, workspaceId) => {
+const getMeshId = async (organizationId, projectId, workspaceId, workspaceName) => {
 	const { baseUrl: devConsoleUrl, accessToken, apiKey } = await getDevConsoleConfig();
 	logger.info('Initiating Mesh ID request');
 
@@ -453,6 +454,7 @@ const getMeshId = async (organizationId, projectId, workspaceId) => {
 		headers: {
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
+			'workspaceName': workspaceName,
 		},
 	};
 

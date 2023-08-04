@@ -424,6 +424,7 @@ async function initSdk(options) {
 		imsOrgId: org.id,
 		projectId: project.id,
 		workspaceId: workspace.id,
+		workspaceName: workspace.title,
 	};
 }
 

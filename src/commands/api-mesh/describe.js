@@ -35,12 +35,12 @@ class DescribeCommand extends Command {
 
 		const ignoreCache = await flags.ignoreCache;
 
-		const { imsOrgId, projectId, workspaceId } = await initSdk({
+		const { imsOrgId, projectId, workspaceId, workspaceName } = await initSdk({
 			ignoreCache,
 		});
 
 		try {
-			const meshDetails = await describeMesh(imsOrgId, projectId, workspaceId);
+			const meshDetails = await describeMesh(imsOrgId, projectId, workspaceId, workspaceName);
 
 			if (meshDetails) {
 				const { meshId, apiKey } = meshDetails;
@@ -52,7 +52,13 @@ class DescribeCommand extends Command {
 					this.log('Workspace ID: %s', workspaceId);
 					this.log('Mesh ID: %s', meshId);
 
-					const { meshURL } = await getMesh(imsOrgId, projectId, workspaceId, meshId);
+					const { meshURL } = await getMesh(
+						imsOrgId,
+						projectId,
+						workspaceId,
+						workspaceName,
+						meshId,
+					);
 					const meshUrl = meshURL === '' ? MULTITENANT_GRAPHQL_SERVER_BASE_URL : meshURL;
 
 					if (

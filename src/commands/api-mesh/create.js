@@ -59,7 +59,7 @@ class CreateCommand extends Command {
 		const ignoreCache = await flags.ignoreCache;
 		const autoConfirmAction = await flags.autoConfirmAction;
 		const envFilePath = await flags.env;
-		const { imsOrgId, projectId, workspaceId } = await initSdk({
+		const { imsOrgId, projectId, workspaceId, workspaceName } = await initSdk({
 			ignoreCache,
 		});
 
@@ -109,7 +109,7 @@ class CreateCommand extends Command {
 
 		if (shouldContinue) {
 			try {
-				const mesh = await createMesh(imsOrgId, projectId, workspaceId, data);
+				const mesh = await createMesh(imsOrgId, projectId, workspaceId, workspaceName, data);
 
 				let sdkList = [];
 
@@ -150,7 +150,13 @@ class CreateCommand extends Command {
 								adobeIdIntegrationsForWorkspace.apiKey,
 							);
 
-							const { meshURL } = await getMesh(imsOrgId, projectId, workspaceId, mesh.meshId);
+							const { meshURL } = await getMesh(
+								imsOrgId,
+								projectId,
+								workspaceId,
+								workspaceName,
+								mesh.meshId,
+							);
 							const meshUrl =
 								meshURL === '' || meshURL === undefined
 									? MULTITENANT_GRAPHQL_SERVER_BASE_URL
