@@ -21,7 +21,7 @@ const ProdConstants = {
 };
 const TMOConstants = {
 	TMO_STAGE_URL: 'https://tigraph-dev.adobe.io/api',
-	TMO_SANDBOX_URL: 'https://tigraph-sandbox.adobe.io/api',
+	TMO_SANDBOX_URL: 'https://mcprod.t-mobile2.dummycachetest.com/api',
 	TMO_PROD_URL: 'https://tigraph.adobe.io/api',
 };
 const envConstants = clientEnv === 'stage' ? StageConstants : ProdConstants;
