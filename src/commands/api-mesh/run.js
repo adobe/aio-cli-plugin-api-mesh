@@ -15,11 +15,14 @@ const { exec } = require('child_process');
 const logger = require('../../classes/logger');
 const { initRequestId } = require('../../helpers');
 const { debugFlag } = require('../../utils');
+const meshBuidler = require('@multitenant-graphql/mesh-builder');
+
+const { buildMesh, compileMesh } = meshBuidler.default;
 
 require('dotenv').config();
 
-function startGraphqlServer(debug = false) {
-	const serverPath = `${__dirname}/../../server.js`;
+function startGraphqlServer(meshId, debug = false) {
+	const serverPath = `${__dirname}/../../server.js ${meshId}`;
 	const command = debug ? `node --inspect-brk ${serverPath}` : `node ${serverPath}`;
 
 	const server = exec(command);
@@ -58,7 +61,24 @@ class RunCommand extends Command {
 		const { flags } = await this.parse(RunCommand);
 		const debug = await flags.debug;
 
-		startGraphqlServer(debug);
+		const meshId = 'testMesh';
+		const meshConfig = {
+			sources: [
+				{
+					name: 'MagentoMonolithApi',
+					handler: {
+						graphql: {
+							endpoint: 'https://venia.magento.com/graphql',
+						},
+					},
+				},
+			],
+		};
+
+		return buildMesh(meshId, meshConfig, process.cwd())
+			.then(() => compileMesh(meshId, process.cwd()))
+			.then(() => startGraphqlServer(meshId, debug))
+			.catch(console.error);
 	}
 }
 

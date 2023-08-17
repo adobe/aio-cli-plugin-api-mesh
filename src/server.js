@@ -3,10 +3,13 @@ const { createYoga } = require('graphql-yoga');
 
 let yogaServer = null;
 
+// get meshId from command line arguments
+const meshId = process.argv[2];
+
 const getCORSOptions = () => {
 	try {
 		const currentWorkingDirectory = process.cwd();
-		const meshConfigPath = `${currentWorkingDirectory}/mesh-artifact/.meshrc.json`;
+		const meshConfigPath = `${currentWorkingDirectory}/mesh-artifact/${meshId}/.meshrc.json`;
 
 		const meshConfig = require(meshConfigPath);
 		const { responseConfig } = meshConfig;
@@ -23,7 +26,7 @@ const getYogaServer = async () => {
 		return yogaServer;
 	} else {
 		const currentWorkingDirectory = process.cwd();
-		const meshArtifactsPath = `${currentWorkingDirectory}/mesh-artifact`;
+		const meshArtifactsPath = `${currentWorkingDirectory}/mesh-artifact/${meshId}`;
 
 		const meshArtifacts = require(meshArtifactsPath);
 		const { getBuiltMesh } = meshArtifacts;
