@@ -23,10 +23,7 @@ const {
 	readFileContents,
 	validateAndInterpolateMesh,
 } = require('../../utils');
-const {
-	getMesh,
-	createMesh,
-} = require('../../lib/devConsole');
+const { getMesh, createMesh } = require('../../lib/devConsole');
 
 const { MULTITENANT_GRAPHQL_SERVER_BASE_URL, TMOConstants } = CONSTANTS;
 
@@ -107,10 +104,9 @@ class CreateCommand extends Command {
 
 		if (shouldContinue) {
 			try {
-				const { mesh, apiKey, sdkList} = await createMesh(imsOrgId, projectId, workspaceId, data);
+				const { mesh, apiKey, sdkList } = await createMesh(imsOrgId, projectId, workspaceId, data);
 
 				if (mesh) {
-					
 					this.log(
 						'******************************************************************************************************',
 					);
@@ -128,10 +124,7 @@ class CreateCommand extends Command {
 						this.log('Successfully created API Key %s', apiKey);
 
 						if (sdkList) {
-							this.log(
-								'Successfully subscribed API Key %s to API Mesh service',
-								apiKey,
-							);
+							this.log('Successfully subscribed API Key %s to API Mesh service', apiKey);
 
 							const { meshURL } = await getMesh(imsOrgId, projectId, workspaceId, mesh.meshId);
 							const meshUrl =
@@ -152,10 +145,7 @@ class CreateCommand extends Command {
 								);
 							}
 						} else {
-							this.log(
-								'Unable to subscribe API Key %s to API Mesh service',
-								apiKey,
-							);
+							this.log('Unable to subscribe API Key %s to API Mesh service', apiKey);
 						}
 					} else {
 						this.log('Unable to create API Key');

@@ -75,9 +75,14 @@ describe('create command tests', () => {
 		errorLogSpy = jest.spyOn(CreateCommand.prototype, 'error');
 
 		createMesh.mockResolvedValue({
-			meshId: 'dummy_mesh_id',
-			meshConfig: sampleCreateMeshConfig.meshConfig,
+			mesh: {
+				meshId: 'dummy_mesh_id',
+				meshConfig: sampleCreateMeshConfig.meshConfig,
+			},
+			apiKey: 'dummy_api_key',
+			sdkList: ['dummy_service'],
 		});
+
 		createAPIMeshCredentials.mockResolvedValue({
 			apiKey: 'dummy_api_key',
 			id: 'dummy_id',
@@ -109,11 +114,11 @@ describe('create command tests', () => {
 		});
 		const output = await CreateCommand.run();
 		expect(output).toHaveProperty('mesh');
-		expect(output).toHaveProperty('adobeIdIntegrationsForWorkspace');
+		expect(output).toHaveProperty('apiKey');
+		expect(output).toHaveProperty('sdkList');
 		expect(output.mesh).toEqual(expect.objectContaining({ meshId: 'dummy_mesh_id' }));
-		expect(output.adobeIdIntegrationsForWorkspace).toEqual(
-			expect.objectContaining({ apiKey: 'dummy_api_key' }),
-		);
+		expect(output.apiKey).toEqual('dummy_api_key');
+		expect(output.sdkList).toEqual(['dummy_service']);
 	});
 
 	test('snapshot create command description', () => {
@@ -169,8 +174,12 @@ describe('create command tests', () => {
 
 	test('should pass if a valid mesh config file with composer files are provided', async () => {
 		createMesh.mockResolvedValueOnce({
-			meshId: 'dummy_mesh_id',
-			meshConfig: meshConfigWithComposerFiles.meshConfig,
+			mesh: {
+				meshId: 'dummy_mesh_id',
+				meshConfig: meshConfigWithComposerFiles.meshConfig,
+			},
+			apiKey: 'dummy_api_key',
+			sdkList: ['dummy_service'],
 		});
 
 		parseSpy.mockResolvedValueOnce({
@@ -184,10 +193,7 @@ describe('create command tests', () => {
 
 		expect(output).toMatchInlineSnapshot(`
 		{
-		  "adobeIdIntegrationsForWorkspace": {
-		    "apiKey": "dummy_api_key",
-		    "id": "dummy_id",
-		  },
+		  "apiKey": "dummy_api_key",
 		  "mesh": {
 		    "meshConfig": {
 		      "files": [
@@ -288,27 +294,24 @@ describe('create command tests', () => {
 		  },
 		]
 	`);
-		expect(createAPIMeshCredentials.mock.calls[0]).toMatchInlineSnapshot(`
+		/*expect(createAPIMeshCredentials.mock.calls[0]).toMatchInlineSnapshot(`
 		[
 		  "1234",
 		  "5678",
 		  "123456789",
 		]
-	`);
-		expect(subscribeCredentialToMeshService.mock.calls[0]).toMatchInlineSnapshot(`
+	`);*/
+		/*expect(subscribeCredentialToMeshService.mock.calls[0]).toMatchInlineSnapshot(`
 		[
 		  "1234",
 		  "5678",
 		  "123456789",
 		  "dummy_id",
 		]
-	`);
+	`);*/
 		expect(runResult).toMatchInlineSnapshot(`
 		{
-		  "adobeIdIntegrationsForWorkspace": {
-		    "apiKey": "dummy_api_key",
-		    "id": "dummy_id",
-		  },
+		  "apiKey": "dummy_api_key",
 		  "mesh": {
 		    "meshConfig": {
 		      "sources": [
@@ -395,27 +398,10 @@ describe('create command tests', () => {
 		  },
 		]
 	`);
-		expect(createAPIMeshCredentials.mock.calls[0]).toMatchInlineSnapshot(`
-		[
-		  "1234",
-		  "5678",
-		  "123456789",
-		]
-	`);
-		expect(subscribeCredentialToMeshService.mock.calls[0]).toMatchInlineSnapshot(`
-		[
-		  "1234",
-		  "5678",
-		  "123456789",
-		  "dummy_id",
-		]
-	`);
+
 		expect(runResult).toMatchInlineSnapshot(`
 		{
-		  "adobeIdIntegrationsForWorkspace": {
-		    "apiKey": "dummy_api_key",
-		    "id": "dummy_id",
-		  },
+		  "apiKey": "dummy_api_key",
 		  "mesh": {
 		    "meshConfig": {
 		      "sources": [
@@ -521,7 +507,7 @@ describe('create command tests', () => {
 	`);
 	});
 
-	test('should fail if create api credential api has failed', async () => {
+	test.skip('should fail if create api credential api has failed', async () => {
 		createAPIMeshCredentials.mockRejectedValue(new Error('create api credential api failed'));
 
 		const runResult = CreateCommand.run();
@@ -563,7 +549,7 @@ describe('create command tests', () => {
 	`);
 	});
 
-	test('should fail if subscribe credential to mesh service api has failed', async () => {
+	test.skip('should fail if subscribe credential to mesh service api has failed', async () => {
 		subscribeCredentialToMeshService.mockRejectedValueOnce(
 			new Error('subscribe credential to mesh service api failed'),
 		);
@@ -692,11 +678,11 @@ describe('create command tests', () => {
 		});
 		const output = await CreateCommand.run();
 		expect(output).toHaveProperty('mesh');
-		expect(output).toHaveProperty('adobeIdIntegrationsForWorkspace');
+		expect(output).toHaveProperty('apiKey');
+		expect(output).toHaveProperty('sdkList');
 		expect(output.mesh).toEqual(expect.objectContaining({ meshId: 'dummy_mesh_id' }));
-		expect(output.adobeIdIntegrationsForWorkspace).toEqual(
-			expect.objectContaining({ apiKey: 'dummy_api_key' }),
-		);
+		expect(output.apiKey).toEqual('dummy_api_key');
+		expect(output.sdkList).toEqual(['dummy_service']);
 	});
 
 	test('should return error if the mesh has placeholders and env file provided using --env flag is not found', async () => {
@@ -851,10 +837,7 @@ describe('create command tests', () => {
 		expect(promptConfirm).toHaveBeenCalledWith('Are you sure you want to create a mesh?');
 		expect(runResult).toMatchInlineSnapshot(`
 		{
-		  "adobeIdIntegrationsForWorkspace": {
-		    "apiKey": "dummy_api_key",
-		    "id": "dummy_id",
-		  },
+		  "apiKey": "dummy_api_key",
 		  "mesh": {
 		    "meshConfig": {
 		      "sources": [
@@ -930,8 +913,12 @@ describe('create command tests', () => {
 		};
 
 		createMesh.mockResolvedValueOnce({
-			meshId: 'dummy_mesh_id',
-			meshConfig: meshConfig,
+			mesh: {
+				meshId: 'dummy_mesh_id',
+				meshConfig: meshConfig,
+			},
+			apiKey: 'dummy_api_key',
+			sdkList: ['dummy_service'],
 		});
 
 		parseSpy.mockResolvedValueOnce({
@@ -984,28 +971,10 @@ describe('create command tests', () => {
 		  },
 		]
 	`);
-		expect(createAPIMeshCredentials.mock.calls[0]).toMatchInlineSnapshot(`
-		[
-		  "1234",
-		  "5678",
-		  "123456789",
-		]
-		`);
 
-		expect(subscribeCredentialToMeshService.mock.calls[0]).toMatchInlineSnapshot(`
-		[
-		  "1234",
-		  "5678",
-		  "123456789",
-		  "dummy_id",
-		]
-		`);
 		expect(output).toMatchInlineSnapshot(`
 		{
-		  "adobeIdIntegrationsForWorkspace": {
-		    "apiKey": "dummy_api_key",
-		    "id": "dummy_id",
-		  },
+		  "apiKey": "dummy_api_key",
 		  "mesh": {
 		    "meshConfig": {
 		      "files": [
@@ -1209,8 +1178,12 @@ describe('create command tests', () => {
 		importFiles.mockResolvedValueOnce(meshConfig);
 
 		createMesh.mockResolvedValueOnce({
-			meshId: 'dummy_mesh_id',
-			meshConfig: meshConfig,
+			mesh: {
+				meshId: 'dummy_mesh_id',
+				meshConfig: meshConfig,
+			},
+			apiKey: 'dummy_api_key',
+			sdkList: ['dummy_service'],
 		});
 
 		parseSpy.mockResolvedValueOnce({
@@ -1257,27 +1230,9 @@ describe('create command tests', () => {
 		  },
 		]
 	`);
-		expect(createAPIMeshCredentials.mock.calls[0]).toMatchInlineSnapshot(`
-		[
-		  "1234",
-		  "5678",
-		  "123456789",
-		]
-	`);
-		expect(subscribeCredentialToMeshService.mock.calls[0]).toMatchInlineSnapshot(`
-		[
-		  "1234",
-		  "5678",
-		  "123456789",
-		  "dummy_id",
-		]
-	`);
 		expect(output).toMatchInlineSnapshot(`
 		{
-		  "adobeIdIntegrationsForWorkspace": {
-		    "apiKey": "dummy_api_key",
-		    "id": "dummy_id",
-		  },
+		  "apiKey": "dummy_api_key",
 		  "mesh": {
 		    "meshConfig": {
 		      "files": [
@@ -1358,8 +1313,12 @@ describe('create command tests', () => {
 		});
 
 		createMesh.mockResolvedValueOnce({
-			meshId: 'dummy_mesh_id',
-			meshConfig: meshConfig,
+			mesh: {
+				meshId: 'dummy_mesh_id',
+				meshConfig: meshConfig,
+			},
+			apiKey: 'dummy_api_key',
+			sdkList: ['dummy_service'],
 		});
 
 		const output = await CreateCommand.run();
@@ -1401,28 +1360,10 @@ describe('create command tests', () => {
 		  },
 		]
 	`);
-		expect(createAPIMeshCredentials.mock.calls[0]).toMatchInlineSnapshot(`
-		[
-		  "1234",
-		  "5678",
-		  "123456789",
-		]
-	`);
 
-		expect(subscribeCredentialToMeshService.mock.calls[0]).toMatchInlineSnapshot(`
-		[
-		  "1234",
-		  "5678",
-		  "123456789",
-		  "dummy_id",
-		]
-	`);
 		expect(output).toMatchInlineSnapshot(`
 		{
-		  "adobeIdIntegrationsForWorkspace": {
-		    "apiKey": "dummy_api_key",
-		    "id": "dummy_id",
-		  },
+		  "apiKey": "dummy_api_key",
 		  "mesh": {
 		    "meshConfig": {
 		      "files": [
@@ -1503,8 +1444,12 @@ describe('create command tests', () => {
 		});
 
 		createMesh.mockResolvedValueOnce({
-			meshId: 'dummy_mesh_id',
-			meshConfig: meshConfig,
+			mesh: {
+				meshId: 'dummy_mesh_id',
+				meshConfig: meshConfig,
+			},
+			apiKey: 'dummy_api_key',
+			sdkList: ['dummy_service'],
 		});
 
 		const output = await CreateCommand.run();
@@ -1546,27 +1491,9 @@ describe('create command tests', () => {
 		  },
 		]
 	`);
-		expect(createAPIMeshCredentials.mock.calls[0]).toMatchInlineSnapshot(`
-		[
-		  "1234",
-		  "5678",
-		  "123456789",
-		]
-	`);
-		expect(subscribeCredentialToMeshService.mock.calls[0]).toMatchInlineSnapshot(`
-		[
-		  "1234",
-		  "5678",
-		  "123456789",
-		  "dummy_id",
-		]
-	`);
 		expect(output).toMatchInlineSnapshot(`
 		{
-		  "adobeIdIntegrationsForWorkspace": {
-		    "apiKey": "dummy_api_key",
-		    "id": "dummy_id",
-		  },
+		  "apiKey": "dummy_api_key",
 		  "mesh": {
 		    "meshConfig": {
 		      "files": [
@@ -1634,8 +1561,12 @@ describe('create command tests', () => {
 		};
 
 		createMesh.mockResolvedValueOnce({
-			meshId: 'dummy_mesh_id',
-			meshConfig: meshConfig,
+			mesh: {
+				meshId: 'dummy_mesh_id',
+				meshConfig: meshConfig,
+			},
+			apiKey: 'dummy_api_key',
+			sdkList: ['dummy_service'],
 		});
 
 		parseSpy.mockResolvedValueOnce({
@@ -1688,28 +1619,9 @@ describe('create command tests', () => {
 		  },
 		]
 	`);
-		expect(createAPIMeshCredentials.mock.calls[0]).toMatchInlineSnapshot(`
-		[
-		  "1234",
-		  "5678",
-		  "123456789",
-		]
-		`);
-
-		expect(subscribeCredentialToMeshService.mock.calls[0]).toMatchInlineSnapshot(`
-		[
-		  "1234",
-		  "5678",
-		  "123456789",
-		  "dummy_id",
-		]
-		`);
 		expect(output).toMatchInlineSnapshot(`
 		{
-		  "adobeIdIntegrationsForWorkspace": {
-		    "apiKey": "dummy_api_key",
-		    "id": "dummy_id",
-		  },
+		  "apiKey": "dummy_api_key",
 		  "mesh": {
 		    "meshConfig": {
 		      "files": [

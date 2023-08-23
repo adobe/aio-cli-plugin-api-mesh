@@ -241,7 +241,7 @@ const createMesh = async (organizationId, projectId, workspaceId, data) => {
 				};
 			} else {
 				logger.error('API Key credential not found on workspace');
-				
+
 				// try to create a new API key credential
 				credential = await createAPIMeshCredentials(organizationId, projectId, workspaceId);
 				if (credential) {
