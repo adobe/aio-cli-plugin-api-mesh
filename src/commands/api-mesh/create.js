@@ -26,8 +26,6 @@ const {
 const {
 	getMesh,
 	createMesh,
-	createAPIMeshCredentials,
-	subscribeCredentialToMeshService,
 } = require('../../lib/devConsole');
 
 const { MULTITENANT_GRAPHQL_SERVER_BASE_URL, TMOConstants } = CONSTANTS;
@@ -109,11 +107,10 @@ class CreateCommand extends Command {
 
 		if (shouldContinue) {
 			try {
-				const mesh = await createMesh(imsOrgId, projectId, workspaceId, data);
-
-				let sdkList = [];
+				const { mesh, apiKey, sdkList} = await createMesh(imsOrgId, projectId, workspaceId, data);
 
 				if (mesh) {
+					
 					this.log(
 						'******************************************************************************************************',
 					);
@@ -127,27 +124,13 @@ class CreateCommand extends Command {
 						'******************************************************************************************************',
 					);
 
-					// create API key credential
-					const adobeIdIntegrationsForWorkspace = await createAPIMeshCredentials(
-						imsOrgId,
-						projectId,
-						workspaceId,
-					);
-
-					if (adobeIdIntegrationsForWorkspace) {
-						this.log('Successfully created API Key %s', adobeIdIntegrationsForWorkspace.apiKey);
-						// subscribe the credential to API mesh service
-						sdkList = await subscribeCredentialToMeshService(
-							imsOrgId,
-							projectId,
-							workspaceId,
-							adobeIdIntegrationsForWorkspace.id,
-						);
+					if (apiKey) {
+						this.log('Successfully created API Key %s', apiKey);
 
 						if (sdkList) {
 							this.log(
 								'Successfully subscribed API Key %s to API Mesh service',
-								adobeIdIntegrationsForWorkspace.apiKey,
+								apiKey,
 							);
 
 							const { meshURL } = await getMesh(imsOrgId, projectId, workspaceId, mesh.meshId);
@@ -165,22 +148,22 @@ class CreateCommand extends Command {
 							} else {
 								this.log(
 									'Mesh Endpoint: %s\n',
-									`${meshUrl}/${mesh.meshId}/graphql?api_key=${adobeIdIntegrationsForWorkspace.apiKey}`,
+									`${meshUrl}/${mesh.meshId}/graphql?api_key=${apiKey}`,
 								);
 							}
 						} else {
 							this.log(
 								'Unable to subscribe API Key %s to API Mesh service',
-								adobeIdIntegrationsForWorkspace.apiKey,
+								apiKey,
 							);
 						}
 					} else {
 						this.log('Unable to create API Key');
 					}
-					// Do not remove or rename return values.
-					// Template adobe/generator-app-api-mesh relies on "mesh" & "adobeIdIntegrationsForWorkspace" obj structure
+					// When renaming the return values, make sure to make necessary changes to
+					// template adobe/generator-app-api-mesh since it relies on "mesh" & "apiKey"
 					return {
-						adobeIdIntegrationsForWorkspace,
+						apiKey,
 						sdkList,
 						mesh,
 					};
