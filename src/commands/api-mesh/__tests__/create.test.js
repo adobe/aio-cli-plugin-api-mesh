@@ -294,21 +294,6 @@ describe('create command tests', () => {
 		  },
 		]
 	`);
-		/*expect(createAPIMeshCredentials.mock.calls[0]).toMatchInlineSnapshot(`
-		[
-		  "1234",
-		  "5678",
-		  "123456789",
-		]
-	`);*/
-		/*expect(subscribeCredentialToMeshService.mock.calls[0]).toMatchInlineSnapshot(`
-		[
-		  "1234",
-		  "5678",
-		  "123456789",
-		  "dummy_id",
-		]
-	`);*/
 		expect(runResult).toMatchInlineSnapshot(`
 		{
 		  "apiKey": "dummy_api_key",
