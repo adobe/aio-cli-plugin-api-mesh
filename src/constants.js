@@ -19,10 +19,6 @@ const ProdConstants = {
 	AIO_CLI_API_KEY: 'aio-cli-console-auth',
 	SMS_BASE_URL: 'https://graph.adobe.io/api-admin',
 };
-const TMOConstants = {
-	TMO_STAGE_URL: 'https://tigraph-dev.adobe.io/api',
-	TMO_SANDBOX_URL: 'https://mcprod.t-mobile2.dummycachetest.com/api',
-	TMO_PROD_URL: 'https://tigraph.adobe.io/api',
-};
+
 const envConstants = clientEnv === 'stage' ? StageConstants : ProdConstants;
-module.exports = { ...envConstants, TMOConstants };
+module.exports = { ...envConstants };

@@ -30,7 +30,7 @@ const {
 	subscribeCredentialToMeshService,
 } = require('../../lib/devConsole');
 
-const { MULTITENANT_GRAPHQL_SERVER_BASE_URL, TMOConstants } = CONSTANTS;
+const { MULTITENANT_GRAPHQL_SERVER_BASE_URL } = CONSTANTS;
 
 class CreateCommand extends Command {
 	static args = [{ name: 'file' }];
@@ -161,18 +161,14 @@ class CreateCommand extends Command {
 								meshURL === '' || meshURL === undefined
 									? MULTITENANT_GRAPHQL_SERVER_BASE_URL
 									: meshURL;
-
-							if (
-								meshUrl === TMOConstants.TMO_STAGE_URL ||
-								meshUrl === TMOConstants.TMO_SANDBOX_URL ||
-								meshUrl === TMOConstants.TMO_PROD_URL
-							) {
-								this.log('Mesh Endpoint: %s\n', `${meshUrl}/${mesh.meshId}/graphql`);
-							} else {
+							
+							if(adobeIdIntegrationsForWorkspace.apiKey && MULTITENANT_GRAPHQL_SERVER_BASE_URL.includes(meshUrl)){
 								this.log(
 									'Mesh Endpoint: %s\n',
 									`${meshUrl}/${mesh.meshId}/graphql?api_key=${adobeIdIntegrationsForWorkspace.apiKey}`,
 								);
+							} else {
+								this.log('Mesh Endpoint: %s\n', `${meshUrl}/${mesh.meshId}/graphql`);
 							}
 						} else {
 							this.log(
