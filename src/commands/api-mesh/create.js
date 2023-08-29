@@ -161,8 +161,11 @@ class CreateCommand extends Command {
 								meshURL === '' || meshURL === undefined
 									? MULTITENANT_GRAPHQL_SERVER_BASE_URL
 									: meshURL;
-							
-							if(adobeIdIntegrationsForWorkspace.apiKey && MULTITENANT_GRAPHQL_SERVER_BASE_URL.includes(meshUrl)){
+
+							if (
+								adobeIdIntegrationsForWorkspace.apiKey &&
+								MULTITENANT_GRAPHQL_SERVER_BASE_URL.includes(meshUrl)
+							) {
 								this.log(
 									'Mesh Endpoint: %s\n',
 									`${meshUrl}/${mesh.meshId}/graphql?api_key=${adobeIdIntegrationsForWorkspace.apiKey}`,

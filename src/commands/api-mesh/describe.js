@@ -60,11 +60,9 @@ class DescribeCommand extends Command {
 						meshId,
 					);
 					const meshUrl =
-								meshURL === '' || meshURL === undefined
-									? MULTITENANT_GRAPHQL_SERVER_BASE_URL
-									: meshURL;
-		
-					if(apiKey && MULTITENANT_GRAPHQL_SERVER_BASE_URL.includes(meshUrl)){
+						meshURL === '' || meshURL === undefined ? MULTITENANT_GRAPHQL_SERVER_BASE_URL : meshURL;
+
+					if (apiKey && MULTITENANT_GRAPHQL_SERVER_BASE_URL.includes(meshUrl)) {
 						this.log('Mesh Endpoint: %s\n', `${meshUrl}/${meshId}/graphql?api_key=${apiKey}`);
 					} else {
 						this.log('Mesh Endpoint: %s\n', `${meshUrl}/${meshId}/graphql`);
