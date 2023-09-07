@@ -37,11 +37,13 @@ class RunCommand extends Command {
 	static examples = [];
 
 	async run() {
-		const { args, flags } = await this.parse(InitCommand);
+		const { args, flags } = await this.parse(RunCommand);
         if(flags.debug){
             console.log("Run in debug mode");
         }
 	}
 }
 
-module.exports = InitCommand;
+CreateCommand.description = 'Run the mesh config in the local development server';
+
+module.exports = RunCommand;
