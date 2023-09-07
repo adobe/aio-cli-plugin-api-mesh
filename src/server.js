@@ -3,8 +3,22 @@ const { createYoga } = require('graphql-yoga');
 
 let yogaServer = null;
 
+// catch unhandled promise rejections
+process.on('unhandledRejection', (reason, promise) => {
+	console.error('Unhandled Rejection at:', reason.stack || reason);
+});
+
+// catch uncaught exceptions
+process.on('uncaughtException', err => {
+	console.error('Uncaught Exception thrown');
+	console.error(err.stack);
+	process.exit(1);
+});
+
 // get meshId from command line arguments
 const meshId = process.argv[2];
+
+// TODO: get PORT number from command line arguments
 
 const getCORSOptions = () => {
 	try {
@@ -76,6 +90,12 @@ app.route({
 	},
 });
 
-app.listen(3000, () => {
-	console.log('Server is running on http://localhost:3000/graphql');
-});
+app.listen(
+	{
+		// TODO: get PORT number from command line arguments
+		port: 5000,
+	},
+	() => {
+		console.log('Server is running on http://localhost:5000/graphql');
+	},
+);

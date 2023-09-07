@@ -23,7 +23,9 @@ require('dotenv').config();
 
 function startGraphqlServer(meshId, debug = false) {
 	const serverPath = `${__dirname}/../../server.js ${meshId}`;
-	const command = debug ? `node --inspect-brk ${serverPath}` : `node ${serverPath}`;
+	const command = debug
+		? `node --inspect-brk --trace-warnings ${serverPath}`
+		: `node ${serverPath}`;
 
 	const server = exec(command);
 
@@ -36,7 +38,7 @@ function startGraphqlServer(meshId, debug = false) {
 	});
 
 	server.on('close', code => {
-		console.log(`Server exited with code ${code}`);
+		console.log(`Server closed with code ${code}`);
 	});
 
 	server.on('exit', code => {
@@ -51,6 +53,7 @@ function startGraphqlServer(meshId, debug = false) {
 class RunCommand extends Command {
 	static flags = {
 		debug: debugFlag,
+		// TODO: get port number from --port or -p flag
 	};
 
 	async run() {
@@ -61,7 +64,7 @@ class RunCommand extends Command {
 		const { flags } = await this.parse(RunCommand);
 		const debug = await flags.debug;
 
-		const meshId = 'testMesh';
+		// TODO - to be read from file whose path is passed as an argument
 		const meshConfig = {
 			sources: [
 				{
@@ -74,6 +77,7 @@ class RunCommand extends Command {
 				},
 			],
 		};
+		const meshId = 'testMesh'; // TODO - build mesh ID from meshConfig as a hash like SMS
 
 		return buildMesh(meshId, meshConfig, process.cwd())
 			.then(() => compileMesh(meshId, process.cwd()))
