@@ -95,7 +95,12 @@ app.listen(
 		// TODO: get PORT number from command line arguments
 		port: 5000,
 	},
-	() => {
+	err => {
+		if (err) {
+			console.error(err);
+			process.exit(1);
+		}
+
 		console.log('Server is running on http://localhost:5000/graphql');
 	},
 );
