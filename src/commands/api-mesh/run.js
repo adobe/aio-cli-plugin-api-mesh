@@ -15,7 +15,8 @@ const { exec } = require('child_process');
 const logger = require('../../classes/logger');
 const { initRequestId } = require('../../helpers');
 const { debugFlag } = require('../../utils');
-const meshBuidler = require('@multitenant-graphql/mesh-builder');
+// TODO - import from @adobe/mesh-builder once its published, right now it is tested using yarn link
+const meshBuidler = require('@adobe/mesh-builder');
 
 const { buildMesh, compileMesh } = meshBuidler.default;
 
