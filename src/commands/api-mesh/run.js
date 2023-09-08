@@ -10,7 +10,7 @@ governing permissions and limitations under the License.
 */
 
 const { Command, Flags } = require('@oclif/core');
-const { portNoFlag, debugFlag } =require('../../utils')
+const { portNoFlag, debugFlag } = require('../../utils')
 
 const { promptConfirm, promptSelect, runCliCommand } = require('../../helpers');
 
@@ -21,15 +21,15 @@ class RunCommand extends Command {
 
 	static args = [
 		{
-			name: 'meshFile',
+			name: 'file',
 			required: true,
-			description: 'Mesh JSON',
+			description: 'Mesh File',
 		},
 	];
 
 	static flags = {
-        port: portNoFlag,
-        debug: debugFlag
+		port: portNoFlag,
+		debug: debugFlag
 	};
 
 	static enableJsonFlag = true;
@@ -38,12 +38,10 @@ class RunCommand extends Command {
 
 	async run() {
 		const { args, flags } = await this.parse(RunCommand);
-        if(flags.debug){
-            console.log("Run in debug mode");
-        }
+		if (flags.debug) {
+			console.log("Run in debug mode");
+		}
 	}
 }
-
-CreateCommand.description = 'Run the mesh config in the local development server';
 
 module.exports = RunCommand;
