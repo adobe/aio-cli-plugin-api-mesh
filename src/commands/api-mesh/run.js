@@ -10,9 +10,9 @@ governing permissions and limitations under the License.
 */
 
 const { Command, Flags } = require('@oclif/core');
-const { portNoFlag, debugFlag } = require('../../utils')
-
-const { promptConfirm, promptSelect, runCliCommand } = require('../../helpers');
+const { portNoFlag, debugFlag, readFileContents } = require('../../utils')
+const meshBuilder = require('@adobe/mesh-builder').default;
+//const meshBuilder = require("@multitenant-graphql/mesh-builder").default;
 
 class RunCommand extends Command {
 	static summary = 'Run local development server';
@@ -38,9 +38,22 @@ class RunCommand extends Command {
 
 	async run() {
 		const { args, flags } = await this.parse(RunCommand);
+
+		
 		if (flags.debug) {
 			console.log("Run in debug mode");
 		}
+		//Read the file see create example
+		let inputMeshData = await readFileContents(args.file, this, 'mesh');
+		let data = JSON.parse(inputMeshData);
+
+		try{
+			await meshBuilder.buildMesh("mesh123",data,process.cwd());
+		}
+		catch(error){
+			console.log(error);
+		}
+		
 	}
 }
 
