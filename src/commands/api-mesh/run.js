@@ -18,7 +18,8 @@ const { debugFlag } = require('../../utils');
 // TODO - import from @adobe/mesh-builder once its published, right now it is tested using yarn link
 const meshBuidler = require('@adobe/mesh-builder');
 
-const { buildMesh, compileMesh } = meshBuidler.default;
+// Note - use feature/addMeshValidation branch of the mesh-builder package to get access to validateMesh function
+const { buildMesh, compileMesh, validateMesh } = meshBuidler.default;
 
 require('dotenv').config();
 
@@ -66,7 +67,7 @@ class RunCommand extends Command {
 		const debug = await flags.debug;
 
 		// TODO - to be read from file whose path is passed as an argument
-		const meshConfig = {
+		const config = {
 			sources: [
 				{
 					name: 'MagentoMonolithApi',
@@ -80,8 +81,9 @@ class RunCommand extends Command {
 		};
 		const meshId = 'testMesh'; // TODO - build mesh ID from meshConfig as a hash like SMS
 
-		return buildMesh(meshId, meshConfig, process.cwd())
-			.then(() => compileMesh(meshId, process.cwd()))
+		return validateMesh(config)
+			.then(() => buildMesh(meshId, config))
+			.then(() => compileMesh(meshId))
 			.then(() => startGraphqlServer(meshId, debug))
 			.catch(console.error);
 	}
