@@ -11,8 +11,12 @@ governing permissions and limitations under the License.
 
 const { Command, Flags } = require('@oclif/core');
 const { portNoFlag, debugFlag, readFileContents } = require('../../utils')
-const meshBuilder = require('@adobe/mesh-builder').default;
-//const meshBuilder = require("@multitenant-graphql/mesh-builder").default;
+const meshBuilder = require('@adobe/mesh-builder');
+const fs = require('fs');
+const UUID = require('../../uuid');
+const path = require('path');
+
+const { buildMesh, compileMesh } = meshBuilder.default;
 
 class RunCommand extends Command {
 	static summary = 'Run local development server';
@@ -39,21 +43,69 @@ class RunCommand extends Command {
 	async run() {
 		const { args, flags } = await this.parse(RunCommand);
 
-		
+		if (!args.file) {
+			this.error('Missing file path. Run aio api-mesh run --help for more info.');
+		}
+		let portNo;
+		let API_MESH_TIER;
+		portNo = await flags.port;
+		const debugStatus = await flags.debug;
+
+		// Set the path to the .env file in the user's current working directory
+		const localEnvFilePath = path.join(process.cwd(), '.env');
+
+
+		//The environment variables are optional and need default values
+		// Check if the .env file exists
+		if (fs.existsSync(localEnvFilePath)) {
+			// Load environment variables
+			dotenv.config({ path: localEnvFilePath });
+
+			if (process.env.hasOwnProperty('PORT')) {
+
+				// Use parseInt to attempt to convert the environment variable's value to an integer
+				const portNumber = parseInt(process.env.PORT);
+
+				if (isNaN(portNumber) || !Number.isInteger(portNo)) {
+					this.error('PORT value in the .env file is not a valid integer')
+				}
+
+				portNo = portNumber;
+
+			}
+			if (process.env.hasOwnProperty('API_MESH_TIER')) {
+				API_MESH_TIER = process.env.API_MESH_TIER
+			}
+
+		}
+
+
+		console.log(JSON.stringify(process.env));
+
 		if (flags.debug) {
 			console.log("Run in debug mode");
 		}
-		//Read the file see create example
-		let inputMeshData = await readFileContents(args.file, this, 'mesh');
-		let data = JSON.parse(inputMeshData);
 
-		try{
-			await meshBuilder.buildMesh("mesh123",data,process.cwd());
+
+		try {
+
+			//Read the mesh input file
+			let inputMeshData = await readFileContents(args.file, this, 'mesh');
+			let data = JSON.parse(inputMeshData);
+
+			//Generating unique mesh id
+			let meshId = UUID.newUuid().toString();
+
+			console.log(" PORT NO is : ", portNo);
+			console.log("Mesh Id is ", meshId);
+
+			return buildMesh(meshId, data.meshConfig);
+			//await compileMesh(meshId);
 		}
-		catch(error){
+		catch (error) {
 			console.log(error);
 		}
-		
+
 	}
 }
 
