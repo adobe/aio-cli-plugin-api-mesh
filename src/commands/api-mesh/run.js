@@ -9,12 +9,13 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const { Command, Flags } = require('@oclif/core');
+const { Command } = require('@oclif/core');
 const { portNoFlag, debugFlag, readFileContents } = require('../../utils')
 const meshBuilder = require('@adobe/mesh-builder');
 const fs = require('fs');
 const UUID = require('../../uuid');
 const path = require('path');
+const dotenv = require('dotenv');
 
 const { buildMesh, compileMesh } = meshBuilder.default;
 
@@ -79,9 +80,6 @@ class RunCommand extends Command {
 
 		}
 
-
-		console.log(JSON.stringify(process.env));
-
 		if (flags.debug) {
 			console.log("Run in debug mode");
 		}
@@ -99,11 +97,18 @@ class RunCommand extends Command {
 			console.log(" PORT NO is : ", portNo);
 			console.log("Mesh Id is ", meshId);
 
-			return buildMesh(meshId, data.meshConfig);
-			//await compileMesh(meshId);
+			//Ensure that current directory includes package.json
+			if(fs.existsSync(path.join(process.cwd() , "package.json"))){
+				await buildMesh(meshId, data.meshConfig,'cli');
+				console.log("Hello");
+				//await compileMesh(meshId);
+			}
+			else{
+				this.error("aio api-mesh run command cannot be executed as there is no package.json file in current directory. Use aio api-mesh init command to setup a package.")
+			}	
 		}
 		catch (error) {
-			console.log(error);
+			this.log("ERROR: "+error.message);
 		}
 
 	}
