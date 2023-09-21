@@ -16,8 +16,38 @@ const fs = require('fs');
 const UUID = require('../../uuid');
 const path = require('path');
 const dotenv = require('dotenv');
+const { exec } = require('child_process');
 
 const { buildMesh, compileMesh } = meshBuilder.default;
+
+function startGraphqlServer(meshId, port, debug = false) {
+	const serverPath = `${__dirname}/../../server.js ${meshId} ${port}`;
+	const command = debug
+		? `node --inspect-brk --trace-warnings ${serverPath}`
+		: `node ${serverPath}`;
+
+	const server = exec(command);
+
+	server.stdout.on('data', data => {
+		console.log('Data from server - ', data);
+	});
+
+	server.stderr.on('data', data => {
+		console.log('Error from server - ', data);
+	});
+
+	server.on('close', code => {
+		console.log(`Server closed with code ${code}`);
+	});
+
+	server.on('exit', code => {
+		console.log(`Server exited with code ${code}`);
+	});
+
+	server.on('error', err => {
+		console.log(`Server exited with error ${err}`);
+	});
+}
 
 class RunCommand extends Command {
 	static summary = 'Run local development server';
@@ -47,9 +77,14 @@ class RunCommand extends Command {
 		if (!args.file) {
 			this.error('Missing file path. Run aio api-mesh run --help for more info.');
 		}
+
 		let portNo;
 		let API_MESH_TIER;
+
+		//To set the port number as default or provided value in the command
 		portNo = await flags.port;
+
+		//Set the debugStatus based on flags
 		const debugStatus = await flags.debug;
 
 		// Set the path to the .env file in the user's current working directory
@@ -77,38 +112,29 @@ class RunCommand extends Command {
 			if (process.env.hasOwnProperty('API_MESH_TIER')) {
 				API_MESH_TIER = process.env.API_MESH_TIER
 			}
-
-		}
-
-		if (flags.debug) {
-			console.log("Run in debug mode");
 		}
 
 
 		try {
-
-			//Read the mesh input file
-			let inputMeshData = await readFileContents(args.file, this, 'mesh');
-			let data = JSON.parse(inputMeshData);
-
-			//Generating unique mesh id
-			let meshId = UUID.newUuid().toString();
-
-			console.log(" PORT NO is : ", portNo);
-			console.log("Mesh Id is ", meshId);
-
 			//Ensure that current directory includes package.json
-			if(fs.existsSync(path.join(process.cwd() , "package.json"))){
-				await buildMesh(meshId, data.meshConfig,'cli');
-				console.log("Hello");
-				//await compileMesh(meshId);
+			if (fs.existsSync(path.join(process.cwd(), "package.json"))) {
+				//Read the mesh input file
+				let inputMeshData = await readFileContents(args.file, this, 'mesh');
+				let data = JSON.parse(inputMeshData);
+
+				//Generating unique mesh id
+				let meshId = UUID.newUuid().toString();
+
+				await buildMesh(meshId, data.meshConfig);
+				await compileMesh(meshId);
+				await startGraphqlServer(meshId, portNo, debugStatus);
 			}
-			else{
+			else {
 				this.error("aio api-mesh run command cannot be executed as there is no package.json file in current directory. Use aio api-mesh init command to setup a package.")
-			}	
+			}
 		}
 		catch (error) {
-			this.log("ERROR: "+error.message);
+			this.log("ERROR: " + error.message);
 		}
 
 	}
