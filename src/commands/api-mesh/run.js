@@ -125,9 +125,22 @@ class RunCommand extends Command {
 				//Generating unique mesh id
 				let meshId = UUID.newUuid().toString();
 
-				await buildMesh(meshId, data.meshConfig);
-				await compileMesh(meshId);
-				await startGraphqlServer(meshId, portNo, debugStatus);
+				const config = {
+					sources: [
+						{
+							name: 'MagentoMonolithApi',
+							handler: {
+								graphql: {
+									endpoint: 'https://venia.magento.com/graphql',
+								},
+							},
+						},
+					],
+				};
+
+				return buildMesh(meshId, config)
+				.then(() => compileMesh(meshId))
+				.then(() => startGraphqlServer(meshId, portNo, debugStatus))
 			}
 			else {
 				this.error("aio api-mesh run command cannot be executed as there is no package.json file in current directory. Use aio api-mesh init command to setup a package.")

@@ -17,9 +17,9 @@ process.on('uncaughtException', err => {
 
 // get meshId from command line arguments
 const meshId = process.argv[2];
-const portNo = process.argv[3];
 
-// TODO: get PORT number from command line arguments
+// get PORT number from command line arguments
+const portNo = process.argv[3];
 
 const getCORSOptions = () => {
 	try {
@@ -49,6 +49,8 @@ const getYogaServer = async () => {
 		const tenantMesh = await getBuiltMesh();
 		const corsOptions = getCORSOptions();
 
+		console.log("Creating graphQL server")
+
 		yogaServer = createYoga({
 			plugins: tenantMesh.plugins,
 			graphqlEndpoint: `/graphql`,
@@ -76,7 +78,7 @@ app.route({
 
 		const response = await yogaServer.handleNodeRequest(req, {
 			req,
-			reply: res,
+			reply:res
 		});
 
 		response.headers.forEach((value, key) => {
@@ -93,8 +95,8 @@ app.route({
 
 app.listen(
 	{
-		// TODO: get PORT number from command line arguments
-		port: 5000,
+		//set the port no of the server based on the input value
+		port: portNo,
 	},
 	err => {
 		if (err) {
