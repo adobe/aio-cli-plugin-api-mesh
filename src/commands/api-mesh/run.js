@@ -17,6 +17,7 @@ const UUID = require('../../uuid');
 const path = require('path');
 const dotenv = require('dotenv');
 const { exec } = require('child_process');
+const { initRequestId } = require('../../helpers');
 
 const { buildMesh, compileMesh } = meshBuilder.default;
 
@@ -52,7 +53,7 @@ function startGraphqlServer(meshId, port, debug = false) {
 class RunCommand extends Command {
 	static summary = 'Run local development server';
 	static description =
-		'This command will run a local development server for developers to build, compile and debug meshes';
+		'Run a local development server using mesh built and compiled locally';
 
 	static args = [
 		{
@@ -72,6 +73,10 @@ class RunCommand extends Command {
 	static examples = [];
 
 	async run() {
+		await initRequestId();
+
+		logger.info(`RequestId: ${global.requestId}`);
+
 		const { args, flags } = await this.parse(RunCommand);
 
 		if (!args.file) {
@@ -80,9 +85,6 @@ class RunCommand extends Command {
 
 		let portNo;
 		let API_MESH_TIER;
-
-		//To set the port number as default or provided value in the command
-		portNo = await flags.port;
 
 		//Set the debugStatus based on flags
 		const debugStatus = await flags.debug;
@@ -114,6 +116,9 @@ class RunCommand extends Command {
 			}
 		}
 
+		//To set the port number as default or provided value in the command
+		portNo = await flags.port;
+
 
 		try {
 			//Ensure that current directory includes package.json
@@ -130,7 +135,7 @@ class RunCommand extends Command {
 				await startGraphqlServer(meshId, portNo, debugStatus);
 			}
 			else {
-				this.error("aio api-mesh run command cannot be executed as there is no package.json file in current directory. Use aio api-mesh init command to setup a package.")
+				this.error("`aio api-mesh run` cannot be executed as there is no package.json file in current directory. Use `aio api-mesh init` to setup a package.")
 			}
 		}
 		catch (error) {
