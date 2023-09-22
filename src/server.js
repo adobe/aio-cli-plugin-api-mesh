@@ -49,7 +49,7 @@ const getYogaServer = async () => {
 		const tenantMesh = await getBuiltMesh();
 		const corsOptions = getCORSOptions();
 
-		console.log("Creating graphQL server")
+		console.log('Creating graphQL server');
 
 		yogaServer = createYoga({
 			plugins: tenantMesh.plugins,
@@ -78,7 +78,7 @@ app.route({
 
 		const response = await yogaServer.handleNodeRequest(req, {
 			req,
-			reply:res
+			reply: res,
 		});
 
 		response.headers.forEach((value, key) => {

@@ -23,7 +23,9 @@
 		"@graphql-mesh/transform-resolvers-composition": "^0.12.111",
 		"@graphql-mesh/transform-type-merging": "^0.4.56",
 		"@graphql-mesh/types": "^0.87.1",
-		"graphql": "^16.6.0"
+		"graphql": "^16.6.0",
+		"@adobe/plugin-hooks": "^0.1.0",
+		"@adobe/plugin-on-fetch": "^0.1.0"
 	},
 	"engines": {
 		"node": ">=18.0.0"

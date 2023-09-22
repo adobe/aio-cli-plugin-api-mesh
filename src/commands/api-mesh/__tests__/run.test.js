@@ -10,15 +10,27 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
+const RunCommand = require('../run');
+const { initRequestId, startGraphqlServer } = require('../../../helpers');
+const meshBuilder = require('@adobe/mesh-builder');
+
 jest.mock('../../../helpers', () => ({
 	initRequestId: jest.fn().mockResolvedValue({}),
+	startGraphqlServer: jest.fn().mockResolvedValue({}),
 }));
 
-const RunCommand = require('../run');
-const { initRequestId } = require('../../../helpers');
+jest.mock('@adobe/mesh-builder', () => {
+	return {
+		default: {
+			buildMesh: jest.fn().mockResolvedValue({}),
+			compileMesh: jest.fn().mockResolvedValue({}),
+		},
+	};
+});
 
 let logSpy = null;
 let errorLogSpy = null;
+let parseSpy = null;
 
 describe('run command tests', () => {
 	beforeEach(() => {
@@ -26,6 +38,7 @@ describe('run command tests', () => {
 
 		logSpy = jest.spyOn(RunCommand.prototype, 'log');
 		errorLogSpy = jest.spyOn(RunCommand.prototype, 'error');
+		parseSpy = jest.spyOn(RunCommand.prototype, 'parse');
 	});
 
 	test('snapshot run command description', () => {
@@ -38,7 +51,6 @@ describe('run command tests', () => {
 		  {
 		    "description": "Mesh File",
 		    "name": "file",
-		    "required": true,
 		  },
 		]
 	`);
@@ -66,8 +78,50 @@ describe('run command tests', () => {
 	});
 
 	test('should fail if mesh file is not provided', async () => {
-        
-        const runResult = RunCommand.run();
+		parseSpy.mockResolvedValue({
+			args: {},
+			flags: {},
+		});
 
-    });
+		const runResult = RunCommand.run();
+		await expect(runResult).rejects.toEqual(
+			new Error('Missing file path. Run aio api-mesh run --help for more info.'),
+		);
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`[]`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Missing file path. Run aio api-mesh run --help for more info.",
+		  ],
+		]
+	`);
+	});
+
+	test('should use the port number provided in the flags for starting the server', async () => {
+		const parseOutput = {
+			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
+			flags: { port: 6000, debug: false },
+		};
+
+		parseSpy.mockResolvedValue(parseOutput);
+
+		await RunCommand.run();
+		expect(startGraphqlServer).toHaveBeenCalledWith(
+			expect.anything(),
+			parseOutput.flags.port,
+			false,
+		);
+	});
+
+	/*test('should use the port number provided in the .env if flags are not provided for starting the server', async () => {
+		process.env.PORT=7000;
+		parseSpy.mockResolvedValue({
+			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
+			flags: {debug: false},
+		});
+
+		await RunCommand.run();
+		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), process.env.PORT, false);
+	});
+	*/
 });
