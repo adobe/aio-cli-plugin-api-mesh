@@ -11,8 +11,8 @@ governing permissions and limitations under the License.
 */
 
 const RunCommand = require('../run');
-const { initRequestId, startGraphqlServer } = require('../../../helpers');
-const meshBuilder = require('@adobe/mesh-builder');
+const { startGraphqlServer } = require('../../../helpers');
+require('@adobe/mesh-builder');
 
 jest.mock('../../../helpers', () => ({
 	initRequestId: jest.fn().mockResolvedValue({}),

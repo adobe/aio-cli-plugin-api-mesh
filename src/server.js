@@ -4,7 +4,7 @@ const { createYoga } = require('graphql-yoga');
 let yogaServer = null;
 
 // catch unhandled promise rejections
-process.on('unhandledRejection', (reason, promise) => {
+process.on('unhandledRejection', reason => {
 	console.error('Unhandled Rejection at:', reason.stack || reason);
 });
 

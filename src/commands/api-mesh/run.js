@@ -11,13 +11,12 @@ governing permissions and limitations under the License.
 
 const { Command } = require('@oclif/core');
 const { portNoFlag, debugFlag, readFileContents } = require('../../utils');
-const meshBuilder=require('@adobe/mesh-builder')
+const meshBuilder = require('@adobe/mesh-builder');
 //const meshBuilder = require('@testmeshbuilder/mesh-builder');
 const fs = require('fs');
 const UUID = require('../../uuid');
 const path = require('path');
 const dotenv = require('dotenv');
-const { exec } = require('child_process');
 const { initRequestId, startGraphqlServer } = require('../../helpers');
 const logger = require('../../classes/logger');
 
@@ -55,7 +54,6 @@ class RunCommand extends Command {
 		}
 
 		let portNo;
-		let API_MESH_TIER;
 
 		//Set the debugStatus based on flags
 		const debugStatus = await flags.debug;
@@ -69,7 +67,7 @@ class RunCommand extends Command {
 			// Load environment variables
 			dotenv.config({ path: localEnvFilePath });
 
-			if (process.env.hasOwnProperty('PORT')) {
+			if (process.env.PORT) {
 				// Use parseInt to attempt to convert the environment variable's value to an integer
 				const portNumber = parseInt(process.env.PORT);
 
@@ -78,9 +76,6 @@ class RunCommand extends Command {
 				}
 
 				portNo = portNumber;
-			}
-			if (process.env.hasOwnProperty('API_MESH_TIER')) {
-				API_MESH_TIER = process.env.API_MESH_TIER;
 			}
 		}
 
@@ -96,6 +91,7 @@ class RunCommand extends Command {
 
 				//Generating unique mesh id
 				let meshId = UUID.newUuid().toString();
+				meshId = '1ac71b6f-63c5-4f6f-829d-c9b403b0c302';
 
 				this.log(`Beginning steps to start server on port : ${portNo}`);
 
