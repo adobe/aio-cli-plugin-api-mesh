@@ -70,6 +70,11 @@ class InitCommand extends Command {
 		await fs.writeFile(filePath, JSON.stringify(pkgJSON, null, 2), 'utf8', { mode: 'w' });
 	}
 
+	async createDotNpmrcFile(templatePath, filePath){
+		const dotNpmrcFile =await fs.readFile(templatePath, filePath);
+		await fs.writeFile(filePath,dotNpmrcFile);
+	}
+
 	async run() {
 		const { args, flags } = await this.parse(InitCommand);
 		const gitFlagOptions = {
@@ -81,6 +86,7 @@ class InitCommand extends Command {
 		let shouldCreateGit = gitFlagOptions[flags.git];
 		let packageManagerChoice = flags.packageManager;
 		const packageJsonTemplate = `${getAppRootDir()}/src/templates/package.json`;
+		const dotNpmrcPath =`${getAppRootDir()}/src/templates/.npmrc`;
 		const shouldCreateWorkspace = await promptConfirm(
 			`Do you want to create the workspace in ${absolutePath}`,
 		);
@@ -143,6 +149,11 @@ class InitCommand extends Command {
 				`${absolutePath}/package.json`,
 				args.projectName,
 			);
+
+			await this.createDotNpmrcFile(
+				dotNpmrcPath,
+				`${absolutePath}/.npmrc`,
+				);
 
 			if (packageManagerChoice === 'npm') {
 				try {

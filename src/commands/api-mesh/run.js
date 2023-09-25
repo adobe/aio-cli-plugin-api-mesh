@@ -11,7 +11,8 @@ governing permissions and limitations under the License.
 
 const { Command } = require('@oclif/core');
 const { portNoFlag, debugFlag, readFileContents } = require('../../utils');
-const meshBuilder = require('@adobe/mesh-builder');
+const meshBuilder=require('@adobe/mesh-builder')
+//const meshBuilder = require('@testmeshbuilder/mesh-builder');
 const fs = require('fs');
 const UUID = require('../../uuid');
 const path = require('path');
@@ -20,7 +21,7 @@ const { exec } = require('child_process');
 const { initRequestId, startGraphqlServer } = require('../../helpers');
 const logger = require('../../classes/logger');
 
-const { buildMesh, compileMesh } = meshBuilder.default;
+const { validateMesh, buildMesh, compileMesh } = meshBuilder.default;
 
 class RunCommand extends Command {
 	static summary = 'Run local development server';
@@ -98,6 +99,7 @@ class RunCommand extends Command {
 
 				this.log(`Beginning steps to start server on port : ${portNo}`);
 
+				await validateMesh(data.meshConfig);
 				await buildMesh(meshId, data.meshConfig);
 				await compileMesh(meshId);
 				await startGraphqlServer(meshId, portNo, debugStatus);
