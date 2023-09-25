@@ -12,16 +12,16 @@ governing permissions and limitations under the License.
 
 const RunCommand = require('../run');
 const { startGraphqlServer } = require('../../../helpers');
-require('@adobe/mesh-builder');
-
+require('@testmeshbuilder/mesh-builder');
 jest.mock('../../../helpers', () => ({
 	initRequestId: jest.fn().mockResolvedValue({}),
 	startGraphqlServer: jest.fn().mockResolvedValue({}),
 }));
 
-jest.mock('@adobe/mesh-builder', () => {
+jest.mock('@testmeshbuilder/mesh-builder', () => {
 	return {
 		default: {
+			validateMesh: jest.fn().mockResolvedValue({}),
 			buildMesh: jest.fn().mockResolvedValue({}),
 			compileMesh: jest.fn().mockResolvedValue({}),
 		},
@@ -59,13 +59,13 @@ describe('run command tests', () => {
 		{
 		  "debug": {
 		    "allowNo": false,
+		    "default": false,
 		    "description": "Enable debugging mode",
 		    "parse": [Function],
 		    "type": "boolean",
 		  },
 		  "port": {
 		    "char": "p",
-		    "default": 5000,
 		    "description": "Port number of local dev server",
 		    "input": [],
 		    "multiple": false,
@@ -113,15 +113,16 @@ describe('run command tests', () => {
 		);
 	});
 
-	/*test('should use the port number provided in the .env if flags are not provided for starting the server', async () => {
-		process.env.PORT=7000;
-		parseSpy.mockResolvedValue({
+	test('should use the port number provided in the .env file if there is no port', async () => {
+		process.env.PORT = 7000;
+		const parseOutput = {
 			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
-			flags: {debug: false},
-		});
+			flags: { debug: false },
+		};
+
+		parseSpy.mockResolvedValue(parseOutput);
 
 		await RunCommand.run();
 		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), process.env.PORT, false);
 	});
-	*/
 });

@@ -19,7 +19,7 @@ process.on('uncaughtException', err => {
 const meshId = process.argv[2];
 
 // get PORT number from command line arguments
-const portNo = process.argv[3];
+const portNo = parseInt(process.argv[3]);
 
 const getCORSOptions = () => {
 	try {
@@ -96,7 +96,7 @@ app.route({
 app.listen(
 	{
 		//set the port no of the server based on the input value
-		port: parseInt(portNo),
+		port: portNo
 	},
 	err => {
 		if (err) {

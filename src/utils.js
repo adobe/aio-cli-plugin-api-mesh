@@ -44,11 +44,11 @@ const envFileFlag = Flags.string({
 const portNoFlag = Flags.integer({
 	char: 'p',
 	description: 'Port number of local dev server',
-	default: 5000,
 });
 
 const debugFlag = Flags.boolean({
 	description: 'Enable debugging mode',
+	default: false,
 });
 
 /**

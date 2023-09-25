@@ -11,14 +11,13 @@ governing permissions and limitations under the License.
 
 const { Command } = require('@oclif/core');
 const { portNoFlag, debugFlag, readFileContents } = require('../../utils');
-const meshBuilder = require('@adobe/mesh-builder');
-//const meshBuilder = require('@testmeshbuilder/mesh-builder');
+const meshBuilder = require('@testmeshbuilder/mesh-builder');
 const fs = require('fs');
 const UUID = require('../../uuid');
 const path = require('path');
-const dotenv = require('dotenv');
 const { initRequestId, startGraphqlServer } = require('../../helpers');
 const logger = require('../../classes/logger');
+require('dotenv').config();
 
 const { validateMesh, buildMesh, compileMesh } = meshBuilder.default;
 
@@ -55,32 +54,23 @@ class RunCommand extends Command {
 
 		let portNo;
 
-		//Set the debugStatus based on flags
-		const debugStatus = await flags.debug;
-
-		// Set the path to the .env file in the user's current working directory
-		const localEnvFilePath = path.join(process.cwd(), '.env');
-
 		//The environment variables are optional and need default values
-		// Check if the .env file exists
-		if (fs.existsSync(localEnvFilePath)) {
-			// Load environment variables
-			dotenv.config({ path: localEnvFilePath });
-
-			if (process.env.PORT) {
-				// Use parseInt to attempt to convert the environment variable's value to an integer
-				const portNumber = parseInt(process.env.PORT);
-
-				if (isNaN(portNumber) || !Number.isInteger(portNo)) {
-					this.error('PORT value in the .env file is not a valid integer');
-				}
-
-				portNo = portNumber;
+		if (process.env.PORT !== undefined) {
+			if (isNaN(process.env.PORT) || !Number.isInteger(parseInt(process.env.PORT))) {
+				this.error('PORT value in the .env file is not a valid integer');
 			}
+
+			portNo = process.env.PORT;
 		}
 
-		//To set the port number as default or provided value in the command
-		portNo = await flags.port;
+		//To set the port number as the provided value in the command
+		if (flags.port !== undefined) {
+			portNo = flags.port;
+		}
+
+		if (!portNo) {
+			portNo = 5000;
+		}
 
 		try {
 			//Ensure that current directory includes package.json
@@ -91,14 +81,13 @@ class RunCommand extends Command {
 
 				//Generating unique mesh id
 				let meshId = UUID.newUuid().toString();
-				meshId = '1ac71b6f-63c5-4f6f-829d-c9b403b0c302';
 
 				this.log(`Beginning steps to start server on port : ${portNo}`);
 
 				await validateMesh(data.meshConfig);
 				await buildMesh(meshId, data.meshConfig);
 				await compileMesh(meshId);
-				await startGraphqlServer(meshId, portNo, debugStatus);
+				await startGraphqlServer(meshId, portNo, flags.debug);
 			} else {
 				this.error(
 					'`aio api-mesh run` cannot be executed as there is no package.json file in current directory. Use `aio api-mesh init` to setup a package.',
