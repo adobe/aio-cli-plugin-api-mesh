@@ -11,13 +11,15 @@ governing permissions and limitations under the License.
 
 const { Command } = require('@oclif/core');
 const { portNoFlag, debugFlag, readFileContents } = require('../../utils');
-const meshBuilder = require('@testmeshbuilder/mesh-builder');
+//const meshBuilder = require('@testmeshbuilder/mesh-builder');
+const meshBuilder = require('@adobe/mesh-builder');
 const fs = require('fs');
 const UUID = require('../../uuid');
 const path = require('path');
 const { initRequestId, startGraphqlServer } = require('../../helpers');
 const logger = require('../../classes/logger');
 require('dotenv').config();
+
 
 const { validateMesh, buildMesh, compileMesh } = meshBuilder.default;
 
@@ -42,59 +44,63 @@ class RunCommand extends Command {
 	static examples = [];
 
 	async run() {
-		await initRequestId();
+		try {
+			await initRequestId();
 
-		logger.info(`RequestId: ${global.requestId}`);
+			logger.info(`RequestId: ${global.requestId}`);
 
-		const { args, flags } = await this.parse(RunCommand);
+			const { args, flags } = await this.parse(RunCommand);
 
-		if (!args.file) {
-			this.error('Missing file path. Run aio api-mesh run --help for more info.');
-		}
-
-		let portNo;
-
-		//The environment variables are optional and need default values
-		if (process.env.PORT !== undefined) {
-			if (isNaN(process.env.PORT) || !Number.isInteger(parseInt(process.env.PORT))) {
-				this.error('PORT value in the .env file is not a valid integer');
+			if (!args.file) {
+				this.error('Missing file path. Run aio api-mesh run --help for more info.');
 			}
 
-			portNo = process.env.PORT;
-		}
+			let portNo;
 
-		//To set the port number as the provided value in the command
-		if (flags.port !== undefined) {
-			portNo = flags.port;
-		}
+			//The environment variables are optional and need default values
+			if (process.env.PORT !== undefined) {
+				if (isNaN(process.env.PORT) || !Number.isInteger(parseInt(process.env.PORT))) {
+					this.error('PORT value in the .env file is not a valid integer');
+				}
 
-		if (!portNo) {
-			portNo = 5000;
-		}
+				portNo = process.env.PORT;
+			}
 
-		try {
-			//Ensure that current directory includes package.json
-			if (fs.existsSync(path.join(process.cwd(), 'package.json'))) {
-				//Read the mesh input file
-				let inputMeshData = await readFileContents(args.file, this, 'mesh');
-				let data = JSON.parse(inputMeshData);
+			//To set the port number as the provided value in the command
+			if (flags.port !== undefined) {
+				portNo = flags.port;
+			}
 
-				//Generating unique mesh id
-				let meshId = UUID.newUuid().toString();
+			if (!portNo) {
+				portNo = 5000;
+			}
 
-				this.log(`Beginning steps to start server on port : ${portNo}`);
+			try {
+				//Ensure that current directory includes package.json
+				if (fs.existsSync(path.join(process.cwd(), 'package.json'))) {
+					//Read the mesh input file
+					let inputMeshData = await readFileContents(args.file, this, 'mesh');
+					let data = JSON.parse(inputMeshData);
 
-				await validateMesh(data.meshConfig);
-				await buildMesh(meshId, data.meshConfig);
-				await compileMesh(meshId);
-				await startGraphqlServer(meshId, portNo, flags.debug);
-			} else {
-				this.error(
-					'`aio api-mesh run` cannot be executed as there is no package.json file in current directory. Use `aio api-mesh init` to setup a package.',
-				);
+					//Generating unique mesh id
+					let meshId = UUID.newUuid().toString();
+
+					this.log(`Beginning steps to start server on port : ${portNo}`);
+
+					await validateMesh(data.meshConfig);
+					await buildMesh(meshId, data.meshConfig);
+					await compileMesh(meshId);
+					await startGraphqlServer(meshId, portNo, flags.debug);
+				} else {
+					this.error(
+						'`aio api-mesh run` cannot be executed as there is no package.json file in current directory. Use `aio api-mesh init` to setup a package.',
+					);
+				}
+			} catch (error) {
+				this.log('ERROR: ' + error.message);
 			}
 		} catch (error) {
-			this.log('ERROR: ' + error.message);
+			this.log('Error from run')
 		}
 	}
 }

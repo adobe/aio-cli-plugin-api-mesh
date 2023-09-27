@@ -1,5 +1,10 @@
-const fastify = require('fastify');
-const { createYoga } = require('graphql-yoga');
+// Resolve the path to 'fastify' and 'graphql-yoga' within the local 'node_modules'
+const fastifyPath = require.resolve('fastify', { paths: [process.cwd()] });
+const yogaPath = require.resolve('graphql-yoga', { paths: [process.cwd()] });
+
+// Load 'fastify' and 'graphql-yoga' using the resolved paths
+const fastify = require(fastifyPath);
+const { createYoga } = require(yogaPath);
 
 let yogaServer = null;
 
@@ -72,8 +77,6 @@ app.route({
 	method: ['GET', 'POST'],
 	url: '/graphql',
 	handler: async (req, res) => {
-		const yogaServer = await getYogaServer();
-
 		console.log('Request received: ', req.body);
 
 		const response = await yogaServer.handleNodeRequest(req, {
@@ -98,11 +101,12 @@ app.listen(
 		//set the port no of the server based on the input value
 		port: portNo
 	},
-	err => {
+	async (err) => {
 		if (err) {
 			console.error(err);
 			process.exit(1);
 		}
+		yogaServer = await getYogaServer();
 
 		console.log(`Server is running on http://localhost:${portNo}/graphql`);
 	},
