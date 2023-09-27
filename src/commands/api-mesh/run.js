@@ -42,63 +42,59 @@ class RunCommand extends Command {
 	static examples = [];
 
 	async run() {
+		await initRequestId();
+
+		logger.info(`RequestId: ${global.requestId}`);
+
+		const { args, flags } = await this.parse(RunCommand);
+
+		if (!args.file) {
+			this.error('Missing file path. Run aio api-mesh run --help for more info.');
+		}
+
+		let portNo;
+
+		//The environment variables are optional and need default values
+		if (process.env.PORT !== undefined) {
+			if (isNaN(process.env.PORT) || !Number.isInteger(parseInt(process.env.PORT))) {
+				this.error('PORT value in the .env file is not a valid integer');
+			}
+
+			portNo = process.env.PORT;
+		}
+
+		//To set the port number as the provided value in the command
+		if (flags.port !== undefined) {
+			portNo = flags.port;
+		}
+
+		if (!portNo) {
+			portNo = 5000;
+		}
+
 		try {
-			await initRequestId();
+			//Ensure that current directory includes package.json
+			if (fs.existsSync(path.join(process.cwd(), 'package.json'))) {
+				//Read the mesh input file
+				let inputMeshData = await readFileContents(args.file, this, 'mesh');
+				let data = JSON.parse(inputMeshData);
 
-			logger.info(`RequestId: ${global.requestId}`);
+				//Generating unique mesh id
+				let meshId = UUID.newUuid().toString();
 
-			const { args, flags } = await this.parse(RunCommand);
+				this.log(`Beginning steps to start server on port : ${portNo}`);
 
-			if (!args.file) {
-				this.error('Missing file path. Run aio api-mesh run --help for more info.');
-			}
-
-			let portNo;
-
-			//The environment variables are optional and need default values
-			if (process.env.PORT !== undefined) {
-				if (isNaN(process.env.PORT) || !Number.isInteger(parseInt(process.env.PORT))) {
-					this.error('PORT value in the .env file is not a valid integer');
-				}
-
-				portNo = process.env.PORT;
-			}
-
-			//To set the port number as the provided value in the command
-			if (flags.port !== undefined) {
-				portNo = flags.port;
-			}
-
-			if (!portNo) {
-				portNo = 5000;
-			}
-
-			try {
-				//Ensure that current directory includes package.json
-				if (fs.existsSync(path.join(process.cwd(), 'package.json'))) {
-					//Read the mesh input file
-					let inputMeshData = await readFileContents(args.file, this, 'mesh');
-					let data = JSON.parse(inputMeshData);
-
-					//Generating unique mesh id
-					let meshId = UUID.newUuid().toString();
-
-					this.log(`Beginning steps to start server on port : ${portNo}`);
-
-					await validateMesh(data.meshConfig);
-					await buildMesh(meshId, data.meshConfig);
-					await compileMesh(meshId);
-					await startGraphqlServer(meshId, portNo, flags.debug);
-				} else {
-					this.error(
-						'`aio api-mesh run` cannot be executed as there is no package.json file in current directory. Use `aio api-mesh init` to setup a package.',
-					);
-				}
-			} catch (error) {
-				this.log('ERROR: ' + error.message);
+				await validateMesh(data.meshConfig);
+				await buildMesh(meshId, data.meshConfig);
+				await compileMesh(meshId);
+				await startGraphqlServer(meshId, portNo, flags.debug);
+			} else {
+				this.error(
+					'`aio api-mesh run` cannot be executed as there is no package.json file in current directory. Use `aio api-mesh init` to setup a package.',
+				);
 			}
 		} catch (error) {
-			this.log('Error from run');
+			this.log('ERROR: ' + error.message);
 		}
 	}
 }
