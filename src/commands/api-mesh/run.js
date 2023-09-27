@@ -54,7 +54,7 @@ class RunCommand extends Command {
 
 		let portNo;
 
-		//The environment variables are optional and need default values
+		//To set the port number using the environment file
 		if (process.env.PORT !== undefined) {
 			if (isNaN(process.env.PORT) || !Number.isInteger(parseInt(process.env.PORT))) {
 				this.error('PORT value in the .env file is not a valid integer');
@@ -68,6 +68,7 @@ class RunCommand extends Command {
 			portNo = flags.port;
 		}
 
+		//To set the default port to 5000
 		if (!portNo) {
 			portNo = 5000;
 		}
