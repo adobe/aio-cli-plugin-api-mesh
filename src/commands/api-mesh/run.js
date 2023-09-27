@@ -11,8 +11,7 @@ governing permissions and limitations under the License.
 
 const { Command } = require('@oclif/core');
 const { portNoFlag, debugFlag, readFileContents } = require('../../utils');
-//const meshBuilder = require('@testmeshbuilder/mesh-builder');
-const meshBuilder = require('@adobe/mesh-builder');
+const meshBuilder = require('@testmeshbuilder/mesh-builder');
 const fs = require('fs');
 const UUID = require('../../uuid');
 const path = require('path');
