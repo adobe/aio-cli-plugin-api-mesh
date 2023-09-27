@@ -67,6 +67,7 @@ describe('create command tests', () => {
 			imsOrgId: selectedOrg.id,
 			projectId: selectedProject.id,
 			workspaceId: selectedWorkspace.id,
+			workspaceName: selectedWorkspace.title,
 		});
 
 		global.requestId = 'dummy_request_id';
@@ -278,6 +279,7 @@ describe('create command tests', () => {
 		  "1234",
 		  "5678",
 		  "123456789",
+		  "Workspace01",
 		  {
 		    "meshConfig": {
 		      "sources": [
@@ -367,6 +369,7 @@ describe('create command tests', () => {
 		  "1234",
 		  "5678",
 		  "123456789",
+		  "Workspace01",
 		  {
 		    "meshConfig": {
 		      "sources": [
@@ -436,7 +439,7 @@ describe('create command tests', () => {
 		  [
 		    "Mesh Endpoint: %s
 		",
-		    "https://tigraph.adobe.io/dummy_mesh_id/graphql?api_key=dummy_api_key",
+		    "https://tigraph.adobe.io/dummy_mesh_id/graphql",
 		  ],
 		]
 	`);
@@ -925,6 +928,7 @@ describe('create command tests', () => {
 		  "1234",
 		  "5678",
 		  "123456789",
+		  "Workspace01",
 		  {
 		    "meshConfig": {
 		      "files": [
@@ -1186,6 +1190,7 @@ describe('create command tests', () => {
 		  "1234",
 		  "5678",
 		  "123456789",
+		  "Workspace01",
 		  {
 		    "files": [
 		      {
@@ -1314,6 +1319,7 @@ describe('create command tests', () => {
 		  "1234",
 		  "5678",
 		  "123456789",
+		  "Workspace01",
 		  {
 		    "meshConfig": {
 		      "files": [
@@ -1445,6 +1451,7 @@ describe('create command tests', () => {
 		  "1234",
 		  "5678",
 		  "123456789",
+		  "Workspace01",
 		  {
 		    "meshConfig": {
 		      "files": [
@@ -1573,6 +1580,7 @@ describe('create command tests', () => {
 		  "1234",
 		  "5678",
 		  "123456789",
+		  "Workspace01",
 		  {
 		    "meshConfig": {
 		      "files": [

@@ -36,7 +36,7 @@ class InstallCommand extends Command {
 		await initRequestId();
 		logger.info(`RequestId: ${global.requestId}`);
 		const ignoreCache = await flags.ignoreCache;
-		const { imsOrgId, projectId, workspaceId } = await initSdk({ ignoreCache });
+		const { imsOrgId, projectId, workspaceId, workspaceName } = await initSdk({ ignoreCache });
 		const filepath = flags['variable-file'];
 		let variables = flags.variable
 			? flags.variable.reduce((obj, val) => {
@@ -119,7 +119,7 @@ class InstallCommand extends Command {
 		}
 
 		try {
-			meshId = await getMeshId(imsOrgId, projectId, workspaceId);
+			meshId = await getMeshId(imsOrgId, projectId, workspaceId, workspaceName);
 		} catch (err) {
 			this.error(
 				`Unable to get mesh ID. Please check the details and try again. RequestId: ${global.requestId}`,
@@ -133,7 +133,7 @@ class InstallCommand extends Command {
 		}
 
 		try {
-			const mesh = await getMesh(imsOrgId, projectId, workspaceId, meshId);
+			const mesh = await getMesh(imsOrgId, projectId, workspaceId, meshId, workspaceName);
 
 			if (!mesh) {
 				this.error(
@@ -199,7 +199,7 @@ class InstallCommand extends Command {
 			}
 
 			try {
-				const response = await updateMesh(imsOrgId, projectId, workspaceId, meshId, {
+				const response = await updateMesh(imsOrgId, projectId, workspaceId, workspaceName, meshId, {
 					meshConfig: mesh.meshConfig,
 				});
 

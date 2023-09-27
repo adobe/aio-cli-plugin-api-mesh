@@ -38,7 +38,7 @@ class GetCommand extends Command {
 		const ignoreCache = await flags.ignoreCache;
 		const json = await flags.json;
 
-		const { imsOrgId, projectId, workspaceId } = await initSdk({
+		const { imsOrgId, projectId, workspaceId, workspaceName } = await initSdk({
 			ignoreCache,
 			verbose: !json,
 		});
@@ -46,7 +46,7 @@ class GetCommand extends Command {
 		let meshId = null;
 
 		try {
-			meshId = await getMeshId(imsOrgId, projectId, workspaceId);
+			meshId = await getMeshId(imsOrgId, projectId, workspaceId, workspaceName);
 		} catch (err) {
 			this.error(
 				`Unable to get mesh ID. Please check the details and try again. RequestId: ${global.requestId}`,
@@ -55,7 +55,7 @@ class GetCommand extends Command {
 
 		if (meshId) {
 			try {
-				const mesh = await getMesh(imsOrgId, projectId, workspaceId, meshId);
+				const mesh = await getMesh(imsOrgId, projectId, workspaceId, workspaceName, meshId);
 
 				if (mesh) {
 					this.log('Successfully retrieved mesh %s', JSON.stringify(mesh, null, 2));
