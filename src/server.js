@@ -99,9 +99,9 @@ app.route({
 app.listen(
 	{
 		//set the port no of the server based on the input value
-		port: portNo
+		port: portNo,
 	},
-	async (err) => {
+	async err => {
 		if (err) {
 			console.error(err);
 			process.exit(1);

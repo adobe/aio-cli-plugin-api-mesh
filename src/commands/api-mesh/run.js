@@ -20,7 +20,6 @@ const { initRequestId, startGraphqlServer } = require('../../helpers');
 const logger = require('../../classes/logger');
 require('dotenv').config();
 
-
 const { validateMesh, buildMesh, compileMesh } = meshBuilder.default;
 
 class RunCommand extends Command {
@@ -100,7 +99,7 @@ class RunCommand extends Command {
 				this.log('ERROR: ' + error.message);
 			}
 		} catch (error) {
-			this.log('Error from run')
+			this.log('Error from run');
 		}
 	}
 }
