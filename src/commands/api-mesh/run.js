@@ -95,7 +95,7 @@ class RunCommand extends Command {
 				);
 			}
 		} catch (error) {
-			this.log('ERROR: ' + error.message);
+			this.error('ERROR: ' + error.message);
 		}
 	}
 }
