@@ -85,7 +85,7 @@ class RunCommand extends Command {
 		}
 
 		const envFilePath = await flags.env;
-		
+
 		try {
 			//Ensure that current directory includes package.json
 			if (fs.existsSync(path.join(process.cwd(), 'package.json'))) {
@@ -141,7 +141,7 @@ class RunCommand extends Command {
 				);
 			}
 		} catch (error) {
-			this.error('ERROR: ' + error.message);
+			this.error(error.message);
 		}
 	}
 }

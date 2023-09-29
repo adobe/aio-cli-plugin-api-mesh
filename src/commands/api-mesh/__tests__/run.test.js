@@ -11,11 +11,7 @@ governing permissions and limitations under the License.
 */
 
 const RunCommand = require('../run');
-const { 
-	startGraphqlServer,
-	interpolateMesh,
-	importFiles, 
-} = require('../../../helpers');
+const { startGraphqlServer, interpolateMesh } = require('../../../helpers');
 require('@testmeshbuilder/mesh-builder');
 jest.mock('../../../helpers', () => ({
 	initRequestId: jest.fn().mockResolvedValue({}),
@@ -179,6 +175,9 @@ describe('run command tests', () => {
 		  [
 		    "Unable to read the file src/commands/__fixtures__/.env_nonExisting. Please check the file and try again.",
 		  ],
+		  [
+		    "Unable to read the file src/commands/__fixtures__/.env_nonExisting. Please check the file and try again.",
+		  ],
 		]
 	`);
 	});
@@ -201,6 +200,9 @@ describe('run command tests', () => {
 
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
 		[
+		  [
+		    "Issue in src/commands/__fixtures__/env_invalid file - Duplicate key << key1 >> on line 3,Invalid format for key/value << key2=='value3' >> on line 5,Invalid format << key3 >> on line 6,Invalid format for key/value << key4='value4 >> on line 7",
+		  ],
 		  [
 		    "Issue in src/commands/__fixtures__/env_invalid file - Duplicate key << key1 >> on line 3,Invalid format for key/value << key2=='value3' >> on line 5,Invalid format << key3 >> on line 6,Invalid format for key/value << key4='value4 >> on line 7",
 		  ],
@@ -229,6 +231,9 @@ describe('run command tests', () => {
 
 		await expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
 		[
+		  [
+		    "The mesh file cannot be interpolated due to missing keys : newKey1 , newKey2",
+		  ],
 		  [
 		    "The mesh file cannot be interpolated due to missing keys : newKey1 , newKey2",
 		  ],
@@ -264,6 +269,9 @@ describe('run command tests', () => {
 		  [
 		    "Interpolated mesh is not a valid JSON. Please check the generated json file.",
 		  ],
+		  [
+		    "Interpolated mesh is not a valid JSON. Please check the generated json file.",
+		  ],
 		]
 	`);
 	});
@@ -273,6 +281,7 @@ describe('run command tests', () => {
 			args: { file: 'src/commands/__fixtures__/sample_mesh_with_placeholder' },
 			flags: {
 				env: 'src/commands/__fixtures__/env_valid',
+				debug: false,
 			},
 		});
 
@@ -286,7 +295,7 @@ describe('run command tests', () => {
 			interpolatedMeshData: sampleInterpolatedMesh,
 		});
 
-		const runResult = await RunCommand.run();
+		await RunCommand.run();
 		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), process.env.PORT, false);
 	});
 });
