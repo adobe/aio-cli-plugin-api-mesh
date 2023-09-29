@@ -6,7 +6,14 @@ const yogaPath = require.resolve('graphql-yoga', { paths: [process.cwd()] });
 const fastify = require(fastifyPath);
 const { createYoga } = require(yogaPath);
 
+//Load the functions from serverUtils.js
+const { readMeshConfig, processContextConfig, invokeRemoteFetch } = require('./serverUtils');
+
+const LRU = require('lru-cache');
+const URL = require('url');
+
 let yogaServer = null;
+let meshConfig;
 
 // catch unhandled promise rejections
 process.on('unhandledRejection', reason => {
@@ -25,6 +32,12 @@ const meshId = process.argv[2];
 
 // get PORT number from command line arguments
 const portNo = parseInt(process.argv[3]);
+
+// get includeHTTPDetails from command line arguments
+const isTI = process.argv[4];
+
+//get the expected tenantUUID value for the TI setup
+const tiTenantUUID = process.argv[5];
 
 const getCORSOptions = () => {
 	try {
@@ -56,12 +69,72 @@ const getYogaServer = async () => {
 
 		console.log('Creating graphQL server');
 
-		yogaServer = createYoga({
-			plugins: tenantMesh.plugins,
-			graphqlEndpoint: `/graphql`,
-			graphiql: false,
-			cors: corsOptions,
-		});
+		meshConfig = readMeshConfig(meshId);
+
+		if (isTI) {
+			// TI customers get access to fetcher and sessionCache
+			//create context config
+			const { fetchConfig, cacheConfig } = processContextConfig(meshId, meshConfig);
+			const contextCache = new LRU(cacheConfig);
+
+			const allowedDomainsMap = fetchConfig.allowedDomains?.reduce((acc, allowedDomain) => {
+				acc[allowedDomain] = {};
+				console.log(`acc: ${acc}`);
+				return acc;
+			}, {});
+
+			yogaServer = createYoga({
+				cors: corsOptions,
+				plugins: tenantMesh.plugins,
+				graphqlEndpoint: '/graphql',
+				graphiql: false,
+				maskedErrors: false,
+				context: initialContext => {
+					return {
+						...initialContext,
+						sessionCache: contextCache,
+						log: message => console.log(`${meshId} - ${message}`),
+						fetcher: async (url, options) => {
+							const { protocol, host } = URL.parse(url);
+							if (protocol !== 'https:') {
+								throw new Error(`${url} is not a valid https url`);
+							}
+							const basePath = protocol + '//' + host;
+							console.log(`Host: ${host}`);
+							console.log(`Absolute base: ${basePath}`);
+							console.log(`allowedDomainsMap: ${JSON.stringify(allowedDomainsMap)}`);
+
+							if (basePath !== null && allowedDomainsMap !== null) {
+								if (!(basePath in allowedDomainsMap)) {
+									console.log(
+										`host: ${host} and allowedDomainsMap: ${allowedDomainsMap} and stringified allowedDomain: ${JSON.stringify(
+											allowedDomainsMap,
+										)}`,
+									);
+									console.error(`${url} is not allowed to be accessed`);
+									throw new Error(`${url} is not allowed to be accessed`);
+								} else {
+									console.log(
+										`Fetching invokeRemoteFetch ${url} with options ${JSON.stringify(options)}`,
+									);
+									const response = await invokeRemoteFetch(url, options);
+									const body = await response.text();
+									console.log(`Fetched ${url}. Response body: ${body}`);
+									return { response, body };
+								}
+							}
+						},
+					};
+				},
+			});
+		} else {
+			yogaServer = createYoga({
+				plugins: tenantMesh.plugins,
+				graphqlEndpoint: `/graphql`,
+				graphiql: false,
+				cors: corsOptions,
+			});
+		}
 
 		return yogaServer;
 	}
@@ -79,10 +152,57 @@ app.route({
 	handler: async (req, res) => {
 		console.log('Request received: ', req.body);
 
+		let responseBody = null;
+		let includeMetaData;
+		if (isTI) {
+			if (!req.headers.tenantUUID || req.headers.tenantUUID != tiTenantUUID) {
+				res.status(403);
+				res.send('Forbidden : You are not allowed to query this mesh on this URL');
+				//TO DO - Modify as per GQL
+				return res;
+			}
+		}
+
+		if (req.headers['x-include-metadata'] && req.headers['x-include-metadata'].length > 0) {
+			if (req.headers['x-include-metadata'].toLowerCase() === 'true') {
+				includeMetaData = true;
+			}
+		}
+
 		const response = await yogaServer.handleNodeRequest(req, {
 			req,
 			reply: res,
 		});
+
+		try {
+			let body = null;
+			try {
+				body = await response.text();
+			} catch (err) {
+				console.error(`Error parsing response body: ${err}`);
+			}
+			if (body) {
+				responseBody = JSON.parse(body);
+			}
+		} catch (err) {
+			console.error(`Error parsing response body: ${err}`);
+			console.error(response);
+
+			throw new Error(`Error parsing response body: ${err}`);
+		}
+		//Set the value of includeHTTPDetails flag
+
+		const includeHTTPDetails = !!meshConfig?.responseConfig?.includeHTTPDetails;
+		const meshHTTPDetails = responseBody?.extensions?.httpDetails;
+		console.log('Mesh HTTP Details are : ', meshHTTPDetails);
+		console.log('includeMetadata is : ', includeMetaData);
+		/* TO DO - add the logic for handling mesh response headers using includeMetaData
+		 */
+
+		// Delete the httpDetails extensions details if mesh owner has disabled those details in the config
+		if (includeHTTPDetails !== true) {
+			delete responseBody?.extensions?.httpDetails;
+		}
 
 		response.headers.forEach((value, key) => {
 			res.header(key, value);
@@ -90,7 +210,7 @@ app.route({
 
 		res.status(response.status);
 
-		res.send(response.body);
+		res.send(responseBody);
 
 		return res;
 	},
