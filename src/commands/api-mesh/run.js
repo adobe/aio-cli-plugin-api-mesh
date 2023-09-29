@@ -85,7 +85,8 @@ class RunCommand extends Command {
 		}
 
 		const envFilePath = await flags.env;
-
+		
+		try {
 			//Ensure that current directory includes package.json
 			if (fs.existsSync(path.join(process.cwd(), 'package.json'))) {
 				//Read the mesh input file
@@ -139,6 +140,9 @@ class RunCommand extends Command {
 					'`aio api-mesh run` cannot be executed as there is no package.json file in current directory. Use `aio api-mesh init` to setup a package.',
 				);
 			}
+		} catch (error) {
+			this.error('ERROR: ' + error.message);
+		}
 	}
 }
 
