@@ -11,13 +11,19 @@ governing permissions and limitations under the License.
 */
 
 const RunCommand = require('../run');
-const { startGraphqlServer, interpolateMesh } = require('../../../helpers');
+const {
+	startGraphqlServer,
+	interpolateMesh,
+	importFiles,
+	promptConfirm,
+} = require('../../../helpers');
 require('@testmeshbuilder/mesh-builder');
 jest.mock('../../../helpers', () => ({
 	initRequestId: jest.fn().mockResolvedValue({}),
 	startGraphqlServer: jest.fn().mockResolvedValue({}),
 	interpolateMesh: jest.fn().mockResolvedValue({}),
 	importFiles: jest.fn().mockResolvedValue(),
+	promptConfirm: jest.fn().mockResolvedValue(true),
 }));
 
 jest.mock('@testmeshbuilder/mesh-builder', () => {
@@ -297,5 +303,480 @@ describe('run command tests', () => {
 
 		await RunCommand.run();
 		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), process.env.PORT, false);
+	});
+
+	// file import tests
+	test('should pass if there are local files in meshConfig i.e., the file is appended in files array', async () => {
+		let meshConfig = {
+			sources: [
+				{
+					name: '<json_source_name>',
+					handler: {
+						JsonSchema: {
+							baseUrl: '<json_source__baseurl>',
+							operations: [
+								{
+									type: 'Query',
+									field: '<query>',
+									path: '<query_path>',
+									method: 'POST',
+									requestSchema: './requestParams.json',
+								},
+							],
+						},
+					},
+				},
+			],
+			files: [
+				{
+					path: './requestParams.json',
+					content: '{"type":"updatedContent"}',
+				},
+			],
+		};
+
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_mesh_files.json' },
+			flags: {
+				autoConfirmAction: Promise.resolve(true),
+				debug: false,
+			},
+		});
+
+		importFiles.mockResolvedValueOnce({
+			meshConfig,
+		});
+
+		await RunCommand.run();
+		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), process.env.PORT, false);
+	});
+
+	test('should fail if the file name is more than 25 characters', async () => {
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_mesh_invalid_file_name.json' },
+			flags: {
+				autoConfirmAction: Promise.resolve(false),
+			},
+		});
+
+		const output = RunCommand.run();
+
+		await expect(output).rejects.toEqual(new Error('Input mesh config is not valid.'));
+
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Mesh file names must be less than 25 characters. The following file(s) are invalid: requestJSONParameters.json.",
+		  ],
+		]
+	`);
+
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Input mesh config is not valid.",
+		  ],
+		  [
+		    "Input mesh config is not valid.",
+		  ],
+		]
+	`);
+	});
+
+	test('should fail if the file is of type other than js, json extension', async () => {
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_mesh_invalid_type.json' },
+			flags: {
+				autoConfirmAction: Promise.resolve(false),
+			},
+		});
+
+		const output = RunCommand.run();
+
+		await expect(output).rejects.toEqual(new Error('Input mesh config is not valid.'));
+
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Mesh files must be JavaScript or JSON. Other file types are not supported. The following file(s) are invalid: requestParams.txt.",
+		  ],
+		]
+	`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Input mesh config is not valid.",
+		  ],
+		  [
+		    "Input mesh config is not valid.",
+		  ],
+		]
+	`);
+	});
+
+	test('should fail if the files do not exist in the mesh directory or subdirectory', async () => {
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_mesh_invalid_paths.json' },
+			flags: {
+				autoConfirmAction: Promise.resolve(false),
+			},
+		});
+
+		importFiles.mockImplementation(() => {
+			throw new Error(
+				'Please make sure the files: schemaBody.json and sample_mesh_invalid_paths.json are in the same directory/subdirectory.',
+			);
+		});
+
+		const output = RunCommand.run();
+		await expect(output).rejects.toEqual(
+			new Error(
+				'Unable to import the files in the mesh config. Please check the file and try again.',
+			),
+		);
+
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Please make sure the files: schemaBody.json and sample_mesh_invalid_paths.json are in the same directory/subdirectory.",
+		  ],
+		]
+	`);
+
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Unable to import the files in the mesh config. Please check the file and try again.",
+		  ],
+		  [
+		    "Unable to import the files in the mesh config. Please check the file and try again.",
+		  ],
+		]
+	`);
+	});
+
+	test('should fail if import files function fails', async () => {
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_mesh_files.json' },
+			flags: {
+				autoConfirmAction: Promise.resolve(false),
+			},
+		});
+
+		importFiles.mockImplementation(() => {
+			throw new Error('Error reading the file');
+		});
+
+		const output = RunCommand.run();
+
+		await expect(output).rejects.toEqual(
+			new Error(
+				'Unable to import the files in the mesh config. Please check the file and try again.',
+			),
+		);
+
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Error reading the file",
+		  ],
+		]
+	`);
+
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Unable to import the files in the mesh config. Please check the file and try again.",
+		  ],
+		  [
+		    "Unable to import the files in the mesh config. Please check the file and try again.",
+		  ],
+		]
+	`);
+	});
+
+	test('should not override if prompt returns No, if there is files array', async () => {
+		let meshConfig = {
+			sources: [
+				{
+					name: '<json_source_name>',
+					handler: {
+						JsonSchema: {
+							baseUrl: '<json_source__baseurl>',
+							operations: [
+								{
+									type: 'Query',
+									field: '<query>',
+									path: '<query_path>',
+									method: 'POST',
+									requestSchema: './requestParams.json',
+								},
+							],
+						},
+					},
+				},
+			],
+			files: [
+				{
+					path: './requestParams.json',
+					content: '{"type":"dummyContent"}',
+				},
+			],
+		};
+
+		promptConfirm.mockResolvedValueOnce(false).mockResolvedValueOnce(true);
+
+		importFiles.mockResolvedValueOnce(meshConfig);
+
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_mesh_with_files_array.json' },
+			flags: {
+				debug: false,
+			},
+		});
+
+		await RunCommand.run();
+		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), process.env.PORT, false);
+	});
+
+	test('should override if prompt returns Yes, if there is files array', async () => {
+		let meshConfig = {
+			sources: [
+				{
+					name: '<json_source_name>',
+					handler: {
+						JsonSchema: {
+							baseUrl: '<json_source__baseurl>',
+							operations: [
+								{
+									type: 'Query',
+									field: '<query>',
+									path: '<query_path>',
+									method: 'POST',
+									requestSchema: './requestParams.json',
+								},
+							],
+						},
+					},
+				},
+			],
+			files: [
+				{
+					path: './requestParams.json',
+					content: '{"type":"updatedContent"}',
+				},
+			],
+		};
+
+		promptConfirm.mockResolvedValueOnce(true).mockResolvedValueOnce(true);
+
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_mesh_with_files_array.json' },
+			flags: {
+				debug: false,
+			},
+		});
+
+		importFiles.mockResolvedValueOnce({
+			meshConfig,
+		});
+
+		await RunCommand.run();
+
+		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), process.env.PORT, false);
+	});
+
+	test('should pass for a fully-qualified meshConfig even if the file does not exist in fileSystem', async () => {
+		let meshConfig = {
+			sources: [
+				{
+					name: '<json_source_name>',
+					handler: {
+						JsonSchema: {
+							baseUrl: '<json_source__baseurl>',
+							operations: [
+								{
+									type: 'Query',
+									field: '<query>',
+									path: '<query_path>',
+									method: 'POST',
+									requestSchema: './schemaBody.json',
+								},
+							],
+						},
+					},
+				},
+			],
+			files: [
+				{
+					path: './schemaBody.json',
+					content: '{"type":"dummyContent"}',
+				},
+			],
+		};
+
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_fully_qualified_mesh.json' },
+			flags: {
+				autoConfirmAction: Promise.resolve(true),
+				debug: false,
+			},
+		});
+
+		promptConfirm.mockResolvedValueOnce(true);
+
+		importFiles.mockResolvedValueOnce({
+			meshConfig,
+		});
+
+		await RunCommand.run();
+		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), process.env.PORT, false);
+	});
+
+	test('should pass if the file is located in subdirectory of mesh directory', async () => {
+		let meshConfig = {
+			sources: [
+				{
+					name: '<json_source_name>',
+					handler: {
+						JsonSchema: {
+							baseUrl: '<json_source__baseurl>',
+							operations: [
+								{
+									type: 'Query',
+									field: '<query>',
+									path: '<query_path>',
+									method: 'POST',
+									requestSchema: './files/requestParams.json',
+								},
+							],
+						},
+					},
+				},
+			],
+			files: [
+				{
+					path: './files/requestParams.json',
+					content: '{"type":"updatedContent"}',
+				},
+			],
+		};
+
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_mesh_subdirectory.json' },
+			flags: {
+				autoConfirmAction: Promise.resolve(true),
+				debug: false,
+			},
+		});
+
+		importFiles.mockResolvedValueOnce({
+			meshConfig,
+		});
+
+		await RunCommand.run();
+
+		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), process.env.PORT, false);
+	});
+
+	test('should fail if the file is outside the workspace directory', async () => {
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_mesh_outside_workspace_dir.json' },
+			flags: {
+				debug: false,
+				autoConfirmAction: Promise.resolve(false),
+			},
+		});
+
+		const output = RunCommand.run();
+
+		await expect(output).rejects.toEqual(new Error('Input mesh config is not valid.'));
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "File(s): requestParams.json is outside the mesh directory.",
+		  ],
+		]
+	`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Input mesh config is not valid.",
+		  ],
+		  [
+		    "Input mesh config is not valid.",
+		  ],
+		]
+	`);
+	});
+
+	test('should fail if the file has invalid JSON content', async () => {
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_mesh_invalid_file_content.json' },
+			flags: {
+				autoConfirmAction: Promise.resolve(false),
+			},
+		});
+
+		importFiles.mockImplementation(() => {
+			throw new Error('Invalid JSON content in openapi-schema.json');
+		});
+
+		const output = RunCommand.run();
+
+		await expect(output).rejects.toEqual(
+			new Error(
+				'Unable to import the files in the mesh config. Please check the file and try again.',
+			),
+		);
+
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Invalid JSON content in openapi-schema.json",
+		  ],
+		]
+	`);
+
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Unable to import the files in the mesh config. Please check the file and try again.",
+		  ],
+		  [
+		    "Unable to import the files in the mesh config. Please check the file and try again.",
+		  ],
+		]
+	`);
+	});
+
+	test('should fail if the file path starts from home directory i.e., path starts with ~/', async () => {
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_mesh_path_from_home.json' },
+			flags: {
+				autoConfirmAction: Promise.resolve(false),
+			},
+		});
+
+		const output = RunCommand.run();
+
+		await expect(output).rejects.toEqual(new Error('Input mesh config is not valid.'));
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "File(s): venia-openapi-schema.json is outside the mesh directory.",
+		  ],
+		]
+	`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Input mesh config is not valid.",
+		  ],
+		  [
+		    "Input mesh config is not valid.",
+		  ],
+		]
+	`);
 	});
 });
