@@ -32,7 +32,7 @@ const { validateMesh, buildMesh, compileMesh } = meshBuilder.default;
 
 class RunCommand extends Command {
 	static summary = 'Run local development server';
-	static description = 'Run a local development server using mesh built and compiled locally';
+	static description = 'Run a local development server that builds and compiles a mesh locally';
 
 	static args = [
 		{
@@ -129,15 +129,21 @@ class RunCommand extends Command {
 				//Generating unique mesh id
 				let meshId = UUID.newUuid().toString();
 
-				this.log(`Beginning steps to start server on port : ${portNo}`);
-
 				await validateMesh(data.meshConfig);
 				await buildMesh(meshId, data.meshConfig);
 				await compileMesh(meshId);
-				await startGraphqlServer(meshId, portNo, flags.debug);
+
+				//Set the value of API_MESH_TIER
+				const isTI = process.env.API_MESH_TIER === 'TI';
+
+				//Get the value of tenantUUID for TI
+				const tenantUUID = process.env.tenantUUID;
+
+				this.log(`Starting server on port : ${portNo}`);
+				await startGraphqlServer(meshId, portNo, flags.debug, isTI, tenantUUID);
 			} else {
 				this.error(
-					'`aio api-mesh run` cannot be executed as there is no package.json file in current directory. Use `aio api-mesh init` to setup a package.',
+					'`aio api-mesh run` cannot be executed because there is no package.json file in the current directory. Use `aio api-mesh init` to set up a package.',
 				);
 			}
 		} catch (error) {
