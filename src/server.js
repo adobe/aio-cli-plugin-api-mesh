@@ -204,8 +204,8 @@ app.route({
 		const meshHTTPDetails = responseBody?.extensions?.httpDetails;
 		logger.log('Mesh HTTP Details are : ', meshHTTPDetails);
 		logger.log('includeMetadata is : ', includeMetaData);
-		/* TO DO - add the logic for handling mesh response headers using includeMetaData
-		 */
+
+		/* the logic for handling mesh response headers using includeMetaData */
 		prepSourceResponseHeaders(meshHTTPDetails, req.id);
 		const responseHeaders = processResponseHeaders(meshId, req.id, includeMetaData, req.method);
 
