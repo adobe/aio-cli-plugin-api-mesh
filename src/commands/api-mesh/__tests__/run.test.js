@@ -52,6 +52,9 @@ describe('run command tests', () => {
 		logSpy = jest.spyOn(RunCommand.prototype, 'log');
 		errorLogSpy = jest.spyOn(RunCommand.prototype, 'error');
 		parseSpy = jest.spyOn(RunCommand.prototype, 'parse');
+		process.env = {
+			...originalEnv
+		};
 	});
 
 	test('snapshot run command description', () => {
@@ -359,7 +362,13 @@ describe('run command tests', () => {
 		});
 
 		await RunCommand.run();
-		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), process.env.PORT, false);
+		expect(startGraphqlServer).toHaveBeenCalledWith(
+			expect.anything(),
+			defaultPort,
+			false,
+			false,
+			undefined,
+		);
 	});
 
 	// file import tests
@@ -405,7 +414,13 @@ describe('run command tests', () => {
 		});
 
 		await RunCommand.run();
-		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), process.env.PORT, false);
+		expect(startGraphqlServer).toHaveBeenCalledWith(
+			expect.anything(),
+			defaultPort,
+			false,
+			false,
+			undefined,
+		);
 	});
 
 	test('should fail if the file name is more than 25 characters', async () => {
@@ -430,9 +445,6 @@ describe('run command tests', () => {
 
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
 		[
-		  [
-		    "Input mesh config is not valid.",
-		  ],
 		  [
 		    "Input mesh config is not valid.",
 		  ],
@@ -461,9 +473,6 @@ describe('run command tests', () => {
 	`);
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
 		[
-		  [
-		    "Input mesh config is not valid.",
-		  ],
 		  [
 		    "Input mesh config is not valid.",
 		  ],
@@ -505,9 +514,6 @@ describe('run command tests', () => {
 		  [
 		    "Unable to import the files in the mesh config. Please check the file and try again.",
 		  ],
-		  [
-		    "Unable to import the files in the mesh config. Please check the file and try again.",
-		  ],
 		]
 	`);
 	});
@@ -542,9 +548,6 @@ describe('run command tests', () => {
 
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
 		[
-		  [
-		    "Unable to import the files in the mesh config. Please check the file and try again.",
-		  ],
 		  [
 		    "Unable to import the files in the mesh config. Please check the file and try again.",
 		  ],
@@ -593,7 +596,13 @@ describe('run command tests', () => {
 		});
 
 		await RunCommand.run();
-		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), process.env.PORT, false);
+		expect(startGraphqlServer).toHaveBeenCalledWith(
+			expect.anything(),
+			defaultPort,
+			false,
+			false,
+			undefined,
+		);
 	});
 
 	test('should override if prompt returns Yes, if there is files array', async () => {
@@ -640,7 +649,13 @@ describe('run command tests', () => {
 
 		await RunCommand.run();
 
-		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), process.env.PORT, false);
+		expect(startGraphqlServer).toHaveBeenCalledWith(
+			expect.anything(),
+			defaultPort,
+			false,
+			false,
+			undefined,
+		);
 	});
 
 	test('should pass for a fully-qualified meshConfig even if the file does not exist in fileSystem', async () => {
@@ -687,7 +702,13 @@ describe('run command tests', () => {
 		});
 
 		await RunCommand.run();
-		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), process.env.PORT, false);
+		expect(startGraphqlServer).toHaveBeenCalledWith(
+			expect.anything(),
+			defaultPort,
+			false,
+			false,
+			undefined,
+		);
 	});
 
 	test('should pass if the file is located in subdirectory of mesh directory', async () => {
@@ -733,7 +754,13 @@ describe('run command tests', () => {
 
 		await RunCommand.run();
 
-		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), process.env.PORT, false);
+		expect(startGraphqlServer).toHaveBeenCalledWith(
+			expect.anything(),
+			defaultPort,
+			false,
+			false,
+			undefined,
+		);
 	});
 
 	test('should fail if the file is outside the workspace directory', async () => {
@@ -757,9 +784,6 @@ describe('run command tests', () => {
 	`);
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
 		[
-		  [
-		    "Input mesh config is not valid.",
-		  ],
 		  [
 		    "Input mesh config is not valid.",
 		  ],
@@ -800,9 +824,6 @@ describe('run command tests', () => {
 		  [
 		    "Unable to import the files in the mesh config. Please check the file and try again.",
 		  ],
-		  [
-		    "Unable to import the files in the mesh config. Please check the file and try again.",
-		  ],
 		]
 	`);
 	});
@@ -827,9 +848,6 @@ describe('run command tests', () => {
 	`);
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
 		[
-		  [
-		    "Input mesh config is not valid.",
-		  ],
 		  [
 		    "Input mesh config is not valid.",
 		  ],

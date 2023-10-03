@@ -101,7 +101,7 @@ class RunCommand extends Command {
 						data = JSON.parse(inputMeshData);
 					} catch (err) {
 						this.log(err.message);
-						this.error('Input mesh file is not a valid JSON. Please check the file provided.');
+						throw new Error('Input mesh file is not a valid JSON. Please check the file provided.');
 					}
 				}
 
@@ -111,7 +111,7 @@ class RunCommand extends Command {
 					filesList = getFilesInMeshConfig(data, args.file);
 				} catch (err) {
 					this.log(err.message);
-					this.error('Input mesh config is not valid.');
+					throw new Error('Input mesh config is not valid.');
 				}
 
 				// if local files are present, import them in files array in meshConfig
@@ -120,7 +120,7 @@ class RunCommand extends Command {
 						data = await importFiles(data, filesList, args.file, flags.autoConfirmAction);
 					} catch (err) {
 						this.log(err.message);
-						this.error(
+						throw new Error(
 							'Unable to import the files in the mesh config. Please check the file and try again.',
 						);
 					}
