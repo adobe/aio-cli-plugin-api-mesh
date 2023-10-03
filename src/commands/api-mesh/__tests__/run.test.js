@@ -123,6 +123,6 @@ describe('run command tests', () => {
 		parseSpy.mockResolvedValue(parseOutput);
 
 		await RunCommand.run();
-		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), process.env.PORT, false);
+		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), process.env.PORT, false, expect.anything(), expect.anything());
 	});
 });
