@@ -49,7 +49,7 @@ class RunCommand extends Command {
 		const { args, flags } = await this.parse(RunCommand);
 
 		if (!args.file) {
-			this.error('Missing file path. Run aio api-mesh run --help for more info.');
+			throw new Error('Missing file path. Run aio api-mesh run --help for more info.');
 		}
 
 		let portNo;
@@ -57,7 +57,7 @@ class RunCommand extends Command {
 		//To set the port number using the environment file
 		if (process.env.PORT !== undefined) {
 			if (isNaN(process.env.PORT) || !Number.isInteger(parseInt(process.env.PORT))) {
-				this.error('PORT value in the .env file is not a valid integer');
+				throw new Error('PORT value in the .env file is not a valid integer');
 			}
 
 			portNo = process.env.PORT;
@@ -96,7 +96,7 @@ class RunCommand extends Command {
 				this.log(`Starting server on port : ${portNo}`);
 				await startGraphqlServer(meshId, portNo, flags.debug, isTI, tenantUUID);
 			} else {
-				this.error(
+				throw new Error(
 					'`aio api-mesh run` cannot be executed because there is no package.json file in the current directory. Use `aio api-mesh init` to set up a package.',
 				);
 			}

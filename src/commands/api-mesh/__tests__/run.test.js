@@ -32,6 +32,11 @@ let logSpy = null;
 let errorLogSpy = null;
 let parseSpy = null;
 
+const originalEnv = {
+	API_MESH_TIER: 'NON-TI',
+};
+
+const defaultPort = 5000;
 describe('run command tests', () => {
 	beforeEach(() => {
 		global.requestId = 'dummy_request_id';
@@ -88,13 +93,7 @@ describe('run command tests', () => {
 			new Error('Missing file path. Run aio api-mesh run --help for more info.'),
 		);
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`[]`);
-		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
-		[
-		  [
-		    "Missing file path. Run aio api-mesh run --help for more info.",
-		  ],
-		]
-	`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`[]`);
 	});
 
 	test('should use the port number provided in the flags for starting the server', async () => {
@@ -110,13 +109,17 @@ describe('run command tests', () => {
 			expect.anything(),
 			parseOutput.flags.port,
 			false,
-			expect.anything(),
+			false,
 			undefined,
 		);
 	});
 
 	test('should use the port number provided in the .env file if there is no port', async () => {
-		process.env.PORT = 7000;
+		process.env = {
+			...originalEnv,
+			PORT: 7000,
+		};
+
 		const parseOutput = {
 			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
 			flags: { debug: false },
@@ -129,14 +132,17 @@ describe('run command tests', () => {
 			expect.anything(),
 			process.env.PORT,
 			false,
-			expect.anything(),
+			false,
 			undefined,
 		);
 	});
 
 	test('should set the isTI variable to true if API_MESH_TIER in .env file is `TI`', async () => {
-		process.env.PORT = 7000;
-		process.env.API_MESH_TIER = true;
+		process.env = {
+			...originalEnv,
+			API_MESH_TIER: 'TI',
+		};
+
 		const parseOutput = {
 			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
 			flags: { debug: false },
@@ -147,55 +153,19 @@ describe('run command tests', () => {
 		await RunCommand.run();
 		expect(startGraphqlServer).toHaveBeenCalledWith(
 			expect.anything(),
-			process.env.PORT,
+			defaultPort,
 			false,
-			false,
-			undefined,
-		);
-	});
-
-	test('should set the isTI variable to false if API_MESH_TIER is not present in .env file', async () => {
-		process.env.PORT = 7000;
-		const parseOutput = {
-			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
-			flags: { debug: false },
-		};
-
-		parseSpy.mockResolvedValue(parseOutput);
-
-		await RunCommand.run();
-		expect(startGraphqlServer).toHaveBeenCalledWith(
-			expect.anything(),
-			process.env.PORT,
-			false,
-			false,
-			undefined,
-		);
-	});
-
-	test('should set the isTI variable to false if API_MESH_TIER is not set as `TI`', async () => {
-		process.env.PORT = 7000;
-		process.env.API_MESH_TIER = 'NON-TI';
-		const parseOutput = {
-			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
-			flags: { debug: false },
-		};
-
-		parseSpy.mockResolvedValue(parseOutput);
-
-		await RunCommand.run();
-		expect(startGraphqlServer).toHaveBeenCalledWith(
-			expect.anything(),
-			process.env.PORT,
-			false,
-			false,
+			true,
 			undefined,
 		);
 	});
 
 	test('should pass the correct tenantUUID to the server if it is defined in the env file', async () => {
-		process.env.PORT = 7000;
-		process.env.tenantUUID = 'dummyVal';
+		process.env = {
+			API_MESH_TIER: 'TI',
+			tenantUUID: 'dummyVal',
+		};
+
 		const parseOutput = {
 			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
 			flags: { debug: false },
@@ -206,9 +176,9 @@ describe('run command tests', () => {
 		await RunCommand.run();
 		expect(startGraphqlServer).toHaveBeenCalledWith(
 			expect.anything(),
-			process.env.PORT,
+			defaultPort,
 			false,
-			expect.anything(),
+			true,
 			process.env.tenantUUID,
 		);
 	});

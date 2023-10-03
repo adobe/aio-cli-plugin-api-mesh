@@ -79,7 +79,7 @@ const getYogaServer = async () => {
 
 		meshConfig = readMeshConfig(meshId);
 
-		if (isTI) {
+		if (isTI === 'true') {
 			// TI customers get access to fetcher and sessionCache
 			//create context config
 			const { fetchConfig, cacheConfig } = processContextConfig(meshId, meshConfig);
@@ -162,7 +162,7 @@ app.route({
 
 		let responseBody = null;
 		let includeMetaData;
-		if (isTI) {
+		if (isTI === 'true') {
 			if (!req.headers.tenantUUID || req.headers.tenantUUID !== tiTenantUUID) {
 				res.status(403);
 				res.send('Forbidden : You are not allowed to query this mesh on this URL');
