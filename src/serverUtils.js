@@ -284,14 +284,16 @@ function processMeshResponseHeaders(
  */
 function getCacheControlDirectives(responseHeaders) {
 	let ccDirectives = {};
-    responseHeaders?.forEach(element => {
-        if (element.name.toLowerCase() === 'cache-control') {
-            const currentCacheMap = parseCacheControl(element.values.toString());
-            const standardDizedCacheMap = Object.fromEntries(Object.entries(currentCacheMap).map(([k, v]) => [k.toLowerCase(), v.toLowerCase()]));
-            ccDirectives = resolveCacheDirectives(ccDirectives, standardDizedCacheMap);
-        }
-    });
-    return { 'cache-control': ccDirectivesToString(ccDirectives) };
+	responseHeaders?.forEach(element => {
+		if (element.name.toLowerCase() === 'cache-control') {
+			const currentCacheMap = parseCacheControl(element.values.toString());
+			const standardDizedCacheMap = Object.fromEntries(
+				Object.entries(currentCacheMap).map(([k, v]) => [k.toLowerCase(), v.toLowerCase()]),
+			);
+			ccDirectives = resolveCacheDirectives(ccDirectives, standardDizedCacheMap);
+		}
+	});
+	return { 'cache-control': ccDirectivesToString(ccDirectives) };
 }
 
 /**
@@ -300,16 +302,16 @@ function getCacheControlDirectives(responseHeaders) {
  * @returns
  */
 function parseCacheControl(directives) {
-    //                     1: directive                                                  =   2: token                                              3: quoted-string
-    // eslint-disable-next-line
+	//                     1: directive                                                  =   2: token                                              3: quoted-string
+	// eslint-disable-next-line
     const regex = /(?:^|(?:\s*\,\s*))([^\x00-\x20\(\)<>@\,;\:\\"\/\[\]\?\=\{\}\x7F]+)(?:\=(?:([^\x00-\x20\(\)<>@\,;\:\\"\/\[\]\?\=\{\}\x7F]+)|(?:\"((?:[^"\\]|\\.)*)\")))?/g;
-    const header = {};
-    const err = directives.replace(regex, function ($0, $1, $2, $3) {
-        const value = $2 || $3;
-        header[$1] = value ? value.toLowerCase() : $1;
-        return '';
-    });
-    return err ? {} : header;
+	const header = {};
+	const err = directives.replace(regex, function ($0, $1, $2, $3) {
+		const value = $2 || $3;
+		header[$1] = value ? value.toLowerCase() : $1;
+		return '';
+	});
+	return err ? {} : header;
 }
 
 /**
@@ -319,44 +321,44 @@ function parseCacheControl(directives) {
  * @returns lowestValuesCacheDirectives
  */
 function resolveCacheDirectives(lowestValuesCacheDirectives, currentDirectives) {
-    //if any header contains no-store, we are done
-    if (lowestValuesCacheDirectives['no-store']) {
-        return lowestValuesCacheDirectives;
-    }
-    if (currentDirectives['no-store']) {
-        lowestValuesCacheDirectives = {};
-        lowestValuesCacheDirectives['no-store'] = 'no-store';
-        return lowestValuesCacheDirectives;
-    }
-    //id min values for each of these directives
-    const minDirectives = [
-        'min-fresh',
-        'max-age',
-        'max-stale',
-        's-maxage',
-        'stale-if-error',
-        'stale-while-revalidate',
-    ];
-    minDirectives.forEach(element => {
-        updateToMin(element, currentDirectives[element], lowestValuesCacheDirectives);
-    });
-    //add these directives, if they are not already present
-    const otherDirectives = [
-        'public',
-        'private',
-        'immutable',
-        'no-cache',
-        'no-transform',
-        'must-revalidate',
-        'proxy-revalidate',
-        'must-understand',
-    ];
-    Object.keys(currentDirectives).forEach(key => {
-        if (otherDirectives.includes(key) && !lowestValuesCacheDirectives[key]) {
-            lowestValuesCacheDirectives[key] = currentDirectives[key];
-        }
-    });
-    return lowestValuesCacheDirectives;
+	//if any header contains no-store, we are done
+	if (lowestValuesCacheDirectives['no-store']) {
+		return lowestValuesCacheDirectives;
+	}
+	if (currentDirectives['no-store']) {
+		lowestValuesCacheDirectives = {};
+		lowestValuesCacheDirectives['no-store'] = 'no-store';
+		return lowestValuesCacheDirectives;
+	}
+	//id min values for each of these directives
+	const minDirectives = [
+		'min-fresh',
+		'max-age',
+		'max-stale',
+		's-maxage',
+		'stale-if-error',
+		'stale-while-revalidate',
+	];
+	minDirectives.forEach(element => {
+		updateToMin(element, currentDirectives[element], lowestValuesCacheDirectives);
+	});
+	//add these directives, if they are not already present
+	const otherDirectives = [
+		'public',
+		'private',
+		'immutable',
+		'no-cache',
+		'no-transform',
+		'must-revalidate',
+		'proxy-revalidate',
+		'must-understand',
+	];
+	Object.keys(currentDirectives).forEach(key => {
+		if (otherDirectives.includes(key) && !lowestValuesCacheDirectives[key]) {
+			lowestValuesCacheDirectives[key] = currentDirectives[key];
+		}
+	});
+	return lowestValuesCacheDirectives;
 }
 
 /**
@@ -367,24 +369,24 @@ function resolveCacheDirectives(lowestValuesCacheDirectives, currentDirectives) 
  * @returns
  */
 function updateToMin(key, candidateMin, cachedHeaders) {
-    //first check if both values exist and are not undefined
-    if (cachedHeaders[key] && candidateMin) {
-        //if the value to be replaced is not a number and the candidate is a number we do a direct replacement
-        if (isNaN(Number(cachedHeaders[key])) && !isNaN(Number(candidateMin))) {
-            cachedHeaders[key] = candidateMin;
-        }
-        //if both values are integers and the candidate is lower than the existing lowest value, replace the current value with the candidate
-        else if (!isNaN(Number(cachedHeaders[key])) && !isNaN(Number(candidateMin))) {
-            if (Number(cachedHeaders[key]) > Number(candidateMin)) {
-                cachedHeaders[key] = candidateMin;
-            }
-        }
-    }
-    //do a direct in-place update of the existing array
-    else if (candidateMin) {
-        cachedHeaders[key] = candidateMin;
-    }
-    return cachedHeaders;
+	//first check if both values exist and are not undefined
+	if (cachedHeaders[key] && candidateMin) {
+		//if the value to be replaced is not a number and the candidate is a number we do a direct replacement
+		if (isNaN(Number(cachedHeaders[key])) && !isNaN(Number(candidateMin))) {
+			cachedHeaders[key] = candidateMin;
+		}
+		//if both values are integers and the candidate is lower than the existing lowest value, replace the current value with the candidate
+		else if (!isNaN(Number(cachedHeaders[key])) && !isNaN(Number(candidateMin))) {
+			if (Number(cachedHeaders[key]) > Number(candidateMin)) {
+				cachedHeaders[key] = candidateMin;
+			}
+		}
+	}
+	//do a direct in-place update of the existing array
+	else if (candidateMin) {
+		cachedHeaders[key] = candidateMin;
+	}
+	return cachedHeaders;
 }
 
 /**
@@ -393,16 +395,15 @@ function updateToMin(key, candidateMin, cachedHeaders) {
  * @returns
  */
 function ccDirectivesToString(directives) {
-    const chStr = [];
-    Object.keys(directives).forEach((key, index) => {
-        if (directives[key] === key) {
-            chStr.push(key);
-        }
-        else {
-            chStr.push(key + '=' + directives[key]);
-        }
-    });
-    return chStr.toString();
+	const chStr = [];
+	Object.keys(directives).forEach(key => {
+		if (directives[key] === key) {
+			chStr.push(key);
+		} else {
+			chStr.push(key + '=' + directives[key]);
+		}
+	});
+	return chStr.toString();
 }
 
 module.exports = {

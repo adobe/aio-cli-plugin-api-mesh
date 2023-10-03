@@ -214,11 +214,10 @@ app.route({
 			if (includeHTTPDetails !== true) {
 				delete responseBody?.extensions?.httpDetails;
 			}
-			
+
 			//make sure to remove the request headers from cache after the request is complete
 			removeRequestHeaders(req.id);
 			res.status(response.status).headers(responseHeaders).send(responseBody);
-
 		} catch (err) {
 			logger.error(`Error parsing response body: ${err}`);
 			//we have this fallback catch clause if someone wants to load the graphiql engine. This returns the default headers back
