@@ -53,7 +53,7 @@ describe('run command tests', () => {
 		errorLogSpy = jest.spyOn(RunCommand.prototype, 'error');
 		parseSpy = jest.spyOn(RunCommand.prototype, 'parse');
 		process.env = {
-			...originalEnv
+			...originalEnv,
 		};
 	});
 
