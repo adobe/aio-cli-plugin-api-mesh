@@ -5,9 +5,17 @@ const yogaPath = require.resolve('graphql-yoga', { paths: [process.cwd()] });
 // Load 'fastify' and 'graphql-yoga' using the resolved paths
 const fastify = require(fastifyPath);
 const { createYoga } = require(yogaPath);
+const logger = require('./classes/logger');
 
 //Load the functions from serverUtils.js
-const { readMeshConfig, processContextConfig, invokeRemoteFetch } = require('./serverUtils');
+const {
+	readMeshConfig,
+	processContextConfig,
+	invokeRemoteFetch,
+	removeRequestHeaders,
+	prepSourceResponseHeaders,
+	processResponseHeaders,
+} = require('./serverUtils');
 
 const LRU = require('lru-cache');
 const URL = require('url');
@@ -17,13 +25,13 @@ let meshConfig;
 
 // catch unhandled promise rejections
 process.on('unhandledRejection', reason => {
-	console.error('Unhandled Rejection at:', reason.stack || reason);
+	logger.error('Unhandled Rejection at:', reason.stack || reason);
 });
 
 // catch uncaught exceptions
 process.on('uncaughtException', err => {
-	console.error('Uncaught Exception thrown');
-	console.error(err.stack);
+	logger.error('Uncaught Exception thrown');
+	logger.error(err.stack);
 	process.exit(1);
 });
 
@@ -67,7 +75,7 @@ const getYogaServer = async () => {
 		const tenantMesh = await getBuiltMesh();
 		const corsOptions = getCORSOptions();
 
-		console.log('Creating graphQL server');
+		logger.log('Creating graphQL server');
 
 		meshConfig = readMeshConfig(meshId);
 
@@ -79,7 +87,7 @@ const getYogaServer = async () => {
 
 			const allowedDomainsMap = fetchConfig.allowedDomains?.reduce((acc, allowedDomain) => {
 				acc[allowedDomain] = {};
-				console.log(`acc: ${acc}`);
+				logger.log(`acc: ${acc}`);
 				return acc;
 			}, {});
 
@@ -93,33 +101,33 @@ const getYogaServer = async () => {
 					return {
 						...initialContext,
 						sessionCache: contextCache,
-						log: message => console.log(`${meshId} - ${message}`),
+						log: message => logger.log(`${meshId} - ${message}`),
 						fetcher: async (url, options) => {
 							const { protocol, host } = URL.parse(url);
 							if (protocol !== 'https:') {
 								throw new Error(`${url} is not a valid https url`);
 							}
 							const basePath = protocol + '//' + host;
-							console.log(`Host: ${host}`);
-							console.log(`Absolute base: ${basePath}`);
-							console.log(`allowedDomainsMap: ${JSON.stringify(allowedDomainsMap)}`);
+							logger.log(`Host: ${host}`);
+							logger.log(`Absolute base: ${basePath}`);
+							logger.log(`allowedDomainsMap: ${JSON.stringify(allowedDomainsMap)}`);
 
 							if (basePath !== null && allowedDomainsMap !== null) {
 								if (!(basePath in allowedDomainsMap)) {
-									console.log(
+									logger.log(
 										`host: ${host} and allowedDomainsMap: ${allowedDomainsMap} and stringified allowedDomain: ${JSON.stringify(
 											allowedDomainsMap,
 										)}`,
 									);
-									console.error(`${url} is not allowed to be accessed`);
+									logger.error(`${url} is not allowed to be accessed`);
 									throw new Error(`${url} is not allowed to be accessed`);
 								} else {
-									console.log(
+									logger.log(
 										`Fetching invokeRemoteFetch ${url} with options ${JSON.stringify(options)}`,
 									);
 									const response = await invokeRemoteFetch(url, options);
 									const body = await response.text();
-									console.log(`Fetched ${url}. Response body: ${body}`);
+									logger.log(`Fetched ${url}. Response body: ${body}`);
 									return { response, body };
 								}
 							}
@@ -150,12 +158,12 @@ app.route({
 	method: ['GET', 'POST'],
 	url: '/graphql',
 	handler: async (req, res) => {
-		console.log('Request received: ', req.body);
+		logger.log('Request received: ', req.body);
 
 		let responseBody = null;
 		let includeMetaData;
 		if (isTI) {
-			if (!req.headers.tenantUUID || req.headers.tenantUUID != tiTenantUUID) {
+			if (!req.headers.tenantUUID || req.headers.tenantUUID !== tiTenantUUID) {
 				res.status(403);
 				res.send('Forbidden : You are not allowed to query this mesh on this URL');
 				//TO DO - Modify as per GQL
@@ -179,14 +187,14 @@ app.route({
 			try {
 				body = await response.text();
 			} catch (err) {
-				console.error(`Error parsing response body: ${err}`);
+				logger.error(`Error parsing response body: ${err}`);
 			}
 			if (body) {
 				responseBody = JSON.parse(body);
 			}
 		} catch (err) {
-			console.error(`Error parsing response body: ${err}`);
-			console.error(response);
+			logger.error(`Error parsing response body: ${err}`);
+			logger.error(response);
 
 			throw new Error(`Error parsing response body: ${err}`);
 		}
@@ -194,15 +202,25 @@ app.route({
 
 		const includeHTTPDetails = !!meshConfig?.responseConfig?.includeHTTPDetails;
 		const meshHTTPDetails = responseBody?.extensions?.httpDetails;
-		console.log('Mesh HTTP Details are : ', meshHTTPDetails);
-		console.log('includeMetadata is : ', includeMetaData);
-		/* TO DO - add the logic for handling mesh response headers using includeMetaData
-		 */
+		logger.log('Mesh HTTP Details are : ', meshHTTPDetails);
+		logger.log('includeMetadata is : ', includeMetaData);
+
+		/* the logic for handling mesh response headers using includeMetaData */
+		prepSourceResponseHeaders(meshHTTPDetails, req.id);
+		const responseHeaders = processResponseHeaders(meshId, req.id, includeMetaData, req.method);
+
+		/** Adding the yoga response headers to the response */
+		response.headers?.forEach((value, key) => {
+			res.header(key, value);
+		});
 
 		// Delete the httpDetails extensions details if mesh owner has disabled those details in the config
 		if (includeHTTPDetails !== true) {
 			delete responseBody?.extensions?.httpDetails;
 		}
+		//make sure to remove the request headers from cache after the request is complete
+		removeRequestHeaders(req.id);
+		res.status(response.status).headers(responseHeaders).send(responseBody);
 
 		response.headers.forEach((value, key) => {
 			res.header(key, value);

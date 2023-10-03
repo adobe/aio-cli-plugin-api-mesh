@@ -51,7 +51,7 @@ describe('run command tests', () => {
 
 	test('snapshot run command description', () => {
 		expect(RunCommand.description).toMatchInlineSnapshot(
-			`"Run a local development server using mesh built and compiled locally"`,
+			`"Run a local development server that builds and compiles a mesh locally"`,
 		);
 		expect(RunCommand.summary).toMatchInlineSnapshot(`"Run local development server"`);
 		expect(RunCommand.args).toMatchInlineSnapshot(`
@@ -135,6 +135,8 @@ describe('run command tests', () => {
 			expect.anything(),
 			parseOutput.flags.port,
 			false,
+			expect.anything(),
+			undefined,
 		);
 	});
 
@@ -148,7 +150,92 @@ describe('run command tests', () => {
 		parseSpy.mockResolvedValue(parseOutput);
 
 		await RunCommand.run();
-		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), process.env.PORT, false);
+		expect(startGraphqlServer).toHaveBeenCalledWith(
+			expect.anything(),
+			process.env.PORT,
+			false,
+			expect.anything(),
+			undefined,
+		);
+	});
+
+	test('should set the isTI variable to true if API_MESH_TIER in .env file is `TI`', async () => {
+		process.env.PORT = 7000;
+		process.env.API_MESH_TIER = true;
+		const parseOutput = {
+			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
+			flags: { debug: false },
+		};
+
+		parseSpy.mockResolvedValue(parseOutput);
+
+		await RunCommand.run();
+		expect(startGraphqlServer).toHaveBeenCalledWith(
+			expect.anything(),
+			process.env.PORT,
+			false,
+			false,
+			undefined,
+		);
+	});
+
+	test('should set the isTI variable to false if API_MESH_TIER is not present in .env file', async () => {
+		process.env.PORT = 7000;
+		const parseOutput = {
+			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
+			flags: { debug: false },
+		};
+
+		parseSpy.mockResolvedValue(parseOutput);
+
+		await RunCommand.run();
+		expect(startGraphqlServer).toHaveBeenCalledWith(
+			expect.anything(),
+			process.env.PORT,
+			false,
+			false,
+			undefined,
+		);
+	});
+
+	test('should set the isTI variable to false if API_MESH_TIER is not set as `TI`', async () => {
+		process.env.PORT = 7000;
+		process.env.API_MESH_TIER = 'NON-TI';
+		const parseOutput = {
+			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
+			flags: { debug: false },
+		};
+
+		parseSpy.mockResolvedValue(parseOutput);
+
+		await RunCommand.run();
+		expect(startGraphqlServer).toHaveBeenCalledWith(
+			expect.anything(),
+			process.env.PORT,
+			false,
+			false,
+			undefined,
+		);
+	});
+
+	test('should pass the correct tenantUUID to the server if it is defined in the env file', async () => {
+		process.env.PORT = 7000;
+		process.env.tenantUUID = 'dummyVal';
+		const parseOutput = {
+			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
+			flags: { debug: false },
+		};
+
+		parseSpy.mockResolvedValue(parseOutput);
+
+		await RunCommand.run();
+		expect(startGraphqlServer).toHaveBeenCalledWith(
+			expect.anything(),
+			process.env.PORT,
+			false,
+			expect.anything(),
+			process.env.tenantUUID,
+		);
 	});
 
 	test('should return error for run command if the mesh has placeholders and env file provided using --env flag is not found', async () => {
