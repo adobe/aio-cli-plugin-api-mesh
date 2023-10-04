@@ -190,7 +190,12 @@ function processResponseHeaders(meshId, requestId, includeMetadata, method) {
 		requestId,
 		includeMetadata,
 	);
-	return processMeshResponseHeaders(meshResponseConfig, sourceResponseConfig, method, responseHeaders);
+	return processMeshResponseHeaders(
+		meshResponseConfig,
+		sourceResponseConfig,
+		method,
+		responseHeaders,
+	);
 }
 
 function getMeshResponseConfig(meshId) {
