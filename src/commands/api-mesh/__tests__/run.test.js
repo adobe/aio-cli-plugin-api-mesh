@@ -134,21 +134,4 @@ describe('run command tests', () => {
 			false,
 		);
 	});
-
-	test('should set the isTI variable to true if API_MESH_TIER in .env file is `TI`', async () => {
-		process.env = {
-			...originalEnv,
-			API_MESH_TIER: 'TI',
-		};
-
-		const parseOutput = {
-			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
-			flags: { debug: false },
-		};
-
-		parseSpy.mockResolvedValue(parseOutput);
-
-		await RunCommand.run();
-		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), defaultPort, false, true);
-	});
 });
