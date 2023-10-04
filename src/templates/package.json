@@ -24,6 +24,7 @@
 		"@graphql-mesh/transform-type-merging": "0.5.20",
 		"@graphql-mesh/types": "0.91.12",
 		"@graphql-mesh/soap": "0.14.25",
+		"@graphql-mesh/http": "^0.96.9",
 		"graphql": "^16.6.0",
 		"@adobe/plugin-hooks": "^0.1.0",
 		"@adobe/plugin-on-fetch": "^0.1.0",
