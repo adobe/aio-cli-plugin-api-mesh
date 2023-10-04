@@ -15,9 +15,6 @@ const {
 	processResponseHeaders,
 } = require('./serverUtils');
 
-const LRU = require('lru-cache');
-const URL = require('url');
-
 let yogaServer = null;
 let meshConfig;
 
@@ -83,7 +80,6 @@ const getYogaServer = async () => {
 };
 
 const app = fastify();
-
 
 app.route({
 	method: ['GET', 'POST'],

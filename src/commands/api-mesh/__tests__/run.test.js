@@ -109,11 +109,10 @@ describe('run command tests', () => {
 			expect.anything(),
 			parseOutput.flags.port,
 			false,
-			false,
 		);
 	});
 
-	test('should use the port number provided in the .env file if there is no port', async () => {
+	test('should use the port number provided in the .env file if there is no port in flags', async () => {
 		process.env = {
 			...originalEnv,
 			PORT: 7000,
@@ -127,11 +126,22 @@ describe('run command tests', () => {
 		parseSpy.mockResolvedValue(parseOutput);
 
 		await RunCommand.run();
-		expect(startGraphqlServer).toHaveBeenCalledWith(
-			expect.anything(),
-			process.env.PORT,
-			false,
-			false,
-		);
+		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), process.env.PORT, false);
+	});
+
+	test('should use the default port if port number is not provided explicitly', async () => {
+		process.env = {
+			...originalEnv,
+		};
+
+		const parseOutput = {
+			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
+			flags: { debug: false },
+		};
+
+		parseSpy.mockResolvedValue(parseOutput);
+
+		await RunCommand.run();
+		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), defaultPort, false);
 	});
 });
