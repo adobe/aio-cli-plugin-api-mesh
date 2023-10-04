@@ -75,7 +75,7 @@ const getYogaServer = async () => {
 		const tenantMesh = await getBuiltMesh();
 		const corsOptions = getCORSOptions();
 
-		logger.log('Creating graphQL server');
+		logger.info('Creating graphQL server');
 
 		meshConfig = readMeshConfig(meshId);
 
@@ -87,7 +87,7 @@ const getYogaServer = async () => {
 
 			const allowedDomainsMap = fetchConfig.allowedDomains?.reduce((acc, allowedDomain) => {
 				acc[allowedDomain] = {};
-				logger.log(`acc: ${acc}`);
+				logger.info(`acc: ${acc}`);
 				return acc;
 			}, {});
 
@@ -101,20 +101,20 @@ const getYogaServer = async () => {
 					return {
 						...initialContext,
 						sessionCache: contextCache,
-						log: message => logger.log(`${meshId} - ${message}`),
+						log: message => logger.info(`${meshId} - ${message}`),
 						fetcher: async (url, options) => {
 							const { protocol, host } = URL.parse(url);
 							if (protocol !== 'https:') {
 								throw new Error(`${url} is not a valid https url`);
 							}
 							const basePath = protocol + '//' + host;
-							logger.log(`Host: ${host}`);
-							logger.log(`Absolute base: ${basePath}`);
-							logger.log(`allowedDomainsMap: ${JSON.stringify(allowedDomainsMap)}`);
+							logger.info(`Host: ${host}`);
+							logger.info(`Absolute base: ${basePath}`);
+							logger.info(`allowedDomainsMap: ${JSON.stringify(allowedDomainsMap)}`);
 
 							if (basePath !== null && allowedDomainsMap !== null) {
 								if (!(basePath in allowedDomainsMap)) {
-									logger.log(
+									logger.info(
 										`host: ${host} and allowedDomainsMap: ${allowedDomainsMap} and stringified allowedDomain: ${JSON.stringify(
 											allowedDomainsMap,
 										)}`,
@@ -122,12 +122,12 @@ const getYogaServer = async () => {
 									logger.error(`${url} is not allowed to be accessed`);
 									throw new Error(`${url} is not allowed to be accessed`);
 								} else {
-									logger.log(
+									logger.info(
 										`Fetching invokeRemoteFetch ${url} with options ${JSON.stringify(options)}`,
 									);
 									const response = await invokeRemoteFetch(url, options);
 									const body = await response.text();
-									logger.log(`Fetched ${url}. Response body: ${body}`);
+									logger.info(`Fetched ${url}. Response body: ${body}`);
 									return { response, body };
 								}
 							}
@@ -158,10 +158,11 @@ app.route({
 	method: ['GET', 'POST'],
 	url: '/graphql',
 	handler: async (req, res) => {
-		logger.log('Request received: ', req.body);
+		logger.info('Request received: ', req.body);
 
+		let body = null;
 		let responseBody = null;
-		let includeMetaData;
+		let includeMetaData = false;
 		if (isTI === 'true') {
 			if (!req.headers.tenantUUID || req.headers.tenantUUID !== tiTenantUUID) {
 				res.status(403);
@@ -183,52 +184,50 @@ app.route({
 		});
 
 		try {
-			let body = null;
 			try {
 				body = await response.text();
+				if (body) {
+					responseBody = JSON.parse(body);
+				}
 			} catch (err) {
 				logger.error(`Error parsing response body: ${err}`);
+				logger.error(response);
+				throw new Error(`Error parsing response body: ${err}`);
 			}
-			if (body) {
-				responseBody = JSON.parse(body);
+			//Set the value of includeHTTPDetails flag
+
+			const includeHTTPDetails = !!meshConfig?.responseConfig?.includeHTTPDetails;
+			const meshHTTPDetails = responseBody?.extensions?.httpDetails;
+			logger.info('Mesh HTTP Details are : ', meshHTTPDetails);
+			logger.info('includeMetadata is : ', includeMetaData);
+
+			/* the logic for handling mesh response headers using includeMetaData */
+			prepSourceResponseHeaders(meshHTTPDetails, req.id);
+			const responseHeaders = processResponseHeaders(meshId, req.id, includeMetaData, req.method);
+
+			/** Adding the yoga response headers to the response */
+			response.headers?.forEach((value, key) => {
+				res.header(key, value);
+			});
+
+			// Delete the httpDetails extensions details if mesh owner has disabled those details in the config
+			if (includeHTTPDetails !== true) {
+				delete responseBody?.extensions?.httpDetails;
 			}
+
+			//make sure to remove the request headers from cache after the request is complete
+			removeRequestHeaders(req.id);
+			const fastifyResponseBody = JSON.stringify(responseBody);
+			res.status(response.status).headers(responseHeaders).send(fastifyResponseBody);
 		} catch (err) {
 			logger.error(`Error parsing response body: ${err}`);
-			logger.error(response);
-
-			throw new Error(`Error parsing response body: ${err}`);
+			//we have this fallback catch clause if someone wants to load the graphiql engine. This returns the default headers back
+			response.headers?.forEach((value, key) => {
+				res.header(key, value);
+			});
+			res.status(response.status);
+			res.send(response.body);
 		}
-		//Set the value of includeHTTPDetails flag
-
-		const includeHTTPDetails = !!meshConfig?.responseConfig?.includeHTTPDetails;
-		const meshHTTPDetails = responseBody?.extensions?.httpDetails;
-		logger.log('Mesh HTTP Details are : ', meshHTTPDetails);
-		logger.log('includeMetadata is : ', includeMetaData);
-
-		/* the logic for handling mesh response headers using includeMetaData */
-		prepSourceResponseHeaders(meshHTTPDetails, req.id);
-		const responseHeaders = processResponseHeaders(meshId, req.id, includeMetaData, req.method);
-
-		/** Adding the yoga response headers to the response */
-		response.headers?.forEach((value, key) => {
-			res.header(key, value);
-		});
-
-		// Delete the httpDetails extensions details if mesh owner has disabled those details in the config
-		if (includeHTTPDetails !== true) {
-			delete responseBody?.extensions?.httpDetails;
-		}
-		//make sure to remove the request headers from cache after the request is complete
-		removeRequestHeaders(req.id);
-		res.status(response.status).headers(responseHeaders).send(responseBody);
-
-		response.headers.forEach((value, key) => {
-			res.header(key, value);
-		});
-
-		res.status(response.status);
-
-		res.send(responseBody);
 
 		return res;
 	},
