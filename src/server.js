@@ -147,9 +147,6 @@ const getYogaServer = async () => {
 
 const app = fastify();
 
-app.get('/', (req, res) => {
-	res.send('Hello World!');
-});
 
 app.route({
 	method: ['GET', 'POST'],
@@ -187,8 +184,7 @@ app.route({
 
 			const includeHTTPDetails = !!meshConfig?.responseConfig?.includeHTTPDetails;
 			const meshHTTPDetails = responseBody?.extensions?.httpDetails;
-			logger.info('Mesh HTTP Details are : ', meshHTTPDetails);
-			logger.info('includeMetadata is : ', includeMetaData);
+			logger.info('Mesh HTTP Details: ', meshHTTPDetails);
 
 			/* the logic for handling mesh response headers using includeMetaData */
 			prepSourceResponseHeaders(meshHTTPDetails, req.id);
