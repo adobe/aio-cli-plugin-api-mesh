@@ -729,8 +729,8 @@ function updateFilesArray(data, file, meshConfigName, index) {
  * @param port Port number at which the server is to be started
  * @param debug Boolean flag to set the debug mode
  */
-function startGraphqlServer(meshId, port, debug, isTI, tenantUUID) {
-	const serverPath = `${__dirname}/server.js ${meshId} ${port} ${isTI} ${tenantUUID}`;
+function startGraphqlServer(meshId, port, debug, isTI) {
+	const serverPath = `${__dirname}/server.js ${meshId} ${port} ${isTI}`;
 	const command = debug
 		? `node --inspect-brk --trace-warnings ${serverPath}`
 		: `node ${serverPath}`;

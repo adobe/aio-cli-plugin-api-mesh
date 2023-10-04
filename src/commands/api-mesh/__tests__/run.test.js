@@ -159,27 +159,4 @@ describe('run command tests', () => {
 			undefined,
 		);
 	});
-
-	test('should pass the correct tenantUUID to the server if it is defined in the env file', async () => {
-		process.env = {
-			API_MESH_TIER: 'TI',
-			tenantUUID: 'dummyVal',
-		};
-
-		const parseOutput = {
-			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
-			flags: { debug: false },
-		};
-
-		parseSpy.mockResolvedValue(parseOutput);
-
-		await RunCommand.run();
-		expect(startGraphqlServer).toHaveBeenCalledWith(
-			expect.anything(),
-			defaultPort,
-			false,
-			true,
-			process.env.tenantUUID,
-		);
-	});
 });

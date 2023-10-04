@@ -44,9 +44,6 @@ const portNo = parseInt(process.argv[3]);
 // get includeHTTPDetails from command line arguments
 const isTI = process.argv[4];
 
-//get the expected tenantUUID value for the TI setup
-const tiTenantUUID = process.argv[5];
-
 const getCORSOptions = () => {
 	try {
 		const currentWorkingDirectory = process.cwd();
@@ -163,14 +160,6 @@ app.route({
 		let body = null;
 		let responseBody = null;
 		let includeMetaData = false;
-		if (isTI === 'true') {
-			if (!req.headers.tenantUUID || req.headers.tenantUUID !== tiTenantUUID) {
-				res.status(403);
-				res.send('Forbidden : You are not allowed to query this mesh on this URL');
-				//TO DO - Modify as per GQL
-				return res;
-			}
-		}
 
 		if (req.headers['x-include-metadata'] && req.headers['x-include-metadata'].length > 0) {
 			if (req.headers['x-include-metadata'].toLowerCase() === 'true') {

@@ -90,11 +90,8 @@ class RunCommand extends Command {
 				//Set the value of API_MESH_TIER
 				const isTI = process.env.API_MESH_TIER === 'TI';
 
-				//Get the value of tenantUUID for TI
-				const tenantUUID = process.env.tenantUUID;
-
 				this.log(`Starting server on port : ${portNo}`);
-				await startGraphqlServer(meshId, portNo, flags.debug, isTI, tenantUUID);
+				await startGraphqlServer(meshId, portNo, flags.debug, isTI);
 			} else {
 				throw new Error(
 					'`aio api-mesh run` cannot be executed because there is no package.json file in the current directory. Use `aio api-mesh init` to set up a package.',
