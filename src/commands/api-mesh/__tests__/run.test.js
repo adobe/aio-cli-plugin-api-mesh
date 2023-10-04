@@ -17,7 +17,7 @@ const {
 	importFiles,
 	promptConfirm,
 } = require('../../../helpers');
-require('@testmeshbuilder/mesh-builder');
+require('@adobe-apimesh/mesh-builder');
 jest.mock('../../../helpers', () => ({
 	initRequestId: jest.fn().mockResolvedValue({}),
 	startGraphqlServer: jest.fn().mockResolvedValue({}),
@@ -99,7 +99,7 @@ describe('run command tests', () => {
 		  },
 		  "port": {
 		    "char": "p",
-		    "description": "Port number of local dev server",
+		    "description": "Port number for the local dev server",
 		    "input": [],
 		    "multiple": false,
 		    "parse": [Function],
@@ -137,8 +137,6 @@ describe('run command tests', () => {
 			expect.anything(),
 			parseOutput.flags.port,
 			false,
-			false,
-			undefined,
 		);
 	});
 
@@ -326,13 +324,7 @@ describe('run command tests', () => {
 		});
 
 		await RunCommand.run();
-		expect(startGraphqlServer).toHaveBeenCalledWith(
-			expect.anything(),
-			defaultPort,
-			false,
-			false,
-			undefined,
-		);
+		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), defaultPort, false);
 	});
 
 	// file import tests
@@ -378,13 +370,7 @@ describe('run command tests', () => {
 		});
 
 		await RunCommand.run();
-		expect(startGraphqlServer).toHaveBeenCalledWith(
-			expect.anything(),
-			defaultPort,
-			false,
-			false,
-			undefined,
-		);
+		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), defaultPort, false);
 	});
 
 	test('should fail if the file name is more than 25 characters', async () => {
@@ -560,13 +546,7 @@ describe('run command tests', () => {
 		});
 
 		await RunCommand.run();
-		expect(startGraphqlServer).toHaveBeenCalledWith(
-			expect.anything(),
-			defaultPort,
-			false,
-			false,
-			undefined,
-		);
+		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), defaultPort, false);
 	});
 
 	test('should override if prompt returns Yes, if there is files array', async () => {
@@ -613,13 +593,7 @@ describe('run command tests', () => {
 
 		await RunCommand.run();
 
-		expect(startGraphqlServer).toHaveBeenCalledWith(
-			expect.anything(),
-			defaultPort,
-			false,
-			false,
-			undefined,
-		);
+		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), defaultPort, false);
 	});
 
 	test('should pass for a fully-qualified meshConfig even if the file does not exist in fileSystem', async () => {
@@ -666,13 +640,7 @@ describe('run command tests', () => {
 		});
 
 		await RunCommand.run();
-		expect(startGraphqlServer).toHaveBeenCalledWith(
-			expect.anything(),
-			defaultPort,
-			false,
-			false,
-			undefined,
-		);
+		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), defaultPort, false);
 	});
 
 	test('should pass if the file is located in subdirectory of mesh directory', async () => {
@@ -718,13 +686,7 @@ describe('run command tests', () => {
 
 		await RunCommand.run();
 
-		expect(startGraphqlServer).toHaveBeenCalledWith(
-			expect.anything(),
-			defaultPort,
-			false,
-			false,
-			undefined,
-		);
+		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), defaultPort, false);
 	});
 
 	test('should fail if the file is outside the workspace directory', async () => {
