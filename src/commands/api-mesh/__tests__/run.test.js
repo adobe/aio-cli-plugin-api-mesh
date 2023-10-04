@@ -71,7 +71,7 @@ describe('run command tests', () => {
 		  },
 		  "port": {
 		    "char": "p",
-		    "description": "Port number of local dev server",
+		    "description": "Port number for the local dev server",
 		    "input": [],
 		    "multiple": false,
 		    "parse": [Function],
