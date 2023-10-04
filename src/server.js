@@ -136,7 +136,7 @@ const getYogaServer = async () => {
 			yogaServer = createYoga({
 				plugins: tenantMesh.plugins,
 				graphqlEndpoint: `/graphql`,
-				graphiql: false,
+				graphiql: true,
 				cors: corsOptions,
 			});
 		}
