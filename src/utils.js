@@ -43,7 +43,7 @@ const envFileFlag = Flags.string({
 
 const portNoFlag = Flags.integer({
 	char: 'p',
-	description: 'Port number of local dev server',
+	description: 'Port number for the local dev server',
 });
 
 const debugFlag = Flags.boolean({
