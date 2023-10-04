@@ -12,13 +12,13 @@ governing permissions and limitations under the License.
 
 const RunCommand = require('../run');
 const { startGraphqlServer } = require('../../../helpers');
-require('@testmeshbuilder/mesh-builder');
+require('@adobe-apimesh/mesh-builder');
 jest.mock('../../../helpers', () => ({
 	initRequestId: jest.fn().mockResolvedValue({}),
 	startGraphqlServer: jest.fn().mockResolvedValue({}),
 }));
 
-jest.mock('@testmeshbuilder/mesh-builder', () => {
+jest.mock('@adobe-apimesh/mesh-builder', () => {
 	return {
 		default: {
 			validateMesh: jest.fn().mockResolvedValue({}),
