@@ -110,7 +110,6 @@ describe('run command tests', () => {
 			parseOutput.flags.port,
 			false,
 			false,
-			undefined,
 		);
 	});
 
@@ -133,7 +132,6 @@ describe('run command tests', () => {
 			process.env.PORT,
 			false,
 			false,
-			undefined,
 		);
 	});
 
@@ -151,12 +149,6 @@ describe('run command tests', () => {
 		parseSpy.mockResolvedValue(parseOutput);
 
 		await RunCommand.run();
-		expect(startGraphqlServer).toHaveBeenCalledWith(
-			expect.anything(),
-			defaultPort,
-			false,
-			true,
-			undefined,
-		);
+		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), defaultPort, false, true);
 	});
 });
