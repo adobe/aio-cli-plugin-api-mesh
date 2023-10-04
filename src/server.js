@@ -162,7 +162,7 @@ app.route({
 
 		let body = null;
 		let responseBody = null;
-		let includeMetaData;
+		let includeMetaData = false;
 		if (isTI === 'true') {
 			if (!req.headers.tenantUUID || req.headers.tenantUUID !== tiTenantUUID) {
 				res.status(403);
@@ -217,7 +217,8 @@ app.route({
 
 			//make sure to remove the request headers from cache after the request is complete
 			removeRequestHeaders(req.id);
-			res.status(response.status).headers(responseHeaders).send(responseBody);
+			const fastifyResponseBody = JSON.stringify(responseBody);
+			res.status(response.status).headers(responseHeaders).send(fastifyResponseBody);
 		} catch (err) {
 			logger.error(`Error parsing response body: ${err}`);
 			//we have this fallback catch clause if someone wants to load the graphiql engine. This returns the default headers back
