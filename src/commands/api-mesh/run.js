@@ -117,7 +117,14 @@ class RunCommand extends Command {
 				// if local files are present, import them in files array in meshConfig
 				if (filesList.length) {
 					try {
-						data = await importFiles(data, filesList, args.file, flags.autoConfirmAction);
+						// minification of js will not be done for run command if debugging is enabled
+						data = await importFiles(
+							data,
+							filesList,
+							args.file,
+							flags.autoConfirmAction,
+							!debugFlag,
+						);
 					} catch (err) {
 						this.log(err.message);
 						throw new Error(
