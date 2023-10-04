@@ -722,6 +722,42 @@ function updateFilesArray(data, file, meshConfigName, index) {
 	}
 }
 
+/**
+ * Start GraphQL server for a particular mesh on a particular port
+ *
+ * @param meshId MeshId of the mesh
+ * @param port Port number at which the server is to be started
+ * @param debug Boolean flag to set the debug mode
+ */
+function startGraphqlServer(meshId, port, debug) {
+	const serverPath = `${__dirname}/server.js ${meshId} ${port}`;
+	const command = debug
+		? `node --inspect-brk --trace-warnings ${serverPath}`
+		: `node ${serverPath}`;
+
+	const server = exec(command);
+
+	server.stdout.on('data', data => {
+		console.log('Data from server - ', data);
+	});
+
+	server.stderr.on('data', data => {
+		console.log('Error from server - ', data);
+	});
+
+	server.on('close', code => {
+		console.log(`Server closed with code ${code}`);
+	});
+
+	server.on('exit', code => {
+		console.log(`Server exited with code ${code}`);
+	});
+
+	server.on('error', err => {
+		console.log(`Server exited with error ${err}`);
+	});
+}
+
 module.exports = {
 	objToString,
 	promptInput,
@@ -736,4 +772,5 @@ module.exports = {
 	interpolateMesh,
 	runCliCommand,
 	updateFilesArray,
+	startGraphqlServer,
 };
