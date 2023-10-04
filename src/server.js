@@ -10,15 +10,10 @@ const logger = require('./classes/logger');
 //Load the functions from serverUtils.js
 const {
 	readMeshConfig,
-	processContextConfig,
-	invokeRemoteFetch,
 	removeRequestHeaders,
 	prepSourceResponseHeaders,
 	processResponseHeaders,
 } = require('./serverUtils');
-
-const LRU = require('lru-cache');
-const URL = require('url');
 
 let yogaServer = null;
 let meshConfig;
@@ -40,12 +35,6 @@ const meshId = process.argv[2];
 
 // get PORT number from command line arguments
 const portNo = parseInt(process.argv[3]);
-
-// get includeHTTPDetails from command line arguments
-const isTI = process.argv[4];
-
-//get the expected tenantUUID value for the TI setup
-const tiTenantUUID = process.argv[5];
 
 const getCORSOptions = () => {
 	try {
@@ -79,80 +68,18 @@ const getYogaServer = async () => {
 
 		meshConfig = readMeshConfig(meshId);
 
-		if (isTI === 'true') {
-			// TI customers get access to fetcher and sessionCache
-			//create context config
-			const { fetchConfig, cacheConfig } = processContextConfig(meshId, meshConfig);
-			const contextCache = new LRU(cacheConfig);
-
-			const allowedDomainsMap = fetchConfig.allowedDomains?.reduce((acc, allowedDomain) => {
-				acc[allowedDomain] = {};
-				logger.info(`acc: ${acc}`);
-				return acc;
-			}, {});
-
-			yogaServer = createYoga({
-				cors: corsOptions,
-				plugins: tenantMesh.plugins,
-				graphqlEndpoint: '/graphql',
-				graphiql: false,
-				maskedErrors: false,
-				context: initialContext => {
-					return {
-						...initialContext,
-						sessionCache: contextCache,
-						log: message => logger.info(`${meshId} - ${message}`),
-						fetcher: async (url, options) => {
-							const { protocol, host } = URL.parse(url);
-							if (protocol !== 'https:') {
-								throw new Error(`${url} is not a valid https url`);
-							}
-							const basePath = protocol + '//' + host;
-							logger.info(`Host: ${host}`);
-							logger.info(`Absolute base: ${basePath}`);
-							logger.info(`allowedDomainsMap: ${JSON.stringify(allowedDomainsMap)}`);
-
-							if (basePath !== null && allowedDomainsMap !== null) {
-								if (!(basePath in allowedDomainsMap)) {
-									logger.info(
-										`host: ${host} and allowedDomainsMap: ${allowedDomainsMap} and stringified allowedDomain: ${JSON.stringify(
-											allowedDomainsMap,
-										)}`,
-									);
-									logger.error(`${url} is not allowed to be accessed`);
-									throw new Error(`${url} is not allowed to be accessed`);
-								} else {
-									logger.info(
-										`Fetching invokeRemoteFetch ${url} with options ${JSON.stringify(options)}`,
-									);
-									const response = await invokeRemoteFetch(url, options);
-									const body = await response.text();
-									logger.info(`Fetched ${url}. Response body: ${body}`);
-									return { response, body };
-								}
-							}
-						},
-					};
-				},
-			});
-		} else {
-			yogaServer = createYoga({
-				plugins: tenantMesh.plugins,
-				graphqlEndpoint: `/graphql`,
-				graphiql: false,
-				cors: corsOptions,
-			});
-		}
+		yogaServer = createYoga({
+			plugins: tenantMesh.plugins,
+			graphqlEndpoint: `/graphql`,
+			graphiql: true,
+			cors: corsOptions,
+		});
 
 		return yogaServer;
 	}
 };
 
 const app = fastify();
-
-app.get('/', (req, res) => {
-	res.send('Hello World!');
-});
 
 app.route({
 	method: ['GET', 'POST'],
@@ -163,14 +90,6 @@ app.route({
 		let body = null;
 		let responseBody = null;
 		let includeMetaData = false;
-		if (isTI === 'true') {
-			if (!req.headers.tenantUUID || req.headers.tenantUUID !== tiTenantUUID) {
-				res.status(403);
-				res.send('Forbidden : You are not allowed to query this mesh on this URL');
-				//TO DO - Modify as per GQL
-				return res;
-			}
-		}
 
 		if (req.headers['x-include-metadata'] && req.headers['x-include-metadata'].length > 0) {
 			if (req.headers['x-include-metadata'].toLowerCase() === 'true') {
@@ -198,8 +117,7 @@ app.route({
 
 			const includeHTTPDetails = !!meshConfig?.responseConfig?.includeHTTPDetails;
 			const meshHTTPDetails = responseBody?.extensions?.httpDetails;
-			logger.info('Mesh HTTP Details are : ', meshHTTPDetails);
-			logger.info('includeMetadata is : ', includeMetaData);
+			logger.info('Mesh HTTP Details: ', meshHTTPDetails);
 
 			/* the logic for handling mesh response headers using includeMetaData */
 			prepSourceResponseHeaders(meshHTTPDetails, req.id);

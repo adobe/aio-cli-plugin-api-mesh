@@ -7,6 +7,48 @@
   resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@aashutoshrathi/word-wrap/-/word-wrap-1.2.6.tgz#bd9154aec9983f77b3a034ecaa015c2e4201f6cf"
   integrity sha512-1Yjs2SvM8TflER/OD3cOjhWWOZb58A2t7wpE2S9XfBYTiIl+XFhQG2bjy4Pu1I+EAlCNUzRDYDdFwFYUKvXcIA==
 
+"@adobe-apimesh/mesh-builder@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@adobe-apimesh/mesh-builder/-/mesh-builder-1.0.3.tgz#ec2aaa196e364b3d708e7c0635cb294bd34ef3b1"
+  integrity sha512-r2RMv90mLyN9AS2xJuNwILDNQ+D2/XA8nW/t3J2CQemxOAv1yu4BLbBN59IPDSU1pY0liFMxHG01/fb4mzXBiw==
+  dependencies:
+    "@adobe/plugin-hooks" "0.1.0"
+    "@adobe/plugin-on-fetch" "0.1.0"
+    "@fastify/request-context" "^4.1.0"
+    "@graphql-mesh/cli" "0.82.30"
+    "@graphql-mesh/graphql" "0.34.13"
+    "@graphql-mesh/json-schema" "0.35.38"
+    "@graphql-mesh/openapi" "0.33.39"
+    "@graphql-mesh/plugin-http-details-extensions" "0.1.21"
+    "@graphql-mesh/runtime" "0.46.21"
+    "@graphql-mesh/soap" "0.14.25"
+    "@graphql-mesh/transform-encapsulate" "0.4.21"
+    "@graphql-mesh/transform-federation" "0.11.14"
+    "@graphql-mesh/transform-filter-schema" "0.15.23"
+    "@graphql-mesh/transform-hoist-field" "0.2.21"
+    "@graphql-mesh/transform-naming-convention" "0.13.22"
+    "@graphql-mesh/transform-prefix" "0.12.22"
+    "@graphql-mesh/transform-prune" "0.1.20"
+    "@graphql-mesh/transform-rename" "0.14.22"
+    "@graphql-mesh/transform-replace-field" "0.4.20"
+    "@graphql-mesh/transform-resolvers-composition" "0.13.20"
+    "@graphql-mesh/transform-type-merging" "0.5.20"
+    "@graphql-mesh/types" "0.91.12"
+    ajv "^8.10.0"
+    eslint "^8.39.0"
+    eslint-plugin-json "^3.1.0"
+    eslint-plugin-no-loops "^0.3.0"
+    eslint-plugin-node "^11.1.0"
+    eslint-plugin-security "^1.5.0"
+    eslint-plugin-sonarjs "^0.16.0"
+    fs-extra "^10.1.0"
+    glob "^10.3.3"
+    graphql "^16.6.0"
+    graphql-tools "7.0.4"
+    pino "7.9.1"
+    pino-pretty "7.5.4"
+    typescript "^5.0.4"
+
 "@adobe/aio-cli-lib-console@^4.0.0":
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@adobe/aio-cli-lib-console/-/aio-cli-lib-console-4.0.0.tgz#94a0193b129b7707c5619d04757301699fe7f784"
@@ -208,23 +250,23 @@
     tslib "^2.3.0"
     zen-observable-ts "^1.2.5"
 
-"@apollo/federation-internals@^2.2.1":
-  version "2.5.4"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@apollo/federation-internals/-/federation-internals-2.5.4.tgz#688720416a532d31b76532f8316ea3fec6254073"
-  integrity sha512-SJCbP90KNlk6QJqUfvBrL/PdYzXKz3aZx2vP2kqJE9Ccc6UrUVrI70XuJ09o6n080sgCArDTC9+ngjdh6P5vTg==
+"@apollo/federation-internals@2.4.0":
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/@apollo/federation-internals/-/federation-internals-2.4.0.tgz#4bfc9ded3381a4c8ff05ac220d941319bdcef1ff"
+  integrity sha512-ovfYwpq3s2LKNvLGg6bxcNlyrCllbF1JhNgQEOEOeAoy3TTmnYuxqd00H3bkT/5xpXvMpBc6+Di6qMkYcQM+Ww==
   dependencies:
     "@types/uuid" "^9.0.0"
     chalk "^4.1.0"
     js-levenshtein "^1.1.6"
     uuid "^9.0.0"
 
-"@apollo/subgraph@2.2.1":
-  version "2.2.1"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@apollo/subgraph/-/subgraph-2.2.1.tgz#56d9a87a36e546354c433a4121d31615dd934289"
-  integrity sha512-fAm7KXr54/5mDA2mhR36AI8rwiaPGHpT9s51t8mOpnKNpX8vc9KrdlPqCAF88LKVxKRZBDTNjlD5sRgx0tQl5w==
+"@apollo/subgraph@2.4.0":
+  version "2.4.0"
+  resolved "https://registry.yarnpkg.com/@apollo/subgraph/-/subgraph-2.4.0.tgz#2c7b8955db4e97eb27e6057f452a6a66816bdcb8"
+  integrity sha512-/njjzPkyzkh0FO2WvLV+I9mlsDWk3DhfOtCc+cmMx9p4mixgyyaRvYvx3tPjSPkMvkPw/cNidCVymuWJVOAu5A==
   dependencies:
     "@apollo/cache-control-types" "^1.0.2"
-    "@apollo/federation-internals" "^2.2.1"
+    "@apollo/federation-internals" "2.4.0"
 
 "@ardatan/aggregate-error@0.0.6":
   version "0.0.6"
@@ -256,9 +298,9 @@
     signedsource "^1.0.0"
     yargs "^15.3.1"
 
-"@ardatan/sync-fetch@0.0.1":
+"@ardatan/sync-fetch@^0.0.1":
   version "0.0.1"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@ardatan/sync-fetch/-/sync-fetch-0.0.1.tgz#3385d3feedceb60a896518a1db857ec1e945348f"
+  resolved "https://registry.yarnpkg.com/@ardatan/sync-fetch/-/sync-fetch-0.0.1.tgz#3385d3feedceb60a896518a1db857ec1e945348f"
   integrity sha512-xhlTqH0m31mnsG0tIP4ETgfSB6gXDaYYsUWTrlUV93fFQPI9dd8hE0Ot6MHLCtqgB32hwJAC3YZMWlXZw7AleA==
   dependencies:
     node-fetch "^2.6.1"
@@ -1298,52 +1340,37 @@
     enabled "2.0.x"
     kuler "^2.0.0"
 
-"@envelop/core@3.0.2":
-  version "3.0.2"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@envelop/core/-/core-3.0.2.tgz#0c74b7cf2a1b3fc15bef29dfbebea084249bf5a3"
-  integrity sha512-0kYBq0gKIARF6vFYw5upUcBgI2oP3wYaDTUfjiX4RhMIkox3DiKPUwRiZHu16ILGr8Qi6p+HTKXRyoSdl9CCqA==
+"@envelop/core@3.0.6", "@envelop/core@^3.0.4":
+  version "3.0.6"
+  resolved "https://registry.yarnpkg.com/@envelop/core/-/core-3.0.6.tgz#e55c3564d05d648b0356a1c465aa90b0c51f485d"
+  integrity sha512-06t1xCPXq6QFN7W1JUEf68aCwYN0OUDNAIoJe7bAqhaoa2vn7NCcuX1VHkJ/OWpmElUgCsRO6RiBbIru1in0Ig==
   dependencies:
-    "@envelop/types" "3.0.0"
-    tslib "2.4.0"
+    "@envelop/types" "3.0.2"
+    tslib "^2.5.0"
 
-"@envelop/core@3.0.3":
-  version "3.0.3"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@envelop/core/-/core-3.0.3.tgz#bf07e690e905dfdfe59da636264fdfd6db081680"
-  integrity sha512-GXIb7HhsSYerMJR/AhJ6nN9F+w17bYRdUfu7ZXTixJEjS/3SXXK29qvr42iLLEqrnum57nk6cDyA3DBZLnuJ9w==
-  dependencies:
-    "@envelop/types" "3.0.0"
-    tslib "2.4.0"
-
-"@envelop/extended-validation@2.0.2":
-  version "2.0.2"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@envelop/extended-validation/-/extended-validation-2.0.2.tgz#b34ef83d92cb07f37b44471901b8147ee57439dd"
-  integrity sha512-r7YXv5Z/DXjeK2r/8G4LOpIRvnQ+G6LWbfgpjzIyCWwl+xCn19N5vXk1/IFFf/yFhdbJ4wk95F2EH1gS4Sr+bA==
+"@envelop/extended-validation@2.0.6":
+  version "2.0.6"
+  resolved "https://registry.yarnpkg.com/@envelop/extended-validation/-/extended-validation-2.0.6.tgz#0dd156d3cbabb5659af6dcd868cc0d1a090f4935"
+  integrity sha512-aXAf1bg5Z71YfEKLCZ8OMUZAOYPGHV/a+7avd5TIMFNDxl5wJTmIonep3T+kdMpwRInDphfNPGFD0GcGdGxpHg==
   dependencies:
     "@graphql-tools/utils" "^8.8.0"
-    tslib "^2.4.0"
+    tslib "^2.5.0"
 
-"@envelop/parser-cache@5.0.1":
-  version "5.0.1"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@envelop/parser-cache/-/parser-cache-5.0.1.tgz#b59c87fa71e719733cf8a6dddcbe357e10479645"
-  integrity sha512-mXS38TKYtU1SdclzKfNTBcILuHxvjzxO3eaaDzLNQx0SO5AR3SIHhBFm1wePvNWIMLt+TH2H1J55YbLuD2LJfQ==
+"@envelop/types@3.0.2":
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/@envelop/types/-/types-3.0.2.tgz#a4b29375b7fcee39bb5830f87f66bbc815cf305e"
+  integrity sha512-pOFea9ha0EkURWxJ/35axoH9fDGP5S2cUu/5Mmo9pb8zUf+TaEot8vB670XXihFEn/92759BMjLJNWBKmNhyng==
   dependencies:
+    tslib "^2.5.0"
+
+"@envelop/validation-cache@^5.1.2":
+  version "5.1.3"
+  resolved "https://registry.yarnpkg.com/@envelop/validation-cache/-/validation-cache-5.1.3.tgz#8348453183af348147e2b690a431b6ca81d2a6bc"
+  integrity sha512-MkzcScQHJJQ/9YCAPdWShEi3xZv4F4neTs+NszzSrZOdlU8z/THuRt7gZ0sO0y2be+sx+SKjHQP8Gq3VXXcTTg==
+  dependencies:
+    hash-it "^6.0.0"
     lru-cache "^6.0.0"
-    tslib "^2.4.0"
-
-"@envelop/types@3.0.0":
-  version "3.0.0"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@envelop/types/-/types-3.0.0.tgz#33795a7826a541eff00c0d6fb4eab9c35fef784b"
-  integrity sha512-ohcZE+XNvgNqURdCA5RLN0yW3nbvi4Pkq8TA6RpG16PKakl3yDgzXBLit1SR6+9By0/XCBfto/9r48ZH25kmvw==
-  dependencies:
-    tslib "^2.4.0"
-
-"@envelop/validation-cache@5.0.1":
-  version "5.0.1"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@envelop/validation-cache/-/validation-cache-5.0.1.tgz#f433e2987c47b41d3cf8a617094dc6566023a8d2"
-  integrity sha512-3LBWORDAYT2Nhg1Gdi5hjUaQZR+qvQJG7dYRpqm0Kyv3eW7sRUa3Daev9yRVmEf+ShZJrkEMplqWb7KBfRf5LA==
-  dependencies:
-    lru-cache "^6.0.0"
-    tslib "^2.4.0"
+    tslib "^2.5.0"
 
 "@eslint-community/eslint-utils@^4.2.0":
   version "4.4.0"
@@ -1426,19 +1453,19 @@
     asynchronous-local-storage "^1.0.2"
     fastify-plugin "^4.0.0"
 
-"@graphql-codegen/core@2.6.2":
-  version "2.6.2"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-codegen/core/-/core-2.6.2.tgz#29c766d2e9e5a3deeeb4f1728c1f7b1aca054a22"
-  integrity sha512-58T5yf9nEfAhDwN1Vz1hImqpdJ/gGpCGUaroQ5tqskZPf7eZYYVkEXbtqRZZLx1MCCKwjWX4hMtTPpHhwKCkng==
+"@graphql-codegen/core@3.1.0":
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/@graphql-codegen/core/-/core-3.1.0.tgz#ad859d52d509a4eb2ebe5aabba6543a628fb181b"
+  integrity sha512-DH1/yaR7oJE6/B+c6ZF2Tbdh7LixF1K8L+8BoSubjNyQ8pNwR4a70mvc1sv6H7qgp6y1bPQ9tKE+aazRRshysw==
   dependencies:
-    "@graphql-codegen/plugin-helpers" "^2.6.2"
+    "@graphql-codegen/plugin-helpers" "^4.1.0"
     "@graphql-tools/schema" "^9.0.0"
-    "@graphql-tools/utils" "^8.8.0"
-    tslib "~2.4.0"
+    "@graphql-tools/utils" "^9.1.1"
+    tslib "~2.5.0"
 
-"@graphql-codegen/plugin-helpers@^2.6.2":
+"@graphql-codegen/plugin-helpers@^2.7.2":
   version "2.7.2"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-codegen/plugin-helpers/-/plugin-helpers-2.7.2.tgz#6544f739d725441c826a8af6a49519f588ff9bed"
+  resolved "https://registry.yarnpkg.com/@graphql-codegen/plugin-helpers/-/plugin-helpers-2.7.2.tgz#6544f739d725441c826a8af6a49519f588ff9bed"
   integrity sha512-kln2AZ12uii6U59OQXdjLk5nOlh1pHis1R98cDZGFnfaiAbX9V3fxcZ1MMJkB7qFUymTALzyjZoXXdyVmPMfRg==
   dependencies:
     "@graphql-tools/utils" "^8.8.0"
@@ -1448,99 +1475,99 @@
     lodash "~4.17.0"
     tslib "~2.4.0"
 
-"@graphql-codegen/plugin-helpers@^3.1.2":
-  version "3.1.2"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-codegen/plugin-helpers/-/plugin-helpers-3.1.2.tgz#69a2e91178f478ea6849846ade0a59a844d34389"
-  integrity sha512-emOQiHyIliVOIjKVKdsI5MXj312zmRDwmHpyUTZMjfpvxq/UVAHUJIVdVf+lnjjrI+LXBTgMlTWTgHQfmICxjg==
+"@graphql-codegen/plugin-helpers@^4.0.0", "@graphql-codegen/plugin-helpers@^4.1.0", "@graphql-codegen/plugin-helpers@^4.2.0":
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/@graphql-codegen/plugin-helpers/-/plugin-helpers-4.2.0.tgz#8324914d0f99162a223cfa01796cdd6be972d2ae"
+  integrity sha512-THFTCfg+46PXlXobYJ/OoCX6pzjI+9woQqCjdyKtgoI0tn3Xq2HUUCiidndxUpEYVrXb5pRiRXb7b/ZbMQqD0A==
   dependencies:
     "@graphql-tools/utils" "^9.0.0"
     change-case-all "1.0.15"
     common-tags "1.8.2"
     import-from "4.0.0"
     lodash "~4.17.0"
-    tslib "~2.4.0"
+    tslib "~2.5.0"
 
-"@graphql-codegen/schema-ast@^2.5.1", "@graphql-codegen/schema-ast@^2.6.1":
-  version "2.6.1"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-codegen/schema-ast/-/schema-ast-2.6.1.tgz#8ba1b38827c034b51ecd3ce88622c2ae6cd3fe1a"
-  integrity sha512-5TNW3b1IHJjCh07D2yQNGDQzUpUl2AD+GVe1Dzjqyx/d2Fn0TPMxLsHsKPS4Plg4saO8FK/QO70wLsP7fdbQ1w==
+"@graphql-codegen/schema-ast@^3.0.0", "@graphql-codegen/schema-ast@^3.0.1":
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/@graphql-codegen/schema-ast/-/schema-ast-3.0.1.tgz#37b458bb57b95715a9eb4259341c856dae2a461d"
+  integrity sha512-rTKTi4XiW4QFZnrEqetpiYEWVsOFNoiR/v3rY9mFSttXFbIwNXPme32EspTiGWmEEdHY8UuTDtZN3vEcs/31zw==
   dependencies:
-    "@graphql-codegen/plugin-helpers" "^3.1.2"
+    "@graphql-codegen/plugin-helpers" "^4.1.0"
     "@graphql-tools/utils" "^9.0.0"
-    tslib "~2.4.0"
+    tslib "~2.5.0"
 
-"@graphql-codegen/typed-document-node@2.3.5":
-  version "2.3.5"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-codegen/typed-document-node/-/typed-document-node-2.3.5.tgz#33e25ae27af2d6fcee8990701c52943ceb260993"
-  integrity sha512-d+CDFQhbqYhgQGPxcchKRVVbMgYX6/xN+nUB53R53v0NxtgmtMGzbcE49ozLzjAoKuu4LVn8Mvi2bfJZ7/YOGQ==
+"@graphql-codegen/typed-document-node@3.0.2":
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/@graphql-codegen/typed-document-node/-/typed-document-node-3.0.2.tgz#afdf039c38f1b02a946854b6f487af764429eec8"
+  integrity sha512-RqX46y0GoMAcCfXjkUabOWpeSQ7tazpS5WyzWJNakpzXxNACx8NACaghU8zTEM+gjqtIp6YbFY/S92HQ34HbRQ==
   dependencies:
-    "@graphql-codegen/plugin-helpers" "^2.6.2"
-    "@graphql-codegen/visitor-plugin-common" "2.13.0"
+    "@graphql-codegen/plugin-helpers" "^4.1.0"
+    "@graphql-codegen/visitor-plugin-common" "3.0.2"
     auto-bind "~4.0.0"
-    change-case-all "1.0.14"
-    tslib "~2.4.0"
+    change-case-all "1.0.15"
+    tslib "~2.5.0"
 
-"@graphql-codegen/typescript-generic-sdk@3.0.3":
-  version "3.0.3"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-codegen/typescript-generic-sdk/-/typescript-generic-sdk-3.0.3.tgz#7980b7565a06c519a815050d825fdc5725c9d7ca"
-  integrity sha512-tW3czN1s8rO7g3JH0iWKmGrkmaGgqs0LqgoohBYN1VsfWVljNpT0SHUT/tgs63BUQagOkeK5KByp+cQmyw0brg==
+"@graphql-codegen/typescript-generic-sdk@3.0.4":
+  version "3.0.4"
+  resolved "https://registry.yarnpkg.com/@graphql-codegen/typescript-generic-sdk/-/typescript-generic-sdk-3.0.4.tgz#6bed9c8f786f19f16e564998c28c1aa59a661ccc"
+  integrity sha512-0bPfoifMTaVP0Jh9g/pG6FsDHei2BHiO4f73Qz+XYgP/TNKq3R5AGPd7NzHeabdoO3lhuRvjKqafc5WtjZC/Dw==
   dependencies:
-    "@graphql-codegen/plugin-helpers" "^2.6.2"
-    "@graphql-codegen/visitor-plugin-common" "2.13.0"
-    auto-bind "~4.0.0"
-    tslib "~2.4.0"
-
-"@graphql-codegen/typescript-operations@2.5.5":
-  version "2.5.5"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-codegen/typescript-operations/-/typescript-operations-2.5.5.tgz#c372404da8fe0197d2a68bab37457719efde971a"
-  integrity sha512-rH15UA34MRf6cITfvt2EkSEaC/8ULvgMg5kzun6895oucA8PFyAFJaQzcjk9UraeD3ddMu56OKhZGdxd0JWfKw==
-  dependencies:
-    "@graphql-codegen/plugin-helpers" "^2.6.2"
-    "@graphql-codegen/typescript" "^2.7.5"
-    "@graphql-codegen/visitor-plugin-common" "2.13.0"
+    "@graphql-codegen/plugin-helpers" "^2.7.2"
+    "@graphql-codegen/visitor-plugin-common" "2.13.1"
     auto-bind "~4.0.0"
     tslib "~2.4.0"
 
-"@graphql-codegen/typescript-resolvers@2.7.5":
-  version "2.7.5"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-codegen/typescript-resolvers/-/typescript-resolvers-2.7.5.tgz#1149c95701eed07c1cab14d66c1ae1c6ae793c0e"
-  integrity sha512-19tG40B6sghd0msSvRa5Wx/QpworUPojHfCL0606rL8tgfhMFIrfwCQGuXs8Sbq+zxwSex+0rCAWBfPk2lt7OQ==
+"@graphql-codegen/typescript-operations@3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@graphql-codegen/typescript-operations/-/typescript-operations-3.0.0.tgz#e67c9dedb739a20f8a1d2c9a9631701c269de0c1"
+  integrity sha512-t+Lk+lxkUFDh6F0t8CErowOccP3bZwxhl66qmEeBcOrC7jQrSCnRZoFvOXhFKFBJe/y4DIJiizgSr34AqjiJIQ==
   dependencies:
-    "@graphql-codegen/plugin-helpers" "^2.6.2"
-    "@graphql-codegen/typescript" "^2.7.5"
-    "@graphql-codegen/visitor-plugin-common" "2.13.0"
-    "@graphql-tools/utils" "^8.8.0"
+    "@graphql-codegen/plugin-helpers" "^4.0.0"
+    "@graphql-codegen/typescript" "^3.0.0"
+    "@graphql-codegen/visitor-plugin-common" "3.0.0"
     auto-bind "~4.0.0"
     tslib "~2.4.0"
 
-"@graphql-codegen/typescript@2.8.0":
-  version "2.8.0"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-codegen/typescript/-/typescript-2.8.0.tgz#c4a20cd88f301bed094b53c982cf85bceda1b78c"
-  integrity sha512-atQ6NFfMmoknJi0QdVSozPugKcgeJB6t1/cVskbhVtX8tAEFFLjl6H23mpz3t35AH6aGWtvx2LCjUSxHI6P6xA==
+"@graphql-codegen/typescript-resolvers@3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@graphql-codegen/typescript-resolvers/-/typescript-resolvers-3.0.0.tgz#69856b9eb003660b7c7551727a63764b8a6c89ee"
+  integrity sha512-yfRNJF9ZUoiLSPhaBEpQ9E4ymExYzbsKgjU2qJ/0c8l0lViA+o4ALkJMTwb7yU/yTayQtQWgxL5cdDY2I12GpQ==
   dependencies:
-    "@graphql-codegen/plugin-helpers" "^2.6.2"
-    "@graphql-codegen/schema-ast" "^2.5.1"
-    "@graphql-codegen/visitor-plugin-common" "2.13.0"
+    "@graphql-codegen/plugin-helpers" "^4.0.0"
+    "@graphql-codegen/typescript" "^3.0.0"
+    "@graphql-codegen/visitor-plugin-common" "3.0.0"
+    "@graphql-tools/utils" "^9.0.0"
     auto-bind "~4.0.0"
     tslib "~2.4.0"
 
-"@graphql-codegen/typescript@^2.7.5":
-  version "2.8.8"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-codegen/typescript/-/typescript-2.8.8.tgz#8c3b9153e334db43c65f8f31ced69b4c60d14861"
-  integrity sha512-A0oUi3Oy6+DormOlrTC4orxT9OBZkIglhbJBcDmk34jAKKUgesukXRd4yOhmTrnbchpXz2T8IAOFB3FWIaK4Rw==
+"@graphql-codegen/typescript@3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@graphql-codegen/typescript/-/typescript-3.0.0.tgz#473dde1646540039bca5db4b6daf174d13af0ce3"
+  integrity sha512-FQWyuIUy1y+fxb9+EZfvdBHBQpYExlIBHV5sg2WGNCsyVyCqBTl0mO8icyOtsQPVg6YFMFe8JJO69vQbwHma5w==
   dependencies:
-    "@graphql-codegen/plugin-helpers" "^3.1.2"
-    "@graphql-codegen/schema-ast" "^2.6.1"
-    "@graphql-codegen/visitor-plugin-common" "2.13.8"
+    "@graphql-codegen/plugin-helpers" "^4.0.0"
+    "@graphql-codegen/schema-ast" "^3.0.0"
+    "@graphql-codegen/visitor-plugin-common" "3.0.0"
     auto-bind "~4.0.0"
     tslib "~2.4.0"
 
-"@graphql-codegen/visitor-plugin-common@2.13.0":
-  version "2.13.0"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-codegen/visitor-plugin-common/-/visitor-plugin-common-2.13.0.tgz#206d91d90a3cc3b1fc0c3a04e8015c22584e461f"
-  integrity sha512-8lKw4l8W6yKaqrxx025eB6+lRMWaBKedbKjC9UyLhXAnqTi3tgaRKOBo4zvl1+KzE6R41Ruov9UcGD7OjgmBrw==
+"@graphql-codegen/typescript@^3.0.0":
+  version "3.0.4"
+  resolved "https://registry.yarnpkg.com/@graphql-codegen/typescript/-/typescript-3.0.4.tgz#e12dc106a2722ebc7d18556980ccf47fa9d0805f"
+  integrity sha512-x4O47447DZrWNtE/l5CU9QzzW4m1RbmCEdijlA3s2flG/y1Ckqdemob4CWfilSm5/tZ3w1junVDY616RDTSvZw==
   dependencies:
-    "@graphql-codegen/plugin-helpers" "^2.6.2"
+    "@graphql-codegen/plugin-helpers" "^4.2.0"
+    "@graphql-codegen/schema-ast" "^3.0.1"
+    "@graphql-codegen/visitor-plugin-common" "3.1.1"
+    auto-bind "~4.0.0"
+    tslib "~2.5.0"
+
+"@graphql-codegen/visitor-plugin-common@2.13.1":
+  version "2.13.1"
+  resolved "https://registry.yarnpkg.com/@graphql-codegen/visitor-plugin-common/-/visitor-plugin-common-2.13.1.tgz#2228660f6692bcdb96b1f6d91a0661624266b76b"
+  integrity sha512-mD9ufZhDGhyrSaWQGrU1Q1c5f01TeWtSWy/cDwXYjJcHIj1Y/DG2x0tOflEfCvh5WcnmHNIw4lzDsg1W7iFJEg==
+  dependencies:
+    "@graphql-codegen/plugin-helpers" "^2.7.2"
     "@graphql-tools/optimize" "^1.3.0"
     "@graphql-tools/relay-operation-optimizer" "^6.5.0"
     "@graphql-tools/utils" "^8.8.0"
@@ -1551,12 +1578,12 @@
     parse-filepath "^1.0.2"
     tslib "~2.4.0"
 
-"@graphql-codegen/visitor-plugin-common@2.13.8":
-  version "2.13.8"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-codegen/visitor-plugin-common/-/visitor-plugin-common-2.13.8.tgz#09bc6317b227e5a278f394f4cef0d6c2d1910597"
-  integrity sha512-IQWu99YV4wt8hGxIbBQPtqRuaWZhkQRG2IZKbMoSvh0vGeWb3dB0n0hSgKaOOxDY+tljtOf9MTcUYvJslQucMQ==
+"@graphql-codegen/visitor-plugin-common@3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@graphql-codegen/visitor-plugin-common/-/visitor-plugin-common-3.0.0.tgz#527185eb3b1b06739702084bc6263713e167a166"
+  integrity sha512-ZoNlCmmkGClB137SpJT9og/nkihLN7Z4Ynl9Ir3OlbDuI20dbpyXsclpr9QGLcxEcfQeVfhGw9CooW7wZJJ8LA==
   dependencies:
-    "@graphql-codegen/plugin-helpers" "^3.1.2"
+    "@graphql-codegen/plugin-helpers" "^4.0.0"
     "@graphql-tools/optimize" "^1.3.0"
     "@graphql-tools/relay-operation-optimizer" "^6.5.0"
     "@graphql-tools/utils" "^9.0.0"
@@ -1566,6 +1593,38 @@
     graphql-tag "^2.11.0"
     parse-filepath "^1.0.2"
     tslib "~2.4.0"
+
+"@graphql-codegen/visitor-plugin-common@3.0.2":
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/@graphql-codegen/visitor-plugin-common/-/visitor-plugin-common-3.0.2.tgz#784c0faaa7e0773072ea5de464fdcae8d7765564"
+  integrity sha512-dKblRFrB0Fdl3+nPlzlLBka+TN/EGwr/q09mwry0H58z3j6gXkMbsdPr+dc8MhgOV7w/8egRvSPIvd7m6eFCnw==
+  dependencies:
+    "@graphql-codegen/plugin-helpers" "^4.1.0"
+    "@graphql-tools/optimize" "^1.3.0"
+    "@graphql-tools/relay-operation-optimizer" "^6.5.0"
+    "@graphql-tools/utils" "^9.0.0"
+    auto-bind "~4.0.0"
+    change-case-all "1.0.15"
+    dependency-graph "^0.11.0"
+    graphql-tag "^2.11.0"
+    parse-filepath "^1.0.2"
+    tslib "~2.5.0"
+
+"@graphql-codegen/visitor-plugin-common@3.1.1":
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/@graphql-codegen/visitor-plugin-common/-/visitor-plugin-common-3.1.1.tgz#50c2aa3c537a805ce68d2f115d0a9811b151428c"
+  integrity sha512-uAfp+zu/009R3HUAuTK2AamR1bxIltM6rrYYI6EXSmkM3rFtFsLTuJhjUDj98HcUCszJZrADppz8KKLGRUVlNg==
+  dependencies:
+    "@graphql-codegen/plugin-helpers" "^4.2.0"
+    "@graphql-tools/optimize" "^1.3.0"
+    "@graphql-tools/relay-operation-optimizer" "^6.5.0"
+    "@graphql-tools/utils" "^9.0.0"
+    auto-bind "~4.0.0"
+    change-case-all "1.0.15"
+    dependency-graph "^0.11.0"
+    graphql-tag "^2.11.0"
+    parse-filepath "^1.0.2"
+    tslib "~2.5.0"
 
 "@graphql-inspector/core@3.3.0":
   version "3.3.0"
@@ -1576,77 +1635,68 @@
     object-inspect "1.10.3"
     tslib "^2.0.0"
 
-"@graphql-mesh/cache-localforage@0.6.56":
-  version "0.6.56"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-mesh/cache-localforage/-/cache-localforage-0.6.56.tgz#5f337f3ee6d16b0a0832baf45d156ec98c963b4f"
-  integrity sha512-I0FWO9jZESCTN0Z4Bbg99RriV24GHO8UBwl/fdR+xBb0nbgWq9ER6rARlcVDq6oDHorUI3FPQ7/5Z2OMnMe8gA==
+"@graphql-mesh/cache-localforage@0.7.20":
+  version "0.7.20"
+  resolved "https://registry.yarnpkg.com/@graphql-mesh/cache-localforage/-/cache-localforage-0.7.20.tgz#31e936c38a07f388264667c8f1502958d2561402"
+  integrity sha512-9ZQyRJsqEGpLaW8felTVcUKmQCyln4494SCfURKcLuihKRheJeoATJpsu4bCNo+Idk803rOtNrYIaZ1lXgc7pg==
   dependencies:
-    "@graphql-mesh/types" "0.85.3"
-    "@graphql-mesh/utils" "0.42.2"
     localforage "1.10.0"
-    tslib "^2.4.0"
 
-"@graphql-mesh/cli@^0.78.40":
-  version "0.78.41"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-mesh/cli/-/cli-0.78.41.tgz#8ef98229a7ebfe9bca765f054a5996c328a43c9c"
-  integrity sha512-G1nRD23RBffoYIiR9jNYW2Si1+EWfK1keCLQWWGemw/+LffVE74tMj/3A2Cx+pme9qx2k0gCboxXeVW9dxo+kA==
+"@graphql-mesh/cli@0.82.30":
+  version "0.82.30"
+  resolved "https://registry.yarnpkg.com/@graphql-mesh/cli/-/cli-0.82.30.tgz#5e00a3c33604bd601c26a8d4f0311944fb0632bb"
+  integrity sha512-TOPgAVs6flkngswZy9bjQghZe6CQAWdhC7diZ8UaAJxxRwyUonC3GH7GMA+YavEg1aRP+pRkxhHyd1vhkIkEUA==
   dependencies:
-    "@graphql-codegen/core" "2.6.2"
-    "@graphql-codegen/typed-document-node" "2.3.5"
-    "@graphql-codegen/typescript" "2.8.0"
-    "@graphql-codegen/typescript-generic-sdk" "3.0.3"
-    "@graphql-codegen/typescript-operations" "2.5.5"
-    "@graphql-codegen/typescript-resolvers" "2.7.5"
-    "@graphql-mesh/config" "8.0.27"
-    "@graphql-mesh/cross-helpers" "0.2.6"
-    "@graphql-mesh/http" "0.2.8"
-    "@graphql-mesh/runtime" "0.44.27"
-    "@graphql-mesh/store" "0.8.58"
-    "@graphql-mesh/types" "0.85.3"
-    "@graphql-mesh/utils" "0.42.2"
-    "@graphql-tools/utils" "8.12.0"
-    ajv "8.11.0"
+    "@graphql-codegen/core" "3.1.0"
+    "@graphql-codegen/typed-document-node" "3.0.2"
+    "@graphql-codegen/typescript" "3.0.0"
+    "@graphql-codegen/typescript-generic-sdk" "3.0.4"
+    "@graphql-codegen/typescript-operations" "3.0.0"
+    "@graphql-codegen/typescript-resolvers" "3.0.0"
+    "@graphql-mesh/config" "10.1.13"
+    "@graphql-mesh/cross-helpers" "0.3.4"
+    "@graphql-mesh/http" "0.3.26"
+    "@graphql-mesh/runtime" "0.46.21"
+    "@graphql-mesh/store" "0.9.20"
+    "@graphql-mesh/types" "0.91.12"
+    "@graphql-mesh/utils" "0.43.20"
+    "@graphql-tools/utils" "9.2.1"
+    ajv "8.12.0"
     change-case "4.1.2"
-    cosmiconfig "7.0.1"
+    cosmiconfig "8.1.3"
     dnscache "1.0.2"
     dotenv "16.0.3"
     graphql-import-node "0.0.5"
-    graphql-ws "5.11.2"
+    graphql-ws "5.12.0"
     json-bigint-patch "0.0.8"
-    json5 "2.2.1"
-    mkdirp "1.0.4"
+    json5 "2.2.3"
+    mkdirp "2.1.6"
     open "7.4.2"
     pascal-case "3.1.2"
-    rimraf "3.0.2"
+    rimraf "4.4.1"
     ts-node "10.9.1"
-    tsconfig-paths "4.1.0"
+    tsconfig-paths "4.1.2"
     tslib "^2.4.0"
-    typescript "4.8.4"
-    ws "8.10.0"
-    yargs "17.6.0"
+    typescript "4.9.5"
+    ws "8.13.0"
+    yargs "17.7.1"
 
-"@graphql-mesh/config@8.0.27":
-  version "8.0.27"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-mesh/config/-/config-8.0.27.tgz#ca1babbc208c5cad8e574a753834465ce0f4d9a2"
-  integrity sha512-TD/pSqUEe61wTtKV3HDRlDyJOj52lo2/eJAfvFQl6DcPCVI6j6n7uDGOOvp+pYEeQnMDO96Py1FTGceAcp0WPg==
+"@graphql-mesh/config@10.1.13":
+  version "10.1.13"
+  resolved "https://registry.yarnpkg.com/@graphql-mesh/config/-/config-10.1.13.tgz#3a727b874ed406a6e36bede58ef294f78e3eeb05"
+  integrity sha512-40h4ONzgmoPRCIEeMgQ/0CsFnDFnAYJoupl1oY9zWCP5oVe13Lu4p+6ZQNAdXLoNX00tmbwbBpoZfyGF32tI+A==
   dependencies:
-    "@envelop/core" "3.0.2"
-    "@graphql-mesh/cache-localforage" "0.6.56"
-    "@graphql-mesh/cross-helpers" "0.2.6"
-    "@graphql-mesh/merger-bare" "0.15.42"
-    "@graphql-mesh/merger-stitching" "0.17.2"
-    "@graphql-mesh/store" "0.8.58"
-    "@graphql-mesh/types" "0.85.3"
-    "@graphql-mesh/utils" "0.42.2"
-    "@graphql-tools/code-file-loader" "7.3.6"
-    "@graphql-tools/graphql-file-loader" "7.5.5"
-    "@graphql-tools/load" "7.8.0"
-    "@graphql-tools/utils" "8.12.0"
-    "@whatwg-node/fetch" "^0.5.0"
+    "@envelop/core" "3.0.6"
+    "@graphql-mesh/cache-localforage" "0.7.20"
+    "@graphql-mesh/merger-bare" "0.16.22"
+    "@graphql-mesh/merger-stitching" "0.18.22"
+    "@graphql-tools/code-file-loader" "7.3.21"
+    "@graphql-tools/graphql-file-loader" "7.5.16"
+    "@graphql-tools/load" "7.8.13"
+    "@whatwg-node/fetch" "^0.8.3"
     camel-case "4.1.2"
     param-case "3.0.4"
     pascal-case "3.1.2"
-    tslib "^2.4.0"
 
 "@graphql-mesh/cross-helpers@0.2.10":
   version "0.2.10"
@@ -1668,62 +1718,38 @@
     react-native-fs "2.20.0"
     react-native-path "0.0.5"
 
-"@graphql-mesh/cross-helpers@0.2.9":
-  version "0.2.9"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-mesh/cross-helpers/-/cross-helpers-0.2.9.tgz#38520d9fcf8a2d9b2e4430555279b4815505a21e"
-  integrity sha512-yLULnq6crWQebELbdTHPprbue6+NAWdv41omcUx/mKiBaTVpfU2VAVkHeJqEXE3If/5ex0sD3rnPs4ZDvSlG+A==
+"@graphql-mesh/cross-helpers@0.3.4":
+  version "0.3.4"
+  resolved "https://registry.yarnpkg.com/@graphql-mesh/cross-helpers/-/cross-helpers-0.3.4.tgz#72ec33359f0dd87a796bd2e91b4c9abb4164725d"
+  integrity sha512-jseNppSNEwNWjcjDDwsxmRBK+ub8tz2qc/ca2ZfCTebuCk/+D3dI3LJ95ceNFOIhInK0g2HVq8BO8lMMX1pQtg==
   dependencies:
-    "@graphql-tools/utils" "9.0.1"
     path-browserify "1.0.1"
     react-native-fs "2.20.0"
     react-native-path "0.0.5"
 
-"@graphql-mesh/cross-helpers@0.3.1":
-  version "0.3.1"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-mesh/cross-helpers/-/cross-helpers-0.3.1.tgz#b45b53d71b1c97705738282ee5ff7e69f0049814"
-  integrity sha512-RrGLIABHtAXpsI+hLkBzeydzxzhjMhCJfRUPTSGCeEnZTBZ5+8XM20ZbqCNDcvbuJuSCxMMOhVdT4StNqZD6Wg==
+"@graphql-mesh/graphql@0.34.13":
+  version "0.34.13"
+  resolved "https://registry.yarnpkg.com/@graphql-mesh/graphql/-/graphql-0.34.13.tgz#17d20228b82b80dca571fc19d4c4e2cce50d8664"
+  integrity sha512-i+VdajdK6qPpqGvqUKtZDzC2MuhHsRQfsDiVuh2zMpdaTGNnm2O4Utom/WXF0k7+fx5CIay3Bpcma1VXJdMTsA==
   dependencies:
-    "@graphql-tools/utils" "9.1.4"
-    path-browserify "1.0.1"
-    react-native-fs "2.20.0"
-    react-native-path "0.0.5"
-
-"@graphql-mesh/graphql@^0.33.0":
-  version "0.33.10"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-mesh/graphql/-/graphql-0.33.10.tgz#753b12c2a7b5f0fe7255807a424460cd0fdb79b8"
-  integrity sha512-dg02EHJUSX96DkMAgucm/RRc+QCyFqT8ODgl8q/QXm1x433vTgT+dhcihevCsqHD8uFUbWSrBjq7Poxo9oB7Hg==
-  dependencies:
-    "@graphql-mesh/cross-helpers" "0.3.1"
-    "@graphql-mesh/store" "0.9.6"
-    "@graphql-mesh/string-interpolation" "0.4.2"
-    "@graphql-mesh/types" "0.89.5"
-    "@graphql-mesh/utils" "0.43.6"
-    "@graphql-tools/delegate" "9.0.23"
-    "@graphql-tools/url-loader" "7.17.4"
-    "@graphql-tools/utils" "9.1.4"
-    "@graphql-tools/wrap" "9.3.2"
+    "@graphql-mesh/string-interpolation" "0.4.3"
+    "@graphql-tools/delegate" "9.0.28"
+    "@graphql-tools/url-loader" "7.17.14"
+    "@graphql-tools/wrap" "9.3.8"
     lodash.get "4.4.2"
-    tslib "^2.4.0"
 
-"@graphql-mesh/http@0.2.8":
-  version "0.2.8"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-mesh/http/-/http-0.2.8.tgz#fb58c6720068322b267ff9c8b4814d7d64578019"
-  integrity sha512-wQCrCGAS/rk6L8OX53Xu2+obShnEdB690f889kAiOdVWCjVeo3RAHBXf70o0Y/dKqvzwdFd8SwOBjuQEzIyOUA==
+"@graphql-mesh/http@0.3.26":
+  version "0.3.26"
+  resolved "https://registry.yarnpkg.com/@graphql-mesh/http/-/http-0.3.26.tgz#965d40b1f51df671656ffd44e8dcccee7eb5c882"
+  integrity sha512-j63lecUHR8wJ/HNGaBUZrhqJPZJnwlEXiC/WFdbKAmXPUm6pmmS19QNCjKRm+q8p4O1aqq2XRlwd5r6LJ2XFHA==
   dependencies:
-    "@graphql-mesh/cross-helpers" "0.2.6"
-    "@graphql-mesh/runtime" "0.44.27"
-    "@graphql-mesh/types" "0.85.3"
-    "@graphql-mesh/utils" "0.42.2"
-    "@whatwg-node/fetch" "^0.5.0"
-    "@whatwg-node/server" "^0.4.10"
-    graphql-yoga "3.0.0-next.7"
-    itty-router "2.6.6"
-    itty-router-extras "0.4.2"
-    tslib "^2.4.0"
+    "@graphql-mesh/runtime" "0.46.21"
+    "@whatwg-node/router" "0.3.0"
+    graphql-yoga "3.7.3"
 
-"@graphql-mesh/json-schema@^0.35.28":
+"@graphql-mesh/json-schema@0.35.38":
   version "0.35.38"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-mesh/json-schema/-/json-schema-0.35.38.tgz#44951fd244f96df6be5cc203dc7f0fcedf327afe"
+  resolved "https://registry.yarnpkg.com/@graphql-mesh/json-schema/-/json-schema-0.35.38.tgz#44951fd244f96df6be5cc203dc7f0fcedf327afe"
   integrity sha512-XyEMl4fxy9uV/azkfhvxoPCZ/rKbV/4uU7dSfgyBHJ/YQ6F1CdV8s85QO4YLbjiT90uBGTWpvgL/Z5XRpJ9f4Q==
   dependencies:
     "@graphql-mesh/cross-helpers" "0.2.10"
@@ -1738,36 +1764,27 @@
     json-machete "0.16.5"
     tslib "^2.4.0"
 
-"@graphql-mesh/merger-bare@0.15.42":
-  version "0.15.42"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-mesh/merger-bare/-/merger-bare-0.15.42.tgz#5a6ae7cf7092f1d3138409f966e4dbcefee37f83"
-  integrity sha512-sOEdbuThk7TKlVHUqHYxCQZD2f+fuoHD+nlrvUhGaeyCCI2tvhcNHWdrx6mARQMAZdjHhfbF6jrhjcLoPHDKhQ==
+"@graphql-mesh/merger-bare@0.16.22":
+  version "0.16.22"
+  resolved "https://registry.yarnpkg.com/@graphql-mesh/merger-bare/-/merger-bare-0.16.22.tgz#4d12465999f61596f06d19c456b7bc3b93359cfb"
+  integrity sha512-whDMbnSMpAjNJ80TaXvgoI8I5jLzvbzvr1zhViA2uUAvVBkZZV6xcAxHDTiRzwu5d1SQHymX9dPxFMJ8oHGFvw==
   dependencies:
-    "@graphql-mesh/merger-stitching" "0.17.2"
-    "@graphql-mesh/types" "0.85.3"
-    "@graphql-mesh/utils" "0.42.2"
-    "@graphql-tools/schema" "9.0.4"
-    "@graphql-tools/utils" "8.12.0"
-    tslib "^2.4.0"
+    "@graphql-mesh/merger-stitching" "0.18.22"
+    "@graphql-tools/schema" "9.0.17"
 
-"@graphql-mesh/merger-stitching@0.17.2":
-  version "0.17.2"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-mesh/merger-stitching/-/merger-stitching-0.17.2.tgz#232a508c484b9b4c117da4c868b1122029c5d2b3"
-  integrity sha512-+xygE+xZIwVe5V8T/8/hLc3gmdFeiErMB+6PnEopdnDKbjnvHDokt6wXHaDIzydmDr29LSvCVPsl1kDAMT9I9A==
+"@graphql-mesh/merger-stitching@0.18.22":
+  version "0.18.22"
+  resolved "https://registry.yarnpkg.com/@graphql-mesh/merger-stitching/-/merger-stitching-0.18.22.tgz#5581d744752860d1b40adf5392dd8f52aa2dc25e"
+  integrity sha512-6iAG5dP/zPW4lOHOsIRh0Cvx9+p9VLOyeQfN6Ww4Fsm3gyoLbMikwGSPykTw1PsmrtJwDCi3BiEh8DcP8nP9Zw==
   dependencies:
-    "@graphql-mesh/store" "0.8.58"
-    "@graphql-mesh/types" "0.85.3"
-    "@graphql-mesh/utils" "0.42.2"
-    "@graphql-tools/delegate" "9.0.8"
-    "@graphql-tools/schema" "9.0.4"
-    "@graphql-tools/stitch" "8.7.13"
-    "@graphql-tools/stitching-directives" "2.3.11"
-    "@graphql-tools/utils" "8.12.0"
-    tslib "^2.4.0"
+    "@graphql-tools/delegate" "9.0.28"
+    "@graphql-tools/schema" "9.0.17"
+    "@graphql-tools/stitch" "8.7.43"
+    "@graphql-tools/stitching-directives" "2.3.31"
 
-"@graphql-mesh/openapi@^0.33.29":
+"@graphql-mesh/openapi@0.33.39":
   version "0.33.39"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-mesh/openapi/-/openapi-0.33.39.tgz#023029f472be19429f734c78f4275ecfc0c30092"
+  resolved "https://registry.yarnpkg.com/@graphql-mesh/openapi/-/openapi-0.33.39.tgz#023029f472be19429f734c78f4275ecfc0c30092"
   integrity sha512-RfMvqhtQo4/3OXJRw/k1kePTuI6QuxOtDfHbN2zxbKVImNSMaKz8n6ODMuKqHAm4Ms7FGmMxdT0+oP5a88qWdw==
   dependencies:
     "@graphql-mesh/store" "0.8.65"
@@ -1776,73 +1793,55 @@
     "@omnigraph/openapi" "0.17.11"
     tslib "^2.4.0"
 
-"@graphql-mesh/plugin-http-details-extensions@^0.0.9":
-  version "0.0.9"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-mesh/plugin-http-details-extensions/-/plugin-http-details-extensions-0.0.9.tgz#150de5e614a44e6d04e190cd4c2baac146895a20"
-  integrity sha512-3ITOMpCOfhhKcwM/uIPFGdYnqxgN4e6cgKTkWJFy0ZQhrHVI71pzbK7C/XTOCRBvAbA1GWJr1RAbIfPV0yNHQQ==
+"@graphql-mesh/plugin-http-details-extensions@0.1.21":
+  version "0.1.21"
+  resolved "https://registry.yarnpkg.com/@graphql-mesh/plugin-http-details-extensions/-/plugin-http-details-extensions-0.1.21.tgz#3847ab55660f7d103eb4bf4884630141c1672e6a"
+  integrity sha512-SUY9tzC14/2NM+nxY4zZQiB/w5tKuVP9n55BPLOF/kq9q5JWWNGrUczSZdh4T6pTAgRKGwk18efoiZEZwV7KeA==
   dependencies:
-    "@envelop/core" "3.0.3"
-    "@graphql-mesh/types" "0.86.0"
-    "@graphql-mesh/utils" "0.42.7"
-    "@whatwg-node/fetch" "0.5.3"
-    tslib "^2.4.0"
+    "@envelop/core" "3.0.6"
+    "@whatwg-node/fetch" "^0.8.3"
 
-"@graphql-mesh/runtime@0.44.27":
-  version "0.44.27"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-mesh/runtime/-/runtime-0.44.27.tgz#cfe6176c84d55a61db4e40e4f1fb45020289691a"
-  integrity sha512-1p2MvXEds+S9wVNda/yC0XfcuywNMIsWcOij59of2BYHuY8yEvh6x8rBaJ0wGkKO7lvQi1mljlMup+7Zg9SalA==
+"@graphql-mesh/runtime@0.46.21":
+  version "0.46.21"
+  resolved "https://registry.yarnpkg.com/@graphql-mesh/runtime/-/runtime-0.46.21.tgz#75939307c73d4a73903ec91fb3a52f0922fa0d5d"
+  integrity sha512-N56gNrabJ/pQ/x7DvkxZof0mexDGmTdiYKF5JzqK7HfhReRSPN0gRnStgYlGRRKa9RKBY5+kBbQq1DiSnjXTrw==
   dependencies:
-    "@envelop/core" "3.0.2"
-    "@envelop/extended-validation" "2.0.2"
+    "@envelop/core" "3.0.6"
+    "@envelop/extended-validation" "2.0.6"
+    "@graphql-mesh/string-interpolation" "0.4.3"
+    "@graphql-tools/batch-delegate" "8.4.21"
+    "@graphql-tools/batch-execute" "8.5.18"
+    "@graphql-tools/delegate" "9.0.28"
+    "@graphql-tools/wrap" "9.3.8"
+    "@whatwg-node/fetch" "^0.8.3"
+
+"@graphql-mesh/soap@0.14.25":
+  version "0.14.25"
+  resolved "https://registry.yarnpkg.com/@graphql-mesh/soap/-/soap-0.14.25.tgz#0009503ffcbb359bcba5c2fb6a4515283e180bf3"
+  integrity sha512-SUMRMtbjQvCf1oEbf38kAHwpmrqBQ7/2T51Ru3/j8A5Rqd1m/nxrYbtgWW7lzJ2mlDaCzqygx5v1k8ihf15k5Q==
+  dependencies:
     "@graphql-mesh/cross-helpers" "0.2.6"
-    "@graphql-mesh/string-interpolation" "0.3.3"
-    "@graphql-mesh/types" "0.85.3"
-    "@graphql-mesh/utils" "0.42.2"
-    "@graphql-tools/batch-delegate" "8.4.1"
-    "@graphql-tools/batch-execute" "8.5.6"
-    "@graphql-tools/delegate" "9.0.8"
+    "@graphql-mesh/store" "0.8.57"
+    "@graphql-mesh/types" "0.85.2"
+    "@graphql-mesh/utils" "0.42.1"
     "@graphql-tools/utils" "8.12.0"
-    "@graphql-tools/wrap" "9.2.3"
-    "@whatwg-node/fetch" "^0.5.0"
+    graphql-scalars "1.20.0"
+    soap "0.45.0"
     tslib "^2.4.0"
 
-"@graphql-mesh/store@0.8.58":
-  version "0.8.58"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-mesh/store/-/store-0.8.58.tgz#0bec0af9f82f9461ccce2b4ca2b19f6b3269542f"
-  integrity sha512-NFyWBn+CyxYoeBIO487yJSHXzr2NIyVmoGEQUGemL9Tti3ygCLZQxeTteaeaHsDYhnJ0gLEVTK9631zGtJ1h+Q==
+"@graphql-mesh/store@0.8.57":
+  version "0.8.57"
+  resolved "https://registry.yarnpkg.com/@graphql-mesh/store/-/store-0.8.57.tgz#f7e0897951db8e40bcecc759a1d575f1a92062dc"
+  integrity sha512-iL0NPubjtIAoxlIoNZgMfhcvHXyD355ln1q8E7f/4QYN/tXXgzLj8KmBB+nTuxFuPbMdw6maZWThq6OHCiM3+Q==
   dependencies:
     "@graphql-inspector/core" "3.3.0"
     "@graphql-mesh/cross-helpers" "0.2.6"
-    "@graphql-mesh/types" "0.85.3"
-    "@graphql-mesh/utils" "0.42.2"
+    "@graphql-mesh/types" "0.85.2"
+    "@graphql-mesh/utils" "0.42.1"
     "@graphql-tools/utils" "8.12.0"
     tslib "^2.4.0"
 
-"@graphql-mesh/store@0.8.62":
-  version "0.8.62"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-mesh/store/-/store-0.8.62.tgz#0a156556864e0a47824b4cc937445cc01180d32d"
-  integrity sha512-Ydj+Z+pqAhSiVAvpwPRKDLrGEOrHtaL5XKTnT49C+gUSz4MSycQNAKGR+FbZ9ImMJwkDWJ+xntVR1mjXgTvHSg==
-  dependencies:
-    "@graphql-inspector/core" "3.3.0"
-    "@graphql-mesh/cross-helpers" "0.2.9"
-    "@graphql-mesh/types" "0.85.7"
-    "@graphql-mesh/utils" "0.42.6"
-    "@graphql-tools/utils" "9.0.1"
-    tslib "^2.4.0"
-
-"@graphql-mesh/store@0.8.63":
-  version "0.8.63"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-mesh/store/-/store-0.8.63.tgz#eace65850e44aec10ecc146fdd39feb74b919b20"
-  integrity sha512-4Chp+6EfQibR1WxnLIcMo59ZeeZZaQwrn5nu1Agdnpl/ZF7fH27a6rgao6jeoRKaZXI7y9GNhjkgVnNouynXzw==
-  dependencies:
-    "@graphql-inspector/core" "3.3.0"
-    "@graphql-mesh/cross-helpers" "0.2.10"
-    "@graphql-mesh/types" "0.86.0"
-    "@graphql-mesh/utils" "0.42.7"
-    "@graphql-tools/utils" "9.1.1"
-    tslib "^2.4.0"
-
-"@graphql-mesh/store@0.8.65", "@graphql-mesh/store@^0.8.57":
+"@graphql-mesh/store@0.8.65":
   version "0.8.65"
   resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-mesh/store/-/store-0.8.65.tgz#4c64a1fd0e5e76daba8312f66b52422c61a23a21"
   integrity sha512-WzhP8/0a4mRr8nl3AsJN9AtArw6KTXjox/ClhMCgn4vQozzWf94KI48d5byQh9unEqKmi5K/a8PchmhKWGuGOA==
@@ -1854,17 +1853,12 @@
     "@graphql-tools/utils" "9.1.1"
     tslib "^2.4.0"
 
-"@graphql-mesh/store@0.9.6":
-  version "0.9.6"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-mesh/store/-/store-0.9.6.tgz#e40f68077e80d94f339d1b552561fe80247e6a33"
-  integrity sha512-sv4ltsrC2T6IyhvnTAlRCbXrlSTQK4eL7qSS5xbDz1uRA2UROOJVj0Ee19y0fAjFtpnT4PW41EeAgHQungQrZQ==
+"@graphql-mesh/store@0.9.20":
+  version "0.9.20"
+  resolved "https://registry.yarnpkg.com/@graphql-mesh/store/-/store-0.9.20.tgz#2a2ca801807625b9814579c6cd01cdddccfa0ec6"
+  integrity sha512-RxuyIpZq+6ss3E8enZOFuLKB7P41KDik1JuWwYI0+1Lp7ijr292AiIFWQuRm7n7VfRbB5l3cJSqSwGFahxxleA==
   dependencies:
     "@graphql-inspector/core" "3.3.0"
-    "@graphql-mesh/cross-helpers" "0.3.1"
-    "@graphql-mesh/types" "0.89.5"
-    "@graphql-mesh/utils" "0.43.6"
-    "@graphql-tools/utils" "9.1.4"
-    tslib "^2.4.0"
 
 "@graphql-mesh/string-interpolation@0.3.3":
   version "0.3.3"
@@ -1875,15 +1869,14 @@
     json-pointer "0.6.2"
     lodash.get "4.4.2"
 
-"@graphql-mesh/string-interpolation@0.4.2":
-  version "0.4.2"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-mesh/string-interpolation/-/string-interpolation-0.4.2.tgz#4778ae192731e1dd21383560fcb278c60f25f9bb"
-  integrity sha512-xUSLpir2F4QlAZPVr9GTZ8fOeHYL4PCanykFhIH+CJRFWgolbsUSkTbNBUginQ8pjbQNFEpD2YGgz7N9aJKQ0w==
+"@graphql-mesh/string-interpolation@0.4.3":
+  version "0.4.3"
+  resolved "https://registry.yarnpkg.com/@graphql-mesh/string-interpolation/-/string-interpolation-0.4.3.tgz#cdb8376fb2f567950b2e2a426677165fe7e6904d"
+  integrity sha512-snrlsJa7rXwyxQObLWQLU3I1eYX3YdFbYgnrJYaoc5NVTkgY/TbG3P8vt2mZnpOHokMukIr3TOVVwg7gUD3cDQ==
   dependencies:
     dayjs "1.11.7"
     json-pointer "0.6.2"
     lodash.get "4.4.2"
-    tslib "^2.4.0"
 
 "@graphql-mesh/string-interpolation@0.4.4":
   version "0.4.4"
@@ -1894,157 +1887,112 @@
     json-pointer "0.6.2"
     lodash.get "4.4.2"
 
-"@graphql-mesh/transform-encapsulate@^0.3.111":
-  version "0.3.115"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-mesh/transform-encapsulate/-/transform-encapsulate-0.3.115.tgz#cffb1c29af24824a4eb7eef55f4c16e40c5c5c29"
-  integrity sha512-haFAW0P6TyQOX7D0DJuy7GaVDpJXfJGwLemcXwRekhJKh/tbAg86cdl1aNo028qZOR/erDSDbmH1cjeY+yjpaQ==
+"@graphql-mesh/transform-encapsulate@0.4.21":
+  version "0.4.21"
+  resolved "https://registry.yarnpkg.com/@graphql-mesh/transform-encapsulate/-/transform-encapsulate-0.4.21.tgz#4b65f267992d605c04c2a037460f2f2ee03ad177"
+  integrity sha512-9+2Bmyi6/jRz9n1EN8MJNAXuV3Fq+kV7XJv4MpN7tltLPakBk0mhnLKN2VArhH1MvDdK4FYlP7Mp11wG92SoZQ==
   dependencies:
-    "@graphql-mesh/types" "0.87.1"
-    "@graphql-mesh/utils" "0.42.9"
-    "@graphql-tools/delegate" "9.0.17"
-    "@graphql-tools/utils" "9.1.1"
-    "@graphql-tools/wrap" "9.2.18"
-    tslib "^2.4.0"
+    "@graphql-tools/delegate" "9.0.28"
+    "@graphql-tools/wrap" "9.3.8"
 
-"@graphql-mesh/transform-federation@^0.9.55":
-  version "0.9.60"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-mesh/transform-federation/-/transform-federation-0.9.60.tgz#3fc328d2034cbdd2acfbe893ded352339b374f6b"
-  integrity sha512-g6erZCK//NPEeTLe4QFNqNPUDOPsGslQ4N1yGXPmrws9GipQLmBDYGG4Z05Kvrdoan+4FAZX31SO1s0LHJcMEA==
+"@graphql-mesh/transform-federation@0.11.14":
+  version "0.11.14"
+  resolved "https://registry.yarnpkg.com/@graphql-mesh/transform-federation/-/transform-federation-0.11.14.tgz#edf46462b2296adb5aececbb63fdab8cafb32a27"
+  integrity sha512-wZpHSK9JJ5Dyai4sPizqb3ouhl1VjE3JLDW5VUjA841Xthz5i/CW3FgeYLUv5V6DWx7zCiz1s04o/zBxzGq//A==
   dependencies:
-    "@apollo/subgraph" "2.2.1"
-    "@graphql-mesh/string-interpolation" "0.3.3"
-    "@graphql-mesh/types" "0.87.1"
-    "@graphql-mesh/utils" "0.42.9"
-    "@graphql-tools/delegate" "9.0.17"
-    "@graphql-tools/stitching-directives" "2.3.20"
-    "@graphql-tools/utils" "9.1.1"
+    "@apollo/subgraph" "2.4.0"
+    "@graphql-mesh/string-interpolation" "0.4.3"
+    "@graphql-tools/delegate" "9.0.28"
+    "@graphql-tools/stitching-directives" "2.3.31"
+    dset "3.1.2"
     graphql-transform-federation "2.2.0"
-    lodash.set "4.3.2"
-    tslib "^2.4.0"
 
-"@graphql-mesh/transform-filter-schema@^0.14.110":
-  version "0.14.115"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-mesh/transform-filter-schema/-/transform-filter-schema-0.14.115.tgz#306f65eee7ea284ab61ac573763e25abd61035bd"
-  integrity sha512-rXF25PlVZyL2DD3TdsHI4ZG8pFLl2povGYt+AQQ1LxGEv4A3hY2QnnF/Jq+WzPzk/3e6PnvfQzt5y9t14a6OZA==
+"@graphql-mesh/transform-filter-schema@0.15.23":
+  version "0.15.23"
+  resolved "https://registry.yarnpkg.com/@graphql-mesh/transform-filter-schema/-/transform-filter-schema-0.15.23.tgz#bec6b8efd8f3e74851f420a181655345edeeeec0"
+  integrity sha512-kfOmd15YFYF6/7vY5jWHylVHIZK4aiU+zdOJkEbYytjlvkR3VmmHu0Hza7X9S1iMFeO4HRrsYrV1WYMbLq5jLg==
   dependencies:
-    "@graphql-mesh/types" "0.87.1"
-    "@graphql-mesh/utils" "0.42.9"
-    "@graphql-tools/delegate" "9.0.17"
-    "@graphql-tools/utils" "9.1.1"
-    "@graphql-tools/wrap" "9.2.18"
-    minimatch "5.1.1"
-    tslib "^2.4.0"
+    "@graphql-tools/delegate" "9.0.28"
+    "@graphql-tools/wrap" "9.3.8"
+    minimatch "7.4.3"
 
-"@graphql-mesh/transform-naming-convention@^0.11.19":
-  version "0.11.19"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-mesh/transform-naming-convention/-/transform-naming-convention-0.11.19.tgz#eae2851c867f70c097ea2f384d84aa14daef64dc"
-  integrity sha512-VWAtSExHF4M3fQKrFVYOIz2/PG8iP/XEeV84SztH0Qvflh7BEjgL9YYSsfn3WoxGFRGTsOUiOjt6yYaSLoGxFg==
+"@graphql-mesh/transform-hoist-field@0.2.21":
+  version "0.2.21"
+  resolved "https://registry.yarnpkg.com/@graphql-mesh/transform-hoist-field/-/transform-hoist-field-0.2.21.tgz#9895d6e4f3afdf0819d046f3f78f1addd5f0e4c1"
+  integrity sha512-ojJpMa5xANwBf66RSuAEhSe9gwN32ymPe537J/jE2QKoh6TgdoPWltVz3uqfMNPqyMeGcNDk5lErLK1/j0bZfA==
   dependencies:
-    "@graphql-mesh/types" "0.85.7"
-    "@graphql-mesh/utils" "0.42.6"
-    "@graphql-tools/delegate" "9.0.14"
-    "@graphql-tools/utils" "9.0.1"
-    "@graphql-tools/wrap" "9.2.10"
+    "@graphql-tools/delegate" "9.0.28"
+    "@graphql-tools/wrap" "9.3.8"
+
+"@graphql-mesh/transform-naming-convention@0.13.22":
+  version "0.13.22"
+  resolved "https://registry.yarnpkg.com/@graphql-mesh/transform-naming-convention/-/transform-naming-convention-0.13.22.tgz#70b1d04f3e9e626ecf434cd39e17204cd7f1abfd"
+  integrity sha512-sbXU1IaYY6X4+S8M/2QBkX5q5V66A2q7MTsmExyxP68OYfXkzRdICetJ+T5lUm4C+fXzhZLP/xHKGZogzBV1YQ==
+  dependencies:
+    "@graphql-tools/delegate" "9.0.28"
+    "@graphql-tools/wrap" "9.3.8"
     change-case "4.1.2"
-    graphql-scalars "1.20.0"
+    graphql-scalars "^1.20.4"
     lower-case "2.0.2"
-    tslib "2.4.1"
     upper-case "2.0.2"
 
-"@graphql-mesh/transform-prefix@^0.11.100":
-  version "0.11.105"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-mesh/transform-prefix/-/transform-prefix-0.11.105.tgz#0e6586fc9e10e263669d4a20ad0b696f913d9004"
-  integrity sha512-4wXcZYAmE30UHw82GhP+wgkL+XIHJBWUymPYKPPZ/5qkXRqWPWNFJruxbmCfcfUBfw04eeOBjoYp1Pp1hc7Rdw==
+"@graphql-mesh/transform-prefix@0.12.22":
+  version "0.12.22"
+  resolved "https://registry.yarnpkg.com/@graphql-mesh/transform-prefix/-/transform-prefix-0.12.22.tgz#dfe93082088b69e8f1b42a285706a7643b2a56db"
+  integrity sha512-OPVdWhDnQdF25ZpAL9YInIvy9O4r8nv5K31UHHqniWVLWxeCegn9TXZrwMOiT7aOV5FbTcA4W/fDrmQYsOoLHw==
   dependencies:
-    "@graphql-mesh/types" "0.87.1"
-    "@graphql-mesh/utils" "0.42.9"
-    "@graphql-tools/delegate" "9.0.17"
-    "@graphql-tools/utils" "9.1.1"
-    "@graphql-tools/wrap" "9.2.18"
-    graphql-scalars "1.20.1"
-    tslib "^2.4.0"
+    "@graphql-tools/delegate" "9.0.28"
+    "@graphql-tools/wrap" "9.3.8"
+    graphql-scalars "^1.20.4"
 
-"@graphql-mesh/transform-rename@^0.12.101":
-  version "0.12.102"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-mesh/transform-rename/-/transform-rename-0.12.102.tgz#b36e6d55e50aff2f0422ed008279b0a696cec476"
-  integrity sha512-u7ofzdpJLV0MUtnup/0e8Qt1Zb+4StoQZVpOLmLBf8ftNRvSyvA3LutfmP2CZxHwJbv+9PkbvwCdUgQjcS4XsQ==
-  dependencies:
-    "@graphql-mesh/types" "0.86.0"
-    "@graphql-mesh/utils" "0.42.7"
-    "@graphql-tools/delegate" "9.0.17"
-    "@graphql-tools/utils" "9.1.1"
-    "@graphql-tools/wrap" "9.2.16"
-    graphql-scalars "1.20.1"
-    tslib "^2.4.0"
+"@graphql-mesh/transform-prune@0.1.20":
+  version "0.1.20"
+  resolved "https://registry.yarnpkg.com/@graphql-mesh/transform-prune/-/transform-prune-0.1.20.tgz#c3bb37054a631974517c789d9b7d230bc43a954e"
+  integrity sha512-xs5G+o3TJSGSwdt+iIEcHOGUNSCEOqfLt1Vi3G1y3lVrSz0HFbWvj3vTi4+YjDfB+bMBCQq2ZfNqmtKl4PXH5Q==
 
-"@graphql-mesh/transform-replace-field@^0.3.108":
-  version "0.3.112"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-mesh/transform-replace-field/-/transform-replace-field-0.3.112.tgz#039edb1f0ab954d1e54d31d68da99a2b482c3548"
-  integrity sha512-8OltEcBoJgNpJMZDlL98l3vzo8pmJNZYokH0nHOPh7qK6qzTVzx9H8rp7Rb7RnBIGbqpN2/xKusUiD3J7qFSsQ==
+"@graphql-mesh/transform-rename@0.14.22":
+  version "0.14.22"
+  resolved "https://registry.yarnpkg.com/@graphql-mesh/transform-rename/-/transform-rename-0.14.22.tgz#30d8a26938a37438dae7db5763d0650b07caad85"
+  integrity sha512-Tc7KYzIt9M3vHs1kMi+AqeFmSOpO7yN0ST4zqEkJNcFbFh7UKyCrIxc4Rk5ayUS+vDM6L65c3J8VpjsXzwLkzw==
   dependencies:
-    "@graphql-mesh/types" "0.87.1"
-    "@graphql-mesh/utils" "0.42.9"
-    "@graphql-tools/code-file-loader" "7.3.13"
-    "@graphql-tools/graphql-file-loader" "7.5.11"
-    "@graphql-tools/load" "7.8.6"
-    "@graphql-tools/utils" "9.1.1"
-    tslib "^2.4.0"
+    "@graphql-tools/delegate" "9.0.28"
+    "@graphql-tools/wrap" "9.3.8"
+    graphql-scalars "^1.20.4"
 
-"@graphql-mesh/transform-resolvers-composition@^0.12.108":
-  version "0.12.111"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-mesh/transform-resolvers-composition/-/transform-resolvers-composition-0.12.111.tgz#19f9902adc44da2eb86c1eba52866bd23605d5a2"
-  integrity sha512-02QETWO+Ko/bHWPEZarNn/kNFQ3efbmTCI4ErTyC8jLpsXxPVfRCPnNHbBEE68Ix9ydKf3BXDYnaEzTVrdsHlw==
+"@graphql-mesh/transform-replace-field@0.4.20":
+  version "0.4.20"
+  resolved "https://registry.yarnpkg.com/@graphql-mesh/transform-replace-field/-/transform-replace-field-0.4.20.tgz#da95049263785f901cc32e66d32d9b3f027945c3"
+  integrity sha512-ISj+1aK/J8GKBopPTCR2BABKOJ8yZPE+UUxYVyPysXLFARQnee1U3Z/3odDOW3W38OKB0KyWsqxR4rMtVCriRw==
   dependencies:
-    "@graphql-mesh/types" "0.87.1"
-    "@graphql-mesh/utils" "0.42.9"
-    "@graphql-tools/resolvers-composition" "6.5.12"
-    "@graphql-tools/schema" "9.0.10"
-    tslib "^2.4.0"
+    "@graphql-tools/code-file-loader" "7.3.21"
+    "@graphql-tools/graphql-file-loader" "7.5.16"
+    "@graphql-tools/load" "7.8.13"
 
-"@graphql-mesh/transform-type-merging@^0.4.53":
-  version "0.4.56"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-mesh/transform-type-merging/-/transform-type-merging-0.4.56.tgz#1227cd2ce3a0d9273712dfe6a70a74c9a29b78ab"
-  integrity sha512-C1b42vy9FCVe7NeI1rPwg3SfGFROC96RzFiTFqbl2jyVbl4At5PpExOl4BgcCVPEUM5JOHScisSPy/FO7MN5fA==
+"@graphql-mesh/transform-resolvers-composition@0.13.20":
+  version "0.13.20"
+  resolved "https://registry.yarnpkg.com/@graphql-mesh/transform-resolvers-composition/-/transform-resolvers-composition-0.13.20.tgz#a2d38a7ed1477212f9d39d1b3e37565b356d3e01"
+  integrity sha512-vvwTrloUslOB3bDEtNVFXNhGmeBwXy1ppmGO/y5LNYuDeMfb/U8XGR+681+KSAUbSYWTJep7KBhWTII5h5sfGg==
   dependencies:
-    "@graphql-mesh/types" "0.87.1"
-    "@graphql-mesh/utils" "0.42.9"
-    "@graphql-tools/delegate" "9.0.17"
-    "@graphql-tools/stitching-directives" "2.3.20"
-    tslib "^2.4.0"
+    "@graphql-tools/resolvers-composition" "6.5.17"
+    "@graphql-tools/schema" "9.0.17"
 
-"@graphql-mesh/types@0.85.3":
-  version "0.85.3"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-mesh/types/-/types-0.85.3.tgz#b98b033cb3a38723ea47dbfe4369265c04ea19ca"
-  integrity sha512-gEC6x72zdz55PbYrsuMAlPnmJ4/UOX/AhBEAkSy+sHZGlafkflfjf1PaRT8EE2abzWN6DisFDYqlaVM66T41lw==
+"@graphql-mesh/transform-type-merging@0.5.20":
+  version "0.5.20"
+  resolved "https://registry.yarnpkg.com/@graphql-mesh/transform-type-merging/-/transform-type-merging-0.5.20.tgz#640933e711859b803719d4d37365906d60ca999d"
+  integrity sha512-i1KDLZC/NU6aSW9CN4+DZr3lYD8ZC/old9fCr5tHrEcKqMpp/KRg3RXCRM+3iOroBxHR1Bb/02YWpTZ0r6KPyQ==
   dependencies:
-    "@graphql-mesh/store" "0.8.58"
+    "@graphql-tools/delegate" "9.0.28"
+    "@graphql-tools/stitching-directives" "2.3.31"
+
+"@graphql-mesh/types@0.85.2":
+  version "0.85.2"
+  resolved "https://registry.yarnpkg.com/@graphql-mesh/types/-/types-0.85.2.tgz#db672e382e56fa633679c7332ff5506efcd17829"
+  integrity sha512-4HD+74fliWDEmOBfHWdRCpiQFu+QtTugstIJTBe43WpUYVR+I3b6EwbDREJPTS7abHADnewGmMK+1hk7pBY+tg==
+  dependencies:
+    "@graphql-mesh/store" "0.8.57"
     "@graphql-tools/batch-delegate" "8.4.1"
     "@graphql-tools/delegate" "9.0.8"
     "@graphql-tools/utils" "8.12.0"
-    "@graphql-typed-document-node/core" "3.1.1"
-    tslib "^2.4.0"
-
-"@graphql-mesh/types@0.85.7":
-  version "0.85.7"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-mesh/types/-/types-0.85.7.tgz#82d08f5e0cf586002eed5b039ac9b25e53f063d6"
-  integrity sha512-4hoeTlocVHacyWMZO/zeDmlfcbkmC8DSRCqNaX8H5HX8+gJ7cTRa51Lw+6U4FNzcCVDQbjjyV5fR8WYgHlZe7A==
-  dependencies:
-    "@graphql-mesh/store" "0.8.62"
-    "@graphql-tools/batch-delegate" "8.4.7"
-    "@graphql-tools/delegate" "9.0.14"
-    "@graphql-tools/utils" "9.0.1"
-    "@graphql-typed-document-node/core" "3.1.1"
-    tslib "^2.4.0"
-
-"@graphql-mesh/types@0.86.0":
-  version "0.86.0"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-mesh/types/-/types-0.86.0.tgz#661952eed1ec472ae7083088aba6362ebd9e4d08"
-  integrity sha512-YiezkoJ8Q6YyzAvF0GiSjvJxicP2RKr/BF6GZSnA89A22/KjJkR+sNEi4BCbDPLcX6bYKOBLmwnGET8jooFryQ==
-  dependencies:
-    "@graphql-mesh/store" "0.8.63"
-    "@graphql-tools/batch-delegate" "8.4.10"
-    "@graphql-tools/delegate" "9.0.17"
-    "@graphql-tools/utils" "9.1.1"
     "@graphql-typed-document-node/core" "3.1.1"
     tslib "^2.4.0"
 
@@ -2060,62 +2008,25 @@
     "@graphql-typed-document-node/core" "3.1.1"
     tslib "^2.4.0"
 
-"@graphql-mesh/types@0.89.5", "@graphql-mesh/types@^0.89.5":
-  version "0.89.5"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-mesh/types/-/types-0.89.5.tgz#abb97042f59f7b2d65763ae02c29264247ef44ec"
-  integrity sha512-DexqgB1qp7ZhJurKImZyxGMhxz+6ewzqq85BQAj6Cvr8GrdQc2QaG9fhY83mu2M0eVEzXBcJMF2eLbZVilA+mA==
+"@graphql-mesh/types@0.91.12":
+  version "0.91.12"
+  resolved "https://registry.yarnpkg.com/@graphql-mesh/types/-/types-0.91.12.tgz#8bc3c913da0d50ac4d8437a4d302ec91930f3a5a"
+  integrity sha512-9vvETkeSd5prZWGlC3jR6JM+HRqPim6elJfhUEKH4t5TC5asjiCG17HjUdVALWmcEFrtPXxLHTjMLqTrC1yQ/w==
   dependencies:
-    "@graphql-mesh/store" "0.9.6"
-    "@graphql-tools/batch-delegate" "8.4.16"
-    "@graphql-tools/delegate" "9.0.23"
-    "@graphql-tools/utils" "9.1.4"
-    "@graphql-typed-document-node/core" "3.1.1"
-    tslib "^2.4.0"
+    "@graphql-tools/batch-delegate" "8.4.21"
+    "@graphql-tools/delegate" "9.0.28"
+    "@graphql-typed-document-node/core" "3.2.0"
 
-"@graphql-mesh/utils@0.42.2":
-  version "0.42.2"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-mesh/utils/-/utils-0.42.2.tgz#fe3bca9e1221098d965517eb87c20814899be178"
-  integrity sha512-mleRe9GIaelGDzvmfnECUTaUAt/Dig1fqvXSFpc3Mi3Bx7YBTjX69HsJYrs8s1QbVSJIEjknEATe/5ciCYzY2A==
+"@graphql-mesh/utils@0.42.1":
+  version "0.42.1"
+  resolved "https://registry.yarnpkg.com/@graphql-mesh/utils/-/utils-0.42.1.tgz#e233ee2bc4c55d2f811a7e6c6ebc28af6155c22a"
+  integrity sha512-jTOvRfPymsis8c4vZhWC/oKMz6Ytca8YVn8l8tzzxfoI0Xecg0GhDI7Nu9YpF5tHDXbMwENvLpkE1NfVSuHpmw==
   dependencies:
     "@graphql-mesh/cross-helpers" "0.2.6"
     "@graphql-mesh/string-interpolation" "0.3.3"
-    "@graphql-mesh/types" "0.85.3"
+    "@graphql-mesh/types" "0.85.2"
     "@graphql-tools/delegate" "9.0.8"
     "@graphql-tools/utils" "8.12.0"
-    js-yaml "4.1.0"
-    lodash.get "4.4.2"
-    lodash.set "4.3.2"
-    lodash.topath "4.5.2"
-    tiny-lru "8.0.2"
-    tslib "^2.4.0"
-
-"@graphql-mesh/utils@0.42.6":
-  version "0.42.6"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-mesh/utils/-/utils-0.42.6.tgz#0588125bbee59d025da44704991ae6175f094669"
-  integrity sha512-/JH5QYnJ6NLWzBSZPrFYMSeFvf9+ZN7wQ4XLIMNV19iWzFFkDFaQJWzsvlVRC6bFlGBJ/ZPZLMzBFCUEFyxAuw==
-  dependencies:
-    "@graphql-mesh/cross-helpers" "0.2.9"
-    "@graphql-mesh/string-interpolation" "0.3.3"
-    "@graphql-mesh/types" "0.85.7"
-    "@graphql-tools/delegate" "9.0.14"
-    "@graphql-tools/utils" "9.0.1"
-    js-yaml "4.1.0"
-    lodash.get "4.4.2"
-    lodash.set "4.3.2"
-    lodash.topath "4.5.2"
-    tiny-lru "8.0.2"
-    tslib "^2.4.0"
-
-"@graphql-mesh/utils@0.42.7":
-  version "0.42.7"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-mesh/utils/-/utils-0.42.7.tgz#6199ec22b383be73ed1c45b76b289204fa5ec877"
-  integrity sha512-p7XqCEiy/a12flClmsP4CeqziK/pU0OVIhgm6bArxplKLwPV/BINHsw8OskOJxCffprRlae4a9P4UAX6dZxFLA==
-  dependencies:
-    "@graphql-mesh/cross-helpers" "0.2.10"
-    "@graphql-mesh/string-interpolation" "0.3.3"
-    "@graphql-mesh/types" "0.86.0"
-    "@graphql-tools/delegate" "9.0.17"
-    "@graphql-tools/utils" "9.1.1"
     js-yaml "4.1.0"
     lodash.get "4.4.2"
     lodash.set "4.3.2"
@@ -2140,22 +2051,18 @@
     tiny-lru "8.0.2"
     tslib "^2.4.0"
 
-"@graphql-mesh/utils@0.43.6":
-  version "0.43.6"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-mesh/utils/-/utils-0.43.6.tgz#d3862896440ba77fb3bd65a75456a70c6e750be7"
-  integrity sha512-cylO59bVCs4MIShvkjCO1lYMaLS1OJP+n9SN1uxyPXh5BQaedTc0QzsszSj9CCXO8WMlnKdwG7H7vR8Izcemgw==
+"@graphql-mesh/utils@0.43.20":
+  version "0.43.20"
+  resolved "https://registry.yarnpkg.com/@graphql-mesh/utils/-/utils-0.43.20.tgz#ecfa2e62a39b5ed55567762bc5bdba5a77cfbf22"
+  integrity sha512-XDccNle+unlG7oHQ//FnNtBLTZkKWzrVni5hk8h61NkUkLSzEmAf4yn3g12MNU/vzTBks0ABnOrdqLcDdbIIYQ==
   dependencies:
-    "@graphql-mesh/cross-helpers" "0.3.1"
-    "@graphql-mesh/string-interpolation" "0.4.2"
-    "@graphql-mesh/types" "0.89.5"
-    "@graphql-tools/delegate" "9.0.23"
-    "@graphql-tools/utils" "9.1.4"
+    "@graphql-mesh/string-interpolation" "0.4.3"
+    "@graphql-tools/delegate" "9.0.28"
+    dset "3.1.2"
     js-yaml "4.1.0"
     lodash.get "4.4.2"
-    lodash.set "4.3.2"
     lodash.topath "4.5.2"
     tiny-lru "8.0.2"
-    tslib "^2.4.0"
 
 "@graphql-mesh/utils@^0.43.4":
   version "0.43.23"
@@ -2190,24 +2097,14 @@
     dataloader "2.1.0"
     tslib "^2.4.0"
 
-"@graphql-tools/batch-delegate@8.4.16":
-  version "8.4.16"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-tools/batch-delegate/-/batch-delegate-8.4.16.tgz#025a7c909bb88c18555f576d79cd944c25cc0565"
-  integrity sha512-mk+2BFuqQD5eFcyieQWVcO7pbPTKjjiwPeKpI2TIAWLjipXQbRh1JHthEKXyOQqQHnnkYCRoiboVoo9351Zd+w==
+"@graphql-tools/batch-delegate@8.4.21":
+  version "8.4.21"
+  resolved "https://registry.yarnpkg.com/@graphql-tools/batch-delegate/-/batch-delegate-8.4.21.tgz#765476c7b09ef4699beb07af228f2eeb1a78204b"
+  integrity sha512-NrnMGF6SHv7b0OWSyPUURZDoPGKEFTmTyYwVQ+iM950ZPBx3gOUPODZaXWpFVlFK2UGVNk6atvbigPDHnwSZnw==
   dependencies:
-    "@graphql-tools/delegate" "9.0.23"
-    "@graphql-tools/utils" "9.1.4"
-    dataloader "2.1.0"
-    tslib "^2.4.0"
-
-"@graphql-tools/batch-delegate@8.4.7":
-  version "8.4.7"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-tools/batch-delegate/-/batch-delegate-8.4.7.tgz#5d7be1b43a4691fab5ded072f20eacf1fe81ed3b"
-  integrity sha512-FB/HMPihd3AdImAPBJARzGkkC+ha/5AGz3FsXSHtsIzDR89aqCzvom0eYzpQ30D3NP1P4qqbv7O5T6x/wFg/Kg==
-  dependencies:
-    "@graphql-tools/delegate" "9.0.14"
-    "@graphql-tools/utils" "9.0.1"
-    dataloader "2.1.0"
+    "@graphql-tools/delegate" "9.0.28"
+    "@graphql-tools/utils" "9.2.1"
+    dataloader "2.2.2"
     tslib "^2.4.0"
 
 "@graphql-tools/batch-delegate@^7.0.0":
@@ -2219,16 +2116,6 @@
     dataloader "2.0.0"
     tslib "~2.1.0"
 
-"@graphql-tools/batch-execute@8.5.10":
-  version "8.5.10"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-tools/batch-execute/-/batch-execute-8.5.10.tgz#ec0a300ec0646aba3d52a5b4ad378da7531703de"
-  integrity sha512-f3b/UPvscQ4NaSmSQIeZPNFhpZ9xb3AftKKSn9NzsUp3vxz0d8tymBVn28f51oqiqN9BMDpCH9P8TZrKpH1//Q==
-  dependencies:
-    "@graphql-tools/utils" "9.0.1"
-    dataloader "2.1.0"
-    tslib "^2.4.0"
-    value-or-promise "1.0.11"
-
 "@graphql-tools/batch-execute@8.5.12":
   version "8.5.12"
   resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-tools/batch-execute/-/batch-execute-8.5.12.tgz#3059646b87e4ea3a196a6c8cbc3faf9b7c410d52"
@@ -2239,13 +2126,13 @@
     tslib "^2.4.0"
     value-or-promise "1.0.11"
 
-"@graphql-tools/batch-execute@8.5.15":
-  version "8.5.15"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-tools/batch-execute/-/batch-execute-8.5.15.tgz#f61ac71d11e57c9b9f8b8b60fc882e4e9762d182"
-  integrity sha512-qb12M8XCK6SBJmZDS8Lzd4PVJFsIwNUkYmFuqcTiBqOI/WsoDlQDZI++ghRpGcusLkL9uzcIOTT/61OeHhsaLg==
+"@graphql-tools/batch-execute@8.5.18":
+  version "8.5.18"
+  resolved "https://registry.yarnpkg.com/@graphql-tools/batch-execute/-/batch-execute-8.5.18.tgz#2f0e91cc12e8eed32f14bc814f27c6a498b75e17"
+  integrity sha512-mNv5bpZMLLwhkmPA6+RP81A6u3KF4CSKLf3VX9hbomOkQR4db8pNs8BOvpZU54wKsUzMzdlws/2g/Dabyb2Vsg==
   dependencies:
-    "@graphql-tools/utils" "9.1.4"
-    dataloader "2.1.0"
+    "@graphql-tools/utils" "9.2.1"
+    dataloader "2.2.2"
     tslib "^2.4.0"
     value-or-promise "1.0.12"
 
@@ -2269,7 +2156,7 @@
     tslib "~2.2.0"
     value-or-promise "1.0.6"
 
-"@graphql-tools/batch-execute@^8.5.19":
+"@graphql-tools/batch-execute@^8.5.18", "@graphql-tools/batch-execute@^8.5.19", "@graphql-tools/batch-execute@^8.5.22":
   version "8.5.22"
   resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-tools/batch-execute/-/batch-execute-8.5.22.tgz#a742aa9d138fe794e786d8fb6429665dc7df5455"
   integrity sha512-hcV1JaY6NJQFQEwCKrYhpfLK8frSXDbtNMoTur98u10Cmecy1zrqNKSqhEyGetpgHxaJRqszGzKeI3RuroDN6A==
@@ -2279,24 +2166,13 @@
     tslib "^2.4.0"
     value-or-promise "^1.0.12"
 
-"@graphql-tools/code-file-loader@7.3.13":
-  version "7.3.13"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-tools/code-file-loader/-/code-file-loader-7.3.13.tgz#439c21c80aed1018f9457d3742b1d51ce60cd3f0"
-  integrity sha512-6anNQJ/VqseqBGcrZexGsiW40cBWF8Uko9AgvGSuZx2uJl1O8H9a3XMZnkmuI17yoGRCzXkwf52AS0+O5UYFUA==
+"@graphql-tools/code-file-loader@7.3.21":
+  version "7.3.21"
+  resolved "https://registry.yarnpkg.com/@graphql-tools/code-file-loader/-/code-file-loader-7.3.21.tgz#3eed4ff4610cf0a6f4b1be17d0bce1eec9359479"
+  integrity sha512-dj+OLnz1b8SYkXcuiy0CUQ25DWnOEyandDlOcdBqU3WVwh5EEVbn0oXUYm90fDlq2/uut00OrtC5Wpyhi3tAvA==
   dependencies:
-    "@graphql-tools/graphql-tag-pluck" "7.4.0"
-    "@graphql-tools/utils" "9.1.1"
-    globby "^11.0.3"
-    tslib "^2.4.0"
-    unixify "^1.0.0"
-
-"@graphql-tools/code-file-loader@7.3.6":
-  version "7.3.6"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-tools/code-file-loader/-/code-file-loader-7.3.6.tgz#3e6bdd4dc93c592be3d6fbcc2c2bad1228ca0f8d"
-  integrity sha512-PNWWSwSuQAqANerDwS0zdQ5FPipirv75TjjzBHnY+6AF/WvKq5sQiUQheA2P7B+MZc/KdQ7h/JAGMQOhKNVA+Q==
-  dependencies:
-    "@graphql-tools/graphql-tag-pluck" "7.3.6"
-    "@graphql-tools/utils" "8.12.0"
+    "@graphql-tools/graphql-tag-pluck" "7.5.0"
+    "@graphql-tools/utils" "9.2.1"
     globby "^11.0.3"
     tslib "^2.4.0"
     unixify "^1.0.0"
@@ -2309,19 +2185,6 @@
     "@graphql-tools/graphql-tag-pluck" "^6.5.1"
     "@graphql-tools/utils" "^7.0.0"
     tslib "~2.1.0"
-
-"@graphql-tools/delegate@9.0.14":
-  version "9.0.14"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-tools/delegate/-/delegate-9.0.14.tgz#0636668c0d76c8aa0bdb419796669465273ad8fb"
-  integrity sha512-yKwNQl10fOdKxSk5yBoKnSjq1oumf4QYVinV9niD9KVow6j0dONtaiAYvhzaQwN/Xwwi7oADFACmKRtphlhFTw==
-  dependencies:
-    "@graphql-tools/batch-execute" "8.5.10"
-    "@graphql-tools/executor" "0.0.6"
-    "@graphql-tools/schema" "9.0.8"
-    "@graphql-tools/utils" "9.0.1"
-    dataloader "2.1.0"
-    tslib "~2.4.0"
-    value-or-promise "1.0.11"
 
 "@graphql-tools/delegate@9.0.17":
   version "9.0.17"
@@ -2336,18 +2199,18 @@
     tslib "~2.4.0"
     value-or-promise "1.0.11"
 
-"@graphql-tools/delegate@9.0.23":
-  version "9.0.23"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-tools/delegate/-/delegate-9.0.23.tgz#5233c9648acf2b26744ebbdc91e84b45facd1b42"
-  integrity sha512-pTmC2ZUGRp/j4bwQRccZV+J2ETMeHYF9RmEXHHdj0S7/LOpyfFE3mGvRV2+n6MzXpPCPp+mh037LWF+q4wLcJw==
+"@graphql-tools/delegate@9.0.28":
+  version "9.0.28"
+  resolved "https://registry.yarnpkg.com/@graphql-tools/delegate/-/delegate-9.0.28.tgz#026275094b2ff3f4cbbe99caff2d48775aeb67d6"
+  integrity sha512-8j23JCs2mgXqnp+5K0v4J3QBQU/5sXd9miaLvMfRf/6963DznOXTECyS9Gcvj1VEeR5CXIw6+aX/BvRDKDdN1g==
   dependencies:
-    "@graphql-tools/batch-execute" "8.5.15"
-    "@graphql-tools/executor" "0.0.12"
-    "@graphql-tools/schema" "9.0.14"
-    "@graphql-tools/utils" "9.1.4"
-    dataloader "2.1.0"
-    tslib "~2.4.0"
-    value-or-promise "1.0.12"
+    "@graphql-tools/batch-execute" "^8.5.18"
+    "@graphql-tools/executor" "^0.0.15"
+    "@graphql-tools/schema" "^9.0.16"
+    "@graphql-tools/utils" "^9.2.1"
+    dataloader "^2.2.2"
+    tslib "^2.5.0"
+    value-or-promise "^1.0.12"
 
 "@graphql-tools/delegate@9.0.31":
   version "9.0.31"
@@ -2387,65 +2250,56 @@
     tslib "~2.2.0"
     value-or-promise "1.0.6"
 
-"@graphql-tools/executor-graphql-ws@0.0.7":
-  version "0.0.7"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-tools/executor-graphql-ws/-/executor-graphql-ws-0.0.7.tgz#5e7b0e6d02d3b64727bfb37c0f2c1e13badcb829"
-  integrity sha512-C6EExKoukn4vu3BbvlqsqtC91F4pTLPDZvRceYjpFzTCQSGFSjfrxQGP/haGlemXVRpIDxBy7wpXoQlsF8UmFA==
+"@graphql-tools/delegate@^9.0.27", "@graphql-tools/delegate@^9.0.31":
+  version "9.0.35"
+  resolved "https://registry.yarnpkg.com/@graphql-tools/delegate/-/delegate-9.0.35.tgz#94683f4bcec63520b4a6c8b2abf2e2e9324ea4f1"
+  integrity sha512-jwPu8NJbzRRMqi4Vp/5QX1vIUeUPpWmlQpOkXQD2r1X45YsVceyUUBnktCrlJlDB4jPRVy7JQGwmYo3KFiOBMA==
   dependencies:
-    "@graphql-tools/utils" "9.1.4"
-    "@repeaterjs/repeater" "3.0.4"
-    "@types/ws" "^8.0.0"
-    graphql-ws "5.11.2"
-    isomorphic-ws "5.0.0"
-    tslib "^2.4.0"
-    ws "8.12.0"
+    "@graphql-tools/batch-execute" "^8.5.22"
+    "@graphql-tools/executor" "^0.0.20"
+    "@graphql-tools/schema" "^9.0.19"
+    "@graphql-tools/utils" "^9.2.1"
+    dataloader "^2.2.2"
+    tslib "^2.5.0"
+    value-or-promise "^1.0.12"
 
-"@graphql-tools/executor-http@0.1.1":
-  version "0.1.1"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-tools/executor-http/-/executor-http-0.1.1.tgz#9c4a43811d36d1be2319fd241d5538e2fac45bce"
-  integrity sha512-bFE6StI7CJEIYGRkAnTYxutSV4OtC1c4MQU3nStOYZZO7KmzIgEQZ4ygPSPrRb+jtRsMCBEqPqlYOD4Rq02aMw==
-  dependencies:
-    "@graphql-tools/utils" "9.1.4"
-    "@repeaterjs/repeater" "3.0.4"
-    "@whatwg-node/fetch" "0.6.2"
-    dset "3.1.2"
-    extract-files "^11.0.0"
-    meros "1.2.1"
-    tslib "^2.4.0"
-    value-or-promise "1.0.12"
-
-"@graphql-tools/executor-legacy-ws@0.0.6":
-  version "0.0.6"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-tools/executor-legacy-ws/-/executor-legacy-ws-0.0.6.tgz#236dd5b3d4d19492978b1458b74928e8c69d16ff"
-  integrity sha512-L1hRuSvBUCNerYDhfeSZXFeqliDlnNXa3fDHTp7efI3Newpbevqa19Fm0mVzsCL7gqIKOwzrPORwh7kOVE/vew==
-  dependencies:
-    "@graphql-tools/utils" "9.1.4"
-    "@types/ws" "^8.0.0"
-    isomorphic-ws "5.0.0"
-    tslib "^2.4.0"
-    ws "8.12.0"
-
-"@graphql-tools/executor@0.0.12":
+"@graphql-tools/executor-graphql-ws@^0.0.12":
   version "0.0.12"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-tools/executor/-/executor-0.0.12.tgz#d885c7fa98a8aaeaa771163b71fb98ce9f52f9bd"
-  integrity sha512-bWpZcYRo81jDoTVONTnxS9dDHhEkNVjxzvFCH4CRpuyzD3uL+5w3MhtxIh24QyWm4LvQ4f+Bz3eMV2xU2I5+FA==
+  resolved "https://registry.yarnpkg.com/@graphql-tools/executor-graphql-ws/-/executor-graphql-ws-0.0.12.tgz#dde0d1f5beeceff209df44e30b45388b0afaff95"
+  integrity sha512-aFD79i9l282Ob5dOZ7JsyhhXXP1o8eQh0prYkSSVo/OU2ndzWigfANz4DJgWgS3LwBjLDlMcmaXPZZeXt3m4Tg==
   dependencies:
-    "@graphql-tools/utils" "9.1.4"
-    "@graphql-typed-document-node/core" "3.1.1"
+    "@graphql-tools/utils" "9.2.1"
     "@repeaterjs/repeater" "3.0.4"
+    "@types/ws" "^8.0.0"
+    graphql-ws "5.12.0"
+    isomorphic-ws "5.0.0"
     tslib "^2.4.0"
-    value-or-promise "1.0.12"
+    ws "8.12.1"
 
-"@graphql-tools/executor@0.0.6":
-  version "0.0.6"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-tools/executor/-/executor-0.0.6.tgz#e980e3b148b3093091648113bfd14efac5d90c8f"
-  integrity sha512-2KIj1grRb1Lni97xgX1ryekcjU/WTMC1ZdPpnd0nYrBWs/C4Nv4UMNP7E/Tr8za8zlrsESvEUbpLHsBRiQsGxA==
+"@graphql-tools/executor-http@^0.1.7":
+  version "0.1.10"
+  resolved "https://registry.yarnpkg.com/@graphql-tools/executor-http/-/executor-http-0.1.10.tgz#faf48e18e62a925796c9653c2f50cf2095bc8e6f"
+  integrity sha512-hnAfbKv0/lb9s31LhWzawQ5hghBfHS+gYWtqxME6Rl0Aufq9GltiiLBcl7OVVOnkLF0KhwgbYP1mB5VKmgTGpg==
   dependencies:
-    "@graphql-tools/utils" "9.0.1"
-    "@graphql-typed-document-node/core" "3.1.1"
-    "@repeaterjs/repeater" "3.0.4"
+    "@graphql-tools/utils" "^9.2.1"
+    "@repeaterjs/repeater" "^3.0.4"
+    "@whatwg-node/fetch" "^0.8.1"
+    dset "^3.1.2"
+    extract-files "^11.0.0"
+    meros "^1.2.1"
     tslib "^2.4.0"
-    value-or-promise "1.0.11"
+    value-or-promise "^1.0.12"
+
+"@graphql-tools/executor-legacy-ws@^0.0.9":
+  version "0.0.9"
+  resolved "https://registry.yarnpkg.com/@graphql-tools/executor-legacy-ws/-/executor-legacy-ws-0.0.9.tgz#1ff517998f750af2be9c1dae8924665a136e4986"
+  integrity sha512-L7oDv7R5yoXzMH+KLKDB2WHVijfVW4dB2H+Ae1RdW3MFvwbYjhnIB6QzHqKEqksjp/FndtxZkbuTIuAOsYGTYw==
+  dependencies:
+    "@graphql-tools/utils" "9.2.1"
+    "@types/ws" "^8.0.0"
+    isomorphic-ws "5.0.0"
+    tslib "^2.4.0"
+    ws "8.12.1"
 
 "@graphql-tools/executor@0.0.9":
   version "0.0.9"
@@ -2458,6 +2312,17 @@
     tslib "^2.4.0"
     value-or-promise "1.0.11"
 
+"@graphql-tools/executor@^0.0.15":
+  version "0.0.15"
+  resolved "https://registry.yarnpkg.com/@graphql-tools/executor/-/executor-0.0.15.tgz#cbd29af2ec54213a52f6c516a7792b3e626a4c49"
+  integrity sha512-6U7QLZT8cEUxAMXDP4xXVplLi6RBwx7ih7TevlBto66A/qFp3PDb6o/VFo07yBKozr8PGMZ4jMfEWBGxmbGdxA==
+  dependencies:
+    "@graphql-tools/utils" "9.2.1"
+    "@graphql-typed-document-node/core" "3.1.2"
+    "@repeaterjs/repeater" "3.0.4"
+    tslib "^2.4.0"
+    value-or-promise "1.0.12"
+
 "@graphql-tools/executor@^0.0.17":
   version "0.0.17"
   resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-tools/executor/-/executor-0.0.17.tgz#4f48693fd3fa2980c67ee0a1d1c2049942aa28e5"
@@ -2468,6 +2333,17 @@
     "@repeaterjs/repeater" "3.0.4"
     tslib "^2.4.0"
     value-or-promise "1.0.12"
+
+"@graphql-tools/executor@^0.0.20":
+  version "0.0.20"
+  resolved "https://registry.yarnpkg.com/@graphql-tools/executor/-/executor-0.0.20.tgz#d51d159696e839522dd49d936636af251670e425"
+  integrity sha512-GdvNc4vszmfeGvUqlcaH1FjBoguvMYzxAfT6tDd4/LgwymepHhinqLNA5otqwVLW+JETcDaK7xGENzFomuE6TA==
+  dependencies:
+    "@graphql-tools/utils" "^9.2.1"
+    "@graphql-typed-document-node/core" "3.2.0"
+    "@repeaterjs/repeater" "^3.0.4"
+    tslib "^2.4.0"
+    value-or-promise "^1.0.12"
 
 "@graphql-tools/git-loader@^6.2.5":
   version "6.2.6"
@@ -2488,24 +2364,13 @@
     cross-fetch "3.0.6"
     tslib "~2.0.1"
 
-"@graphql-tools/graphql-file-loader@7.5.11":
-  version "7.5.11"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-tools/graphql-file-loader/-/graphql-file-loader-7.5.11.tgz#19c44ea9021d3220c7ed1cef6cfa0afbb40fd9a4"
-  integrity sha512-E4/YYLlM/T/VDYJ3MfQzJSkCpnHck+xMv2R6QTjO3khUeTCWJY4qsLDPFjAWE0+Mbe9NanXi/yL8Bz0yS/usDw==
+"@graphql-tools/graphql-file-loader@7.5.16":
+  version "7.5.16"
+  resolved "https://registry.yarnpkg.com/@graphql-tools/graphql-file-loader/-/graphql-file-loader-7.5.16.tgz#d954b25ee14c6421ddcef43f4320a82e9800cb23"
+  integrity sha512-lK1N3Y2I634FS12nd4bu7oAJbai3bUc28yeX+boT+C83KTO4ujGHm+6hPC8X/FRGwhKOnZBxUM7I5nvb3HiUxw==
   dependencies:
-    "@graphql-tools/import" "6.7.12"
-    "@graphql-tools/utils" "9.1.1"
-    globby "^11.0.3"
-    tslib "^2.4.0"
-    unixify "^1.0.0"
-
-"@graphql-tools/graphql-file-loader@7.5.5":
-  version "7.5.5"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-tools/graphql-file-loader/-/graphql-file-loader-7.5.5.tgz#d8afb391282e3dc33005df04bdec8488e4ab101d"
-  integrity sha512-OL+7qO1S66TpMK7OGz8Ag2WL08HlxKxrObVSDlxzWbSubWuXM5v959XscYAKRf6daYcVpkfNvO37QjflL9mjhg==
-  dependencies:
-    "@graphql-tools/import" "6.7.6"
-    "@graphql-tools/utils" "8.12.0"
+    "@graphql-tools/import" "6.7.17"
+    "@graphql-tools/utils" "9.2.1"
     globby "^11.0.3"
     tslib "^2.4.0"
     unixify "^1.0.0"
@@ -2519,27 +2384,16 @@
     "@graphql-tools/utils" "^7.0.0"
     tslib "~2.1.0"
 
-"@graphql-tools/graphql-tag-pluck@7.3.6":
-  version "7.3.6"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-tools/graphql-tag-pluck/-/graphql-tag-pluck-7.3.6.tgz#27029ef9e8d7f4bcf8dd8627fb93bd45cc0215fd"
-  integrity sha512-qULgqsOGKY1/PBqmP7fJZqbCg/TzPHKB9Wl51HGA9QjGymrzmrH5EjvsC8RtgdubF8yuTTVVFTz1lmSQ7RPssQ==
-  dependencies:
-    "@babel/parser" "^7.16.8"
-    "@babel/traverse" "^7.16.8"
-    "@babel/types" "^7.16.8"
-    "@graphql-tools/utils" "8.12.0"
-    tslib "^2.4.0"
-
-"@graphql-tools/graphql-tag-pluck@7.4.0":
-  version "7.4.0"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-tools/graphql-tag-pluck/-/graphql-tag-pluck-7.4.0.tgz#b8082801164aad0b9b03bc61fb92388d076cc66a"
-  integrity sha512-f966Z8cMDiPxWuN3ksuHpNgGE8euZtrL/Gcwz9rRarAb13al4CGHKmw2Cb/ZNdt7GbyhdiLT4wbaddrF0xCpdw==
+"@graphql-tools/graphql-tag-pluck@7.5.0":
+  version "7.5.0"
+  resolved "https://registry.yarnpkg.com/@graphql-tools/graphql-tag-pluck/-/graphql-tag-pluck-7.5.0.tgz#be99bc6b5e8331a2379ab4585d71b057eb981497"
+  integrity sha512-76SYzhSlH50ZWkhWH6OI94qrxa8Ww1ZeOU04MdtpSeQZVT2rjGWeTb3xM3kjTVWQJsr/YJBhDeNPGlwNUWfX4Q==
   dependencies:
     "@babel/parser" "^7.16.8"
     "@babel/plugin-syntax-import-assertions" "7.20.0"
     "@babel/traverse" "^7.16.8"
     "@babel/types" "^7.16.8"
-    "@graphql-tools/utils" "9.1.1"
+    "@graphql-tools/utils" "9.2.1"
     tslib "^2.4.0"
 
 "@graphql-tools/graphql-tag-pluck@^6.2.6", "@graphql-tools/graphql-tag-pluck@^6.5.1":
@@ -2553,21 +2407,12 @@
     "@graphql-tools/utils" "^7.0.0"
     tslib "~2.1.0"
 
-"@graphql-tools/import@6.7.12":
-  version "6.7.12"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-tools/import/-/import-6.7.12.tgz#173d2ce94304d1930e8674857d4ffe3cd52cfdd5"
-  integrity sha512-3+IV3RHqnpQz0o+0Liw3jkr0HL8LppvsFROKdfXihbnCGO7cIq4S9QYdczZ2DAJ7AosyzSu8m36X5dEmOYY6WA==
+"@graphql-tools/import@6.7.17":
+  version "6.7.17"
+  resolved "https://registry.yarnpkg.com/@graphql-tools/import/-/import-6.7.17.tgz#ab51ed08bcbf757f952abf3f40793ce3db42d4a3"
+  integrity sha512-bn9SgrECXq3WIasgNP7ful/uON51wBajPXtxdY+z/ce7jLWaFE6lzwTDB/GAgiZ+jo7nb0ravlxteSAz2qZmuA==
   dependencies:
-    "@graphql-tools/utils" "9.1.1"
-    resolve-from "5.0.0"
-    tslib "^2.4.0"
-
-"@graphql-tools/import@6.7.6":
-  version "6.7.6"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-tools/import/-/import-6.7.6.tgz#9bc0bb304a6fcc43aa2c9177631670b1fdfb2115"
-  integrity sha512-WtUyiO2qCaK/H4u81zAw/NbBvCOzwKl4N+Vl+FqrFCzYobscwL6x6roePyoXM1O3+JJIIn3CETv4kg4kwxaBVw==
-  dependencies:
-    "@graphql-tools/utils" "8.12.0"
+    "@graphql-tools/utils" "9.2.1"
     resolve-from "5.0.0"
     tslib "^2.4.0"
 
@@ -2610,23 +2455,13 @@
     tslib "^2.4.0"
     unixify "1.0.0"
 
-"@graphql-tools/load@7.8.0":
-  version "7.8.0"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-tools/load/-/load-7.8.0.tgz#bd4d2e2a5117de9a60f9691a218217e96afc2ea7"
-  integrity sha512-l4FGgqMW0VOqo+NMYizwV8Zh+KtvVqOf93uaLo9wJ3sS3y/egPCgxPMDJJ/ufQZG3oZ/0oWeKt68qop3jY0yZg==
+"@graphql-tools/load@7.8.13":
+  version "7.8.13"
+  resolved "https://registry.yarnpkg.com/@graphql-tools/load/-/load-7.8.13.tgz#a813bfc8195d27f465739c15fb1672a6def6e9ee"
+  integrity sha512-c97/GuUl81Wpa38cx3E6nMz8gUrvVcFokoPfDOaA5uTWSTXA1UxaF4KrvM9P5rNFaKVAtF9f6nMIusRE5B0mag==
   dependencies:
-    "@graphql-tools/schema" "9.0.4"
-    "@graphql-tools/utils" "8.12.0"
-    p-limit "3.1.0"
-    tslib "^2.4.0"
-
-"@graphql-tools/load@7.8.6":
-  version "7.8.6"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-tools/load/-/load-7.8.6.tgz#f0c5d7852337f8c7e4b88a9a7d63255d29d98395"
-  integrity sha512-yFDM5hVhV0eOom3SGyc+mjL8FvEb+0PZTZ/OSc4zrs3m/ABiQFHm2ilhzNS+OsMCpOsfGl2kXguEdt86QPp60Q==
-  dependencies:
-    "@graphql-tools/schema" "9.0.10"
-    "@graphql-tools/utils" "9.1.1"
+    "@graphql-tools/schema" "9.0.17"
+    "@graphql-tools/utils" "9.2.1"
     p-limit "3.1.0"
     tslib "^2.4.0"
 
@@ -2653,14 +2488,6 @@
     "@graphql-tools/utils" "8.9.0"
     tslib "^2.4.0"
 
-"@graphql-tools/merge@8.3.10":
-  version "8.3.10"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-tools/merge/-/merge-8.3.10.tgz#81f374bc1e8c81d45cb1003d8ed05f181b7e6bd5"
-  integrity sha512-/hSg69JwqEA+t01wQmMGKPuaJ9VJBSz6uAXhbNNrTBJu8bmXljw305NVXM49pCwDKFVUGtbTqYrBeLcfT3RoYw==
-  dependencies:
-    "@graphql-tools/utils" "9.0.1"
-    tslib "^2.4.0"
-
 "@graphql-tools/merge@8.3.12":
   version "8.3.12"
   resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-tools/merge/-/merge-8.3.12.tgz#e3f2e5d8a7b34fb689cda66799d845cbc919e464"
@@ -2669,20 +2496,20 @@
     "@graphql-tools/utils" "9.1.1"
     tslib "^2.4.0"
 
-"@graphql-tools/merge@8.3.16":
-  version "8.3.16"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-tools/merge/-/merge-8.3.16.tgz#fede610687b148e34ff861e8b038dcd71e20039b"
-  integrity sha512-In0kcOZcPIpYOKaqdrJ3thdLPE7TutFnL9tbrHUy2zCinR2O/blpRC48jPckcs0HHrUQ0pGT4HqvzMkZUeEBAw==
-  dependencies:
-    "@graphql-tools/utils" "9.1.4"
-    tslib "^2.4.0"
-
 "@graphql-tools/merge@8.3.6":
   version "8.3.6"
   resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-tools/merge/-/merge-8.3.6.tgz#97a936d4c8e8f935e58a514bb516c476437b5b2c"
   integrity sha512-uUBokxXi89bj08P+iCvQk3Vew4vcfL5ZM6NTylWi8PIpoq4r5nJ625bRuN8h2uubEdRiH8ntN9M4xkd/j7AybQ==
   dependencies:
     "@graphql-tools/utils" "8.12.0"
+    tslib "^2.4.0"
+
+"@graphql-tools/merge@8.4.0":
+  version "8.4.0"
+  resolved "https://registry.yarnpkg.com/@graphql-tools/merge/-/merge-8.4.0.tgz#47fbe5c4b6764276dc35bd19c4e7d3c46d3dc0fc"
+  integrity sha512-3XYCWe0d3I4F1azNj1CdShlbHfTIfiDgj00R9uvFH8tHKh7i1IWN3F7QQYovcHKhayaR6zPok3YYMESYQcBoaA==
+  dependencies:
+    "@graphql-tools/utils" "9.2.1"
     tslib "^2.4.0"
 
 "@graphql-tools/merge@^6.2.11", "@graphql-tools/merge@^6.2.12", "@graphql-tools/merge@^6.2.5":
@@ -2742,12 +2569,12 @@
     "@graphql-tools/utils" "^9.2.1"
     tslib "^2.4.0"
 
-"@graphql-tools/resolvers-composition@6.5.12":
-  version "6.5.12"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-tools/resolvers-composition/-/resolvers-composition-6.5.12.tgz#cf67434e4369ed5ee3f495600b0cfdc7a22e5fe9"
-  integrity sha512-F3yqooBlhXrO2KN2rK4xaLWzg2U+Ae0gNXBrx4JKf1swfRNfL6R7lNapzinBf14QJ+39wxRRmJiwMa+vA8bf0g==
+"@graphql-tools/resolvers-composition@6.5.17":
+  version "6.5.17"
+  resolved "https://registry.yarnpkg.com/@graphql-tools/resolvers-composition/-/resolvers-composition-6.5.17.tgz#fe3444d762309a3c23726a7cb4d9d91b16161034"
+  integrity sha512-9VGQUt71wdwoKBda2Yln6X1ulTrhknIsO9G7+S1szTeadzDFnBDFXjlzTINd6/+3hmfDiUg0ps5VLzgivQwzpg==
   dependencies:
-    "@graphql-tools/utils" "9.1.1"
+    "@graphql-tools/utils" "9.2.1"
     lodash "4.17.21"
     micromatch "^4.0.4"
     tslib "^2.4.0"
@@ -2772,13 +2599,13 @@
     tslib "^2.4.0"
     value-or-promise "1.0.11"
 
-"@graphql-tools/schema@9.0.14":
-  version "9.0.14"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-tools/schema/-/schema-9.0.14.tgz#9a658ab82d5a7d4db73f68a44900d4c88a98f0bc"
-  integrity sha512-U6k+HY3Git+dsOEhq+dtWQwYg2CAgue8qBvnBXoKu5eEeH284wymMUoNm0e4IycOgMCJANVhClGEBIkLRu3FQQ==
+"@graphql-tools/schema@9.0.17":
+  version "9.0.17"
+  resolved "https://registry.yarnpkg.com/@graphql-tools/schema/-/schema-9.0.17.tgz#d731e9899465f88d5b9bf69e607ec465bb88b062"
+  integrity sha512-HVLq0ecbkuXhJlpZ50IHP5nlISqH2GbNgjBJhhRzHeXhfwlUOT4ISXGquWTmuq61K0xSaO0aCjMpxe4QYbKTng==
   dependencies:
-    "@graphql-tools/merge" "8.3.16"
-    "@graphql-tools/utils" "9.1.4"
+    "@graphql-tools/merge" "8.4.0"
+    "@graphql-tools/utils" "9.2.1"
     tslib "^2.4.0"
     value-or-promise "1.0.12"
 
@@ -2789,16 +2616,6 @@
   dependencies:
     "@graphql-tools/merge" "8.3.6"
     "@graphql-tools/utils" "8.12.0"
-    tslib "^2.4.0"
-    value-or-promise "1.0.11"
-
-"@graphql-tools/schema@9.0.8":
-  version "9.0.8"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-tools/schema/-/schema-9.0.8.tgz#df3119c8543e6dacf425998f83aa714e2ee86eb0"
-  integrity sha512-PnES7sNkhQ/FdPQhP7cup0OIzwzQh+nfjklilU7YJzE209ACIyEQtxoNCfvPW5eV6hc9bWsBQeI3Jm4mMtwxNA==
-  dependencies:
-    "@graphql-tools/merge" "8.3.10"
-    "@graphql-tools/utils" "9.0.1"
     tslib "^2.4.0"
     value-or-promise "1.0.11"
 
@@ -2821,7 +2638,7 @@
     tslib "^2.4.0"
     value-or-promise "1.0.11"
 
-"@graphql-tools/schema@^9.0.0", "@graphql-tools/schema@^9.0.18":
+"@graphql-tools/schema@^9.0.0", "@graphql-tools/schema@^9.0.16", "@graphql-tools/schema@^9.0.18", "@graphql-tools/schema@^9.0.19":
   version "9.0.19"
   resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-tools/schema/-/schema-9.0.19.tgz#c4ad373b5e1b8a0cf365163435b7d236ebdd06e7"
   integrity sha512-oBRPoNBtCkk0zbUsyP4GaIzCt8C0aCI4ycIRUL67KK5pOHljKLBBtGT+Jr6hkzA74C8Gco8bpZPe7aWFjiaK2w==
@@ -2831,17 +2648,17 @@
     tslib "^2.4.0"
     value-or-promise "^1.0.12"
 
-"@graphql-tools/stitch@8.7.13":
-  version "8.7.13"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-tools/stitch/-/stitch-8.7.13.tgz#94f8445ae1367569d9680ad4db6738ca4d98816c"
-  integrity sha512-7bKJWT1vJJfg1GKiHd6c3GxdmCX1y4HiMw6nXKKad79wdYC9uxRSBOWFGaGbyIZBkCv4E5ptZioCn65NX+Fmkw==
+"@graphql-tools/stitch@8.7.43":
+  version "8.7.43"
+  resolved "https://registry.yarnpkg.com/@graphql-tools/stitch/-/stitch-8.7.43.tgz#f779c0fc3b9c6883bb6337be85090cff972ce253"
+  integrity sha512-XfZEtGU/zKUuAvVdRl+ZyZuZra67wwg0BqDvYJJ4gzhm9X2JcV8jALEqrTMVuFn4xK5oxcTe1uLlaLmhxQXHWQ==
   dependencies:
-    "@graphql-tools/batch-delegate" "8.4.1"
-    "@graphql-tools/delegate" "9.0.8"
-    "@graphql-tools/merge" "8.3.6"
-    "@graphql-tools/schema" "9.0.4"
-    "@graphql-tools/utils" "8.12.0"
-    "@graphql-tools/wrap" "9.2.3"
+    "@graphql-tools/batch-delegate" "8.4.21"
+    "@graphql-tools/delegate" "9.0.28"
+    "@graphql-tools/merge" "8.4.0"
+    "@graphql-tools/schema" "9.0.17"
+    "@graphql-tools/utils" "9.2.1"
+    "@graphql-tools/wrap" "9.3.8"
     tslib "^2.4.0"
     value-or-promise "^1.0.11"
 
@@ -2858,42 +2675,33 @@
     "@graphql-tools/wrap" "^7.0.6"
     tslib "~2.2.0"
 
-"@graphql-tools/stitching-directives@2.3.11":
-  version "2.3.11"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-tools/stitching-directives/-/stitching-directives-2.3.11.tgz#8a3ae81f7a08a47579118e9bbac507108b6996af"
-  integrity sha512-Om1ApZXH5WUbaE4tKl1+5ZbxtFDKPJee4gIGbIQxFu7E/6p+Qoda4XSqjQoWDscZNgAtgxeICVMWGS6B9HqWzg==
+"@graphql-tools/stitching-directives@2.3.31":
+  version "2.3.31"
+  resolved "https://registry.yarnpkg.com/@graphql-tools/stitching-directives/-/stitching-directives-2.3.31.tgz#299bcdfdbd5f1a808ded0d7dd4e9f9a217448b01"
+  integrity sha512-XX81hqZy4IHB2OwrG1escEA5yT5ZBxUYoHaxohAa8gaYUij5Xc6l4qzZ8HT05T1x1mNhFFNILEgQaJA1EDGv/A==
   dependencies:
-    "@graphql-tools/delegate" "9.0.8"
-    "@graphql-tools/utils" "8.12.0"
+    "@graphql-tools/delegate" "9.0.28"
+    "@graphql-tools/utils" "9.2.1"
     tslib "^2.4.0"
 
-"@graphql-tools/stitching-directives@2.3.20":
-  version "2.3.20"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-tools/stitching-directives/-/stitching-directives-2.3.20.tgz#dccaef50c16ba536ba37d30de912e9aed9012774"
-  integrity sha512-q3oKfQbX88NY3YxPIwHHJ6506QSuG01rjJzEQL/k3mClZCVlrayedn9vJUu3Rc0ZikqKQ6F05zgAsbEfK+h3Ug==
+"@graphql-tools/url-loader@7.17.14":
+  version "7.17.14"
+  resolved "https://registry.yarnpkg.com/@graphql-tools/url-loader/-/url-loader-7.17.14.tgz#a08618aa275b4cd8a214a7646a0ca74795e36192"
+  integrity sha512-7boEmrZlbViqQSSvu2VFCGi9YAY7E0BCVObiv1sLYbFR+62mo825As0haU5l7wlx1zCDyUlOleNz+X2jVvBbSQ==
   dependencies:
-    "@graphql-tools/delegate" "9.0.17"
-    "@graphql-tools/utils" "9.1.1"
-    tslib "^2.4.0"
-
-"@graphql-tools/url-loader@7.17.4":
-  version "7.17.4"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-tools/url-loader/-/url-loader-7.17.4.tgz#4c25fde9223f761ce502c809fa585b152982e2e0"
-  integrity sha512-nB2fhkn4LTYjU2qoTOBZYmWQRVYsCI0K2LScwD49QVMNAPWthg/lHao4hFUe70aTInT8oquvl8d0rIb7fRWOvA==
-  dependencies:
-    "@ardatan/sync-fetch" "0.0.1"
-    "@graphql-tools/delegate" "9.0.23"
-    "@graphql-tools/executor-graphql-ws" "0.0.7"
-    "@graphql-tools/executor-http" "0.1.1"
-    "@graphql-tools/executor-legacy-ws" "0.0.6"
-    "@graphql-tools/utils" "9.1.4"
-    "@graphql-tools/wrap" "9.3.2"
+    "@ardatan/sync-fetch" "^0.0.1"
+    "@graphql-tools/delegate" "^9.0.27"
+    "@graphql-tools/executor-graphql-ws" "^0.0.12"
+    "@graphql-tools/executor-http" "^0.1.7"
+    "@graphql-tools/executor-legacy-ws" "^0.0.9"
+    "@graphql-tools/utils" "^9.2.1"
+    "@graphql-tools/wrap" "^9.3.8"
     "@types/ws" "^8.0.0"
-    "@whatwg-node/fetch" "^0.6.0"
-    isomorphic-ws "5.0.0"
+    "@whatwg-node/fetch" "^0.8.0"
+    isomorphic-ws "^5.0.0"
     tslib "^2.4.0"
     value-or-promise "^1.0.11"
-    ws "8.12.0"
+    ws "^8.12.0"
 
 "@graphql-tools/url-loader@^6.3.2":
   version "6.10.1"
@@ -2941,13 +2749,6 @@
   dependencies:
     tslib "^2.4.0"
 
-"@graphql-tools/utils@9.0.1":
-  version "9.0.1"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-tools/utils/-/utils-9.0.1.tgz#04933b34c3435ef9add4f8bdfdf452040376f9d0"
-  integrity sha512-z6FimVa5E44bHKmqK0/uMp9hHvHo2Tkt9A5rlLb40ReD/8IFKehSXLzM4b2N1vcP7mSsbXIdDK9Aoc8jT/he1Q==
-  dependencies:
-    tslib "^2.4.0"
-
 "@graphql-tools/utils@9.1.1":
   version "9.1.1"
   resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-tools/utils/-/utils-9.1.1.tgz#b47ea8f0d18c038c5c1c429e72caa5c25039fbab"
@@ -2955,11 +2756,12 @@
   dependencies:
     tslib "^2.4.0"
 
-"@graphql-tools/utils@9.1.4":
-  version "9.1.4"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-tools/utils/-/utils-9.1.4.tgz#2c9e0aefc9655dd73247667befe3c850ec014f3f"
-  integrity sha512-hgIeLt95h9nQgQuzbbdhuZmh+8WV7RZ/6GbTj6t3IU4Zd2zs9yYJ2jgW/krO587GMOY8zCwrjNOMzD40u3l7Vg==
+"@graphql-tools/utils@9.2.1", "@graphql-tools/utils@^9.0.0", "@graphql-tools/utils@^9.1.1", "@graphql-tools/utils@^9.2.1":
+  version "9.2.1"
+  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-tools/utils/-/utils-9.2.1.tgz#1b3df0ef166cfa3eae706e3518b17d5922721c57"
+  integrity sha512-WUw506Ql6xzmOORlriNrD6Ugx+HjVgYxt9KCXD9mHAak+eaXSwuGGPyE60hy9xaDEoXKBsG7SkG69ybitaVl6A==
   dependencies:
+    "@graphql-typed-document-node/core" "^3.1.1"
     tslib "^2.4.0"
 
 "@graphql-tools/utils@^7.0.0", "@graphql-tools/utils@^7.0.1", "@graphql-tools/utils@^7.1.2", "@graphql-tools/utils@^7.5.0", "@graphql-tools/utils@^7.7.0", "@graphql-tools/utils@^7.7.1", "@graphql-tools/utils@^7.8.1", "@graphql-tools/utils@^7.9.0":
@@ -2978,66 +2780,14 @@
   dependencies:
     tslib "^2.4.0"
 
-"@graphql-tools/utils@^9.0.0", "@graphql-tools/utils@^9.2.1":
-  version "9.2.1"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-tools/utils/-/utils-9.2.1.tgz#1b3df0ef166cfa3eae706e3518b17d5922721c57"
-  integrity sha512-WUw506Ql6xzmOORlriNrD6Ugx+HjVgYxt9KCXD9mHAak+eaXSwuGGPyE60hy9xaDEoXKBsG7SkG69ybitaVl6A==
+"@graphql-tools/wrap@9.3.8":
+  version "9.3.8"
+  resolved "https://registry.yarnpkg.com/@graphql-tools/wrap/-/wrap-9.3.8.tgz#c6f53b7bc98cf3fa3d91e41be3b99254ae99b409"
+  integrity sha512-MGsExYPiILMw4Qff7HcvE9MMSYdjb/tr5IQYJbxJIU4/TrBHox1/smne8HG+Bd7kmDlTTj7nU/Z8sxmoRd0hOQ==
   dependencies:
-    "@graphql-typed-document-node/core" "^3.1.1"
-    tslib "^2.4.0"
-
-"@graphql-tools/wrap@9.2.10":
-  version "9.2.10"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-tools/wrap/-/wrap-9.2.10.tgz#9bf0859a5f6b11899d00cb90738ef6bbd2213fe0"
-  integrity sha512-K21XFLxcZ6JJGRzmzylY/HvoQ6eJU0o6J8ZLR828M/HVGKQgbK7qhn+AZrZKqBjFeZfBQojx8SzWDJPUmv8oEw==
-  dependencies:
-    "@graphql-tools/delegate" "9.0.14"
-    "@graphql-tools/schema" "9.0.8"
-    "@graphql-tools/utils" "9.0.1"
-    tslib "^2.4.0"
-    value-or-promise "1.0.11"
-
-"@graphql-tools/wrap@9.2.16":
-  version "9.2.16"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-tools/wrap/-/wrap-9.2.16.tgz#ec7696101a34cacd1bfefb86ccb631f55651c8fa"
-  integrity sha512-fWTvGytllPq0IVrRcEAc6VuVUInfCEpOUhSAo1ocsSe0HZMoyrQkS1ST0jmCpEWeGWuUd/S2zBLS2yjH8fYfhA==
-  dependencies:
-    "@graphql-tools/delegate" "9.0.17"
-    "@graphql-tools/schema" "9.0.10"
-    "@graphql-tools/utils" "9.1.1"
-    tslib "^2.4.0"
-    value-or-promise "1.0.11"
-
-"@graphql-tools/wrap@9.2.18":
-  version "9.2.18"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-tools/wrap/-/wrap-9.2.18.tgz#be19f164dad8c855081b190db9953e6e15b0343c"
-  integrity sha512-ocdwRM2lDjqXiu/1tpvegmxumYuwHZVLLnzLFuch5i5S10y+EmTqcfgalG/2CbMrPV6BS9t4R7/w6p6+ZbppVg==
-  dependencies:
-    "@graphql-tools/delegate" "9.0.17"
-    "@graphql-tools/schema" "9.0.10"
-    "@graphql-tools/utils" "9.1.1"
-    tslib "^2.4.0"
-    value-or-promise "1.0.11"
-
-"@graphql-tools/wrap@9.2.3":
-  version "9.2.3"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-tools/wrap/-/wrap-9.2.3.tgz#70f7602aed9781fbc860cea64a918636599883be"
-  integrity sha512-aiLjcAuUwcvA1mF25c7KFDPXEdQDpo6bTDyAMCSlFXpF4T01hoxLERmfmbRmsmy/dP80ZB31a+t70aspVdqZSA==
-  dependencies:
-    "@graphql-tools/delegate" "9.0.8"
-    "@graphql-tools/schema" "9.0.4"
-    "@graphql-tools/utils" "8.12.0"
-    tslib "^2.4.0"
-    value-or-promise "1.0.11"
-
-"@graphql-tools/wrap@9.3.2":
-  version "9.3.2"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-tools/wrap/-/wrap-9.3.2.tgz#3372986214e2e83636e7382500f3c87e79bc26d1"
-  integrity sha512-jqBMJZyKFATxWA3alPhGRWh/ZluaPWrXFumXRaqAwK9QdCAxM24jG8Kmy3FrTfeyxNqDyzDlHZobtwwDKurm5g==
-  dependencies:
-    "@graphql-tools/delegate" "9.0.23"
-    "@graphql-tools/schema" "9.0.14"
-    "@graphql-tools/utils" "9.1.4"
+    "@graphql-tools/delegate" "9.0.28"
+    "@graphql-tools/schema" "9.0.17"
+    "@graphql-tools/utils" "9.2.1"
     tslib "^2.4.0"
     value-or-promise "1.0.12"
 
@@ -3052,19 +2802,42 @@
     tslib "~2.2.0"
     value-or-promise "1.0.6"
 
+"@graphql-tools/wrap@^9.3.8":
+  version "9.4.2"
+  resolved "https://registry.yarnpkg.com/@graphql-tools/wrap/-/wrap-9.4.2.tgz#30835587c4c73be1780908a7cb077d8013aa2703"
+  integrity sha512-DFcd9r51lmcEKn0JW43CWkkI2D6T9XI1juW/Yo86i04v43O9w2/k4/nx2XTJv4Yv+iXwUw7Ok81PGltwGJSDSA==
+  dependencies:
+    "@graphql-tools/delegate" "^9.0.31"
+    "@graphql-tools/schema" "^9.0.18"
+    "@graphql-tools/utils" "^9.2.1"
+    tslib "^2.4.0"
+    value-or-promise "^1.0.12"
+
 "@graphql-typed-document-node/core@3.1.1":
   version "3.1.1"
   resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-typed-document-node/core/-/core-3.1.1.tgz#076d78ce99822258cf813ecc1e7fa460fa74d052"
   integrity sha512-NQ17ii0rK1b34VZonlmT2QMJFI70m0TRwbknO/ihlbatXyaktDhN/98vBiUU6kNBPljqGqyIrl2T4nY2RpFANg==
+
+"@graphql-typed-document-node/core@3.1.2":
+  version "3.1.2"
+  resolved "https://registry.yarnpkg.com/@graphql-typed-document-node/core/-/core-3.1.2.tgz#6fc464307cbe3c8ca5064549b806360d84457b04"
+  integrity sha512-9anpBMM9mEgZN4wr2v8wHJI2/u5TnnggewRN6OlvXTTnuVyoY19X6rOv9XTqKRw6dcGKwZsBi8n0kDE2I5i4VA==
 
 "@graphql-typed-document-node/core@3.2.0", "@graphql-typed-document-node/core@^3.1.1":
   version "3.2.0"
   resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-typed-document-node/core/-/core-3.2.0.tgz#5f3d96ec6b2354ad6d8a28bf216a1d97b5426861"
   integrity sha512-mB9oAsNCm9aM3/SOv4YtBMqZbYj10R7dkq8byBqxGY/ncFwhf2oQzMV+LCRlWoDSEBJ3COiR1yeDvMtsoOsuFQ==
 
-"@graphql-yoga/subscription@^3.0.0-next.0":
+"@graphql-yoga/logger@^0.0.1":
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/@graphql-yoga/logger/-/logger-0.0.1.tgz#48504fa6ecaee487d9df00fd44c28e356635a324"
+  integrity sha512-6npFz7eZz33mXgSm1waBLMjUNG0D5hTc/p5Hcs1mojkT3KsLpCOFokzTEKboNsBhKevYcaVa/xeA7WBj4UYMLg==
+  dependencies:
+    tslib "^2.3.1"
+
+"@graphql-yoga/subscription@^3.1.0":
   version "3.1.0"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@graphql-yoga/subscription/-/subscription-3.1.0.tgz#4a0bb0b9db2602d02c68f9828603e1e40329140b"
+  resolved "https://registry.yarnpkg.com/@graphql-yoga/subscription/-/subscription-3.1.0.tgz#4a0bb0b9db2602d02c68f9828603e1e40329140b"
   integrity sha512-Vc9lh8KzIHyS3n4jBlCbz7zCjcbtQnOBpsymcRvHhFr2cuH+knmRn0EmzimMQ58jQ8kxoRXXC3KJS3RIxSdPIg==
   dependencies:
     "@graphql-yoga/typed-event-target" "^1.0.0"
@@ -4107,53 +3880,15 @@
   resolved "https://registry.yarnpkg.com/@vue/shared/-/shared-3.2.45.tgz#a3fffa7489eafff38d984e23d0236e230c818bc2"
   integrity sha512-Ewzq5Yhimg7pSztDV+RH1UDKBzmtqieXQlpTVm2AwraoRL/Rks96mvd8Vgi7Lj+h+TH8dv7mXD3FRZR3TUvbSg==
 
-"@whatwg-node/events@0.0.2", "@whatwg-node/events@^0.0.2":
+"@whatwg-node/events@0.0.2":
   version "0.0.2"
   resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@whatwg-node/events/-/events-0.0.2.tgz#7b7107268d2982fc7b7aff5ee6803c64018f84dd"
   integrity sha512-WKj/lI4QjnLuPrim0cfO7i+HsDSXHxNv1y0CrJhdntuO3hxWZmnXCwNDnwOvry11OjRin6cgWNF+j/9Pn8TN4w==
 
-"@whatwg-node/fetch@0.4.7":
-  version "0.4.7"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@whatwg-node/fetch/-/fetch-0.4.7.tgz#4cbcda3ba93d5ae15ab823aae5869eae4a0cb14b"
-  integrity sha512-+oKDMGtmUJ7H37VDL5U2Vdk+ZxsIypZxO2q6y42ytu6W3PL6OIIUYZGliNqQgWtCdtxOZ9WPQvbIAuiLpnLlUw==
-  dependencies:
-    "@peculiar/webcrypto" "^1.4.0"
-    abort-controller "^3.0.0"
-    busboy "^1.6.0"
-    form-data-encoder "^1.7.1"
-    formdata-node "^4.3.1"
-    node-fetch "^2.6.7"
-    undici "^5.10.0"
-    web-streams-polyfill "^3.2.0"
-
-"@whatwg-node/fetch@0.5.3":
-  version "0.5.3"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@whatwg-node/fetch/-/fetch-0.5.3.tgz#afbd38a2e5392d91318845b967529076ca654b9e"
-  integrity sha512-cuAKL3Z7lrJJuUrfF1wxkQTb24Qd1QO/lsjJpM5ZSZZzUMms5TPnbGeGUKWA3hVKNHh30lVfr2MyRCT5Jfkucw==
-  dependencies:
-    "@peculiar/webcrypto" "^1.4.0"
-    abort-controller "^3.0.0"
-    busboy "^1.6.0"
-    form-data-encoder "^1.7.1"
-    formdata-node "^4.3.1"
-    node-fetch "^2.6.7"
-    undici "^5.12.0"
-    web-streams-polyfill "^3.2.0"
-
-"@whatwg-node/fetch@0.6.2":
-  version "0.6.2"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@whatwg-node/fetch/-/fetch-0.6.2.tgz#fe4837505f6fc91bcfd6e12cdcec66f4aecfeecc"
-  integrity sha512-fCUycF1W+bI6XzwJFnbdDuxIldfKM3w8+AzVCLGlucm0D+AQ8ZMm2j84hdcIhfV6ZdE4Y1HFVrHosAxdDZ+nPw==
-  dependencies:
-    "@peculiar/webcrypto" "^1.4.0"
-    abort-controller "^3.0.0"
-    busboy "^1.6.0"
-    form-data-encoder "^1.7.1"
-    formdata-node "^4.3.1"
-    node-fetch "^2.6.7"
-    undici "^5.12.0"
-    urlpattern-polyfill "^6.0.2"
-    web-streams-polyfill "^3.2.0"
+"@whatwg-node/events@^0.0.3":
+  version "0.0.3"
+  resolved "https://registry.yarnpkg.com/@whatwg-node/events/-/events-0.0.3.tgz#13a65dd4f5893f55280f766e29ae48074927acad"
+  integrity sha512-IqnKIDWfXBJkvy/k6tzskWTc2NK3LcqHlb+KHGCrjOCH4jfQckRX0NAiIcC/vIqQkzLYw2r2CTSwAxcrtcD6lA==
 
 "@whatwg-node/fetch@^0.5.0":
   version "0.5.4"
@@ -4169,40 +3904,43 @@
     undici "^5.12.0"
     web-streams-polyfill "^3.2.0"
 
-"@whatwg-node/fetch@^0.6.0":
-  version "0.6.9"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@whatwg-node/fetch/-/fetch-0.6.9.tgz#6cc694cc0378e27b8dfed427c5bf633eda6972b9"
-  integrity sha512-JfrBCJdMu9n9OARc0e/hPHcD98/8Nz1CKSdGYDg6VbObDkV/Ys30xe5i/wPOatYbxuvatj1kfWeHf7iNX3i17w==
+"@whatwg-node/fetch@^0.8.0", "@whatwg-node/fetch@^0.8.1", "@whatwg-node/fetch@^0.8.2", "@whatwg-node/fetch@^0.8.3":
+  version "0.8.8"
+  resolved "https://registry.yarnpkg.com/@whatwg-node/fetch/-/fetch-0.8.8.tgz#48c6ad0c6b7951a73e812f09dd22d75e9fa18cae"
+  integrity sha512-CdcjGC2vdKhc13KKxgsc6/616BQ7ooDIgPeTuAiE8qfCnS0mGzcfCOoZXypQSz73nxI+GWc7ZReIAVhxoE1KCg==
   dependencies:
     "@peculiar/webcrypto" "^1.4.0"
-    "@whatwg-node/node-fetch" "^0.0.5"
+    "@whatwg-node/node-fetch" "^0.3.6"
     busboy "^1.6.0"
-    urlpattern-polyfill "^6.0.2"
+    urlpattern-polyfill "^8.0.0"
     web-streams-polyfill "^3.2.1"
 
-"@whatwg-node/node-fetch@^0.0.5":
-  version "0.0.5"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@whatwg-node/node-fetch/-/node-fetch-0.0.5.tgz#bebf18891088e5e2fc449dea8d1bc94af5ec38df"
-  integrity sha512-hbccmaSZaItdsRuBKBEEhLoO+5oXJPxiyd0kG2xXd0Dh3Rt+vZn4pADHxuSiSHLd9CM+S2z4+IxlEGbWUgiz9g==
+"@whatwg-node/node-fetch@^0.3.6":
+  version "0.3.6"
+  resolved "https://registry.yarnpkg.com/@whatwg-node/node-fetch/-/node-fetch-0.3.6.tgz#e28816955f359916e2d830b68a64493124faa6d0"
+  integrity sha512-w9wKgDO4C95qnXZRwZTfCmLWqyRnooGjcIwG0wADWjw9/HN0p7dtvtgSvItZtUyNteEvgTrd8QojNEqV6DAGTA==
   dependencies:
-    "@whatwg-node/events" "^0.0.2"
+    "@whatwg-node/events" "^0.0.3"
     busboy "^1.6.0"
+    fast-querystring "^1.1.1"
+    fast-url-parser "^1.1.3"
     tslib "^2.3.1"
 
-"@whatwg-node/server@0.4.12":
-  version "0.4.12"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@whatwg-node/server/-/server-0.4.12.tgz#4d6d1597d41d7c70538e04294c0f493da949bfb5"
-  integrity sha512-NMnR4vaLZQZeBGebzKFE+BXELQ8QdqoLfJc10m0rgXFIJpcn/iqNtw+GXXx8zLTrEqHOuYTzn6+UpmKsG4bpgQ==
+"@whatwg-node/router@0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@whatwg-node/router/-/router-0.3.0.tgz#70002afb4a8ef4b544894c8344933e9559c0ba40"
+  integrity sha512-d7qzIvbbBm6d0VpJGlRbp/G9PTLRCcpS9fRNnfjE87ZbWbB05vBzHkaUyOs2zaTny/GPuBzrEY2QewoLj4+5JQ==
   dependencies:
-    "@whatwg-node/fetch" "0.4.7"
+    "@whatwg-node/fetch" "^0.8.0"
+    "@whatwg-node/server" "^0.7.0"
     tslib "^2.3.1"
 
-"@whatwg-node/server@^0.4.10":
-  version "0.4.17"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@whatwg-node/server/-/server-0.4.17.tgz#c40bd644f569e40e4813e7dd6154d7bd77bf1a77"
-  integrity sha512-kq1AHyi87VWfiDqiSTAOY+py83HMJg42+fI8JAe1wjmMkJ8v/E5mKq5NpLNRM9Cnf7NHsQR0AwQgvX/RFuptaA==
+"@whatwg-node/server@^0.7.0", "@whatwg-node/server@^0.7.3":
+  version "0.7.7"
+  resolved "https://registry.yarnpkg.com/@whatwg-node/server/-/server-0.7.7.tgz#daaae73999cf8ea4d4f7e617276dcb8e84a6e49e"
+  integrity sha512-aHURgNDFm/48WVV3vhTMfnEKCYwYgdaRdRhZsQZx4UVFjGGkGay7Ys0+AYu9QT/jpoImv2oONkstoTMUprDofg==
   dependencies:
-    "@whatwg-node/fetch" "0.5.3"
+    "@whatwg-node/fetch" "^0.8.3"
     tslib "^2.3.1"
 
 "@wry/context@^0.7.0", "@wry/context@^0.7.3":
@@ -4225,6 +3963,11 @@
   integrity sha512-I6bHwH0fSf6RqQcnnXLJKhkSXG45MFral3GxPaY4uAl0LYDZM+YDVDAiU9bYwjTuysy1S0IeecWtmq1SZA3M1w==
   dependencies:
     tslib "^2.3.0"
+
+"@xmldom/xmldom@^0.7.9":
+  version "0.7.13"
+  resolved "https://registry.yarnpkg.com/@xmldom/xmldom/-/xmldom-0.7.13.tgz#ff34942667a4e19a9f4a0996a76814daac364cf3"
+  integrity sha512-lm2GW5PkosIzccsaZIz7tp8cPADSIlIHWDFTR1N0SzfinhhYgeIQjFMz4rYzanCScr3DqQLeomUDArp6MWKm+g==
 
 abort-controller@3.0.0, abort-controller@^3.0.0:
   version "3.0.0"
@@ -4284,20 +4027,20 @@ ajv-formats@2.1.1, ajv-formats@^2.1.1:
   dependencies:
     ajv "^8.0.0"
 
-ajv@8.11.0:
-  version "8.11.0"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/ajv/-/ajv-8.11.0.tgz#977e91dd96ca669f54a11e23e378e33b884a565f"
-  integrity sha512-wGgprdCvMalC0BztXvitD2hC04YffAvtsUn93JbGXYLAtCUO4xd17mCCZQxUOItiBwZvJScWo8NIvQMQ71rdpg==
+ajv@8.11.2:
+  version "8.11.2"
+  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/ajv/-/ajv-8.11.2.tgz#aecb20b50607acf2569b6382167b65a96008bb78"
+  integrity sha512-E4bfmKAhGiSTvMfL1Myyycaub+cUEU2/IvpylXkUu7CHBkBj1f/ikdzbD7YQ6FKUbixDxeYvB/xY4fvyroDlQg==
   dependencies:
     fast-deep-equal "^3.1.1"
     json-schema-traverse "^1.0.0"
     require-from-string "^2.0.2"
     uri-js "^4.2.2"
 
-ajv@8.11.2:
-  version "8.11.2"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/ajv/-/ajv-8.11.2.tgz#aecb20b50607acf2569b6382167b65a96008bb78"
-  integrity sha512-E4bfmKAhGiSTvMfL1Myyycaub+cUEU2/IvpylXkUu7CHBkBj1f/ikdzbD7YQ6FKUbixDxeYvB/xY4fvyroDlQg==
+ajv@8.12.0, ajv@^8.0.0, ajv@^8.10.0, ajv@^8.11.0:
+  version "8.12.0"
+  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/ajv/-/ajv-8.12.0.tgz#d1a0527323e22f53562c567c00991577dfbe19d1"
+  integrity sha512-sRu1kpcO9yLtYxBKvqfTeh9KzZEwO3STyX1HT+4CaDzC6HpTGYhIhPIzj9XuKU7KYDwnaeh5hcOwjy1QuJzBPA==
   dependencies:
     fast-deep-equal "^3.1.1"
     json-schema-traverse "^1.0.0"
@@ -4465,7 +4208,7 @@ array.prototype.flat@^1.2.5:
     es-abstract "^1.20.4"
     es-shim-unscopables "^1.0.0"
 
-asap@^2.0.6, asap@~2.0.3:
+asap@^2.0.0, asap@^2.0.6, asap@~2.0.3:
   version "2.0.6"
   resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/asap/-/asap-2.0.6.tgz#e50347611d7e690943208bbdafebcbc2fb866d46"
   integrity sha512-BSHWgDSAiKs50o2Re8ppvp3seVHXSRM44cdSsT9FfNEUUZLOGWVCsiWaRPWM1Znn+mqZ1OfVZ3z3DWEzSp7hRA==
@@ -4532,6 +4275,16 @@ await-timeout@^1.1.1:
   resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/await-timeout/-/await-timeout-1.1.1.tgz#d42062ee6bc4eb271fe4d4f851eb658dae7e3906"
   integrity sha512-gsDXAS6XVc4Jt+7S92MPX6Noq69bdeXUPEaXd8dk3+yVr629LTDLxNt4j1ycBbrU+AStK2PhKIyNIM+xzWMVOQ==
 
+axios-ntlm@^1.2.0:
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/axios-ntlm/-/axios-ntlm-1.4.1.tgz#55cfcb36605ff3bcb5d9b707ba40086de73b9787"
+  integrity sha512-6dKPhsfxONR3PyXFMsUM5g55cYNKifgkV2NV+ZesAHryKLeO+WhNgSnJecDER6jGUCl13OEhu8tCOLUMJFMGEQ==
+  dependencies:
+    axios "^1.3.2"
+    des.js "^1.0.1"
+    dev-null "^0.1.1"
+    js-md4 "^0.3.2"
+
 axios@^0.27.2:
   version "0.27.2"
   resolved "https://registry.yarnpkg.com/axios/-/axios-0.27.2.tgz#207658cc8621606e586c85db4b41a750e756d972"
@@ -4544,6 +4297,15 @@ axios@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/axios/-/axios-1.2.0.tgz#1cb65bd75162c70e9f8d118a905126c4a201d383"
   integrity sha512-zT7wZyNYu3N5Bu0wuZ6QccIf93Qk1eV8LOewxgjOZFd2DenOs98cJ7+Y6703d0wkaXGY6/nZd4EweJaHz9uzQw==
+  dependencies:
+    follow-redirects "^1.15.0"
+    form-data "^4.0.0"
+    proxy-from-env "^1.1.0"
+
+axios@^1.3.2:
+  version "1.5.1"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-1.5.1.tgz#11fbaa11fc35f431193a9564109c88c1f27b585f"
+  integrity sha512-Q28iYCWzNHjAm+yEAot5QaAMxhMghWLFVf7rRdwhUI+c2jix2DUXjAHXVi+s1ibs3mjPO/cCgbA++3BjD0vP/A==
   dependencies:
     follow-redirects "^1.15.0"
     form-data "^4.0.0"
@@ -5157,16 +4919,15 @@ core-js-pure@^3.25.1:
   resolved "https://registry.yarnpkg.com/core-js-pure/-/core-js-pure-3.26.1.tgz#653f4d7130c427820dcecd3168b594e8bb095a33"
   integrity sha512-VVXcDpp/xJ21KdULRq/lXdLzQAtX7+37LzpyfFM973il0tWSsDEoyzG38G14AjTpK9VTfiNM9jnFauq/CpaWGQ==
 
-cosmiconfig@7.0.1:
-  version "7.0.1"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/cosmiconfig/-/cosmiconfig-7.0.1.tgz#714d756522cace867867ccb4474c5d01bbae5d6d"
-  integrity sha512-a1YWNUV2HwGimB7dU2s1wUMurNKjpx60HxBB6xUM8Re+2s1g1IIfJvFR0/iCF+XHdE0GMTKTuLR32UQff4TEyQ==
+cosmiconfig@8.1.3:
+  version "8.1.3"
+  resolved "https://registry.yarnpkg.com/cosmiconfig/-/cosmiconfig-8.1.3.tgz#0e614a118fcc2d9e5afc2f87d53cd09931015689"
+  integrity sha512-/UkO2JKI18b5jVMJUp0lvKFMpa/Gye+ZgZjKD+DGEN9y7NRcf/nK1A0sp67ONmKtnDCNMS44E6jrk0Yc3bDuUw==
   dependencies:
-    "@types/parse-json" "^4.0.0"
     import-fresh "^3.2.1"
+    js-yaml "^4.1.0"
     parse-json "^5.0.0"
     path-type "^4.0.0"
-    yaml "^1.10.0"
 
 create-require@^1.1.0:
   version "1.1.1"
@@ -5238,7 +4999,7 @@ dataloader@2.1.0:
   resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/dataloader/-/dataloader-2.1.0.tgz#c69c538235e85e7ac6c6c444bae8ecabf5de9df7"
   integrity sha512-qTcEYLen3r7ojZNgVUaRggOI+KM7jrKxXeSHhogh/TWxYMeONEMqY+hmkobiYQozsGIyg9OYVzO4ZIfoB4I0pQ==
 
-dataloader@^2.2.2:
+dataloader@2.2.2, dataloader@^2.2.2:
   version "2.2.2"
   resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/dataloader/-/dataloader-2.2.2.tgz#216dc509b5abe39d43a9b9d97e6e5e473dfbe3e0"
   integrity sha512-8YnDaaf7N3k/q5HnTJVuzSyLETjoZjVmHc4AeKAzOvKHEFQKcn64OKBfzHYtE9zGjctNM7V9I0MfnUVLpi7M5g==
@@ -5329,6 +5090,14 @@ dependency-graph@0.11.0, dependency-graph@^0.11.0:
   resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/dependency-graph/-/dependency-graph-0.11.0.tgz#ac0ce7ed68a54da22165a85e97a01d53f5eb2e27"
   integrity sha512-JeMq7fEshyepOWDfcfHK06N3MhyPhz++vtqWhMT5O9A3K42rdsEDpfdVqjaqaAhsw6a+ZqeDvQVtD0hFHQWrzg==
 
+des.js@^1.0.1:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/des.js/-/des.js-1.1.0.tgz#1d37f5766f3bbff4ee9638e871a8768c173b81da"
+  integrity sha512-r17GxjhUCjSRy8aiJpr8/UadFIzMzJGexI3Nmz4ADi9LYSFx4gTBp80+NaX/YsXWWLhpZ7v/v/ubEc/bCNfKwg==
+  dependencies:
+    inherits "^2.0.1"
+    minimalistic-assert "^1.0.0"
+
 detect-indent@^6.0.0:
   version "6.1.0"
   resolved "https://registry.yarnpkg.com/detect-indent/-/detect-indent-6.1.0.tgz#592485ebbbf6b3b1ab2be175c8393d04ca0d57e6"
@@ -5338,6 +5107,19 @@ detect-newline@^3.0.0:
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/detect-newline/-/detect-newline-3.1.0.tgz#576f5dfc63ae1a192ff192d8ad3af6308991b651"
   integrity sha512-TLz+x/vEXm/Y7P7wn1EJFNLxYpUD4TgMosxY6fAVJUnJMbupHBOncxyWUG9OpTaH9EBD7uFI5LfEgmMOc54DsA==
+
+dev-null@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/dev-null/-/dev-null-0.1.1.tgz#5a205ce3c2b2ef77b6238d6ba179eb74c6a0e818"
+  integrity sha512-nMNZG0zfMgmdv8S5O0TM5cpwNbGKRGPCxVsr0SmA3NZZy9CYBbuNLL0PD3Acx9e5LIUgwONXtM9kM6RlawPxEQ==
+
+dezalgo@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/dezalgo/-/dezalgo-1.0.4.tgz#751235260469084c132157dfa857f386d4c33d81"
+  integrity sha512-rXSP0bf+5n0Qonsb+SVVfNfIsimO4HEtmnIpPHY8Q1UCzKlQrDMfdobr8nJOOsRgWCyMRqeSBQzmWUMq7zvVig==
+  dependencies:
+    asap "^2.0.0"
+    wrappy "1"
 
 diff-sequences@^29.3.1:
   version "29.3.1"
@@ -5396,7 +5178,7 @@ dotenv@8.2.0:
   resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-8.2.0.tgz#97e619259ada750eea3e4ea3e26bceea5424b16a"
   integrity sha512-8sJ78ElpbDJBHNeBzUbUVLsqKdccaa/BXF1uPTw3GrvQTBgrQrtObr2mUrE38vzYd8cEv+m/JBfDLioYcfXoaw==
 
-dset@3.1.2, dset@^3.1.1:
+dset@3.1.2, dset@^3.1.1, dset@^3.1.2:
   version "3.1.2"
   resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/dset/-/dset-3.1.2.tgz#89c436ca6450398396dc6538ea00abc0c54cd45a"
   integrity sha512-g/M9sqy3oHe477Ar4voQxWtaPIFw1jTdKZuomOjhCcBx9nHUNn0pu6NopuFFrTh/TRZIKEj+76vLWFu9BNKk+Q==
@@ -6120,9 +5902,9 @@ fast-levenshtein@^2.0.6:
   resolved "https://registry.yarnpkg.com/fast-levenshtein/-/fast-levenshtein-2.0.6.tgz#3d8a5c66883a16a30ca8643e851f19baa7797917"
   integrity sha512-DCXu6Ifhqcks7TZKY3Hxp3y6qphY5SJZmrWMDrKcERSOXWQdMhU9Ig/PYrzyw/ul9jOIyh0N4M0tbC5hodg8dw==
 
-fast-querystring@^1.0.0:
+fast-querystring@^1.0.0, fast-querystring@^1.1.1:
   version "1.1.2"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/fast-querystring/-/fast-querystring-1.1.2.tgz#a6d24937b4fc6f791b4ee31dcb6f53aeafb89f53"
+  resolved "https://registry.yarnpkg.com/fast-querystring/-/fast-querystring-1.1.2.tgz#a6d24937b4fc6f791b4ee31dcb6f53aeafb89f53"
   integrity sha512-g6KuKWmFXc0fID8WWH0jit4g0AGBoJhCkJMb1RmbsSEUNvQ+ZC8D6CUZ+GtF8nMzSPXnhiePyyqqipzNNEnHjg==
   dependencies:
     fast-decode-uri-component "^1.0.1"
@@ -6146,6 +5928,13 @@ fast-uri@^2.0.0, fast-uri@^2.1.0:
   version "2.2.0"
   resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/fast-uri/-/fast-uri-2.2.0.tgz#519a0f849bef714aad10e9753d69d8f758f7445a"
   integrity sha512-cIusKBIt/R/oI6z/1nyfe2FvGKVTohVRfvkOhvx0nCEW+xf5NoCXjAHcWp93uOUBchzYcsvPlrapAdX1uW+YGg==
+
+fast-url-parser@^1.1.3:
+  version "1.1.3"
+  resolved "https://registry.yarnpkg.com/fast-url-parser/-/fast-url-parser-1.1.3.tgz#f4af3ea9f34d8a271cf58ad2b3759f431f0b318d"
+  integrity sha512-5jOCVXADYNuRkKFzNJ0dCCewsZiYo0dz8QNYljkOpFC6r2U4OBmKtvm/Tsuh4w1YYdDqDb31a8TVhBJ2OJKdqQ==
+  dependencies:
+    punycode "^1.3.2"
 
 fastify-plugin@^4.0.0:
   version "4.5.1"
@@ -6361,6 +6150,16 @@ formdata-node@^4.3.1:
     node-domexception "1.0.0"
     web-streams-polyfill "4.0.0-beta.3"
 
+formidable@^2.0.1:
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/formidable/-/formidable-2.1.2.tgz#fa973a2bec150e4ce7cac15589d7a25fc30ebd89"
+  integrity sha512-CM3GuJ57US06mlpQ47YcunuUZ9jpm8Vx+P2CGt2j7HpgkKZO/DJYQ0Bobim8G6PFQmK5lOqOOdUXboU+h73A4g==
+  dependencies:
+    dezalgo "^1.0.4"
+    hexoid "^1.0.0"
+    once "^1.4.0"
+    qs "^6.11.0"
+
 forwarded@0.2.0:
   version "0.2.0"
   resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/forwarded/-/forwarded-0.2.0.tgz#2269936428aad4c15c7ebe9779a84bf0b2a81811"
@@ -6488,7 +6287,7 @@ get-stream@^5.0.0, get-stream@^5.1.0:
   dependencies:
     pump "^3.0.0"
 
-get-stream@^6.0.0:
+get-stream@^6.0.0, get-stream@^6.0.1:
   version "6.0.1"
   resolved "https://registry.yarnpkg.com/get-stream/-/get-stream-6.0.1.tgz#a262d8eef67aced57c2852ad6167526a43cbf7b7"
   integrity sha512-ts6Wi+2j3jQjqi70w5AlN8DFnkSwC+MqmxEzdEALB2qXZYV3X/b1CTfgPLGJNMeAWxdPfU8FO1ms3NUfaHCPYg==
@@ -6542,6 +6341,16 @@ glob@^7.1.1, glob@^7.1.2, glob@^7.1.3, glob@^7.1.4, glob@^7.1.6:
     minimatch "^3.1.1"
     once "^1.3.0"
     path-is-absolute "^1.0.0"
+
+glob@^9.2.0:
+  version "9.3.5"
+  resolved "https://registry.yarnpkg.com/glob/-/glob-9.3.5.tgz#ca2ed8ca452781a3009685607fdf025a899dfe21"
+  integrity sha512-e1LleDykUz2Iu+MTYdkSsuWX8lvAjAcs0Xef0lNIu0S2wOAzuTxCJtcd9S3cijlwYF18EsU3rzb8jPVobxDh9Q==
+  dependencies:
+    fs.realpath "^1.0.0"
+    minimatch "^8.0.2"
+    minipass "^4.2.4"
+    path-scurry "^1.6.1"
 
 globals@^11.1.0:
   version "11.12.0"
@@ -6634,6 +6443,13 @@ graphql-scalars@1.20.1:
   dependencies:
     tslib "~2.4.0"
 
+graphql-scalars@^1.20.4:
+  version "1.22.2"
+  resolved "https://registry.yarnpkg.com/graphql-scalars/-/graphql-scalars-1.22.2.tgz#6326e6fe2d0ad4228a9fea72a977e2bf26b86362"
+  integrity sha512-my9FB4GtghqXqi/lWSVAOPiTzTnnEzdOXCsAC2bb5V7EFNQjVjwy3cSSbUvgYOtDuDibd+ZsCDhz+4eykYOlhQ==
+  dependencies:
+    tslib "^2.5.0"
+
 graphql-tag@^2.11.0, graphql-tag@^2.12.6:
   version "2.12.6"
   resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/graphql-tag/-/graphql-tag-2.12.6.tgz#d441a569c1d2537ef10ca3d1633b48725329b5f1"
@@ -6682,30 +6498,32 @@ graphql-type-json@0.3.2:
   resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/graphql-type-json/-/graphql-type-json-0.3.2.tgz#f53a851dbfe07bd1c8157d24150064baab41e115"
   integrity sha512-J+vjof74oMlCWXSvt0DOf2APEdZOCdubEvGDUAlqH//VBYcOYsGgRW7Xzorr44LvkjiuvecWc8fChxuZZbChtg==
 
-graphql-ws@5.11.2:
-  version "5.11.2"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/graphql-ws/-/graphql-ws-5.11.2.tgz#d5e0acae8b4d4a4cf7be410a24135cfcefd7ddc0"
-  integrity sha512-4EiZ3/UXYcjm+xFGP544/yW1+DVI8ZpKASFbzrV5EDTFWJp0ZvLl4Dy2fSZAzz9imKp5pZMIcjB0x/H69Pv/6w==
+graphql-ws@5.12.0:
+  version "5.12.0"
+  resolved "https://registry.yarnpkg.com/graphql-ws/-/graphql-ws-5.12.0.tgz#d06fe38916334b4a4c827f73268cbf4359a32ed7"
+  integrity sha512-PA3ImUp8utrpEjoxBMhvxsjkStvFEdU0E1gEBREt8HZIWkxOUymwJBhFnBL7t/iHhUq1GVPeZevPinkZFENxTw==
 
 graphql-ws@^4.4.1:
   version "4.9.0"
   resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/graphql-ws/-/graphql-ws-4.9.0.tgz#5cfd8bb490b35e86583d8322f5d5d099c26e365c"
   integrity sha512-sHkK9+lUm20/BGawNEWNtVAeJzhZeBg21VmvmLoT5NdGVeZWv5PdIhkcayQIAgjSyyQ17WMKmbDijIPG2On+Ag==
 
-graphql-yoga@3.0.0-next.7:
-  version "3.0.0-next.7"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/graphql-yoga/-/graphql-yoga-3.0.0-next.7.tgz#b0fa486a12e3f9d486179dde7b606541c8d56c41"
-  integrity sha512-V3Zue/nzv8gi0LH9nVlwFMTwpvWpgS4UeZHG9FW40lvPqRB7zg/4I43ZoXK1BxKEkT6lq6Jf2C7L1xwWMdu1vA==
+graphql-yoga@3.7.3:
+  version "3.7.3"
+  resolved "https://registry.yarnpkg.com/graphql-yoga/-/graphql-yoga-3.7.3.tgz#6b26b3bf4b8d87005cbdfdef34f4c0e7fc1e9286"
+  integrity sha512-u0Xs4iUfsCcZPVTM1kwd+zVJsX0IsYQ0N8s/aU6Ch/Ez2P1cppLRrFPb7WqN0eK+pMipUuyVC9Wm/cIbQdprkA==
   dependencies:
-    "@envelop/core" "3.0.2"
-    "@envelop/parser-cache" "5.0.1"
-    "@envelop/validation-cache" "5.0.1"
+    "@envelop/core" "^3.0.4"
+    "@envelop/validation-cache" "^5.1.2"
+    "@graphql-tools/executor" "^0.0.15"
     "@graphql-tools/schema" "^9.0.0"
-    "@graphql-typed-document-node/core" "^3.1.1"
-    "@graphql-yoga/subscription" "^3.0.0-next.0"
-    "@whatwg-node/fetch" "0.4.7"
-    "@whatwg-node/server" "0.4.12"
+    "@graphql-tools/utils" "^9.2.1"
+    "@graphql-yoga/logger" "^0.0.1"
+    "@graphql-yoga/subscription" "^3.1.0"
+    "@whatwg-node/fetch" "^0.8.2"
+    "@whatwg-node/server" "^0.7.3"
     dset "^3.1.1"
+    lru-cache "^8.0.0"
     tslib "^2.3.1"
 
 graphql@^16.6.0:
@@ -6754,6 +6572,11 @@ has@^1.0.3:
   dependencies:
     function-bind "^1.1.1"
 
+hash-it@^6.0.0:
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/hash-it/-/hash-it-6.0.0.tgz#188df5a8ca2f8e036690e35f2ef88bd9417ff334"
+  integrity sha512-KHzmSFx1KwyMPw0kXeeUD752q/Kfbzhy6dAZrjXV9kAIXGqzGvv8vhkUqj+2MGZldTo0IBpw6v7iWE7uxsvH0w==
+
 header-case@^2.0.4:
   version "2.0.4"
   resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/header-case/-/header-case-2.0.4.tgz#5a42e63b55177349cf405beb8d775acabb92c063"
@@ -6761,6 +6584,11 @@ header-case@^2.0.4:
   dependencies:
     capital-case "^1.0.4"
     tslib "^2.0.3"
+
+hexoid@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/hexoid/-/hexoid-1.0.0.tgz#ad10c6573fb907de23d9ec63a711267d9dc9bc18"
+  integrity sha512-QFLV0taWQOZtvIRIAdBChesmogZrtuXvVWsFHZTk2SU+anspqZ2vMnoLg7IE1+Uk16N19APic1BuF8bC8c2m5g==
 
 hjson@^3.1.2:
   version "3.2.2"
@@ -6935,7 +6763,7 @@ inflight@^1.0.4:
     once "^1.3.0"
     wrappy "1"
 
-inherits@2, inherits@^2.0.3, inherits@^2.0.4:
+inherits@2, inherits@^2.0.1, inherits@^2.0.3, inherits@^2.0.4:
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/inherits/-/inherits-2.0.4.tgz#0fa2c64f932917c3433a0ded55363aae37416b7c"
   integrity sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==
@@ -7246,9 +7074,9 @@ isomorphic-ws@4.0.1:
   resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/isomorphic-ws/-/isomorphic-ws-4.0.1.tgz#55fd4cd6c5e6491e76dc125938dd863f5cd4f2dc"
   integrity sha512-BhBvN2MBpWTaSHdWRb/bwdZJ1WaehQ2L1KngkCkfLUGF0mAWAT1sQUQacEmQ0jXkFw/czDXPNQSL5u2/Krsz1w==
 
-isomorphic-ws@5.0.0:
+isomorphic-ws@5.0.0, isomorphic-ws@^5.0.0:
   version "5.0.0"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/isomorphic-ws/-/isomorphic-ws-5.0.0.tgz#e5529148912ecb9b451b46ed44d53dae1ce04bbf"
+  resolved "https://registry.yarnpkg.com/isomorphic-ws/-/isomorphic-ws-5.0.0.tgz#e5529148912ecb9b451b46ed44d53dae1ce04bbf"
   integrity sha512-muId7Zzn9ywDsyXgTIafTry2sV3nySZeUDe6YedVd1Hvuuep5AsIlqK+XefWpYTyJG5e503F2xIuT2lcU6rCSw==
 
 istanbul-lib-coverage@^3.0.0, istanbul-lib-coverage@^3.2.0:
@@ -7297,16 +7125,6 @@ iterall@^1.2.1:
   version "1.3.0"
   resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/iterall/-/iterall-1.3.0.tgz#afcb08492e2915cbd8a0884eb93a8c94d0d72fea"
   integrity sha512-QZ9qOMdF+QLHxy1QIpUHUU1D5pS2CG2P69LF6L6CPjPYA/XMOmKV3PZpawHoAjHNyB0swdVTRxdYT4tbBbxqwg==
-
-itty-router-extras@0.4.2:
-  version "0.4.2"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/itty-router-extras/-/itty-router-extras-0.4.2.tgz#e46891ebea63f09ada74603649d8a6c4ce0c5df7"
-  integrity sha512-ppHaBzcTXs7idFSDISehG+8kif2/4aqLCfyY/Y/uIZv79sfEfNmTq9G+rDeqblun/VZRBiXZD8ztYmMS8EOsKw==
-
-itty-router@2.6.6:
-  version "2.6.6"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/itty-router/-/itty-router-2.6.6.tgz#78a08c3b7dc1bd90ce832cae8eff7e4cbfbf67ef"
-  integrity sha512-hIPHtXGymCX7Lzb2I4G6JgZFE4QEEQwst9GORK7sMYUpJvLfy4yZJr95r04e8DzoAnj6HcxM2m4TbK+juu+18g==
 
 jackspeak@^2.0.3:
   version "2.3.3"
@@ -7741,6 +7559,11 @@ js-levenshtein@^1.1.6:
   resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/js-levenshtein/-/js-levenshtein-1.1.6.tgz#c6cee58eb3550372df8deb85fad5ce66ce01d59d"
   integrity sha512-X2BB11YZtrRqY4EnQcLX5Rh373zbK4alC1FW7D7MBhL2gtcC17cTnr6DmfHZeS0s2rTHjUTMMHfG7gO8SSdw+g==
 
+js-md4@^0.3.2:
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/js-md4/-/js-md4-0.3.2.tgz#cd3b3dc045b0c404556c81ddb5756c23e59d7cf5"
+  integrity sha512-/GDnfQYsltsjRswQhN9fhv3EMw2sCpUdrdxyWDOUK7eyD++r3gRhzgiQgc/x4MAv2i1iuQ4lxO5mvqM3vj4bwA==
+
 js-sdsl@^4.1.4:
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/js-sdsl/-/js-sdsl-4.2.0.tgz#278e98b7bea589b8baaf048c20aeb19eb7ad09d0"
@@ -7841,10 +7664,10 @@ json-stable-stringify-without-jsonify@^1.0.1:
   resolved "https://registry.yarnpkg.com/json-stable-stringify-without-jsonify/-/json-stable-stringify-without-jsonify-1.0.1.tgz#9db7b59496ad3f3cfef30a75142d2d930ad72651"
   integrity sha512-Bdboy+l7tA3OGW6FjyFHWkP5LuByj1Tk33Ljyq0axyzdk9//JSi2u3fP1QSmd1KNwq6VOKYGlAu87CisVir6Pw==
 
-json5@2.2.1, json5@^2.1.2, json5@^2.2.1:
-  version "2.2.1"
-  resolved "https://registry.yarnpkg.com/json5/-/json5-2.2.1.tgz#655d50ed1e6f95ad1a3caababd2b0efda10b395c"
-  integrity sha512-1hqLFMSrGHRHxav9q9gNjJ5EXznIxGVO09xQRrwplcS8qs28pZ8s8hupZAmqDwZUmVZ2Qb2jnyPOWcDH8m8dlA==
+json5@2.2.3, json5@^2.2.2, json5@^2.2.3:
+  version "2.2.3"
+  resolved "https://registry.yarnpkg.com/json5/-/json5-2.2.3.tgz#78cd6f1a19bdc12b73db5ad0c61efd66c1e29283"
+  integrity sha512-XmOWe7eyHYH14cLdVPoyg+GOH3rYX++KpzrylJwSW98t3Nk+U8XOl8FWKOgwtzdb8lXGf6zYwDUzeHMWfxasyg==
 
 json5@^1.0.1:
   version "1.0.1"
@@ -7853,10 +7676,15 @@ json5@^1.0.1:
   dependencies:
     minimist "^1.2.0"
 
-json5@^2.2.2, json5@^2.2.3:
-  version "2.2.3"
-  resolved "https://registry.yarnpkg.com/json5/-/json5-2.2.3.tgz#78cd6f1a19bdc12b73db5ad0c61efd66c1e29283"
-  integrity sha512-XmOWe7eyHYH14cLdVPoyg+GOH3rYX++KpzrylJwSW98t3Nk+U8XOl8FWKOgwtzdb8lXGf6zYwDUzeHMWfxasyg==
+json5@^2.1.2, json5@^2.2.1:
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/json5/-/json5-2.2.1.tgz#655d50ed1e6f95ad1a3caababd2b0efda10b395c"
+  integrity sha512-1hqLFMSrGHRHxav9q9gNjJ5EXznIxGVO09xQRrwplcS8qs28pZ8s8hupZAmqDwZUmVZ2Qb2jnyPOWcDH8m8dlA==
+
+jsonc-parser@^3.0.0:
+  version "3.2.0"
+  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/jsonc-parser/-/jsonc-parser-3.2.0.tgz#31ff3f4c2b9793f89c67212627c51c6394f88e76"
+  integrity sha512-gfFQZrcTc8CnKXp6Y4/CBT3fTc0OVuDofpre4aEeEpSBPV5X5v4+Vmx+8snU7RLPrNHPKSgLxGo9YuQzz20o+w==
 
 jsonc-parser@^3.0.0:
   version "3.2.0"
@@ -8173,6 +8001,11 @@ lru-cache@^7.14.1:
   resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/lru-cache/-/lru-cache-7.18.3.tgz#f793896e0fd0e954a59dfdd82f0773808df6aa89"
   integrity sha512-jumlc0BIUrS3qJGgIkWZsyfAM7NCWiBcCDhnd+3NNM5KbBmLTgHVfWBcg6W+rLUsIpzpERPsvwUP7CckAQSOoA==
 
+lru-cache@^8.0.0:
+  version "8.0.5"
+  resolved "https://registry.yarnpkg.com/lru-cache/-/lru-cache-8.0.5.tgz#983fe337f3e176667f8e567cfcce7cb064ea214e"
+  integrity sha512-MhWWlVnuab1RG5/zMRRcVGXZLCXrZTgfwMikgzCegsPnG62yDQo5JnqKkrK4jO5iKqDAZGItAqN5CtKBCBWRUA==
+
 "lru-cache@^9.1.1 || ^10.0.0":
   version "10.0.1"
   resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/lru-cache/-/lru-cache-10.0.1.tgz#0a3be479df549cca0e5d693ac402ff19537a6b7a"
@@ -8185,7 +8018,7 @@ magic-string@^0.25.7:
   dependencies:
     sourcemap-codec "^1.4.8"
 
-make-cancellable-promise@^1.1.0, make-cancellable-promise@^1.2.1:
+make-cancellable-promise@^1.1.0:
   version "1.3.1"
   resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/make-cancellable-promise/-/make-cancellable-promise-1.3.1.tgz#3bd89704c75afe6251cdd6a82baca1fcfbd2c792"
   integrity sha512-DWOzWdO3xhY5ESjVR+wVFy03rpt0ZccS4bunccNwngoX6rllKlMZm6S9ZnJ5nMuDDweqDMjtaO0g6tZeh+cCUA==
@@ -8229,10 +8062,10 @@ meros@1.1.4:
   resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/meros/-/meros-1.1.4.tgz#c17994d3133db8b23807f62bec7f0cb276cfd948"
   integrity sha512-E9ZXfK9iQfG9s73ars9qvvvbSIkJZF5yOo9j4tcwM5tN8mUKfj/EKN5PzOr3ZH0y5wL7dLAHw3RVEfpQV9Q7VQ==
 
-meros@1.2.1:
-  version "1.2.1"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/meros/-/meros-1.2.1.tgz#056f7a76e8571d0aaf3c7afcbe7eb6407ff7329e"
-  integrity sha512-R2f/jxYqCAGI19KhAvaxSOxALBMkaXWH2a7rOyqQw+ZmizX5bKkEYWLzdhC+U82ZVVPVp6MCXe3EkVligh+12g==
+meros@^1.2.1:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/meros/-/meros-1.3.0.tgz#c617d2092739d55286bf618129280f362e6242f2"
+  integrity sha512-2BNGOimxEz5hmjUG2FwoxCt5HN7BXdaWyFqEwxPTrJzVdABtrL4TiHTcsWSFAxPQ/tOnEaQEJh3qWq71QRMY+w==
 
 micromatch@^4.0.2, micromatch@^4.0.4:
   version "4.0.5"
@@ -8259,10 +8092,15 @@ mimic-fn@^2.1.0:
   resolved "https://registry.yarnpkg.com/mimic-fn/-/mimic-fn-2.1.0.tgz#7ed2c2ccccaf84d3ffcb7a69b57711fc2083401b"
   integrity sha512-OqbOk5oEQeAZ8WXWydlu9HJjz9WVdEIvamMCcXmuqUYjTknH/sqsWvhQ3vgwKFRR1HpjvNBKQ37nbJgYzGqGcg==
 
-minimatch@5.1.1, minimatch@^5.0.1:
-  version "5.1.1"
-  resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-5.1.1.tgz#6c9dffcf9927ff2a31e74b5af11adf8b9604b022"
-  integrity sha512-362NP+zlprccbEt/SkxKfRMHnNY85V74mVnpUpNyr3F35covl09Kec7/sEFLt3RA4oXmewtoaanoIf67SE5Y5g==
+minimalistic-assert@^1.0.0:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/minimalistic-assert/-/minimalistic-assert-1.0.1.tgz#2e194de044626d4a10e7f7fbc00ce73e83e4d5c7"
+  integrity sha512-UtJcAD4yEaGtjPezWuO9wC4nwUnVH/8/Im3yEHQP4b67cXlD/Qr9hdITCU1xDbSEXg2XKNaP8jsReV7vQd00/A==
+
+minimatch@7.4.3:
+  version "7.4.3"
+  resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-7.4.3.tgz#012cbf110a65134bb354ae9773b55256cdb045a2"
+  integrity sha512-5UB4yYusDtkRPbRiy1cqZ1IpGNcJCGlEMG17RKzPddpyiPKoCdwohbED8g4QXT0ewCt8LTkQXuljsUfQ3FKM4A==
   dependencies:
     brace-expansion "^2.0.1"
 
@@ -8280,10 +8118,29 @@ minimatch@^9.0.1:
   dependencies:
     brace-expansion "^2.0.1"
 
+minimatch@^8.0.2:
+  version "8.0.4"
+  resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-8.0.4.tgz#847c1b25c014d4e9a7f68aaf63dedd668a626229"
+  integrity sha512-W0Wvr9HyFXZRGIDgCicunpQ299OKXs9RgZfaukz4qAW/pJhcpUfupc9c+OObPOFueNy8VSrZgEmDtk6Kh4WzDA==
+  dependencies:
+    brace-expansion "^2.0.1"
+
+minimatch@^9.0.1:
+  version "9.0.3"
+  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/minimatch/-/minimatch-9.0.3.tgz#a6e00c3de44c3a542bfaae70abfc22420a6da825"
+  integrity sha512-RHiac9mvaRw0x3AYRgDC1CxAP7HTcNrrECeA8YYJeWnpo+2Q5CegtZjaotWTWxDG3UeGA1coE05iH1mPjT/2mg==
+  dependencies:
+    brace-expansion "^2.0.1"
+
 minimist@^1.2.0, minimist@^1.2.6:
   version "1.2.7"
   resolved "https://registry.yarnpkg.com/minimist/-/minimist-1.2.7.tgz#daa1c4d91f507390437c6a8bc01078e7000c4d18"
   integrity sha512-bzfL1YUZsP41gmu/qjrEk0Q6i2ix/cVeAhbCbqH9u3zYutS1cLg00qhrD0M2MVdCcx4Sc0UpP2eBWo9rotpq6g==
+
+minipass@^4.2.4:
+  version "4.2.8"
+  resolved "https://registry.yarnpkg.com/minipass/-/minipass-4.2.8.tgz#f0010f64393ecfc1d1ccb5f582bcaf45f48e1a3a"
+  integrity sha512-fNzuVyifolSLFL4NzpF+wEF4qrgqaaKX0haXPQEdQ7NKAN+WecoKMHV09YcuL/DHxrUsYQOK3MiuDf7Ip2OXfQ==
 
 "minipass@^5.0.0 || ^6.0.2 || ^7.0.0":
   version "7.0.3"
@@ -8295,10 +8152,10 @@ mkdirp-classic@^0.5.2:
   resolved "https://registry.yarnpkg.com/mkdirp-classic/-/mkdirp-classic-0.5.3.tgz#fa10c9115cc6d8865be221ba47ee9bed78601113"
   integrity sha512-gKLcREMhtuZRwRAfqP3RFW+TK4JqApVBtOIftVgjuABpAtpxhPGaDcfvbhNvD0B8iD1oUr/txX35NjcaY6Ns/A==
 
-mkdirp@1.0.4:
-  version "1.0.4"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/mkdirp/-/mkdirp-1.0.4.tgz#3eb5ed62622756d79a5f0e2a221dfebad75c2f7e"
-  integrity sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==
+mkdirp@2.1.6:
+  version "2.1.6"
+  resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-2.1.6.tgz#964fbcb12b2d8c5d6fbc62a963ac95a273e2cc19"
+  integrity sha512-+hEnITedc8LAtIP9u3HJDFIdcLV2vXP33sqLLIzkv1Db1zO/1OxbvYf0Y1OC/S/Qo5dxHXepofhmxL02PsKe+A==
 
 mkdirp@^0.5.1:
   version "0.5.6"
@@ -8775,7 +8632,7 @@ path-root@^0.1.1:
   dependencies:
     path-root-regex "^0.1.0"
 
-path-scurry@^1.10.1:
+path-scurry@^1.10.1, path-scurry@^1.6.1:
   version "1.10.1"
   resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/path-scurry/-/path-scurry-1.10.1.tgz#9ba6bf5aa8500fe9fd67df4f0d9483b2b0bfc698"
   integrity sha512-MkhCqzzBEpPvxxQ71Md0b1Kk51W01lrYvlMzSUaIzNsODdd7mqhiimSZlr+VegAz5Z6Vzt9Xg2ttE//XBhH3EQ==
@@ -9044,6 +8901,11 @@ punycode@1.3.2:
   resolved "https://registry.yarnpkg.com/punycode/-/punycode-1.3.2.tgz#9653a036fb7c1ee42342f2325cceefea3926c48d"
   integrity sha512-RofWgt/7fL5wP1Y7fxE7/EmTLzQVnB0ycyibJ0OOHIlJqTNzglYFxVwETOcIoJqJmpDXJ9xImDv+Fq34F/d4Dw==
 
+punycode@^1.3.2:
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/punycode/-/punycode-1.4.1.tgz#c0d5a63b2718800ad8e1eb0fa5269c84dd41845e"
+  integrity sha512-jmYNElW7yvO7TV33CjSmvSiE2yco3bV2czu/OzDKdMNVZQWfxCblURLhf+47syQRBntjfLdd/H0egrzIG+oaFQ==
+
 punycode@^2.1.0:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/punycode/-/punycode-2.1.1.tgz#b58b010ac40c22c5657616c8d2c2c02c7bf479ec"
@@ -9091,6 +8953,13 @@ qs@6.11.0, qs@^6.9.4:
   version "6.11.0"
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.11.0.tgz#fd0d963446f7a65e1367e01abd85429453f0c37a"
   integrity sha512-MvjoMCJwEarSbUYk5O+nmoSzSutSsTwF85zcHPQ9OrlFoZOYIjaqBAJIqIXjptyD5vThxGq52Xu/MaJzRkIk4Q==
+  dependencies:
+    side-channel "^1.0.4"
+
+qs@^6.11.0:
+  version "6.11.2"
+  resolved "https://registry.yarnpkg.com/qs/-/qs-6.11.2.tgz#64bea51f12c1f5da1bc01496f48ffcff7c69d7d9"
+  integrity sha512-tDNIz22aBzCDxLtVH++VnTfzxlfeK5CbqohpSqpJgj1Wg/cQbStNAz3NuqCs5vV+pjBsK4x4pN9HlVh7rcYRiA==
   dependencies:
     side-channel "^1.0.4"
 
@@ -9315,12 +9184,12 @@ rfdc@^1.2.0, rfdc@^1.3.0:
   resolved "https://registry.yarnpkg.com/rfdc/-/rfdc-1.3.0.tgz#d0b7c441ab2720d05dc4cf26e01c89631d9da08b"
   integrity sha512-V2hovdzFbOi77/WajaSMXk2OLm+xNIeQdMMuB7icj7bk6zi2F8GGAxigcnDFpJHbNyNcgyJDiP+8nOrY5cZGrA==
 
-rimraf@3.0.2, rimraf@^3.0.2:
-  version "3.0.2"
-  resolved "https://registry.yarnpkg.com/rimraf/-/rimraf-3.0.2.tgz#f1a5402ba6220ad52cc1282bac1ae3aa49fd061a"
-  integrity sha512-JZkJMZkAGFFPP2YqXZXPbMlMBgsxzE8ILs4lMIX/2o0L9UBw9O/Y3o6wFw/i9YLapcUJWwqbi3kdxIPdC62TIA==
+rimraf@4.4.1:
+  version "4.4.1"
+  resolved "https://registry.yarnpkg.com/rimraf/-/rimraf-4.4.1.tgz#bd33364f67021c5b79e93d7f4fa0568c7c21b755"
+  integrity sha512-Gk8NlF062+T9CqNGn6h4tls3k6T1+/nXdOcSZVikNVtlRdYpA7wRJJMoXmuvOnLW844rPjdQ7JgXCYM6PPC/og==
   dependencies:
-    glob "^7.1.3"
+    glob "^9.2.0"
 
 rimraf@^2.6.3:
   version "2.7.1"
@@ -9385,6 +9254,11 @@ safe-stable-stringify@^2.1.0, safe-stable-stringify@^2.3.1:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/safer-buffer/-/safer-buffer-2.1.2.tgz#44fa161b0187b9549dd84bb91802f9bd8385cd6a"
   integrity sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==
+
+sax@>=0.6:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/sax/-/sax-1.3.0.tgz#a5dbe77db3be05c9d1ee7785dbd3ea9de51593d0"
+  integrity sha512-0s+oAmw9zLl1V1cS9BtZN7JAd0cW5e0QH4W3LWEK6a4LaLEA2OTpGYWDY+6XasBLtz6wkm3u1xRw95mRuJ59WA==
 
 secure-json-parse@^2.4.0:
   version "2.5.0"
@@ -9536,6 +9410,22 @@ snake-case@^3.0.4:
   dependencies:
     dot-case "^3.0.4"
     tslib "^2.0.3"
+
+soap@0.45.0:
+  version "0.45.0"
+  resolved "https://registry.yarnpkg.com/soap/-/soap-0.45.0.tgz#6772e25da4b407bdba63b60fa615d94fd87cb988"
+  integrity sha512-t2wgZaWQCL8htPxpHzwW1Sw/Qy22Ls6my1X9ajMMXcmNYLlO4ogk10T0A+J8p4/6xHUQthfe2J3Ys1e9/sqS5w==
+  dependencies:
+    axios-ntlm "^1.2.0"
+    debug "^4.3.2"
+    formidable "^2.0.1"
+    get-stream "^6.0.1"
+    lodash "^4.17.21"
+    sax ">=0.6"
+    strip-bom "^3.0.0"
+    uuid "^8.3.2"
+    whatwg-mimetype "3.0.0"
+    xml-crypto "^2.1.3"
 
 sonic-boom@^2.2.0, sonic-boom@^2.2.1:
   version "2.8.0"
@@ -10064,12 +9954,12 @@ ts-node@10.9.1:
     v8-compile-cache-lib "^3.0.1"
     yn "3.1.1"
 
-tsconfig-paths@4.1.0:
-  version "4.1.0"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/tsconfig-paths/-/tsconfig-paths-4.1.0.tgz#f8ef7d467f08ae3a695335bf1ece088c5538d2c1"
-  integrity sha512-AHx4Euop/dXFC+Vx589alFba8QItjF+8hf8LtmuiCwHyI4rHXQtOOENaM8kvYf5fR0dRChy3wzWIZ9WbB7FWow==
+tsconfig-paths@4.1.2:
+  version "4.1.2"
+  resolved "https://registry.yarnpkg.com/tsconfig-paths/-/tsconfig-paths-4.1.2.tgz#4819f861eef82e6da52fb4af1e8c930a39ed979a"
+  integrity sha512-uhxiMgnXQp1IR622dUXI+9Ehnws7i/y6xvpZB9IbUVOPy0muvdvgXeZOn88UcGPiT98Vp3rJPTa8bFoalZ3Qhw==
   dependencies:
-    json5 "^2.2.1"
+    json5 "^2.2.2"
     minimist "^1.2.6"
     strip-bom "^3.0.0"
 
@@ -10098,6 +9988,11 @@ tslib@^1.8.1:
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.14.1.tgz#cf2d38bdc34a134bcaf1091c41f6619e2f672d00"
   integrity sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==
 
+tslib@^2.0.0, tslib@^2.0.3, tslib@^2.1.0, tslib@^2.2.0, tslib@^2.3.1, tslib@^2.4.1, tslib@~2.4.0:
+  version "2.4.1"
+  resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.4.1.tgz#0d0bfbaac2880b91e22df0768e55be9753a5b17e"
+  integrity sha512-tGyy4dAjRIEwI7BzsB0lynWgOpfqjUdq91XXAlIWD2OwKBH7oCl/GZG/HT4BOHrTlPMOASlMQ7veyTqpmRcrNA==
+
 tslib@^2.3.0, tslib@^2.4.0, tslib@^2.5.0, tslib@^2.6.1:
   version "2.6.2"
   resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/tslib/-/tslib-2.6.2.tgz#703ac29425e7b37cd6fd456e92404d46d1f3e4ae"
@@ -10122,6 +10017,11 @@ tslib@~2.3.0:
   version "2.3.1"
   resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/tslib/-/tslib-2.3.1.tgz#e8a335add5ceae51aa261d32a490158ef042ef01"
   integrity sha512-77EbyPPpMz+FRFRuAFlWMtmgUWGe9UOG2Z25NqCwiIjRhOf5iKGuzSe5P2w1laq+FkRy4p+PCuVkJSGkzTEKVw==
+
+tslib@~2.5.0:
+  version "2.5.3"
+  resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.5.3.tgz#24944ba2d990940e6e982c4bea147aba80209913"
+  integrity sha512-mSxlJJwl3BMEQCUNnxXBU9jP4JBktcEGhURcPR6VQVlnP0FdDEsIaz0C35dXNGLyRfrATNofF0F5p2KPxQgB+w==
 
 tsutils@^3.17.1:
   version "3.21.0"
@@ -10176,10 +10076,10 @@ typedarray-to-buffer@^3.1.5:
   dependencies:
     is-typedarray "^1.0.0"
 
-typescript@4.8.4:
-  version "4.8.4"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/typescript/-/typescript-4.8.4.tgz#c464abca159669597be5f96b8943500b238e60e6"
-  integrity sha512-QCh+85mCy+h0IGff8r5XWzOVSbBO+KfeYrMQh7NJ58QujwcE22u+NUSmUxqF+un70P9GXKxa2HCNiTTMJknyjQ==
+typescript@4.9.5:
+  version "4.9.5"
+  resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.9.5.tgz#095979f9bcc0d09da324d58d03ce8f8374cbe65a"
+  integrity sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==
 
 typescript@^5.0.4:
   version "5.2.2"
@@ -10206,7 +10106,7 @@ unc-path-regex@^0.1.2:
   resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/unc-path-regex/-/unc-path-regex-0.1.2.tgz#e73dd3d7b0d7c5ed86fbac6b0ae7d8c6a69d50fa"
   integrity sha512-eXL4nmJT7oCpkZsHZUOJo8hcX3GbsiDOa0Qu9F646fi8dT3XuSVopVqAcEiVzSKKH7UoDti23wNX3qGFxcW5Qg==
 
-undici@^5.10.0, undici@^5.12.0:
+undici@^5.12.0:
   version "5.24.0"
   resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/undici/-/undici-5.24.0.tgz#6133630372894cfeb3c3dab13b4c23866bd344b5"
   integrity sha512-OKlckxBjFl0oXxcj9FU6oB8fDAaiRUq+D8jrFWGmOfI/gIyjk/IeS75LMzgYKUaeHzLUcYvf9bbJGSrUwTfwwQ==
@@ -10290,12 +10190,10 @@ url@~0.11.0:
     punycode "1.3.2"
     querystring "0.2.0"
 
-urlpattern-polyfill@^6.0.2:
-  version "6.0.2"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/urlpattern-polyfill/-/urlpattern-polyfill-6.0.2.tgz#a193fe773459865a2a5c93b246bb794b13d07256"
-  integrity sha512-5vZjFlH9ofROmuWmXM9yj2wljYKgWstGwe8YTyiqM7hVum/g9LyCizPZtb3UqsuppVwety9QJmfc42VggLpTgg==
-  dependencies:
-    braces "^3.0.2"
+urlpattern-polyfill@^8.0.0:
+  version "8.0.2"
+  resolved "https://registry.yarnpkg.com/urlpattern-polyfill/-/urlpattern-polyfill-8.0.2.tgz#99f096e35eff8bf4b5a2aa7d58a1523d6ebc7ce5"
+  integrity sha512-Qp95D4TPJl1kC9SKigDcqgyM2VDVO4RiJc2d4qe5GrYm+zbIQCWWKAFaJNQ4BhdFeDGwBmAxqJBwWSJDb9T3BQ==
 
 utf8@^3.0.0:
   version "3.0.0"
@@ -10434,6 +10332,11 @@ webidl-conversions@^3.0.0:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/webidl-conversions/-/webidl-conversions-3.0.1.tgz#24534275e2a7bc6be7bc86611cc16ae0a5654871"
   integrity sha512-2JAn3z8AR6rjK8Sm8orRC0h/bcl/DqL7tRPdGZ4I1CjdF+EaMLmYxBHyXuKL849eucPFhvBoxMsflfOb8kxaeQ==
+
+whatwg-mimetype@3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/whatwg-mimetype/-/whatwg-mimetype-3.0.0.tgz#5fa1a7623867ff1af6ca3dc72ad6b8a4208beba7"
+  integrity sha512-nt+N2dzIutVRxARx1nghPKGv1xHikU7HKdfafKkLNLindmPU/ch3U31NOCGGA/dmPcmb1VlofO0vnKAcsm0o/Q==
 
 whatwg-url@^5.0.0:
   version "5.0.0"
@@ -10603,25 +10506,43 @@ ws@7.4.5:
   resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/ws/-/ws-7.4.5.tgz#a484dd851e9beb6fdb420027e3885e8ce48986c1"
   integrity sha512-xzyu3hFvomRfXKH8vOFMU3OguG6oOvhXMo3xsGy3xWExqaM2dxBbVxuD99O7m3ZUFMvvscsZDqxfgMaRr/Nr1g==
 
-ws@8.10.0:
-  version "8.10.0"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/ws/-/ws-8.10.0.tgz#00a28c09dfb76eae4eb45c3b565f771d6951aa51"
-  integrity sha512-+s49uSmZpvtAsd2h37vIPy1RBusaLawVe8of+GyEPsaJTCMpj/2v8NpeK1SHXjBlQ95lQTmQofOJnFiLoaN3yw==
+ws@8.12.1:
+  version "8.12.1"
+  resolved "https://registry.yarnpkg.com/ws/-/ws-8.12.1.tgz#c51e583d79140b5e42e39be48c934131942d4a8f"
+  integrity sha512-1qo+M9Ba+xNhPB+YTWUlK6M17brTut5EXbcBaMRN5pH5dFrXz7lzz1ChFSUq3bOUl8yEvSenhHmYUNJxFzdJew==
 
-ws@8.12.0:
-  version "8.12.0"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/ws/-/ws-8.12.0.tgz#485074cc392689da78e1828a9ff23585e06cddd8"
-  integrity sha512-kU62emKIdKVeEIOIKVegvqpXMSTAMLJozpHZaJNDYqBjzlSYXQGviYwN1osDLJ9av68qHd4a2oSjd7yD4pacig==
+ws@8.13.0:
+  version "8.13.0"
+  resolved "https://registry.yarnpkg.com/ws/-/ws-8.13.0.tgz#9a9fb92f93cf41512a0735c8f4dd09b8a1211cd0"
+  integrity sha512-x9vcZYTrFPC7aSIbj7sRCYo7L/Xb8Iy+pW0ng0wt2vCJv7M9HOMy0UoN3rr+IFC7hb7vXoqS+P9ktyLLLhO+LA==
 
 "ws@^5.2.0 || ^6.0.0 || ^7.0.0":
   version "7.5.9"
   resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/ws/-/ws-7.5.9.tgz#54fa7db29f4c7cec68b1ddd3a89de099942bb591"
   integrity sha512-F+P9Jil7UiSKSkppIiD94dN07AwvFixvLIj1Og1Rl9GGMuNipJnV9JzjD6XuqmAeiswGvUmNLjr5cFuXwNS77Q==
 
+ws@^8.12.0:
+  version "8.14.2"
+  resolved "https://registry.yarnpkg.com/ws/-/ws-8.14.2.tgz#6c249a806eb2db7a20d26d51e7709eab7b2e6c7f"
+  integrity sha512-wEBG1ftX4jcglPxgFCMJmZ2PLtSbJ2Peg6TmpJFTbe9GZYOQCDPdMYu/Tm0/bGZkw8paZnJY45J4K2PZrLYq8g==
+
+xml-crypto@^2.1.3:
+  version "2.1.5"
+  resolved "https://registry.yarnpkg.com/xml-crypto/-/xml-crypto-2.1.5.tgz#e201ee51dca18dd9ae158ac101b6e995c983dca8"
+  integrity sha512-xOSJmGFm+BTXmaPYk8pPV3duKo6hJuZ5niN4uMzoNcTlwYs0jAu/N3qY+ud9MhE4N7eMRuC1ayC7Yhmb7MmAWg==
+  dependencies:
+    "@xmldom/xmldom" "^0.7.9"
+    xpath "0.0.32"
+
 xml@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/xml/-/xml-1.0.1.tgz#78ba72020029c5bc87b8a81a3cfcd74b4a2fc1e5"
   integrity sha512-huCv9IH9Tcf95zuYCsQraZtWnJvBtLVE0QHMOs8bWyZAFZNDcYjsPq1nEx8jKA9y+Beo9v+7OBPRisQTjinQMw==
+
+xpath@0.0.32:
+  version "0.0.32"
+  resolved "https://registry.yarnpkg.com/xpath/-/xpath-0.0.32.tgz#1b73d3351af736e17ec078d6da4b8175405c48af"
+  integrity sha512-rxMJhSIoiO8vXcWvSifKqhvV96GjiD5wYb8/QHdoRyQvraTpp4IEv944nhGausZZ3u7dhQXteZuZbaqfpB7uYw==
 
 y18n@^4.0.0:
   version "4.0.3"
@@ -10643,11 +10564,6 @@ yallist@^4.0.0:
   resolved "https://registry.yarnpkg.com/yallist/-/yallist-4.0.0.tgz#9bb92790d9c0effec63be73519e11a35019a3a72"
   integrity sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==
 
-yaml@^1.10.0:
-  version "1.10.2"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/yaml/-/yaml-1.10.2.tgz#2301c5ffbf12b467de8da2333a459e29e7920e4b"
-  integrity sha512-r3vXyErRCYJ7wg28yvBY5VSoAF8ZvlcW9/BwUzEtUsjvX/DKs24dIkuwjtuprwJJHsbyUbLApepYTR1BN4uHrg==
-
 yargs-parser@^18.1.2:
   version "18.1.3"
   resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/yargs-parser/-/yargs-parser-18.1.3.tgz#be68c4975c6b2abf469236b0c870362fab09a7b0"
@@ -10656,15 +10572,15 @@ yargs-parser@^18.1.2:
     camelcase "^5.0.0"
     decamelize "^1.2.0"
 
-yargs-parser@^21.0.0, yargs-parser@^21.1.1:
+yargs-parser@^21.1.1:
   version "21.1.1"
   resolved "https://registry.yarnpkg.com/yargs-parser/-/yargs-parser-21.1.1.tgz#9096bceebf990d21bb31fa9516e0ede294a77d35"
   integrity sha512-tVpsJW7DdjecAiFpbIB1e3qxIQsE6NoPc5/eTdrbbIC4h0LVsWhnoa3g+m2HclBIujHzsxZ4VJVA+GUuc2/LBw==
 
-yargs@17.6.0:
-  version "17.6.0"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/yargs/-/yargs-17.6.0.tgz#e134900fc1f218bc230192bdec06a0a5f973e46c"
-  integrity sha512-8H/wTDqlSwoSnScvV2N/JHfLWOKuh5MVla9hqLjK3nsfyy6Y4kDSYSvkU5YCUEPOSnRXfIyx3Sq+B/IWudTo4g==
+yargs@17.7.1:
+  version "17.7.1"
+  resolved "https://registry.yarnpkg.com/yargs/-/yargs-17.7.1.tgz#34a77645201d1a8fc5213ace787c220eabbd0967"
+  integrity sha512-cwiTb08Xuv5fqF4AovYacTFNxk62th7LKJ6BL9IGUpTJrWoU7/7WdQGTP2SjKf1dUNBGzDd28p/Yfs/GI6JrLw==
   dependencies:
     cliui "^8.0.1"
     escalade "^3.1.1"
@@ -10672,7 +10588,7 @@ yargs@17.6.0:
     require-directory "^2.1.1"
     string-width "^4.2.3"
     y18n "^5.0.5"
-    yargs-parser "^21.0.0"
+    yargs-parser "^21.1.1"
 
 yargs@^15.3.1:
   version "15.4.1"

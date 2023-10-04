@@ -20,7 +20,7 @@ const {
 	checkPlaceholders,
 	getFilesInMeshConfig,
 } = require('../../utils');
-const meshBuilder = require('@testmeshbuilder/mesh-builder');
+const meshBuilder = require('@adobe-apimesh/mesh-builder');
 const fs = require('fs');
 const UUID = require('../../uuid');
 const path = require('path');
@@ -140,14 +140,8 @@ class RunCommand extends Command {
 				await buildMesh(meshId, data.meshConfig);
 				await compileMesh(meshId);
 
-				//Set the value of API_MESH_TIER
-				const isTI = process.env.API_MESH_TIER === 'TI';
-
-				//Get the value of tenantUUID for TI
-				const tenantUUID = process.env.tenantUUID;
-
 				this.log(`Starting server on port : ${portNo}`);
-				await startGraphqlServer(meshId, portNo, flags.debug, isTI, tenantUUID);
+				await startGraphqlServer(meshId, portNo, flags.debug);
 			} else {
 				throw new Error(
 					'`aio api-mesh run` cannot be executed because there is no package.json file in the current directory. Use `aio api-mesh init` to set up a package.',
