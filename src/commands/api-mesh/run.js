@@ -10,12 +10,21 @@ governing permissions and limitations under the License.
 */
 
 const { Command } = require('@oclif/core');
-const { portNoFlag, debugFlag, readFileContents } = require('../../utils');
+const {
+	portNoFlag,
+	debugFlag,
+	envFileFlag,
+	autoConfirmActionFlag,
+	readFileContents,
+	validateAndInterpolateMesh,
+	checkPlaceholders,
+	getFilesInMeshConfig,
+} = require('../../utils');
 const meshBuilder = require('@adobe-apimesh/mesh-builder');
 const fs = require('fs');
 const UUID = require('../../uuid');
 const path = require('path');
-const { initRequestId, startGraphqlServer } = require('../../helpers');
+const { initRequestId, startGraphqlServer, importFiles } = require('../../helpers');
 const logger = require('../../classes/logger');
 require('dotenv').config();
 
@@ -35,6 +44,8 @@ class RunCommand extends Command {
 	static flags = {
 		port: portNoFlag,
 		debug: debugFlag,
+		env: envFileFlag,
+		autoConfirmAction: autoConfirmActionFlag,
 	};
 
 	static enableJsonFlag = true;
@@ -73,12 +84,54 @@ class RunCommand extends Command {
 			portNo = 5000;
 		}
 
+		const envFilePath = await flags.env;
+
 		try {
 			//Ensure that current directory includes package.json
 			if (fs.existsSync(path.join(process.cwd(), 'package.json'))) {
 				//Read the mesh input file
 				let inputMeshData = await readFileContents(args.file, this, 'mesh');
-				let data = JSON.parse(inputMeshData);
+				let data;
+
+				if (checkPlaceholders(inputMeshData)) {
+					this.log('The provided mesh contains placeholders. Starting mesh interpolation process.');
+					data = await validateAndInterpolateMesh(inputMeshData, envFilePath, this);
+				} else {
+					try {
+						data = JSON.parse(inputMeshData);
+					} catch (err) {
+						this.log(err.message);
+						throw new Error('Input mesh file is not a valid JSON. Please check the file provided.');
+					}
+				}
+
+				let filesList = [];
+
+				try {
+					filesList = getFilesInMeshConfig(data, args.file);
+				} catch (err) {
+					this.log(err.message);
+					throw new Error('Input mesh config is not valid.');
+				}
+
+				// if local files are present, import them in files array in meshConfig
+				if (filesList.length) {
+					try {
+						// minification of js will not be done for run command if debugging is enabled
+						data = await importFiles(
+							data,
+							filesList,
+							args.file,
+							flags.autoConfirmAction,
+							!debugFlag,
+						);
+					} catch (err) {
+						this.log(err.message);
+						throw new Error(
+							'Unable to import the files in the mesh config. Please check the file and try again.',
+						);
+					}
+				}
 
 				//Generating unique mesh id
 				let meshId = UUID.newUuid().toString();

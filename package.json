@@ -29,6 +29,7 @@
 		"json-interpolate": "^1.0.3",
 		"lru-cache": "^7.14.1",
 		"node-clipboardy": "^1.0.3",
+		"node-fetch": "2.6.1",
 		"pino": "^7.9.2",
 		"pino-pretty": "^7.6.0",
 		"pupa": "^3.1.0",
