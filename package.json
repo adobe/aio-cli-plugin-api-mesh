@@ -15,7 +15,6 @@
 		"@oclif/core": "^1.14.1",
 		"@oclif/errors": "^1.1.2",
 		"@adobe-apimesh/mesh-builder": "^1.0.3",
-		"await-timeout": "^1.1.1",
 		"axios": "^1.2.0",
 		"chalk": "^4.1.0",
 		"dotenv": "^16.0.3",
