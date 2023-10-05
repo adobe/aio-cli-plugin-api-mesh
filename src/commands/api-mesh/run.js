@@ -123,7 +123,7 @@ class RunCommand extends Command {
 							filesList,
 							args.file,
 							flags.autoConfirmAction,
-							!debugFlag,
+							!flags.debug,
 						);
 					} catch (err) {
 						this.log(err.message);
