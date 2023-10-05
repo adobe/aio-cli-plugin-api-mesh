@@ -25,7 +25,7 @@ const {
 } = require('../../utils');
 const { getMesh, createMesh } = require('../../lib/devConsole');
 
-const { MULTITENANT_GRAPHQL_SERVER_BASE_URL, TMOConstants } = CONSTANTS;
+const { MULTITENANT_GRAPHQL_SERVER_BASE_URL } = CONSTANTS;
 
 class CreateCommand extends Command {
 	static args = [{ name: 'file' }];
@@ -54,7 +54,7 @@ class CreateCommand extends Command {
 		const ignoreCache = await flags.ignoreCache;
 		const autoConfirmAction = await flags.autoConfirmAction;
 		const envFilePath = await flags.env;
-		const { imsOrgId, projectId, workspaceId } = await initSdk({
+		const { imsOrgId, projectId, workspaceId, workspaceName } = await initSdk({
 			ignoreCache,
 		});
 
@@ -104,7 +104,13 @@ class CreateCommand extends Command {
 
 		if (shouldContinue) {
 			try {
-				const { mesh, apiKey, sdkList } = await createMesh(imsOrgId, projectId, workspaceId, data);
+				const { mesh, apiKey, sdkList } = await createMesh(
+					imsOrgId,
+					projectId,
+					workspaceId,
+					workspaceName,
+					data,
+				);
 
 				if (mesh) {
 					this.log(
@@ -126,23 +132,25 @@ class CreateCommand extends Command {
 						if (sdkList) {
 							this.log('Successfully subscribed API Key %s to API Mesh service', apiKey);
 
-							const { meshURL } = await getMesh(imsOrgId, projectId, workspaceId, mesh.meshId);
+							const { meshURL } = await getMesh(
+								imsOrgId,
+								projectId,
+								workspaceId,
+								workspaceName,
+								mesh.meshId,
+							);
 							const meshUrl =
 								meshURL === '' || meshURL === undefined
 									? MULTITENANT_GRAPHQL_SERVER_BASE_URL
 									: meshURL;
 
-							if (
-								meshUrl === TMOConstants.TMO_STAGE_URL ||
-								meshUrl === TMOConstants.TMO_SANDBOX_URL ||
-								meshUrl === TMOConstants.TMO_PROD_URL
-							) {
-								this.log('Mesh Endpoint: %s\n', `${meshUrl}/${mesh.meshId}/graphql`);
-							} else {
+							if (apiKey && MULTITENANT_GRAPHQL_SERVER_BASE_URL.includes(meshUrl)) {
 								this.log(
 									'Mesh Endpoint: %s\n',
 									`${meshUrl}/${mesh.meshId}/graphql?api_key=${apiKey}`,
 								);
+							} else {
+								this.log('Mesh Endpoint: %s\n', `${meshUrl}/${mesh.meshId}/graphql`);
 							}
 						} else {
 							this.log('Unable to subscribe API Key %s to API Mesh service', apiKey);

@@ -18,14 +18,14 @@ class StatusCommand extends Command {
 		const { flags } = await this.parse(StatusCommand);
 		const ignoreCache = await flags.ignoreCache;
 
-		const { imsOrgId, projectId, workspaceId } = await initSdk({
+		const { imsOrgId, projectId, workspaceId, workspaceName } = await initSdk({
 			ignoreCache,
 		});
 
 		let meshId = null;
 
 		try {
-			meshId = await getMeshId(imsOrgId, projectId, workspaceId);
+			meshId = await getMeshId(imsOrgId, projectId, workspaceId, workspaceName);
 		} catch (err) {
 			this.log(err.message);
 			this.error(
@@ -35,7 +35,7 @@ class StatusCommand extends Command {
 
 		if (meshId) {
 			try {
-				const mesh = await getMesh(imsOrgId, projectId, workspaceId, meshId);
+				const mesh = await getMesh(imsOrgId, projectId, workspaceId, workspaceName, meshId);
 				switch (mesh.meshStatus) {
 					case 'success':
 						this.log(

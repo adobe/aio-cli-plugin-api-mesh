@@ -19,7 +19,7 @@ const { describeMesh, getMesh } = require('../../lib/devConsole');
 
 require('dotenv').config();
 
-const { MULTITENANT_GRAPHQL_SERVER_BASE_URL, TMOConstants } = CONSTANTS;
+const { MULTITENANT_GRAPHQL_SERVER_BASE_URL } = CONSTANTS;
 
 class DescribeCommand extends Command {
 	static flags = {
@@ -35,12 +35,12 @@ class DescribeCommand extends Command {
 
 		const ignoreCache = await flags.ignoreCache;
 
-		const { imsOrgId, projectId, workspaceId } = await initSdk({
+		const { imsOrgId, projectId, workspaceId, workspaceName } = await initSdk({
 			ignoreCache,
 		});
 
 		try {
-			const meshDetails = await describeMesh(imsOrgId, projectId, workspaceId);
+			const meshDetails = await describeMesh(imsOrgId, projectId, workspaceId, workspaceName);
 
 			if (meshDetails) {
 				const { meshId, apiKey } = meshDetails;
@@ -52,19 +52,20 @@ class DescribeCommand extends Command {
 					this.log('Workspace ID: %s', workspaceId);
 					this.log('Mesh ID: %s', meshId);
 
-					const { meshURL } = await getMesh(imsOrgId, projectId, workspaceId, meshId);
-					const meshUrl = meshURL === '' ? MULTITENANT_GRAPHQL_SERVER_BASE_URL : meshURL;
+					const { meshURL } = await getMesh(
+						imsOrgId,
+						projectId,
+						workspaceId,
+						workspaceName,
+						meshId,
+					);
+					const meshUrl =
+						meshURL === '' || meshURL === undefined ? MULTITENANT_GRAPHQL_SERVER_BASE_URL : meshURL;
 
-					if (
-						apiKey &&
-						(meshUrl === TMOConstants.TMO_STAGE_URL ||
-							meshUrl === TMOConstants.TMO_SANDBOX_URL ||
-							meshUrl === TMOConstants.TMO_PROD_URL)
-					) {
-						this.log('Mesh Endpoint: %s\n', `${meshUrl}/${meshId}/graphql`);
-					} else if (apiKey) {
-						this.log('API Key: %s', apiKey);
+					if (apiKey && MULTITENANT_GRAPHQL_SERVER_BASE_URL.includes(meshUrl)) {
 						this.log('Mesh Endpoint: %s\n', `${meshUrl}/${meshId}/graphql?api_key=${apiKey}`);
+					} else {
+						this.log('Mesh Endpoint: %s\n', `${meshUrl}/${meshId}/graphql`);
 					}
 					return meshDetails;
 				} else {
