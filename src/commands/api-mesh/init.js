@@ -72,7 +72,14 @@ class InitCommand extends Command {
 
 	async createDotNpmrcFile(templatePath, filePath) {
 		const dotNpmrcFile = await fs.readFile(templatePath, 'utf8');
+
 		await fs.writeFile(filePath, dotNpmrcFile, 'utf8', { mode: 'w' });
+	}
+
+	async createGitIgnoreFile(templatePath, filePath) {
+		const gitIgnoreFile = await fs.readFile(templatePath, 'utf8');
+
+		await fs.writeFile(filePath, gitIgnoreFile, 'utf8', { mode: 'w' });
 	}
 
 	async run() {
@@ -86,7 +93,7 @@ class InitCommand extends Command {
 		let shouldCreateGit = gitFlagOptions[flags.git];
 		let packageManagerChoice = flags.packageManager;
 		const packageJsonTemplate = `${getAppRootDir()}/src/templates/package.json`;
-		const dotNpmrcPath = `${getAppRootDir()}/src/templates/.npmrc`;
+		const dotNpmrcPath = `${getAppRootDir()}/src/templates/npmrc`;
 		const shouldCreateWorkspace = await promptConfirm(
 			`Do you want to create the workspace in ${absolutePath}`,
 		);
@@ -130,11 +137,10 @@ class InitCommand extends Command {
 				try {
 					await runCliCommand('git init', absolutePath);
 
-					const gitIgnoreTemplate = `${getAppRootDir()}/src/templates/gitignore`;
+					const gitIgnoreTemplatePath = `${getAppRootDir()}/src/templates/gitignore`;
+					const gitIgnoreFilePath = `${absolutePath}/.gitignore`;
 
-					await fs.writeFile(`${absolutePath}/.gitignore`, gitIgnoreTemplate, 'utf8', {
-						mode: 'w',
-					});
+					await this.createGitIgnoreFile(gitIgnoreTemplatePath, gitIgnoreFilePath);
 				} catch (error) {
 					this.error(error);
 				}
