@@ -754,11 +754,11 @@ function startGraphqlServer(meshId, port, debug) {
 	const server = exec(command);
 
 	server.stdout.on('data', data => {
-		console.log('Data from server - ', data);
+		console.log(data);
 	});
 
 	server.stderr.on('data', data => {
-		console.log('Error from server - ', data);
+		console.error(data);
 	});
 
 	server.on('close', code => {
@@ -770,7 +770,7 @@ function startGraphqlServer(meshId, port, debug) {
 	});
 
 	server.on('error', err => {
-		console.log(`Server exited with error ${err}`);
+		console.error(`Server exited with error ${err}`);
 	});
 }
 

@@ -21,7 +21,7 @@ function readMeshConfig(meshId) {
 	const configPath = path.resolve(process.cwd(), 'mesh-artifact', `${meshId}`, '.meshrc.json');
 	if (fs.existsSync(configPath)) {
 		const meshrcFile = fs.readFileSync(configPath).toString();
-		console.log(`meshrcFile: ${meshrcFile}`);
+
 		return JSON.parse(meshrcFile);
 	}
 }
