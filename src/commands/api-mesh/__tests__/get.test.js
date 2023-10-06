@@ -49,6 +49,7 @@ describe('get command tests', () => {
 			imsOrgId: selectedOrg.id,
 			projectId: selectedProject.id,
 			workspaceId: selectedWorkspace.id,
+			workspaceName: selectedWorkspace.title,
 		});
 
 		global.requestId = 'dummy_request_id';
