@@ -522,7 +522,13 @@ async function promptInput(message) {
  * @param meshConfigName MeshConfigName
  * @param autoConfirmActionFlag The user won't be prompted any questions, if this flag is set
  */
-async function importFiles(data, filesListArray, meshConfigName, autoConfirmActionFlag) {
+async function importFiles(
+	data,
+	filesListArray,
+	meshConfigName,
+	autoConfirmActionFlag,
+	shouldMinifyJS = true,
+) {
 	//if autoConfirmActionFlag is passed in the command, it should override by default
 	let shouldOverride = true;
 	let filesNotFound = [];
@@ -558,7 +564,7 @@ async function importFiles(data, filesListArray, meshConfigName, autoConfirmActi
 		} else {
 			//if file does not exist in files array, but exists in filesystem, we append
 			if (fs.existsSync(path.resolve(path.dirname(meshConfigName), file))) {
-				resultData = updateFilesArray(resultData, file, meshConfigName, -1);
+				resultData = updateFilesArray(resultData, file, meshConfigName, -1, shouldMinifyJS);
 			} else {
 				filesNotFound.push(file);
 			}
@@ -588,6 +594,7 @@ async function importFiles(data, filesListArray, meshConfigName, autoConfirmActi
 				overrideArr[i].fileName,
 				meshConfigName,
 				overrideArr[i].index,
+				shouldMinifyJS,
 			);
 		}
 	}
@@ -673,7 +680,7 @@ function runCliCommand(command, workingDirectory = '.') {
  * @param meshConfigName MeshConfig name
  * @param index Append operation if index is -1, else override, it is the index where the override takes place
  */
-function updateFilesArray(data, file, meshConfigName, index) {
+function updateFilesArray(data, file, meshConfigName, index, shouldMinifyJS = true) {
 	try {
 		let readFileData = fs.readFileSync(
 			path.resolve(path.dirname(meshConfigName), file),
@@ -695,8 +702,17 @@ function updateFilesArray(data, file, meshConfigName, index) {
 			throw new Error(`Invalid JSON content in ${path.basename(file)}`);
 		}
 
-		//data to be overridden or appended
-		const dataInFilesArray = jsmin(readFileData);
+		// shouldMinifyJS would be always true for create and update commands
+		// if run command run on debug mode it will be false and js files wont be minified
+		if (shouldMinifyJS) {
+			readFileData = jsmin(readFileData);
+		} else {
+			if (path.extname(file) !== '.js') {
+				readFileData = jsmin(readFileData);
+			}
+		}
+
+		const dataInFilesArray = readFileData;
 
 		if (index >= 0) {
 			data.meshConfig.files[index] = {
@@ -723,6 +739,42 @@ function updateFilesArray(data, file, meshConfigName, index) {
 	}
 }
 
+/**
+ * Start GraphQL server for a particular mesh on a particular port
+ *
+ * @param meshId MeshId of the mesh
+ * @param port Port number at which the server is to be started
+ * @param debug Boolean flag to set the debug mode
+ */
+function startGraphqlServer(meshId, port, debug) {
+	const serverPath = `${__dirname}/server.js ${meshId} ${port}`;
+	const command = debug
+		? `node --inspect-brk --trace-warnings ${serverPath}`
+		: `node ${serverPath}`;
+
+	const server = exec(command);
+
+	server.stdout.on('data', data => {
+		console.log(data);
+	});
+
+	server.stderr.on('data', data => {
+		console.error(data);
+	});
+
+	server.on('close', code => {
+		console.log(`Server closed with code ${code}`);
+	});
+
+	server.on('exit', code => {
+		console.log(`Server exited with code ${code}`);
+	});
+
+	server.on('error', err => {
+		console.error(`Server exited with error ${err}`);
+	});
+}
+
 module.exports = {
 	objToString,
 	promptInput,
@@ -737,4 +789,5 @@ module.exports = {
 	interpolateMesh,
 	runCliCommand,
 	updateFilesArray,
+	startGraphqlServer,
 };

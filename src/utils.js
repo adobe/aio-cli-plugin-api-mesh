@@ -41,6 +41,16 @@ const envFileFlag = Flags.string({
 	default: '.env',
 });
 
+const portNoFlag = Flags.integer({
+	char: 'p',
+	description: 'Port number for the local dev server',
+});
+
+const debugFlag = Flags.boolean({
+	description: 'Enable debugging mode',
+	default: false,
+});
+
 /**
  * Parse the meshConfig and get the list of (local) files to be imported
  *
@@ -387,4 +397,6 @@ module.exports = {
 	validateEnvFileFormat,
 	validateAndInterpolateMesh,
 	getAppRootDir,
+	portNoFlag,
+	debugFlag,
 };
