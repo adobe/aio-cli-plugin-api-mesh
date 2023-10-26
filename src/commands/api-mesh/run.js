@@ -13,6 +13,7 @@ const { Command } = require('@oclif/core');
 const {
 	portNoFlag,
 	debugFlag,
+	selectFlag,
 	envFileFlag,
 	autoConfirmActionFlag,
 	readFileContents,
@@ -46,6 +47,7 @@ class RunCommand extends Command {
 		debug: debugFlag,
 		env: envFileFlag,
 		autoConfirmAction: autoConfirmActionFlag,
+		select: selectFlag
 	};
 
 	static enableJsonFlag = true;
