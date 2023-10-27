@@ -18,7 +18,6 @@ const { ignoreCacheFlag, jsonFlag } = require('../../utils');
 const { getMeshId, getMesh } = require('../../lib/devConsole');
 
 require('dotenv').config();
-
 class GetCommand extends Command {
 	static args = [{ name: 'file' }];
 	static flags = {
@@ -88,10 +87,12 @@ class GetCommand extends Command {
 				);
 			}
 		} else {
-			this.error(
-				`Unable to get mesh config. No mesh found for Org(${imsOrgId}) -> Project(${projectId}) -> Workspace(${workspaceId}). Please check the details and try again.`,
-				{exit:false}
-			);
+				
+				this.error(
+					`Unable to get mesh config. No mesh found for Org(${imsOrgId}) -> Project(${projectId}) -> Workspace(${workspaceId}). Please check the details and try again.`,
+					{exit:false}
+				);
+			
 		}
 	}
 }
