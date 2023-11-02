@@ -25,7 +25,13 @@ const meshBuilder = require('@adobe-apimesh/mesh-builder');
 const fs = require('fs');
 const UUID = require('../../uuid');
 const path = require('path');
-const { initSdk, initRequestId, startGraphqlServer, importFiles } = require('../../helpers');
+const {
+	initSdk,
+	initRequestId,
+	startGraphqlServer,
+	importFiles,
+	setUpTenantFiles,
+} = require('../../helpers');
 const logger = require('../../classes/logger');
 const { getMeshId, getMeshArtifact } = require('../../lib/devConsole');
 require('dotenv').config();
@@ -48,7 +54,7 @@ class RunCommand extends Command {
 		debug: debugFlag,
 		env: envFileFlag,
 		autoConfirmAction: autoConfirmActionFlag,
-		select: selectFlag
+		select: selectFlag,
 	};
 
 	static enableJsonFlag = true;
@@ -62,34 +68,12 @@ class RunCommand extends Command {
 
 		const { args, flags } = await this.parse(RunCommand);
 
-		//Initialize the meshId based on 
+		//Initialize the meshId based on
 		let meshId = null;
 
 		try {
 			//Ensure that current directory includes package.json
 			if (fs.existsSync(path.join(process.cwd(), 'package.json'))) {
-
-				let portNo;
-
-				//To set the port number using the environment file
-				if (process.env.PORT !== undefined) {
-					if (isNaN(process.env.PORT) || !Number.isInteger(parseInt(process.env.PORT))) {
-						throw new Error('PORT value in the .env file is not a valid integer');
-					}
-
-					portNo = process.env.PORT;
-				}
-
-				//To set the port number as the provided value in the command
-				if (flags.port !== undefined) {
-					portNo = flags.port;
-				}
-
-				//To set the default port to 5000
-				if (!portNo) {
-					portNo = 5000;
-				}
-
 				//If select flag is present then getMeshId for the specified org
 				if (flags.select) {
 					const { imsOrgId, projectId, workspaceId, workspaceName } = await initSdk({});
@@ -104,14 +88,20 @@ class RunCommand extends Command {
 
 					try {
 						await getMeshArtifact(imsOrgId, projectId, workspaceId, workspaceName, meshId);
-					}
-					catch (err) {
+					} catch (err) {
 						throw new Error(
 							`Unable to get mesh artifact. Please check the details and try again. RequestId: ${global.requestId}`,
 						);
 					}
-				}
-				else {
+
+					try {
+						await setUpTenantFiles(meshId);
+					} catch (err) {
+						throw new Error('Mesh files setup for downloaded artifact has failed');
+					}
+
+					this.log('The setup of mesh files for downloaded artifact is complete');
+				} else {
 					if (!args.file) {
 						throw new Error('Missing file path. Run aio api-mesh run --help for more info.');
 					}
@@ -123,14 +113,18 @@ class RunCommand extends Command {
 					let data;
 
 					if (checkPlaceholders(inputMeshData)) {
-						this.log('The provided mesh contains placeholders. Starting mesh interpolation process.');
+						this.log(
+							'The provided mesh contains placeholders. Starting mesh interpolation process.',
+						);
 						data = await validateAndInterpolateMesh(inputMeshData, envFilePath, this);
 					} else {
 						try {
 							data = JSON.parse(inputMeshData);
 						} catch (err) {
 							this.log(err.message);
-							throw new Error('Input mesh file is not a valid JSON. Please check the file provided.');
+							throw new Error(
+								'Input mesh file is not a valid JSON. Please check the file provided.',
+							);
 						}
 					}
 
@@ -168,6 +162,27 @@ class RunCommand extends Command {
 					await validateMesh(data.meshConfig);
 					await buildMesh(meshId, data.meshConfig);
 					await compileMesh(meshId);
+				}
+
+				let portNo;
+
+				//To set the port number using the environment file
+				if (process.env.PORT !== undefined) {
+					if (isNaN(process.env.PORT) || !Number.isInteger(parseInt(process.env.PORT))) {
+						throw new Error('PORT value in the .env file is not a valid integer');
+					}
+
+					portNo = process.env.PORT;
+				}
+
+				//To set the port number as the provided value in the command
+				if (flags.port !== undefined) {
+					portNo = flags.port;
+				}
+
+				//To set the default port to 5000
+				if (!portNo) {
+					portNo = 5000;
 				}
 
 				this.log(`Starting server on port : ${portNo}`);

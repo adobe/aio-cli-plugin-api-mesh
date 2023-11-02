@@ -140,7 +140,8 @@ const getMesh = async (organizationId, projectId, workspaceId, workspaceName, me
 		} else {
 			// Non 200 response received
 			logger.error(
-				`Something went wrong: ${objToString(response, ['data'], 'Unable to get mesh')}. Received ${response.status
+				`Something went wrong: ${objToString(response, ['data'], 'Unable to get mesh')}. Received ${
+					response.status
 				} response instead of 200`,
 			);
 
@@ -782,7 +783,7 @@ const getMeshArtifact = async (organizationId, projectId, workspaceId, workspace
 			'x-request-id': global.requestId,
 			'workspaceName': workspaceName,
 		},
-		responseType: 'arraybuffer'
+		responseType: 'arraybuffer',
 	};
 
 	logger.info(
@@ -796,7 +797,7 @@ const getMeshArtifact = async (organizationId, projectId, workspaceId, workspace
 		if (response && response.status === 200) {
 			// Access the response data as an ArrayBuffer
 			const octetData = response.data;
-			const contentDispositionHeader = response.headers["content-disposition"];
+			const contentDispositionHeader = response.headers['content-disposition'];
 
 			const disposition = contentDisposition.parse(contentDispositionHeader);
 			const filename = disposition.parameters.filename;
@@ -805,33 +806,18 @@ const getMeshArtifact = async (organizationId, projectId, workspaceId, workspace
 			fs.writeFileSync(filename, octetData);
 
 			//Extract the file contents from the tar file
-			await exec(`tar -xf ${filename} -C ${path.resolve(process.cwd())}`)
-
-			logger.info('Data extracted successfully');
+			await exec(`tar -xf ${filename} -C ${path.resolve(process.cwd())}`);
 
 			//Delete the gzip compressed file
 			await exec(`rm ${filename}`);
-
 		} else {
-			// Non 200 response received
-			logger.error(
-				`Something went wrong: ${objToString(response, ['data'], 'Unable to get mesh artifact')}. Received ${response.status
-				} response instead of 200`,
-			);
-
-			throw new Error(
-				`Something went wrong: ${objToString(response, ['data'], 'Unable to get mesh artifact')}`,
-			);
+			throw new Error(`Something went wrong: 'Unable to get mesh artifact')}`);
 		}
 	} catch (error) {
-		logger.info('Response from GET %s', error.response.status);
-		// The request was made but no response was received
-		logger.error(
-			'Error while getting mesh artifact. No response received from the server: %s',
-			objToString(error, [], 'Unable to get mesh artifact'),
+		throw new Error(
+			'Unable to get mesh artifact from Schema Management Service: %s',
+			error.message,
 		);
-
-		throw new Error('Unable to get mesh artifact from Schema Management Service: %s', error.message);
 	}
 };
 
