@@ -16,14 +16,30 @@ const {
 	interpolateMesh,
 	importFiles,
 	promptConfirm,
+	setUpTenantFiles,
+	initSdk,
 } = require('../../../helpers');
+const { getMeshId, getMeshArtifact } = require('../../../lib/devConsole');
 require('@adobe-apimesh/mesh-builder');
+
 jest.mock('../../../helpers', () => ({
+	initSdk: jest.fn().mockResolvedValue({
+		imsOrgId: 'mockOrgId',
+		projectId: 'mockProjectId',
+		workspaceId: 'mockWorkspaceId',
+		workspaceName: 'mockWorkspaceTitle',
+	}),
 	initRequestId: jest.fn().mockResolvedValue({}),
 	startGraphqlServer: jest.fn().mockResolvedValue({}),
 	interpolateMesh: jest.fn().mockResolvedValue({}),
 	importFiles: jest.fn().mockResolvedValue(),
 	promptConfirm: jest.fn().mockResolvedValue(true),
+	setUpTenantFiles: jest.fn().mockResolvedValue(),
+}));
+
+jest.mock('../../../lib/devConsole', () => ({
+	getMeshId: jest.fn().mockResolvedValue('mockMeshId'),
+	getMeshArtifact: jest.fn().mockResolvedValue(),
 }));
 
 jest.mock('@adobe-apimesh/mesh-builder', () => {
@@ -105,6 +121,13 @@ describe('run command tests', () => {
 		    "parse": [Function],
 		    "type": "option",
 		  },
+		  "select": {
+		    "allowNo": false,
+		    "default": false,
+		    "description": "Retrieve existing artifacts from the mesh",
+		    "parse": [Function],
+		    "type": "boolean",
+		  },
 		}
 	`);
 		expect(RunCommand.aliases).toMatchInlineSnapshot(`[]`);
@@ -121,7 +144,13 @@ describe('run command tests', () => {
 			new Error('Missing file path. Run aio api-mesh run --help for more info.'),
 		);
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`[]`);
-		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`[]`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Missing file path. Run aio api-mesh run --help for more info.",
+		  ],
+		]
+	`);
 	});
 
 	test('should use the port number provided in the flags for starting the server', async () => {
@@ -779,5 +808,32 @@ describe('run command tests', () => {
 		  ],
 		]
 	`);
+	});
+
+	test('should retrieve mesh artifact from sms if select flag is used', async () => {
+		const parseOutput = {
+			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
+			flags: { port: 6000, debug: false, select: true },
+		};
+
+		parseSpy.mockResolvedValue(parseOutput);
+
+		await RunCommand.run();
+
+		expect(initSdk).toHaveBeenCalled();
+		expect(getMeshId).toHaveBeenCalledWith(
+			'mockOrgId',
+			'mockProjectId',
+			'mockWorkspaceId',
+			'mockWorkspaceTitle',
+		);
+		expect(getMeshArtifact).toHaveBeenCalledWith(
+			'mockOrgId',
+			'mockProjectId',
+			'mockWorkspaceId',
+			'mockWorkspaceTitle',
+			'mockMeshId',
+		);
+		expect(setUpTenantFiles).toHaveBeenCalled();
 	});
 });
