@@ -15,12 +15,12 @@ jobs:
         #     JF_URL: ${{ secrets.JF_URL }}
         #     JF_USER: ${{ secrets.JF_USER }}
         #     JF_PASSWORD: ${{ secrets.JF_PASSWORD }}
-        - uses: actions/checkout@v2
-        - uses: actions/setup-node@v2
+        - uses: actions/checkout@v4
+        - uses: actions/setup-node@v3
           with:
             node-version: 18
-        - run: npm install -g @adobe/aio-cli
-        - run: npm install
-        - run: npm run lint
+        - run: yarn global add @adobe/aio-cli
+        - run: yarn install --frozen-lockfile
+        - run: yarn run lint
         - run: aio config set cli.env stage
-        - run: xvfb-run npm test
+        - run: xvfb-run yarn run test

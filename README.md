@@ -1,6 +1,11 @@
 # Installation
 
-Prerequisites: [node.js](https://nodejs.org/en/), [aio-cli](https://github.com/adobe/aio-cli).
+## Prerequisites
+
+* [aio-cli](https://github.com/adobe/aio-cli).
+* [node.js](https://nodejs.org/en/)
+* [yarn](https://classic.yarnpkg.com/lang/en/docs/install).
+
 To install a revision from this repository:
 
 ```
@@ -21,7 +26,7 @@ $ aio discover -i
 
 ### Local Development
 
-Install project dependencies. `npm install`
+Install project dependencies. `yarn install`
 
 ```
 aio plugins:link api-mesh

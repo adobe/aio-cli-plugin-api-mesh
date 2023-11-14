@@ -51,6 +51,11 @@ const debugFlag = Flags.boolean({
 	default: false,
 });
 
+const selectFlag = Flags.boolean({
+	description: 'Retrieve existing artifacts from the mesh',
+	default: false,
+});
+
 /**
  * Parse the meshConfig and get the list of (local) files to be imported
  *
@@ -399,4 +404,5 @@ module.exports = {
 	getAppRootDir,
 	portNoFlag,
 	debugFlag,
+	selectFlag,
 };
