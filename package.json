@@ -70,6 +70,8 @@
 		"@oclif/errors": "^1.1.2",
 		"axios": "^1.2.0",
 		"chalk": "^4.1.0",
+		"child_process": "^1.0.2",
+		"content-disposition": "^0.5.4",
 		"dotenv": "^16.0.3",
 		"eslint-plugin-promise": "^6.0.0",
 		"eslint-plugin-security": "^1.5.0",
@@ -88,6 +90,7 @@
 		"pino-pretty": "^7.6.0",
 		"pupa": "^3.1.0",
 		"source-registry-storage-adapter": "github:devx-services/source-registry-storage-adapter#main",
+		"util": "^0.12.5",
 		"uuid": "^8.3.2"
 	},
 	"devDependencies": {
