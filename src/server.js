@@ -157,11 +157,15 @@ app.listen(
 		port: portNo,
 	},
 	async err => {
-		if (err) {
-			console.error(err);
+		try {
+			if (err) {
+				throw new Error(`Server setup error: ${err.message}`);
+			}
+			yogaServer = await getYogaServer();
+		} catch (error) {
+			console.error(error);
 			process.exit(1);
 		}
-		yogaServer = await getYogaServer();
 
 		console.log(`Server is running on http://localhost:${portNo}/graphql`);
 	},
