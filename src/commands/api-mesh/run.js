@@ -100,7 +100,7 @@ class RunCommand extends Command {
 						throw new Error('Failed to install downloaded mesh');
 					}
 
-					this.log('The setup of mesh files for downloaded artifact is complete');
+					this.log('Successfully downloaded mesh');
 				} else {
 					if (!args.file) {
 						throw new Error('Missing file path. Run aio api-mesh run --help for more info.');
