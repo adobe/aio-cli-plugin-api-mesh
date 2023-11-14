@@ -116,10 +116,6 @@
 		"prettier": "2.2.1",
 		"stdout-stderr": "^0.1.9"
 	},
-	"resolutions": {
-		"npm:string-width":"^4.2.0",
-		"npm:wrap-ansi": "^7.0.0"
-	},
 	"engines": {
 		"node": "^16.13 || >=18.0.0",
 		"npm": ">=8.0.0"
