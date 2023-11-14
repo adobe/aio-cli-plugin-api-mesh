@@ -97,7 +97,7 @@ class RunCommand extends Command {
 					try {
 						await setUpTenantFiles(meshId);
 					} catch (err) {
-						throw new Error('Mesh files setup for downloaded artifact has failed');
+						throw new Error('Failed to install downloaded mesh');
 					}
 
 					this.log('The setup of mesh files for downloaded artifact is complete');
