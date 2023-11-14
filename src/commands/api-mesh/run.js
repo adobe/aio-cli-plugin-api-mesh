@@ -90,7 +90,7 @@ class RunCommand extends Command {
 						await getMeshArtifact(imsOrgId, projectId, workspaceId, workspaceName, meshId);
 					} catch (err) {
 						throw new Error(
-							`Unable to get mesh artifact. Please check the details and try again. RequestId: ${global.requestId}`,
+							`Unable to retrieve mesh. Please check the details and try again. RequestId: ${global.requestId}`,
 						);
 					}
 
