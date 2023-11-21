@@ -64,6 +64,7 @@
 		"@graphql-mesh/transform-resolvers-composition": "0.13.20",
 		"@graphql-mesh/transform-type-merging": "0.5.20",
 		"@graphql-mesh/types": "0.91.12",
+		"@graphql-mesh/store": "0.9.20",
 		"@oclif/command": "^1.6.1",
 		"@oclif/config": "^1.15.1",
 		"@oclif/core": "^1.14.1",
@@ -119,6 +120,9 @@
 	"engines": {
 		"node": "^16.13 || >=18.0.0",
 		"npm": ">=8.0.0"
+	},
+	"resolutions": {
+		"jackspeak": "2.1.1"
 	},
 	"publishConfig": {
 		"access": "public"
