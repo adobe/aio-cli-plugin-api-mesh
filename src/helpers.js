@@ -843,16 +843,18 @@ async function processFileConfig(config) {
  * @param config
  */
 async function setUpTenantFiles(meshId) {
-	if (!fs.existsSync(path.resolve(process.cwd(), 'mesh-artifact', 'tenantFiles'))) {
-		// Create tmp tenantFiles folder
-		fs.mkdirSync(path.resolve(process.cwd(), 'mesh-artifact', 'tenantFiles'));
-	}
+	if (fs.existsSync(path.resolve(process.cwd(), 'mesh-artifact', meshId, 'files.json'))) {
+		if (!fs.existsSync(path.resolve(process.cwd(), 'mesh-artifact', 'tenantFiles'))) {
+			// Create tmp tenantFiles folder
+			fs.mkdirSync(path.resolve(process.cwd(), 'mesh-artifact', 'tenantFiles'));
+		}
 
-	const fileContents = fs
-		.readFileSync(path.resolve(process.cwd(), 'mesh-artifact', meshId, 'files.json'))
-		.toString();
-	const tenant = JSON.parse(fileContents);
-	await processFileConfig(tenant);
+		const fileContents = fs
+			.readFileSync(path.resolve(process.cwd(), 'mesh-artifact', meshId, 'files.json'))
+			.toString();
+		const tenant = JSON.parse(fileContents);
+		await processFileConfig(tenant);
+	}
 }
 
 module.exports = {
