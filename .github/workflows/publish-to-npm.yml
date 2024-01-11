@@ -9,12 +9,12 @@ jobs:
         if: github.repository == 'adobe/aio-cli-plugin-api-mesh'
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v2
-            - uses: actions/setup-node@v2
+            - uses: actions/checkout@v4
+            - uses: actions/setup-node@v3
               with:
                   node-version: 18
             - run: yarn install --frozen-lockfile
-            - uses: JS-DevTools/npm-publish@v1
+            - uses: JS-DevTools/npm-publish@v3
               with:
                   token: ${{ secrets.ADOBE_BOT_NPM_TOKEN }}
                   access: 'public'
