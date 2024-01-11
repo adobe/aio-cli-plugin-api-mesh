@@ -13,6 +13,7 @@ const { Command } = require('@oclif/core');
 const {
 	portNoFlag,
 	debugFlag,
+	selectFlag,
 	envFileFlag,
 	autoConfirmActionFlag,
 	readFileContents,
@@ -24,8 +25,15 @@ const meshBuilder = require('@adobe-apimesh/mesh-builder');
 const fs = require('fs');
 const UUID = require('../../uuid');
 const path = require('path');
-const { initRequestId, startGraphqlServer, importFiles } = require('../../helpers');
+const {
+	initSdk,
+	initRequestId,
+	startGraphqlServer,
+	importFiles,
+	setUpTenantFiles,
+} = require('../../helpers');
 const logger = require('../../classes/logger');
+const { getMeshId, getMeshArtifact } = require('../../lib/devConsole');
 require('dotenv').config();
 
 const { validateMesh, buildMesh, compileMesh } = meshBuilder.default;
@@ -46,6 +54,7 @@ class RunCommand extends Command {
 		debug: debugFlag,
 		env: envFileFlag,
 		autoConfirmAction: autoConfirmActionFlag,
+		select: selectFlag,
 	};
 
 	static enableJsonFlag = true;
@@ -59,86 +68,122 @@ class RunCommand extends Command {
 
 		const { args, flags } = await this.parse(RunCommand);
 
-		if (!args.file) {
-			throw new Error('Missing file path. Run aio api-mesh run --help for more info.');
-		}
-
-		let portNo;
-
-		//To set the port number using the environment file
-		if (process.env.PORT !== undefined) {
-			if (isNaN(process.env.PORT) || !Number.isInteger(parseInt(process.env.PORT))) {
-				throw new Error('PORT value in the .env file is not a valid integer');
-			}
-
-			portNo = process.env.PORT;
-		}
-
-		//To set the port number as the provided value in the command
-		if (flags.port !== undefined) {
-			portNo = flags.port;
-		}
-
-		//To set the default port to 5000
-		if (!portNo) {
-			portNo = 5000;
-		}
-
-		const envFilePath = await flags.env;
+		//Initialize the meshId based on
+		let meshId = null;
 
 		try {
 			//Ensure that current directory includes package.json
 			if (fs.existsSync(path.join(process.cwd(), 'package.json'))) {
-				//Read the mesh input file
-				let inputMeshData = await readFileContents(args.file, this, 'mesh');
-				let data;
+				//If select flag is present then getMeshId for the specified org
+				if (flags.select) {
+					const { imsOrgId, projectId, workspaceId, workspaceName } = await initSdk({});
 
-				if (checkPlaceholders(inputMeshData)) {
-					this.log('The provided mesh contains placeholders. Starting mesh interpolation process.');
-					data = await validateAndInterpolateMesh(inputMeshData, envFilePath, this);
-				} else {
 					try {
-						data = JSON.parse(inputMeshData);
+						meshId = await getMeshId(imsOrgId, projectId, workspaceId, workspaceName);
 					} catch (err) {
-						this.log(err.message);
-						throw new Error('Input mesh file is not a valid JSON. Please check the file provided.');
-					}
-				}
-
-				let filesList = [];
-
-				try {
-					filesList = getFilesInMeshConfig(data, args.file);
-				} catch (err) {
-					this.log(err.message);
-					throw new Error('Input mesh config is not valid.');
-				}
-
-				// if local files are present, import them in files array in meshConfig
-				if (filesList.length) {
-					try {
-						// minification of js will not be done for run command if debugging is enabled
-						data = await importFiles(
-							data,
-							filesList,
-							args.file,
-							flags.autoConfirmAction,
-							!flags.debug,
-						);
-					} catch (err) {
-						this.log(err.message);
 						throw new Error(
-							'Unable to import the files in the mesh config. Please check the file and try again.',
+							`Unable to get mesh ID. Please check the details and try again. RequestId: ${global.requestId}`,
 						);
 					}
+
+					try {
+						await getMeshArtifact(imsOrgId, projectId, workspaceId, workspaceName, meshId);
+					} catch (err) {
+						throw new Error(
+							`Unable to retrieve mesh. Please check the details and try again. RequestId: ${global.requestId}`,
+						);
+					}
+
+					try {
+						await setUpTenantFiles(meshId);
+					} catch (err) {
+						throw new Error('Failed to install downloaded mesh');
+					}
+
+					this.log('Successfully downloaded mesh');
+				} else {
+					if (!args.file) {
+						throw new Error('Missing file path. Run aio api-mesh run --help for more info.');
+					}
+
+					const envFilePath = await flags.env;
+
+					//Read the mesh input file
+					let inputMeshData = await readFileContents(args.file, this, 'mesh');
+					let data;
+
+					if (checkPlaceholders(inputMeshData)) {
+						this.log(
+							'The provided mesh contains placeholders. Starting mesh interpolation process.',
+						);
+						data = await validateAndInterpolateMesh(inputMeshData, envFilePath, this);
+					} else {
+						try {
+							data = JSON.parse(inputMeshData);
+						} catch (err) {
+							this.log(err.message);
+							throw new Error(
+								'Input mesh file is not a valid JSON. Please check the file provided.',
+							);
+						}
+					}
+
+					let filesList = [];
+
+					try {
+						filesList = getFilesInMeshConfig(data, args.file);
+					} catch (err) {
+						this.log(err.message);
+						throw new Error('Input mesh config is not valid.');
+					}
+
+					// if local files are present, import them in files array in meshConfig
+					if (filesList.length) {
+						try {
+							// minification of js will not be done for run command if debugging is enabled
+							data = await importFiles(
+								data,
+								filesList,
+								args.file,
+								flags.autoConfirmAction,
+								!flags.debug,
+							);
+						} catch (err) {
+							this.log(err.message);
+							throw new Error(
+								'Unable to import the files in the mesh config. Please check the file and try again.',
+							);
+						}
+					}
+
+					//Generating unique mesh id
+					meshId = UUID.newUuid().toString();
+
+					await validateMesh(data.meshConfig);
+					await buildMesh(meshId, data.meshConfig);
+					await compileMesh(meshId);
 				}
 
-				//Generating unique mesh id
-				let meshId = UUID.newUuid().toString();
+				let portNo;
 
-				await validateMesh(data.meshConfig);
-				await buildMesh(meshId, data.meshConfig);
-				await compileMesh(meshId);
+				//To set the port number using the environment file
+				if (process.env.PORT !== undefined) {
+					if (isNaN(process.env.PORT) || !Number.isInteger(parseInt(process.env.PORT))) {
+						throw new Error('PORT value in the .env file is not a valid integer');
+					}
+
+					portNo = process.env.PORT;
+				}
+
+				//To set the port number as the provided value in the command
+				if (flags.port !== undefined) {
+					portNo = flags.port;
+				}
+
+				//To set the default port to 5000
+				if (!portNo) {
+					portNo = 5000;
+				}
 
 				this.log(`Starting server on port : ${portNo}`);
 				await startGraphqlServer(meshId, portNo, flags.debug);

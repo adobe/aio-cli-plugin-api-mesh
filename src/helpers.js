@@ -25,6 +25,7 @@ const path = require('path');
 const { exec } = require('child_process');
 const { stdout, stderr } = require('process');
 const jsmin = require('jsmin').jsmin;
+const { resolve: resolveAbsolutePath } = require('path');
 
 const { DEV_CONSOLE_BASE_URL, DEV_CONSOLE_API_KEY, AIO_CLI_API_KEY } = CONSTANTS;
 
@@ -775,6 +776,87 @@ function startGraphqlServer(meshId, port, debug) {
 	});
 }
 
+/**
+ * Creates FileInfo object
+ *
+ * @param relativePath
+ * @returns
+ */
+function parseMaterializedFilePath(relativePath) {
+	const fileName = relativePath.replace(/^\.\//, '');
+	const file = path.basename(relativePath);
+
+	// js files are called using require, so we have to move it to relative to the artifact
+	if (path.extname(file) === '.js') {
+		relativePath = 'mesh-artifact/' + relativePath;
+	}
+	const absoluteFilePath = resolveAbsolutePath(relativePath);
+	const relative = path.dirname(absoluteFilePath);
+	const tenantTmpDir = {
+		relative,
+		absolute: resolveAbsolutePath(relative),
+	};
+	const relativeFilePath = relativePath;
+	return {
+		name: fileName,
+		relativePath: relativeFilePath,
+		absolutePath: absoluteFilePath,
+		parentDir: tenantTmpDir,
+	};
+}
+
+/**
+ * This function looks at a meshConfig to check if a files property exists and then materializes those files
+ * on the GraphQL server using the file.materializedPath
+ *
+ * @param config
+ */
+async function processFileConfig(config) {
+	if (config.files) {
+		await Promise.all(
+			config.files.map(async file => {
+				try {
+					if (file.materializedPath) {
+						const filePath = parseMaterializedFilePath(file.materializedPath);
+						try {
+							await fs.mkdirSync(filePath.parentDir.absolute, { recursive: true });
+							await fs.writeFileSync(filePath.absolutePath, file.content, { flag: 'w' });
+						} catch (e) {
+							throw new Error(
+								e,
+								`Materializing ${filePath.name} to ${filePath.absolutePath} failed`,
+							);
+						}
+					}
+				} catch (err) {
+					throw new Error(`Parsing file ${file.path} failed`);
+				}
+			}),
+		);
+	}
+}
+
+/**
+ * This function sets up the tenantFiles used in a particular mesh config
+ * into the tenantFiles folder
+ *
+ * @param config
+ */
+async function setUpTenantFiles(meshId) {
+	if (fs.existsSync(path.resolve(process.cwd(), 'mesh-artifact', meshId, 'files.json'))) {
+		if (!fs.existsSync(path.resolve(process.cwd(), 'mesh-artifact', 'tenantFiles'))) {
+			// Create tmp tenantFiles folder
+			fs.mkdirSync(path.resolve(process.cwd(), 'mesh-artifact', 'tenantFiles'));
+		}
+
+		const fileContents = fs
+			.readFileSync(path.resolve(process.cwd(), 'mesh-artifact', meshId, 'files.json'))
+			.toString();
+		const tenant = JSON.parse(fileContents);
+		await processFileConfig(tenant);
+	}
+}
+
 module.exports = {
 	objToString,
 	promptInput,
@@ -790,4 +872,5 @@ module.exports = {
 	runCliCommand,
 	updateFilesArray,
 	startGraphqlServer,
+	setUpTenantFiles,
 };
