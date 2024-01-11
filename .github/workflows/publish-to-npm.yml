@@ -13,7 +13,7 @@ jobs:
             - uses: actions/setup-node@v2
               with:
                   node-version: 18
-            - run: npm install
+            - run: yarn install --frozen-lockfile
             - uses: JS-DevTools/npm-publish@v1
               with:
                   token: ${{ secrets.ADOBE_BOT_NPM_TOKEN }}
