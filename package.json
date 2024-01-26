@@ -1,6 +1,6 @@
 {
 	"name": "@adobe/aio-cli-plugin-api-mesh",
-	"version": "3.2.1",
+	"version": "3.2.1-beta.2",
 	"description": "Adobe I/O CLI plugin to develop and manage API mesh sources",
 	"keywords": [
 		"oclif-plugin"
@@ -123,6 +123,9 @@
 	},
 	"resolutions": {
 		"jackspeak": "2.1.1"
+	},
+	"overrides": {
+		"@graphql-mesh/types": "0.91.12"
 	},
 	"publishConfig": {
 		"access": "public"
