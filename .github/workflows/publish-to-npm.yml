@@ -14,7 +14,8 @@ jobs:
               with:
                   node-version: 18
             - run: yarn install --frozen-lockfile
-            - uses: JS-DevTools/npm-publish@v3
+            - uses: JS-DevTools/npm-publish@v1
               with:
                   token: ${{ secrets.ADOBE_BOT_NPM_TOKEN }}
                   access: 'public'
+                  tag: 'beta'
