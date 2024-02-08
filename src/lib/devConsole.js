@@ -193,7 +193,15 @@ const getMesh = async (organizationId, projectId, workspaceId, workspaceName, me
 	}
 };
 
-const createMesh = async (organizationId, projectId, workspaceId, workspaceName, data) => {
+const createMesh = async (
+	organizationId,
+	projectId,
+	workspaceId,
+	workspaceName,
+	orgName,
+	projectName,
+	data,
+) => {
 	const { baseUrl: devConsoleUrl, accessToken, apiKey } = await getDevConsoleConfig();
 	const config = {
 		method: 'post',
@@ -202,6 +210,9 @@ const createMesh = async (organizationId, projectId, workspaceId, workspaceName,
 			'Authorization': `Bearer ${accessToken}`,
 			'Content-Type': 'application/json',
 			'x-request-id': global.requestId,
+			'workspaceName': workspaceName,
+			'orgName': orgName,
+			'projectName': projectName,
 		},
 		data: JSON.stringify(data),
 	};
