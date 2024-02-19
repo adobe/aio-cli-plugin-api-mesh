@@ -13,13 +13,12 @@ const { Command } = require('@oclif/command');
 
 const logger = require('../../classes/logger');
 const { initSdk, initRequestId } = require('../../helpers');
-const CONSTANTS = require('../../constants');
 const { ignoreCacheFlag } = require('../../utils');
-const { describeMesh, getMesh } = require('../../lib/devConsole');
+const { describeMesh } = require('../../lib/devConsole');
+const { buildMeshUrl, buildEdgeMeshUrl } = require('../../urlBuilder');
+const chalk = require('chalk');
 
 require('dotenv').config();
-
-const { MULTITENANT_GRAPHQL_SERVER_BASE_URL } = CONSTANTS;
 
 class DescribeCommand extends Command {
 	static flags = {
@@ -32,9 +31,7 @@ class DescribeCommand extends Command {
 		logger.info(`RequestId: ${global.requestId}`);
 
 		const { flags } = await this.parse(DescribeCommand);
-
 		const ignoreCache = await flags.ignoreCache;
-
 		const { imsOrgId, projectId, workspaceId, workspaceName } = await initSdk({
 			ignoreCache,
 		});
@@ -44,6 +41,14 @@ class DescribeCommand extends Command {
 
 			if (meshDetails) {
 				const { meshId, apiKey } = meshDetails;
+				const meshUrl = await buildMeshUrl(
+					imsOrgId,
+					projectId,
+					workspaceId,
+					workspaceName,
+					meshId,
+					apiKey,
+				);
 
 				if (meshId) {
 					this.log('Successfully retrieved mesh details \n');
@@ -52,21 +57,15 @@ class DescribeCommand extends Command {
 					this.log('Workspace ID: %s', workspaceId);
 					this.log('Mesh ID: %s', meshId);
 
-					const { meshURL } = await getMesh(
-						imsOrgId,
-						projectId,
-						workspaceId,
-						workspaceName,
-						meshId,
-					);
-					const meshUrl =
-						meshURL === '' || meshURL === undefined ? MULTITENANT_GRAPHQL_SERVER_BASE_URL : meshURL;
-
-					if (apiKey && MULTITENANT_GRAPHQL_SERVER_BASE_URL.includes(meshUrl)) {
-						this.log('Mesh Endpoint: %s\n', `${meshUrl}/${meshId}/graphql?api_key=${apiKey}`);
+					const shouldShowEdgeMeshUrl = true;
+					if (shouldShowEdgeMeshUrl) {
+						const edgeMeshUrl = buildEdgeMeshUrl(meshId, workspaceName);
+						this.log('Legacy Mesh Endpoint: %s', meshUrl);
+						this.log(chalk.bold('Edge Mesh Endpoint: %s\n'), edgeMeshUrl);
 					} else {
-						this.log('Mesh Endpoint: %s\n', `${meshUrl}/${meshId}/graphql`);
+						this.log('Mesh Endpoint: %\ns', meshUrl);
 					}
+
 					return meshDetails;
 				} else {
 					logger.error(
