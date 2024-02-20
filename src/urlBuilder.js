@@ -8,9 +8,13 @@ const {
 } = CONSTANTS;
 
 /**
- * Build the mesh url for the legacy mesh.
+ * Build the mesh url for the multitenant mesh.
  *
  * Gets the mesh details to checks for a custom domain in the case of a TI mesh.
+ * @param imsOrgId
+ * @param projectId
+ * @param workspaceId
+ * @param workspaceName
  * @param meshId
  * @param apiKey
  * @returns {Promise<string>}
@@ -34,7 +38,7 @@ async function buildMeshUrl(imsOrgId, projectId, workspaceId, workspaceName, mes
 /**
  * Builds the mesh url for the edge mesh.
  *
- * Uses the domain for the appropriate Cloudflare namespace based on the console workspace name.
+ * Uses the url for the appropriate Cloudflare namespace based on the console workspace name.
  * @param meshId
  * @param workspaceName
  * @returns {string}

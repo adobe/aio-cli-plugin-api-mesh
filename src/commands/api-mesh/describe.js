@@ -63,7 +63,7 @@ class DescribeCommand extends Command {
 						this.log('Legacy Mesh Endpoint: %s', meshUrl);
 						this.log(chalk.bold('Edge Mesh Endpoint: %s\n'), edgeMeshUrl);
 					} else {
-						this.log('Mesh Endpoint: %\ns', meshUrl);
+						this.log('Mesh Endpoint: %s\n', meshUrl);
 					}
 
 					return meshDetails;

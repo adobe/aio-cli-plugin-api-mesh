@@ -24,6 +24,8 @@ const {
 	validateAndInterpolateMesh,
 } = require('../../utils');
 const { getMesh, createMesh } = require('../../lib/devConsole');
+const { buildEdgeMeshUrl, buildMeshUrl } = require('../../urlBuilder');
+const chalk = require('chalk');
 
 const { MULTITENANT_GRAPHQL_SERVER_BASE_URL } = CONSTANTS;
 
@@ -132,25 +134,22 @@ class CreateCommand extends Command {
 						if (sdkList) {
 							this.log('Successfully subscribed API Key %s to API Mesh service', apiKey);
 
-							const { meshURL } = await getMesh(
+							const meshUrl = await buildMeshUrl(
 								imsOrgId,
 								projectId,
 								workspaceId,
 								workspaceName,
 								mesh.meshId,
+								apiKey,
 							);
-							const meshUrl =
-								meshURL === '' || meshURL === undefined
-									? MULTITENANT_GRAPHQL_SERVER_BASE_URL
-									: meshURL;
 
-							if (apiKey && MULTITENANT_GRAPHQL_SERVER_BASE_URL.includes(meshUrl)) {
-								this.log(
-									'Mesh Endpoint: %s\n',
-									`${meshUrl}/${mesh.meshId}/graphql?api_key=${apiKey}`,
-								);
+							const shouldShowEdgeMeshUrl = true;
+							if (shouldShowEdgeMeshUrl) {
+								const edgeMeshUrl = buildEdgeMeshUrl(mesh.meshId, workspaceName);
+								this.log('Legacy Mesh Endpoint: %s', meshUrl);
+								this.log(chalk.bold('Edge Mesh Endpoint: %s\n'), edgeMeshUrl);
 							} else {
-								this.log('Mesh Endpoint: %s\n', `${meshUrl}/${mesh.meshId}/graphql`);
+								this.log('Mesh Endpoint: %s\n', meshUrl);
 							}
 						} else {
 							this.log('Unable to subscribe API Key %s to API Mesh service', apiKey);
