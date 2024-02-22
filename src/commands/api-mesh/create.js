@@ -23,11 +23,9 @@ const {
 	readFileContents,
 	validateAndInterpolateMesh,
 } = require('../../utils');
-const { getMesh, createMesh } = require('../../lib/devConsole');
+const { createMesh, getTenantFeatures } = require('../../lib/devConsole');
 const { buildEdgeMeshUrl, buildMeshUrl } = require('../../urlBuilder');
 const chalk = require('chalk');
-
-const { MULTITENANT_GRAPHQL_SERVER_BASE_URL } = CONSTANTS;
 
 class CreateCommand extends Command {
 	static args = [{ name: 'file' }];
@@ -56,7 +54,7 @@ class CreateCommand extends Command {
 		const ignoreCache = await flags.ignoreCache;
 		const autoConfirmAction = await flags.autoConfirmAction;
 		const envFilePath = await flags.env;
-		const { imsOrgId, projectId, workspaceId, workspaceName } = await initSdk({
+		const { imsOrgId, imsOrgCode, projectId, workspaceId, workspaceName } = await initSdk({
 			ignoreCache,
 		});
 
@@ -143,8 +141,9 @@ class CreateCommand extends Command {
 								apiKey,
 							);
 
-							const shouldShowEdgeMeshUrl = true;
-							if (shouldShowEdgeMeshUrl) {
+							const { showCloudflareURL: showEdgeMeshUrl } = await getTenantFeatures(imsOrgCode);
+
+							if (showEdgeMeshUrl) {
 								const edgeMeshUrl = buildEdgeMeshUrl(mesh.meshId, workspaceName);
 								this.log('Legacy Mesh Endpoint: %s', meshUrl);
 								this.log(chalk.bold('Edge Mesh Endpoint: %s\n'), edgeMeshUrl);

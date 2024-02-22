@@ -14,7 +14,7 @@ const { Command } = require('@oclif/command');
 const logger = require('../../classes/logger');
 const { initSdk, initRequestId } = require('../../helpers');
 const { ignoreCacheFlag } = require('../../utils');
-const { describeMesh } = require('../../lib/devConsole');
+const { describeMesh, getTenantFeatures } = require('../../lib/devConsole');
 const { buildMeshUrl, buildEdgeMeshUrl } = require('../../urlBuilder');
 const chalk = require('chalk');
 
@@ -32,7 +32,7 @@ class DescribeCommand extends Command {
 
 		const { flags } = await this.parse(DescribeCommand);
 		const ignoreCache = await flags.ignoreCache;
-		const { imsOrgId, projectId, workspaceId, workspaceName } = await initSdk({
+		const { imsOrgId, imsOrgCode, projectId, workspaceId, workspaceName } = await initSdk({
 			ignoreCache,
 		});
 
@@ -41,24 +41,25 @@ class DescribeCommand extends Command {
 
 			if (meshDetails) {
 				const { meshId, apiKey } = meshDetails;
-				const meshUrl = await buildMeshUrl(
-					imsOrgId,
-					projectId,
-					workspaceId,
-					workspaceName,
-					meshId,
-					apiKey,
-				);
+				const { showCloudflareURL: showEdgeMeshUrl } = await getTenantFeatures(imsOrgCode);
 
 				if (meshId) {
+					const meshUrl = await buildMeshUrl(
+						imsOrgId,
+						projectId,
+						workspaceId,
+						workspaceName,
+						meshId,
+						apiKey,
+					);
+
 					this.log('Successfully retrieved mesh details \n');
 					this.log('Org ID: %s', imsOrgId);
 					this.log('Project ID: %s', projectId);
 					this.log('Workspace ID: %s', workspaceId);
 					this.log('Mesh ID: %s', meshId);
 
-					const shouldShowEdgeMeshUrl = true;
-					if (shouldShowEdgeMeshUrl) {
+					if (showEdgeMeshUrl) {
 						const edgeMeshUrl = buildEdgeMeshUrl(meshId, workspaceName);
 						this.log('Legacy Mesh Endpoint: %s', meshUrl);
 						this.log(chalk.bold('Edge Mesh Endpoint: %s\n'), edgeMeshUrl);
