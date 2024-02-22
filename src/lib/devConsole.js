@@ -11,7 +11,7 @@ const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 const contentDisposition = require('content-disposition');
 
-const { DEV_CONSOLE_TRANSPORTER_API_KEY, SCHEMA_MANAGEMENT_SERVICE_BASE_URL } = CONSTANTS;
+const { DEV_CONSOLE_TRANSPORTER_API_KEY, SMS_BASE_URL } = CONSTANTS;
 
 const { objToString, getDevConsoleConfig } = require('../helpers');
 
@@ -834,7 +834,7 @@ const getTenantFeatures = async organizationCode => {
 	const { accessToken, apiKey } = await getDevConsoleConfig();
 	const config = {
 		method: 'get',
-		url: `${SCHEMA_MANAGEMENT_SERVICE_BASE_URL}/organizations/${organizationCode}/features?API_KEY=${apiKey}`,
+		url: `${SMS_BASE_URL}/organizations/${organizationCode}/features?API_KEY=${apiKey}`,
 		headers: {
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
@@ -843,7 +843,7 @@ const getTenantFeatures = async organizationCode => {
 
 	logger.info(
 		'Initiating GET %s',
-		`${SCHEMA_MANAGEMENT_SERVICE_BASE_URL}/organizations/${organizationCode}/features?API_KEY=${apiKey}`,
+		`${SMS_BASE_URL}/organizations/${organizationCode}/features?API_KEY=${apiKey}`,
 	);
 
 	try {
