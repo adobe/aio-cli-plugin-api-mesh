@@ -10,13 +10,13 @@ governing permissions and limitations under the License.
 */
 
 const { Command } = require('@oclif/command');
+const chalk = require('chalk');
 
 const logger = require('../../classes/logger');
 const { initSdk, initRequestId } = require('../../helpers');
 const { ignoreCacheFlag } = require('../../utils');
 const { describeMesh, getTenantFeatures } = require('../../lib/devConsole');
 const { buildMeshUrl, buildEdgeMeshUrl } = require('../../urlBuilder');
-const chalk = require('chalk');
 
 require('dotenv').config();
 

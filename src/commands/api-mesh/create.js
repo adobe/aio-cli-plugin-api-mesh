@@ -10,9 +10,9 @@ governing permissions and limitations under the License.
 */
 
 const { Command } = require('@oclif/core');
+const chalk = require('chalk');
 const { initSdk, initRequestId, promptConfirm, importFiles } = require('../../helpers');
 const logger = require('../../classes/logger');
-const CONSTANTS = require('../../constants');
 const {
 	ignoreCacheFlag,
 	autoConfirmActionFlag,
@@ -25,7 +25,6 @@ const {
 } = require('../../utils');
 const { createMesh, getTenantFeatures } = require('../../lib/devConsole');
 const { buildEdgeMeshUrl, buildMeshUrl } = require('../../urlBuilder');
-const chalk = require('chalk');
 
 class CreateCommand extends Command {
 	static args = [{ name: 'file' }];
