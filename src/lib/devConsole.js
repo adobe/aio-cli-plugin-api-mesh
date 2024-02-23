@@ -866,11 +866,7 @@ const getTenantFeatures = async organizationCode => {
 			throw new Error(errorMessage);
 		}
 	} catch (error) {
-		if (error.response?.status === 404) {
-			logger.error(`Features not found for organization: ${organizationCode}`);
-		} else {
-			logger.error(`Error getting features for organization: ${organizationCode}`);
-		}
+		logger.error(`Error getting features for organization: ${organizationCode}`);
 
 		return {
 			imsOrgId: organizationCode,
