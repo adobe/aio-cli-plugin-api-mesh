@@ -28,7 +28,7 @@ jest.mock('../../../lib/devConsole');
 
 const DescribeCommand = require('../describe');
 const { initSdk, initRequestId } = require('../../../helpers');
-const { describeMesh, getMesh } = require('../../../lib/devConsole');
+const { describeMesh, getMesh, getTenantFeatures } = require('../../../lib/devConsole');
 const sampleCreateMeshConfig = require('../../__fixtures__/sample_mesh.json');
 
 const selectedOrg = { id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' };
@@ -46,6 +46,11 @@ describe('describe command tests', () => {
 		describeMesh.mockResolvedValue({
 			meshId: 'dummy_meshId',
 			apiKey: 'dummy_apiKey',
+		});
+
+		getTenantFeatures.mockResolvedValue({
+			imsOrgId: selectedProject.code,
+			showCloudflareURL: false,
 		});
 
 		initSdk.mockResolvedValue({

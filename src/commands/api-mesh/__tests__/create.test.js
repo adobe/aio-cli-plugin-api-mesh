@@ -27,6 +27,7 @@ const {
 	createMesh,
 	createAPIMeshCredentials,
 	subscribeCredentialToMeshService,
+	getTenantFeatures,
 } = require('../../../lib/devConsole');
 
 const selectedOrg = { id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' };
@@ -95,6 +96,11 @@ describe('create command tests', () => {
 		fetchedMeshConfig.meshURL = '';
 
 		getMesh.mockResolvedValue(fetchedMeshConfig);
+
+		getTenantFeatures.mockResolvedValue({
+			imsOrgId: selectedProject.code,
+			showCloudflareURL: false,
+		});
 
 		parseSpy = jest.spyOn(CreateCommand.prototype, 'parse');
 		parseSpy.mockResolvedValue({
