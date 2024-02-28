@@ -14,7 +14,6 @@ const mockConsoleCLIInstance = {};
 
 jest.mock('axios');
 jest.mock('@adobe/aio-lib-env');
-jest.mock('@adobe/aio-cli-lib-console');
 jest.mock('@adobe/aio-lib-ims');
 jest.mock('../../../helpers', () => ({
 	initSdk: jest.fn().mockResolvedValue({}),
@@ -43,40 +42,39 @@ const mockIgnoreCacheFlag = jest.fn().mockResolvedValue(true);
 
 describe('describe command tests', () => {
 	beforeEach(() => {
+		initSdk.mockResolvedValue({
+			imsOrgId: selectedOrg.id,
+			imsOrgCode: selectedOrg.code,
+			projectId: selectedProject.id,
+			workspaceId: selectedWorkspace.id,
+			workspaceName: selectedWorkspace.title,
+		});
+
 		describeMesh.mockResolvedValue({
 			meshId: 'dummy_meshId',
 			apiKey: 'dummy_apiKey',
 		});
 
-		getTenantFeatures.mockResolvedValue({
-			imsOrgId: selectedProject.code,
-			showCloudflareURL: false,
+		getMesh.mockResolvedValue({
+			meshId: 'dummy_id',
+			meshURL: '',
 		});
 
-		initSdk.mockResolvedValue({
-			imsOrgId: selectedOrg.id,
-			projectId: selectedProject.id,
-			workspaceId: selectedWorkspace.id,
-			workspaceName: selectedWorkspace.title,
+		getTenantFeatures.mockResolvedValue({
+			imsOrgId: selectedOrg.code,
+			showCloudflareURL: false,
 		});
 
 		global.requestId = 'dummy_request_id';
 
 		logSpy = jest.spyOn(DescribeCommand.prototype, 'log');
 		errorLogSpy = jest.spyOn(DescribeCommand.prototype, 'error');
-
 		parseSpy = jest.spyOn(DescribeCommand.prototype, 'parse');
 		parseSpy.mockResolvedValue({
 			flags: {
 				ignoreCache: mockIgnoreCacheFlag,
 			},
 		});
-
-		let fetchedMeshConfig = sampleCreateMeshConfig;
-		fetchedMeshConfig.meshId = 'dummy_id';
-		fetchedMeshConfig.meshURL = '';
-
-		getMesh.mockResolvedValue(fetchedMeshConfig);
 	});
 
 	afterEach(() => {
@@ -288,5 +286,75 @@ describe('describe command tests', () => {
 		]
 	`);
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`[]`);
+	});
+
+	test('should show prod edge mesh url on workspace named "Production" if feature is enabled', async () => {
+		// mock the edge mesh url feature to be enabled
+		getTenantFeatures.mockResolvedValueOnce({
+			imsOrgId: selectedOrg.code,
+			showCloudflareURL: true,
+		});
+
+		// mock the workspace name to "Production"
+		initSdk.mockResolvedValueOnce({
+			workspaceName: 'Production',
+		});
+
+		await DescribeCommand.run();
+
+		expect(logSpy).toHaveBeenCalledWith(
+			expect.stringContaining('Legacy Mesh Endpoint:'),
+			'https://graph.adobe.io/api/dummy_meshId/graphql?api_key=dummy_apiKey',
+		);
+
+		expect(logSpy).toHaveBeenCalledWith(
+			expect.stringContaining('Edge Mesh Endpoint:'),
+			'https://edge-graph.adobe.io/api/dummy_meshId/graphql',
+		);
+	});
+
+	test('should show sandbox edge mesh url on workspace NOT named "Production" if feature is enabled', async () => {
+		// mock the edge mesh url feature to be enabled
+		getTenantFeatures.mockResolvedValueOnce({
+			imsOrgId: selectedOrg.code,
+			showCloudflareURL: true,
+		});
+
+		// mock the workspace name to a value not equal to "Production"
+		initSdk.mockResolvedValueOnce({
+			workspaceName: 'AnythingButProduction',
+		});
+
+		await DescribeCommand.run();
+
+		expect(logSpy).toHaveBeenCalledWith(
+			expect.stringContaining('Legacy Mesh Endpoint:'),
+			'https://graph.adobe.io/api/dummy_meshId/graphql?api_key=dummy_apiKey',
+		);
+
+		expect(logSpy).toHaveBeenCalledWith(
+			expect.stringContaining('Edge Mesh Endpoint:'),
+			'https://edge-sandbox-graph.adobe.io/api/dummy_meshId/graphql',
+		);
+	});
+
+	test('should not show edge mesh url if feature is disabled', async () => {
+		// mock the edge mesh url feature to be disabled
+		getTenantFeatures.mockResolvedValueOnce({
+			imsOrgId: selectedOrg.code,
+			showCloudflareURL: false,
+		});
+
+		await DescribeCommand.run();
+
+		expect(logSpy).not.toHaveBeenCalledWith(
+			expect.stringContaining('Edge Mesh Endpoint:'),
+			expect.any(String),
+		);
+
+		expect(logSpy).toHaveBeenCalledWith(
+			expect.stringContaining('Mesh Endpoint:'),
+			'https://graph.adobe.io/api/dummy_meshId/graphql?api_key=dummy_apiKey',
+		);
 	});
 });
