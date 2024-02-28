@@ -68,6 +68,8 @@ describe('create command tests', () => {
 			projectId: selectedProject.id,
 			workspaceId: selectedWorkspace.id,
 			workspaceName: selectedWorkspace.title,
+			orgName: selectedOrg.name,
+			projectName: selectedProject.title,
 		});
 
 		global.requestId = 'dummy_request_id';
@@ -280,6 +282,8 @@ describe('create command tests', () => {
 		  "5678",
 		  "123456789",
 		  "Workspace01",
+		  "ORG01",
+		  "Project01",
 		  {
 		    "meshConfig": {
 		      "sources": [
@@ -370,6 +374,8 @@ describe('create command tests', () => {
 		  "5678",
 		  "123456789",
 		  "Workspace01",
+		  "ORG01",
+		  "Project01",
 		  {
 		    "meshConfig": {
 		      "sources": [
@@ -929,6 +935,8 @@ describe('create command tests', () => {
 		  "5678",
 		  "123456789",
 		  "Workspace01",
+		  "ORG01",
+		  "Project01",
 		  {
 		    "meshConfig": {
 		      "files": [
@@ -1191,6 +1199,8 @@ describe('create command tests', () => {
 		  "5678",
 		  "123456789",
 		  "Workspace01",
+		  "ORG01",
+		  "Project01",
 		  {
 		    "files": [
 		      {
@@ -1320,6 +1330,8 @@ describe('create command tests', () => {
 		  "5678",
 		  "123456789",
 		  "Workspace01",
+		  "ORG01",
+		  "Project01",
 		  {
 		    "meshConfig": {
 		      "files": [
@@ -1452,6 +1464,8 @@ describe('create command tests', () => {
 		  "5678",
 		  "123456789",
 		  "Workspace01",
+		  "ORG01",
+		  "Project01",
 		  {
 		    "meshConfig": {
 		      "files": [
@@ -1581,6 +1595,8 @@ describe('create command tests', () => {
 		  "5678",
 		  "123456789",
 		  "Workspace01",
+		  "ORG01",
+		  "Project01",
 		  {
 		    "meshConfig": {
 		      "files": [
