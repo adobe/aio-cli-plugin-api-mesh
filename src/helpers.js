@@ -427,6 +427,8 @@ async function initSdk(options) {
 		projectId: project.id,
 		workspaceId: workspace.id,
 		workspaceName: workspace.title,
+		orgName: org.name,
+		projectName: project.title,
 	};
 }
 

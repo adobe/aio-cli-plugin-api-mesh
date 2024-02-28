@@ -53,7 +53,15 @@ class CreateCommand extends Command {
 		const ignoreCache = await flags.ignoreCache;
 		const autoConfirmAction = await flags.autoConfirmAction;
 		const envFilePath = await flags.env;
-		const { imsOrgId, imsOrgCode, projectId, workspaceId, workspaceName } = await initSdk({
+		const {
+			imsOrgId,
+			imsOrgCode,
+			projectId,
+			workspaceId,
+			workspaceName,
+			orgName,
+			projectName,
+		} = await initSdk({
 			ignoreCache,
 		});
 
@@ -108,6 +116,8 @@ class CreateCommand extends Command {
 					projectId,
 					workspaceId,
 					workspaceName,
+					orgName,
+					projectName,
 					data,
 				);
 
