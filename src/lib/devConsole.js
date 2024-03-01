@@ -5,6 +5,11 @@ const axios = require('axios');
 
 const logger = require('../classes/logger');
 const CONSTANTS = require('../constants');
+const path = require('path');
+const fs = require('fs');
+const util = require('util');
+const exec = util.promisify(require('child_process').exec);
+const contentDisposition = require('content-disposition');
 
 const { DEV_CONSOLE_TRANSPORTER_API_KEY } = CONSTANTS;
 
@@ -76,11 +81,11 @@ const getApiKeyCredential = async (organizationId, projectId, workspaceId) => {
 	}
 };
 
-const describeMesh = async (organizationId, projectId, workspaceId) => {
+const describeMesh = async (organizationId, projectId, workspaceId, workspaceName) => {
 	logger.info('Initiating Describe Mesh');
 
 	try {
-		const meshId = await getMeshId(organizationId, projectId, workspaceId);
+		const meshId = await getMeshId(organizationId, projectId, workspaceId, workspaceName);
 
 		logger.info('Response from getMeshId %s', meshId);
 
@@ -106,7 +111,7 @@ const describeMesh = async (organizationId, projectId, workspaceId) => {
 	}
 };
 
-const getMesh = async (organizationId, projectId, workspaceId, meshId) => {
+const getMesh = async (organizationId, projectId, workspaceId, workspaceName, meshId) => {
 	const { baseUrl: devConsoleUrl, accessToken, apiKey } = await getDevConsoleConfig();
 	const config = {
 		method: 'get',
@@ -114,6 +119,7 @@ const getMesh = async (organizationId, projectId, workspaceId, meshId) => {
 		headers: {
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
+			'workspaceName': workspaceName,
 		},
 	};
 
@@ -187,7 +193,7 @@ const getMesh = async (organizationId, projectId, workspaceId, meshId) => {
 	}
 };
 
-const createMesh = async (organizationId, projectId, workspaceId, data) => {
+const createMesh = async (organizationId, projectId, workspaceId, workspaceName, data) => {
 	const { baseUrl: devConsoleUrl, accessToken, apiKey } = await getDevConsoleConfig();
 	const config = {
 		method: 'post',
@@ -212,7 +218,44 @@ const createMesh = async (organizationId, projectId, workspaceId, data) => {
 
 		if (response && response.status === 201) {
 			logger.info(`Mesh Config : ${objToString(response, ['data'])}`);
-			return response.data;
+
+			let sdkList = [];
+			let credential;
+			let isApiKeyNew = false;
+
+			credential = await getApiKeyCredential(organizationId, projectId, workspaceId);
+			if (!credential) {
+				logger.info('API Key credential not found on workspace');
+
+				// try to create a new API key credential
+				credential = await createAPIMeshCredentials(organizationId, projectId, workspaceId);
+				isApiKeyNew = true;
+			}
+			// subscribe the credential to API mesh service
+			sdkList = await subscribeCredentialToMeshService(
+				organizationId,
+				projectId,
+				workspaceId,
+				isApiKeyNew ? credential.id : credential.id_integration,
+			);
+			const newlyCreatedOrExistingApiKey = isApiKeyNew ? credential.apiKey : credential.client_id;
+
+			if (sdkList) {
+				logger.info(
+					'Successfully subscribed API Key %s to API Mesh service',
+					isApiKeyNew ? credential.apiKey : credential.client_id,
+				);
+			} else {
+				logger.error(
+					'Unable to subscribe API Key %s to API Mesh service',
+					newlyCreatedOrExistingApiKey,
+				);
+			}
+			return {
+				mesh: response.data,
+				apiKey: newlyCreatedOrExistingApiKey,
+				sdkList,
+			};
 		} else {
 			// Non 201 response received
 			logger.error(
@@ -443,7 +486,7 @@ const deleteMesh = async (organizationId, projectId, workspaceId, meshId) => {
 	}
 };
 
-const getMeshId = async (organizationId, projectId, workspaceId) => {
+const getMeshId = async (organizationId, projectId, workspaceId, workspaceName) => {
 	const { baseUrl: devConsoleUrl, accessToken, apiKey } = await getDevConsoleConfig();
 	logger.info('Initiating Mesh ID request');
 
@@ -453,6 +496,7 @@ const getMeshId = async (organizationId, projectId, workspaceId) => {
 		headers: {
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
+			'workspaceName': workspaceName,
 		},
 	};
 
@@ -729,6 +773,54 @@ const unsubscribeCredentialFromMeshService = async (
 	}
 };
 
+const getMeshArtifact = async (organizationId, projectId, workspaceId, workspaceName, meshId) => {
+	const { baseUrl: devConsoleUrl, accessToken, apiKey } = await getDevConsoleConfig();
+	const config = {
+		method: 'get',
+		url: `${devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/artifact?API_KEY=${apiKey}`,
+		headers: {
+			'Authorization': `Bearer ${accessToken}`,
+			'x-request-id': global.requestId,
+			'workspaceName': workspaceName,
+		},
+		responseType: 'arraybuffer',
+	};
+
+	logger.info(
+		'Initiating GET %s',
+		`${devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/artifact?API_KEY=${apiKey}`,
+	);
+
+	try {
+		const response = await axios(config);
+
+		if (response && response.status === 200) {
+			// Access the response data as an ArrayBuffer
+			const octetData = response.data;
+			const contentDispositionHeader = response.headers['content-disposition'];
+
+			const disposition = contentDisposition.parse(contentDispositionHeader);
+			const filename = disposition.parameters.filename;
+
+			// Save the octet-stream into a file
+			fs.writeFileSync(filename, octetData);
+
+			//Extract the file contents from the tar file
+			await exec(`tar -xf ${filename} -C ${path.resolve(process.cwd())}`);
+
+			//Delete the gzip compressed file
+			await exec(`rm ${filename}`);
+		} else {
+			throw new Error(`Something went wrong: 'Unable to get mesh artifact')}`);
+		}
+	} catch (error) {
+		throw new Error(
+			'Unable to get mesh artifact from Schema Management Service: %s',
+			error.message,
+		);
+	}
+};
+
 module.exports = {
 	getApiKeyCredential,
 	describeMesh,
@@ -742,4 +834,5 @@ module.exports = {
 	subscribeCredentialToServices,
 	subscribeCredentialToMeshService,
 	unsubscribeCredentialFromMeshService,
+	getMeshArtifact,
 };

@@ -20,4 +20,5 @@ const ProdConstants = {
 	SMS_BASE_URL: 'https://graph.adobe.io/api-admin',
 };
 
-module.exports = clientEnv === 'stage' ? StageConstants : ProdConstants;
+const envConstants = clientEnv === 'stage' ? StageConstants : ProdConstants;
+module.exports = { ...envConstants };

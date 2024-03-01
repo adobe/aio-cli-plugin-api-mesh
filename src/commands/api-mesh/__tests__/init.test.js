@@ -95,7 +95,7 @@ describe('Workspace init command tests', () => {
 	});
 
 	test('Command should pass with no flags', async () => {
-		parseSpy.mockResolvedValue({
+		parseSpy.mockResolvedValueOnce({
 			args: {
 				projectName: mockProjectName,
 			},
@@ -103,7 +103,7 @@ describe('Workspace init command tests', () => {
 				path: './template',
 			},
 		});
-		promptSelect.mockResolvedValue('yarn');
+		promptSelect.mockResolvedValueOnce('yarn');
 		await InitCommand.run();
 		expect(promptConfirm).toHaveBeenCalled();
 		expect(promptSelect).toHaveBeenCalled();
@@ -121,7 +121,7 @@ describe('Workspace init command tests', () => {
 	});
 
 	test('Command should pass and create git project if git flag is provided', async () => {
-		parseSpy.mockResolvedValue({
+		parseSpy.mockResolvedValueOnce({
 			args: {
 				projectName: mockProjectName,
 			},
@@ -149,7 +149,7 @@ describe('Workspace init command tests', () => {
 	});
 
 	test('Command should fail if git flag is provided and git init fails', async () => {
-		parseSpy.mockResolvedValue({
+		parseSpy.mockResolvedValueOnce({
 			args: {
 				projectName: mockProjectName,
 			},
@@ -178,7 +178,7 @@ describe('Workspace init command tests', () => {
 	});
 
 	test('Command should pass and create yarn project if yarn is package manager', async () => {
-		parseSpy.mockResolvedValue({
+		parseSpy.mockResolvedValueOnce({
 			args: {
 				projectName: mockProjectName,
 			},
@@ -203,7 +203,7 @@ describe('Workspace init command tests', () => {
 	});
 
 	test('Command should pass and create yarn + git project if yarn is package manager and git flag is set', async () => {
-		parseSpy.mockResolvedValue({
+		parseSpy.mockResolvedValueOnce({
 			args: {
 				projectName: mockProjectName,
 			},
@@ -227,7 +227,7 @@ describe('Workspace init command tests', () => {
 	});
 
 	test('Command should pass with creating the sub directory if the directory already exists', async () => {
-		parseSpy.mockResolvedValue({
+		parseSpy.mockResolvedValueOnce({
 			args: {
 				projectName: mockProjectName,
 			},
@@ -237,7 +237,7 @@ describe('Workspace init command tests', () => {
 				packageManager: mockPMDefaultFlag,
 			},
 		});
-		access.mockResolvedValue({});
+		access.mockResolvedValueOnce({});
 
 		await InitCommand.run();
 
@@ -252,7 +252,7 @@ describe('Workspace init command tests', () => {
 	});
 
 	test('Command should fail if the directory already exists and sub directory of project name exists', async () => {
-		parseSpy.mockResolvedValue({
+		parseSpy.mockResolvedValueOnce({
 			args: {
 				projectName: mockProjectName,
 			},
@@ -262,7 +262,7 @@ describe('Workspace init command tests', () => {
 				packageManager: mockPMDefaultFlag,
 			},
 		});
-		access.mockResolvedValue({});
+		access.mockResolvedValueOnce({});
 		mkdir.mockRejectedValue(new Error());
 
 		await expect(InitCommand.run()).rejects.toThrow();
@@ -280,7 +280,7 @@ describe('Workspace init command tests', () => {
 	});
 
 	test('Command should fail if directory creation fails', async () => {
-		parseSpy.mockResolvedValue({
+		parseSpy.mockResolvedValueOnce({
 			args: {
 				projectName: mockProjectName,
 			},
@@ -306,7 +306,7 @@ describe('Workspace init command tests', () => {
 	});
 
 	test('Command should fail if npm install fails', async () => {
-		parseSpy.mockResolvedValue({
+		parseSpy.mockResolvedValueOnce({
 			args: {
 				projectName: mockProjectName,
 			},
@@ -333,7 +333,7 @@ describe('Workspace init command tests', () => {
 	});
 
 	test('Command should fail if yarn install fails', async () => {
-		parseSpy.mockResolvedValue({
+		parseSpy.mockResolvedValueOnce({
 			args: {
 				projectName: mockProjectName,
 			},
@@ -360,7 +360,7 @@ describe('Workspace init command tests', () => {
 	});
 
 	test('Command should exit if sub directory prompt is provided with no', async () => {
-		parseSpy.mockResolvedValue({
+		parseSpy.mockResolvedValueOnce({
 			args: {
 				projectName: mockProjectName,
 			},
@@ -373,7 +373,7 @@ describe('Workspace init command tests', () => {
 		// create workspace prompt
 		promptConfirm.mockResolvedValueOnce(true);
 		// access passes
-		access.mockResolvedValue({});
+		access.mockResolvedValueOnce({});
 		// create in sub directory prompt
 		promptConfirm.mockResolvedValueOnce(false);
 		await InitCommand.run();
@@ -383,8 +383,8 @@ describe('Workspace init command tests', () => {
 });
 
 test('test createPackageJson', async () => {
-	jest.spyOn(fs, 'readFile').mockResolvedValue({});
-	jest.spyOn(fs, 'writeFile').mockResolvedValue({});
+	jest.spyOn(fs, 'readFile').mockResolvedValueOnce({});
+	jest.spyOn(fs, 'writeFile').mockResolvedValueOnce({});
 
 	await expect(InitCommand.prototype.createPackageJson()).resolves;
 });

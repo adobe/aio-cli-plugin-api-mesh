@@ -52,6 +52,7 @@ describe('describe command tests', () => {
 			imsOrgId: selectedOrg.id,
 			projectId: selectedProject.id,
 			workspaceId: selectedWorkspace.id,
+			workspaceName: selectedWorkspace.title,
 		});
 
 		global.requestId = 'dummy_request_id';
@@ -174,6 +175,11 @@ describe('describe command tests', () => {
 		    "Mesh ID: %s",
 		    "dummy_meshId",
 		  ],
+		  [
+		    "Mesh Endpoint: %s
+		",
+		    "https://graph.adobe.io/api/dummy_meshId/graphql",
+		  ],
 		]
 	`);
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`[]`);
@@ -187,6 +193,7 @@ describe('describe command tests', () => {
 			selectedOrg.id,
 			selectedProject.id,
 			selectedWorkspace.id,
+			selectedWorkspace.title,
 		);
 		expect(runResult).toMatchInlineSnapshot(`
 		{
@@ -215,10 +222,6 @@ describe('describe command tests', () => {
 		  [
 		    "Mesh ID: %s",
 		    "dummy_meshId",
-		  ],
-		  [
-		    "API Key: %s",
-		    "dummy_apiKey",
 		  ],
 		  [
 		    "Mesh Endpoint: %s
@@ -242,6 +245,7 @@ describe('describe command tests', () => {
 			selectedOrg.id,
 			selectedProject.id,
 			selectedWorkspace.id,
+			selectedWorkspace.title,
 		);
 		expect(runResult).toMatchInlineSnapshot(`
 		{
@@ -272,13 +276,9 @@ describe('describe command tests', () => {
 		    "dummy_meshId",
 		  ],
 		  [
-		    "API Key: %s",
-		    "dummy_apiKey",
-		  ],
-		  [
 		    "Mesh Endpoint: %s
 		",
-		    "https://tigraph.adobe.io/dummy_meshId/graphql?api_key=dummy_apiKey",
+		    "https://tigraph.adobe.io/dummy_meshId/graphql",
 		  ],
 		]
 	`);

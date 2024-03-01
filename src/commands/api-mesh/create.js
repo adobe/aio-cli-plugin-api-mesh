@@ -10,7 +10,6 @@ governing permissions and limitations under the License.
 */
 
 const { Command } = require('@oclif/core');
-
 const { initSdk, initRequestId, promptConfirm, importFiles } = require('../../helpers');
 const logger = require('../../classes/logger');
 const CONSTANTS = require('../../constants');
@@ -24,12 +23,7 @@ const {
 	readFileContents,
 	validateAndInterpolateMesh,
 } = require('../../utils');
-const {
-	getMesh,
-	createMesh,
-	createAPIMeshCredentials,
-	subscribeCredentialToMeshService,
-} = require('../../lib/devConsole');
+const { getMesh, createMesh } = require('../../lib/devConsole');
 
 const { MULTITENANT_GRAPHQL_SERVER_BASE_URL } = CONSTANTS;
 
@@ -60,7 +54,7 @@ class CreateCommand extends Command {
 		const ignoreCache = await flags.ignoreCache;
 		const autoConfirmAction = await flags.autoConfirmAction;
 		const envFilePath = await flags.env;
-		const { imsOrgId, projectId, workspaceId } = await initSdk({
+		const { imsOrgId, projectId, workspaceId, workspaceName } = await initSdk({
 			ignoreCache,
 		});
 
@@ -110,9 +104,13 @@ class CreateCommand extends Command {
 
 		if (shouldContinue) {
 			try {
-				const mesh = await createMesh(imsOrgId, projectId, workspaceId, data);
-
-				let sdkList = [];
+				const { mesh, apiKey, sdkList } = await createMesh(
+					imsOrgId,
+					projectId,
+					workspaceId,
+					workspaceName,
+					data,
+				);
 
 				if (mesh) {
 					this.log(
@@ -128,52 +126,42 @@ class CreateCommand extends Command {
 						'******************************************************************************************************',
 					);
 
-					// create API key credential
-					const adobeIdIntegrationsForWorkspace = await createAPIMeshCredentials(
-						imsOrgId,
-						projectId,
-						workspaceId,
-					);
-
-					if (adobeIdIntegrationsForWorkspace) {
-						this.log('Successfully created API Key %s', adobeIdIntegrationsForWorkspace.apiKey);
-						// subscribe the credential to API mesh service
-						sdkList = await subscribeCredentialToMeshService(
-							imsOrgId,
-							projectId,
-							workspaceId,
-							adobeIdIntegrationsForWorkspace.id,
-						);
+					if (apiKey) {
+						this.log('Successfully created API Key %s', apiKey);
 
 						if (sdkList) {
-							this.log(
-								'Successfully subscribed API Key %s to API Mesh service',
-								adobeIdIntegrationsForWorkspace.apiKey,
-							);
+							this.log('Successfully subscribed API Key %s to API Mesh service', apiKey);
 
-							const { meshURL } = await getMesh(imsOrgId, projectId, workspaceId, mesh.meshId);
+							const { meshURL } = await getMesh(
+								imsOrgId,
+								projectId,
+								workspaceId,
+								workspaceName,
+								mesh.meshId,
+							);
 							const meshUrl =
 								meshURL === '' || meshURL === undefined
 									? MULTITENANT_GRAPHQL_SERVER_BASE_URL
 									: meshURL;
 
-							this.log(
-								'Mesh Endpoint: %s\n',
-								`${meshUrl}/${mesh.meshId}/graphql?api_key=${adobeIdIntegrationsForWorkspace.apiKey}`,
-							);
+							if (apiKey && MULTITENANT_GRAPHQL_SERVER_BASE_URL.includes(meshUrl)) {
+								this.log(
+									'Mesh Endpoint: %s\n',
+									`${meshUrl}/${mesh.meshId}/graphql?api_key=${apiKey}`,
+								);
+							} else {
+								this.log('Mesh Endpoint: %s\n', `${meshUrl}/${mesh.meshId}/graphql`);
+							}
 						} else {
-							this.log(
-								'Unable to subscribe API Key %s to API Mesh service',
-								adobeIdIntegrationsForWorkspace.apiKey,
-							);
+							this.log('Unable to subscribe API Key %s to API Mesh service', apiKey);
 						}
 					} else {
 						this.log('Unable to create API Key');
 					}
-					// Do not remove or rename return values.
-					// Template adobe/generator-app-api-mesh relies on "mesh" & "adobeIdIntegrationsForWorkspace" obj structure
+					// When renaming the return values, make sure to make necessary changes to
+					// template adobe/generator-app-api-mesh since it relies on "mesh" & "apiKey"
 					return {
-						adobeIdIntegrationsForWorkspace,
+						apiKey,
 						sdkList,
 						mesh,
 					};

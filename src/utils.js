@@ -41,6 +41,21 @@ const envFileFlag = Flags.string({
 	default: '.env',
 });
 
+const portNoFlag = Flags.integer({
+	char: 'p',
+	description: 'Port number for the local dev server',
+});
+
+const debugFlag = Flags.boolean({
+	description: 'Enable debugging mode',
+	default: false,
+});
+
+const selectFlag = Flags.boolean({
+	description: 'Retrieve existing artifacts from the mesh',
+	default: false,
+});
+
 /**
  * Parse the meshConfig and get the list of (local) files to be imported
  *
@@ -79,7 +94,7 @@ function getFilesInMeshConfig(data, meshConfigName) {
 
 	// Additional Resolvers
 	data.meshConfig.additionalResolvers?.forEach(additionalResolver => {
-		if (!fileURLRegex.test(additionalResolver)) {
+		if (typeof additionalResolver === 'string' && !fileURLRegex.test(additionalResolver)) {
 			filesList.push(additionalResolver);
 		}
 	});
@@ -88,7 +103,9 @@ function getFilesInMeshConfig(data, meshConfigName) {
 	data.meshConfig.sources.transforms?.forEach(transform => {
 		transform.replaceField?.replacements.forEach(replacement => {
 			if (replacement.composer && !fileURLRegex.test(replacement.composer)) {
-				filesList.push(replacement.composer);
+				const [filename] = replacement.composer.split('#');
+
+				filesList.push(filename);
 			}
 		});
 	});
@@ -97,16 +114,51 @@ function getFilesInMeshConfig(data, meshConfigName) {
 	data.meshConfig.transforms?.forEach(transform => {
 		transform.replaceField?.replacements.forEach(replacement => {
 			if (replacement.composer && !fileURLRegex.test(replacement.composer)) {
-				filesList.push(replacement.composer);
+				const [filename] = replacement.composer.split('#');
+
+				filesList.push(filename);
 			}
 		});
 	});
+
+	// Hooks Plugin - mesh level
+	data.meshConfig.plugins?.forEach(plugin => {
+		if (plugin.hooks) {
+			if (plugin.hooks.beforeAll) {
+				const composer = plugin.hooks.beforeAll.composer;
+
+				if (composer && !fileURLRegex.test(composer)) {
+					const [filename] = composer.split('#');
+
+					filesList.push(filename);
+				}
+			}
+		}
+	});
+
+	// OnFetch plugin - mesh level
+	data.meshConfig.plugins?.forEach(plugin => {
+		if (plugin.onFetch) {
+			plugin.onFetch.forEach(onFetchConfig => {
+				const handler = onFetchConfig.handler;
+
+				if (handler) {
+					filesList.push(handler);
+				}
+			});
+		}
+	});
+
+	// remove duplicate files
+	filesList = [...new Set(filesList)];
+
+	logger.info(`Files to be imported: ${filesList.join(', ')}`);
 
 	try {
 		if (filesList.length) {
 			checkFilesAreUnderMeshDirectory(filesList, meshConfigName);
 			validateFileType(filesList);
-			validateFileName(filesList, data);
+			validateFileName(filesList);
 		}
 	} catch (err) {
 		logger.error(err.message);
@@ -226,9 +278,8 @@ function validateFileType(filesList) {
  * Validate the filenames
  *
  * @param filesList Files in sources, tranforms or additionalResolvers in the meshConfig
- * @param data MeshConfig
  */
-function validateFileName(filesList, data) {
+function validateFileName(filesList) {
 	const filesWithInvalidNames = [];
 
 	// Check if the file names are less than 25 characters
@@ -243,17 +294,6 @@ function validateFileName(filesList, data) {
 		throw new Error(
 			`Mesh file names must be less than 25 characters. The following file(s) are invalid: ${filesWithInvalidNames}.`,
 		);
-	}
-
-	// check if the the filePaths in the files array match
-	// the fileNames in sources, transforms or additionalResolvers
-
-	if (data.meshConfig.files) {
-		for (let i = 0; i < data.meshConfig.files.length; i++) {
-			if (filesList.indexOf(data.meshConfig.files[i].path) == -1) {
-				throw new Error(`Please make sure the file names are matching in meshConfig.`);
-			}
-		}
 	}
 }
 
@@ -362,4 +402,7 @@ module.exports = {
 	validateEnvFileFormat,
 	validateAndInterpolateMesh,
 	getAppRootDir,
+	portNoFlag,
+	debugFlag,
+	selectFlag,
 };
