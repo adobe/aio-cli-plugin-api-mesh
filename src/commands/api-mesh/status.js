@@ -43,6 +43,7 @@ class StatusCommand extends Command {
 		if (meshId) {
 			try {
 				const { showCloudflareURL: showEdgeMeshUrl } = await getTenantFeatures(imsOrgCode);
+				const mesh = await getMesh(imsOrgId, projectId, workspaceId, workspaceName, meshId);
 				if (showEdgeMeshUrl) {
 					const meshDeployments = await getMeshDeployments(
 						imsOrgCode,
@@ -82,7 +83,6 @@ class StatusCommand extends Command {
 					}
 					this.log(chalk.blackBright('Legacy Mesh Status:'));
 				}
-				const mesh = await getMesh(imsOrgId, projectId, workspaceId, workspaceName, meshId);
 				switch (mesh.meshStatus) {
 					case 'success':
 						this.log(
