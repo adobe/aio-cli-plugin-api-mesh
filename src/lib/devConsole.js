@@ -927,7 +927,7 @@ const getMeshDeployments = async (organizationCode, projectId, workspaceId, mesh
 			let errorMessage = `Something went wrong: ${objToString(
 				response,
 				['data'],
-				'Unable to get tenant features.',
+				'Unable to get mesh deployment.',
 			)}`;
 			logger.error(`${errorMessage}. Received ${response.status} response instead of 200`);
 
@@ -937,8 +937,9 @@ const getMeshDeployments = async (organizationCode, projectId, workspaceId, mesh
 		logger.error(`Error fetching deployments for mesh: ${meshId}`);
 
 		return {
+			status: 'ERROR',
 			meshId: meshId,
-			showCloudflareURL: false,
+			error: 'Error fetching deployments for mesh',
 		};
 	}
 };
