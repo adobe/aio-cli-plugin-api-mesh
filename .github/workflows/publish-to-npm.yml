@@ -18,3 +18,4 @@ jobs:
               with:
                   token: ${{ secrets.ADOBE_BOT_NPM_TOKEN }}
                   access: 'public'
+                  tag: 'alpha'
