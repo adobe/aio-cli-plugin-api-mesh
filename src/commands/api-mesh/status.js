@@ -1,7 +1,14 @@
 const { Command } = require('@oclif/core');
+const chalk = require('chalk');
+
 const logger = require('../../classes/logger');
 const { initRequestId, initSdk } = require('../../helpers');
-const { getMeshId, getMesh } = require('../../lib/devConsole');
+const {
+	getMeshId,
+	getMesh,
+	getTenantFeatures,
+	getMeshDeployments,
+} = require('../../lib/devConsole');
 const { ignoreCacheFlag } = require('../../utils');
 
 require('dotenv').config();
@@ -18,7 +25,7 @@ class StatusCommand extends Command {
 		const { flags } = await this.parse(StatusCommand);
 		const ignoreCache = await flags.ignoreCache;
 
-		const { imsOrgId, projectId, workspaceId, workspaceName } = await initSdk({
+		const { imsOrgId, imsOrgCode, projectId, workspaceId, workspaceName } = await initSdk({
 			ignoreCache,
 		});
 
@@ -35,6 +42,46 @@ class StatusCommand extends Command {
 
 		if (meshId) {
 			try {
+				const { showCloudflareURL: showEdgeMeshUrl } = await getTenantFeatures(imsOrgCode);
+				if (showEdgeMeshUrl) {
+					const meshDeployments = await getMeshDeployments(
+						imsOrgCode,
+						projectId,
+						workspaceId,
+						meshId,
+					);
+					this.log(chalk.blackBright('Edge Mesh Status:'));
+					switch (String(meshDeployments.status).toLowerCase()) {
+						case 'success':
+							this.log(
+								'******************************************************************************************************',
+							);
+							this.log('Your mesh has been successfully built.');
+							this.log(
+								'******************************************************************************************************',
+							);
+							break;
+						case 'provisioning':
+							this.log(
+								'******************************************************************************************************',
+							);
+							this.log('Your mesh is provisioning.');
+							this.log(
+								'******************************************************************************************************',
+							);
+							break;
+						case 'error':
+							this.log(
+								'******************************************************************************************************',
+							);
+							this.log('Your mesh errored out with the following error. ', meshDeployments.error);
+							this.log(
+								'******************************************************************************************************',
+							);
+							break;
+					}
+					this.log(chalk.blackBright('Legacy Mesh Status:'));
+				}
 				const mesh = await getMesh(imsOrgId, projectId, workspaceId, workspaceName, meshId);
 				switch (mesh.meshStatus) {
 					case 'success':
