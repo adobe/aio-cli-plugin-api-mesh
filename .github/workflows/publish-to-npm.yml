@@ -1,21 +1,71 @@
 name: publish-to-npm
 on:
-    pull_request:
-        types: [closed]
-        branches:
-            - main
+  pull_request:
+    types: [ closed ]
+    branches:
+      - main
+      - develop
+      - epic/**
 jobs:
-    publish:
-        if: github.repository == 'adobe/aio-cli-plugin-api-mesh'
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v4
-            - uses: actions/setup-node@v3
-              with:
-                  node-version: 18
-            - run: yarn install --frozen-lockfile
-            - uses: JS-DevTools/npm-publish@v1
-              with:
-                  token: ${{ secrets.ADOBE_BOT_NPM_TOKEN }}
-                  access: 'public'
-                  tag: 'alpha'
+  publish:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Yarn install
+        run: yarn install --frozen-lockfile
+
+      - name: Get version from package.json
+        id: get_version
+        run: | 
+          version=$(jq -r '.version' package.json)
+          echo "version=$version" >> $GITHUB_OUTPUT
+          echo "Read version $version from package.json"
+
+      - name: Verify version corresponds to branch
+        id: verify_version
+        run: |
+          target_branch="${GITHUB_REF#refs/heads/}"
+          version_tag=""
+          
+          if [ "$target_branch" == "main" ]; then
+            version_tag="latest"
+          
+          elif [ "$target_branch" == "develop" ]; then
+            if [[ "${{ steps.get_version.outputs.version }}" =~ beta ]]; then
+              version_tag="beta"
+            else
+              echo "Will not publish. Version on branch \"$target_branch\" is not beta.";
+              exit 0;
+            fi
+          
+          elif [[ $target_branch == epic/* ]]; then
+            if [[ "${{ steps.get_version.outputs.version }}" =~ alpha ]]; then
+              version_tag="alpha"
+            else 
+              echo "Will not publish. Version on branch \"$target_branch\" is not alpha.";
+              exit 0;
+            fi
+          
+          else
+            echo "Will not publish. Branch \"$target_branch\" is not designated for publish.";
+            exit 0;
+          fi
+          
+          echo "version_tag=$version_tag" >> $GITHUB_OUTPUT;
+          echo "Will publish version ${{ steps.get_version.outputs.version }} as $version_tag"
+
+      - name: Publish to npm
+        if: ${{ steps.verify_version.outputs.version_tag != '' }}
+        uses: JS-DevTools/npm-publish@v1
+        with:
+          token: ${{ secrets.ADOBE_BOT_NPM_TOKEN }}
+          access: 'public'
+          tag: ${{ steps.verify_version.outputs.version_tag }}
