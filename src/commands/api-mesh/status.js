@@ -80,7 +80,15 @@ class StatusCommand extends Command {
 								'******************************************************************************************************',
 							);
 							break;
-					}
+						default:
+							//Case when deployments table has no status and only initial metadata
+							this.log(
+								'******************************************************************************************************',
+							);
+							this.log('Your mesh is not having any status. Please wait for a while and try again.');
+							this.log(
+								'******************************************************************************************************',
+							);					}
 					this.log(chalk.blackBright('Legacy Mesh Status:'));
 				}
 				switch (mesh.meshStatus) {
