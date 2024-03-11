@@ -57,7 +57,7 @@ class StatusCommand extends Command {
 							this.log(
 								'******************************************************************************************************',
 							);
-							this.log('Your mesh has been successfully built.');
+							this.log('Your mesh was successfully built.');
 							this.log(
 								'******************************************************************************************************',
 							);
@@ -75,7 +75,7 @@ class StatusCommand extends Command {
 							this.log(
 								'******************************************************************************************************',
 							);
-							this.log('Your mesh errored out with the following error. ', meshDeployments.error);
+							this.log('Your mesh encountered the following error: ', meshDeployments.error);
 							this.log(
 								'******************************************************************************************************',
 							);
