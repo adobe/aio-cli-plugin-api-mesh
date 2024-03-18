@@ -886,6 +886,64 @@ const getTenantFeatures = async organizationCode => {
 	}
 };
 
+/**
+ * Gets the deployments value for mesh.
+ *
+ * This request bypasses the Dev Console and is sent directly to the Schema Management Service.
+ * As a result, we provide the orgCode instead of orgId since Dev Console usually performs the translation.
+ * The near-term goal is to stop using Dev Console as a proxy for all routes.
+ * @param organizationCode
+ * @param projectId
+ * @param workspaceId
+ * @param meshId
+ * @returns {Promise<Object>}
+ */
+const getMeshDeployments = async (organizationCode, projectId, workspaceId, meshId) => {
+	const { accessToken, apiKey } = await getDevConsoleConfig();
+	const config = {
+		method: 'get',
+		url: `${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/deployments/latest?API_KEY=${apiKey}`,
+		headers: {
+			'Authorization': `Bearer ${accessToken}`,
+			'x-request-id': global.requestId,
+		},
+	};
+
+	logger.info(
+		'Initiating GET %s',
+		`${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/deployments/latest?API_KEY=${apiKey}`,
+	);
+
+	try {
+		const response = await axios(config);
+
+		logger.info('Response from GET %s', response.status);
+
+		if (response?.status === 200) {
+			logger.info(`Tenant mesh deployments : ${objToString(response, ['data'])}`);
+
+			return response.data;
+		} else {
+			let errorMessage = `Something went wrong: ${objToString(
+				response,
+				['data'],
+				'Unable to get mesh deployment.',
+			)}`;
+			logger.error(`${errorMessage}. Received ${response.status} response instead of 200`);
+
+			throw new Error(errorMessage);
+		}
+	} catch (error) {
+		logger.error(`Error fetching deployments for mesh: ${meshId}`);
+
+		return {
+			status: 'ERROR',
+			meshId: meshId,
+			error: 'Error fetching deployments for mesh',
+		};
+	}
+};
+
 module.exports = {
 	getApiKeyCredential,
 	describeMesh,
@@ -901,4 +959,5 @@ module.exports = {
 	unsubscribeCredentialFromMeshService,
 	getMeshArtifact,
 	getTenantFeatures,
+	getMeshDeployments,
 };
