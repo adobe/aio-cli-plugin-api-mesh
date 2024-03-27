@@ -325,7 +325,28 @@ const createMesh = async (
 	}
 };
 
-const updateMesh = async (organizationId, projectId, workspaceId, meshId, data) => {
+/**
+ * Update an API Mesh.
+ * @param {string} organizationId Organization identifier.
+ * @param {string} projectId Project identifier.
+ * @param {string} workspaceId Workspace identifier.
+ * @param {string} workspaceName Workspace Name.
+ * @param {string} orgName Organization name.
+ * @param {string} projectName Project name.
+ * @param {string} meshId Mesh identifier.
+ * @param {unknown} data Mesh configuration data.
+ * @returns {Promise<any>}
+ */
+const updateMesh = async (
+	organizationId,
+	projectId,
+	workspaceId,
+	workspaceName,
+	orgName,
+	projectName,
+	meshId,
+	data,
+) => {
 	const { baseUrl: devConsoleUrl, accessToken, apiKey } = await getDevConsoleConfig();
 	const config = {
 		method: 'put',
@@ -334,6 +355,9 @@ const updateMesh = async (organizationId, projectId, workspaceId, meshId, data) 
 			'Authorization': `Bearer ${accessToken}`,
 			'Content-Type': 'application/json',
 			'x-request-id': global.requestId,
+			'workspaceName': workspaceName,
+			'orgName': orgName,
+			'projectName': projectName,
 		},
 		data: JSON.stringify(data),
 	};

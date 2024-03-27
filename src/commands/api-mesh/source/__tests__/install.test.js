@@ -40,6 +40,8 @@ initSdk.mockResolvedValue({
 	projectId: selectedProject.id,
 	workspaceId: selectedWorkspace.id,
 	workspaceName: selectedWorkspace.title,
+	organizationName: selectedOrg.name,
+	projectName: selectedProject.title,
 });
 initRequestId.mockResolvedValue({});
 promptInput.mockResolvedValueOnce('test-03');
@@ -148,6 +150,8 @@ describe('source:install command tests', () => {
 			selectedProject.id,
 			selectedWorkspace.id,
 			selectedWorkspace.title,
+			selectedOrg.name,
+			selectedProject.title,
 			'dummy_meshId',
 			res,
 		);

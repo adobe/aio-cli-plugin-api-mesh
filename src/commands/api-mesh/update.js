@@ -49,9 +49,11 @@ class UpdateCommand extends Command {
 		const autoConfirmAction = await flags.autoConfirmAction;
 		const envFilePath = await flags.env;
 
-		const { imsOrgId, projectId, workspaceId } = await initSdk({
-			ignoreCache,
-		});
+		const { imsOrgId, projectId, workspaceId, orgName, projectName, workspaceName } = await initSdk(
+			{
+				ignoreCache,
+			},
+		);
 
 		//Input the mesh data from the input file
 		let inputMeshData = await readFileContents(args.file, this, 'mesh');
@@ -112,7 +114,16 @@ class UpdateCommand extends Command {
 
 			if (shouldContinue) {
 				try {
-					const response = await updateMesh(imsOrgId, projectId, workspaceId, meshId, data);
+					const response = await updateMesh(
+						imsOrgId,
+						projectId,
+						workspaceId,
+						workspaceName,
+						orgName,
+						projectName,
+						meshId,
+						data,
+					);
 
 					this.log(
 						'******************************************************************************************************',
