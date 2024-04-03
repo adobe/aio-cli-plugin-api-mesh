@@ -52,6 +52,9 @@ describe('update command tests', () => {
 			imsOrgId: selectedOrg.id,
 			projectId: selectedProject.id,
 			workspaceId: selectedWorkspace.id,
+			workspaceName: selectedWorkspace.title,
+			orgName: selectedOrg.name,
+			projectName: selectedProject.title,
 		});
 
 		global.requestId = 'dummy_request_id';
@@ -554,6 +557,9 @@ describe('update command tests', () => {
 		  "1234",
 		  "5678",
 		  "123456789",
+		  "Workspace01",
+		  "ORG01",
+		  "Project01",
 		  "mesh_id",
 		  {
 		    "meshConfig": {
