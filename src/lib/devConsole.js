@@ -963,7 +963,7 @@ const getMeshDeployments = async (organizationCode, projectId, workspaceId, mesh
 		return {
 			status: 'ERROR',
 			meshId: meshId,
-			error: 'Error fetching deployments for mesh',
+			error: 'Mesh status is not available.',
 		};
 	}
 };
