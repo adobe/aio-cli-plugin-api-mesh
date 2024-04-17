@@ -41,6 +41,12 @@ const envFileFlag = Flags.string({
 	default: '.env',
 });
 
+const secretsFlag = Flags.string({
+	char: 's',
+	description: 'Path to secrets file',
+	default: 'secrets.env',
+});
+
 const portNoFlag = Flags.integer({
 	char: 'p',
 	description: 'Port number for the local dev server',
@@ -311,7 +317,7 @@ function validateEnvFileFormat(envContent) {
 	/*
 	The above regex matches one or more of below :
 	(?:"(?:\\.|[^\\"])*"|'(?:\\.|[^\\'])*'|[^'"\s])
-	which is 
+	which is
 	1. ?:"(?:\\.|[^\\"])*" : Non capturing group starts and ends with '"'
 	*/
 	const envDict = {};
@@ -405,4 +411,5 @@ module.exports = {
 	portNoFlag,
 	debugFlag,
 	selectFlag,
+	secretsFlag,
 };
