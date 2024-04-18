@@ -72,7 +72,7 @@ class StatusCommand extends Command {
 				}
 				if (showEdgeMeshUrl) {
 					if (mesh.meshStatus == 'error') {
-						this.log(`${chalk.bold(`Edge Mesh: `)} ${chalk.blackBright(`Build has errors`)}`);
+						this.log(`${chalk.bold(`Edge Mesh:`)} ${chalk.blackBright(`Build has errors`)}`);
 						this.log(`${chalk.blackBright(mesh.error)}`);
 					} else {
 						const meshDeployments = await getMeshDeployments(
@@ -96,25 +96,26 @@ class StatusCommand extends Command {
 									)}`,
 								);
 								break;
+							case 'de-provisioning':
+								this.log(
+									`${chalk.bold(`Edge Mesh:`)} ${chalk.blackBright(
+										`is currently being de-provisioned. Please wait a few minutes before checking again.`,
+									)}`,
+								);
+								break;
 							case 'error':
 								if (meshDeployments.error.includes(`Mesh status is not available`))
 									this.log(
 										`${chalk.bold(`Edge Mesh:`)} ${chalk.blackBright(meshDeployments.error)}`,
 									);
 								else {
-									this.log(
-										`${chalk.bold(`Edge Mesh: `)} ${chalk.blackBright(`build has errors.`)}`,
-									);
+									this.log(`${chalk.bold(`Edge Mesh:`)} ${chalk.blackBright(`build has errors.`)}`);
 									this.log(`${chalk.blackBright(meshDeployments.error)}`);
 								}
 								break;
-							case 'failed':
-								this.log(`${chalk.bold(`Edge Mesh: `)} ${chalk.blackBright(`build has errors.`)}`);
-								this.log(`${chalk.blackBright(meshDeployments.error)}`);
-								break;
 							default:
 								this.log(
-									`${chalk.bold(`Edge Mesh: `)} ${chalk.blackBright(
+									`${chalk.bold(`Edge Mesh:`)} ${chalk.blackBright(
 										`Mesh status is not available. Please wait for a while and try again.`,
 									)}`,
 								);
