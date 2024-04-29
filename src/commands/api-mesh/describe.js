@@ -10,16 +10,15 @@ governing permissions and limitations under the License.
 */
 
 const { Command } = require('@oclif/command');
+const chalk = require('chalk');
 
 const logger = require('../../classes/logger');
 const { initSdk, initRequestId } = require('../../helpers');
-const CONSTANTS = require('../../constants');
 const { ignoreCacheFlag } = require('../../utils');
-const { describeMesh, getMesh } = require('../../lib/devConsole');
+const { describeMesh, getTenantFeatures } = require('../../lib/devConsole');
+const { buildMeshUrl, buildEdgeMeshUrl } = require('../../urlBuilder');
 
 require('dotenv').config();
-
-const { MULTITENANT_GRAPHQL_SERVER_BASE_URL } = CONSTANTS;
 
 class DescribeCommand extends Command {
 	static flags = {
@@ -32,10 +31,8 @@ class DescribeCommand extends Command {
 		logger.info(`RequestId: ${global.requestId}`);
 
 		const { flags } = await this.parse(DescribeCommand);
-
 		const ignoreCache = await flags.ignoreCache;
-
-		const { imsOrgId, projectId, workspaceId, workspaceName } = await initSdk({
+		const { imsOrgId, imsOrgCode, projectId, workspaceId, workspaceName } = await initSdk({
 			ignoreCache,
 		});
 
@@ -44,29 +41,32 @@ class DescribeCommand extends Command {
 
 			if (meshDetails) {
 				const { meshId, apiKey } = meshDetails;
+				const { showCloudflareURL: showEdgeMeshUrl } = await getTenantFeatures(imsOrgCode);
 
 				if (meshId) {
+					const meshUrl = await buildMeshUrl(
+						imsOrgId,
+						projectId,
+						workspaceId,
+						workspaceName,
+						meshId,
+						apiKey,
+					);
+
 					this.log('Successfully retrieved mesh details \n');
 					this.log('Org ID: %s', imsOrgId);
 					this.log('Project ID: %s', projectId);
 					this.log('Workspace ID: %s', workspaceId);
 					this.log('Mesh ID: %s', meshId);
 
-					const { meshURL } = await getMesh(
-						imsOrgId,
-						projectId,
-						workspaceId,
-						workspaceName,
-						meshId,
-					);
-					const meshUrl =
-						meshURL === '' || meshURL === undefined ? MULTITENANT_GRAPHQL_SERVER_BASE_URL : meshURL;
-
-					if (apiKey && MULTITENANT_GRAPHQL_SERVER_BASE_URL.includes(meshUrl)) {
-						this.log('Mesh Endpoint: %s\n', `${meshUrl}/${meshId}/graphql?api_key=${apiKey}`);
+					if (showEdgeMeshUrl) {
+						const edgeMeshUrl = buildEdgeMeshUrl(meshId, workspaceName);
+						this.log('Legacy Mesh Endpoint: %s', meshUrl);
+						this.log(chalk.bold('Edge Mesh Endpoint: %s\n'), edgeMeshUrl);
 					} else {
-						this.log('Mesh Endpoint: %s\n', `${meshUrl}/${meshId}/graphql`);
+						this.log('Mesh Endpoint: %s\n', meshUrl);
 					}
+
 					return meshDetails;
 				} else {
 					logger.error(

@@ -36,7 +36,14 @@ class InstallCommand extends Command {
 		await initRequestId();
 		logger.info(`RequestId: ${global.requestId}`);
 		const ignoreCache = await flags.ignoreCache;
-		const { imsOrgId, projectId, workspaceId, workspaceName } = await initSdk({ ignoreCache });
+		const {
+			imsOrgId,
+			projectId,
+			workspaceId,
+			organizationName,
+			projectName,
+			workspaceName,
+		} = await initSdk({ ignoreCache });
 		const filepath = flags['variable-file'];
 		let variables = flags.variable
 			? flags.variable.reduce((obj, val) => {
@@ -199,9 +206,18 @@ class InstallCommand extends Command {
 			}
 
 			try {
-				const response = await updateMesh(imsOrgId, projectId, workspaceId, workspaceName, meshId, {
-					meshConfig: mesh.meshConfig,
-				});
+				const response = await updateMesh(
+					imsOrgId,
+					projectId,
+					workspaceId,
+					workspaceName,
+					organizationName,
+					projectName,
+					meshId,
+					{
+						meshConfig: mesh.meshConfig,
+					},
+				);
 
 				this.log('Successfully updated the mesh with the id: %s', meshId);
 
