@@ -10,6 +10,8 @@ governing permissions and limitations under the License.
 */
 
 const { Command } = require('@oclif/core');
+const YAML = require('yaml');
+
 const { initSdk, initRequestId, promptConfirm, importFiles } = require('../../helpers');
 const logger = require('../../classes/logger');
 const CONSTANTS = require('../../constants');
@@ -19,6 +21,7 @@ const {
 	jsonFlag,
 	getFilesInMeshConfig,
 	envFileFlag,
+	secretsFlag,
 	checkPlaceholders,
 	readFileContents,
 	validateAndInterpolateMesh,
@@ -34,6 +37,7 @@ class CreateCommand extends Command {
 		autoConfirmAction: autoConfirmActionFlag,
 		json: jsonFlag,
 		env: envFileFlag,
+		secrets: secretsFlag,
 	};
 
 	static enableJsonFlag = true;
@@ -54,6 +58,8 @@ class CreateCommand extends Command {
 		const ignoreCache = await flags.ignoreCache;
 		const autoConfirmAction = await flags.autoConfirmAction;
 		const envFilePath = await flags.env;
+		const secretsFilePath = await flags.secrets;
+
 		const { imsOrgId, projectId, workspaceId, workspaceName } = await initSdk({
 			ignoreCache,
 		});
@@ -94,6 +100,13 @@ class CreateCommand extends Command {
 					'Unable to import the files in the mesh config. Please check the file and try again.',
 				);
 			}
+		}
+
+		if(secretsFilePath) {
+			const secretsFileContent = await readFileContents(secretsFilePath, this, 'secrets');
+			const secrets = YAML.parse(secretsFileContent);
+			console.log('Secrets', secrets);
+			data.secrets = secrets;
 		}
 
 		let shouldContinue = true;

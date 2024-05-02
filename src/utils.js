@@ -41,6 +41,12 @@ const envFileFlag = Flags.string({
 	default: '.env',
 });
 
+const secretsFlag = Flags.string({
+	char: 's',
+	description: 'Path to secrets file',
+	default: 'secrets.yaml',
+});
+
 const portNoFlag = Flags.integer({
 	char: 'p',
 	description: 'Port number for the local dev server',
@@ -405,4 +411,5 @@ module.exports = {
 	portNoFlag,
 	debugFlag,
 	selectFlag,
+	secretsFlag,
 };

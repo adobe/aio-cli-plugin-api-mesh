@@ -1,3 +1,6 @@
+const fs = require('fs');
+const YAML = require('yaml');
+
 // Resolve the path to 'fastify' and 'graphql-yoga' within the local 'node_modules'
 const fastifyPath = require.resolve('fastify', { paths: [process.cwd()] });
 const yogaPath = require.resolve('graphql-yoga', { paths: [process.cwd()] });
@@ -36,6 +39,9 @@ const meshId = process.argv[2];
 // get PORT number from command line arguments
 const portNo = parseInt(process.argv[3]);
 
+// get secretsFilePath from command line arguments
+const secretsFilePath = process.argv[4];
+
 const getCORSOptions = () => {
 	try {
 		const currentWorkingDirectory = process.cwd();
@@ -51,6 +57,18 @@ const getCORSOptions = () => {
 	}
 };
 
+const getSecrets = () => {
+	let secrets = {};
+
+	if (secretsFilePath && fs.existsSync(secretsFilePath)) {
+		const secretsFileContent = fs.readFileSync(secretsFilePath).toString();
+		secrets = YAML.parse(secretsFileContent);
+	}
+	console.log('Secrets', secrets);
+
+	return secrets;
+}
+
 const getYogaServer = async () => {
 	if (yogaServer) {
 		return yogaServer;
@@ -64,6 +82,8 @@ const getYogaServer = async () => {
 		const tenantMesh = await getBuiltMesh();
 		const corsOptions = getCORSOptions();
 
+		const secrets = getSecrets();
+
 		logger.info('Creating graphQL server');
 
 		meshConfig = readMeshConfig(meshId);
@@ -73,6 +93,10 @@ const getYogaServer = async () => {
 			graphqlEndpoint: `/graphql`,
 			graphiql: true,
 			cors: corsOptions,
+			context: initialContext => ({
+				...initialContext,
+				secrets,
+			}),
 		});
 
 		return yogaServer;
