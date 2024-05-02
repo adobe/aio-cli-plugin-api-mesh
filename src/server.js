@@ -78,7 +78,7 @@ const getSecrets = () => {
 	console.log('Secrets', secrets);
 
 	return secrets;
-}
+};
 
 const getYogaServer = async () => {
 	if (yogaServer) {

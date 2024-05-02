@@ -103,7 +103,7 @@ class CreateCommand extends Command {
 			}
 		}
 
-		if(secretsFilePath) {
+		if (secretsFilePath) {
 			const secretsFileContent = await readFileContents(secretsFilePath, this, 'secrets');
 			const compiledSecretsFileContent = parseEnv(secretsFileContent, {
 				outputFile: null,
