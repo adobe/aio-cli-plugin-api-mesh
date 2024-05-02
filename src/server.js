@@ -1,3 +1,4 @@
+const parseEnv = require('envsub/js/envsub-parser');
 const fs = require('fs');
 const YAML = require('yaml');
 
@@ -62,7 +63,17 @@ const getSecrets = () => {
 
 	if (secretsFilePath && fs.existsSync(secretsFilePath)) {
 		const secretsFileContent = fs.readFileSync(secretsFilePath).toString();
-		secrets = YAML.parse(secretsFileContent);
+		const compiledSecretsFileContent = parseEnv(secretsFileContent, {
+			outputFile: null,
+			options: {
+				all: false,
+				diff: false,
+				protect: false,
+				syntax: 'dollar-basic',
+			},
+			cli: false,
+		});
+		secrets = YAML.parse(compiledSecretsFileContent);
 	}
 	console.log('Secrets', secrets);
 

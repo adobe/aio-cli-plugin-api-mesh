@@ -198,7 +198,7 @@ const createMesh = async (organizationId, projectId, workspaceId, workspaceName,
 	const config = {
 		method: 'post',
 		//url: `${devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes?API_KEY=${apiKey}`,
-		url: 'http://localhost:9292/organizations/612C2F3061FAE7720A494230@AdobeOrg/projects/4566206088344755492/workspaces/nv-2may-cli-l/meshes?api_key=adobeio_onboarding',
+		url: 'http://localhost:9292/organizations/612C2F3061FAE7720A494230@AdobeOrg/projects/4566206088344755492/workspaces/nv-2may-cli-3/meshes?api_key=adobeio_onboarding',
 		headers: {
 			'Authorization': `Bearer ${accessToken}`,
 			'Content-Type': 'application/json',

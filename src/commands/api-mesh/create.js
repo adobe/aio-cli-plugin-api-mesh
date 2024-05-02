@@ -10,6 +10,7 @@ governing permissions and limitations under the License.
 */
 
 const { Command } = require('@oclif/core');
+const parseEnv = require('envsub/js/envsub-parser');
 const YAML = require('yaml');
 
 const { initSdk, initRequestId, promptConfirm, importFiles } = require('../../helpers');
@@ -104,7 +105,17 @@ class CreateCommand extends Command {
 
 		if(secretsFilePath) {
 			const secretsFileContent = await readFileContents(secretsFilePath, this, 'secrets');
-			const secrets = YAML.parse(secretsFileContent);
+			const compiledSecretsFileContent = parseEnv(secretsFileContent, {
+				outputFile: null,
+				options: {
+					all: false,
+					diff: false,
+					protect: false,
+					syntax: 'dollar-basic',
+				},
+				cli: false,
+			});
+			const secrets = YAML.parse(compiledSecretsFileContent);
 			console.log('Secrets', secrets);
 			data.secrets = secrets;
 		}
