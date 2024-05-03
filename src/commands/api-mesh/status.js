@@ -43,86 +43,16 @@ class StatusCommand extends Command {
 			try {
 				const { showCloudflareURL: showEdgeMeshUrl } = await getTenantFeatures(imsOrgCode);
 				const mesh = await getMesh(imsOrgId, projectId, workspaceId, workspaceName, meshId);
-				const meshLabel = showEdgeMeshUrl ? `${chalk.bold('Legacy Mesh:')}` : 'Your mesh';
+				const meshLabel = showEdgeMeshUrl ? chalk.bold(`Legacy Mesh:`) : 'Your mesh';
 
-				this.log(
-					'******************************************************************************************************',
-				);
-				switch (mesh.meshStatus) {
-					case 'success':
-						this.log(`${meshLabel} has been successfully built.`);
-						break;
-					case 'pending':
-						this.log(`${meshLabel} is awaiting processing.`);
-						break;
-					case 'building':
-						this.log(
-							`${meshLabel} is currently being provisioned. Please wait a few minutes before checking again.`,
-						);
-						break;
-					case 'error':
-						this.log(
-							showEdgeMeshUrl
-								? `${meshLabel} build has errors.`
-								: `${meshLabel} errored out with the following error.`,
-						);
-						this.log(mesh.error);
-						break;
-				}
-
+				this.log(''.padEnd(102, '*'));
+				this.displayMeshStatus(mesh, meshLabel);
 				if (showEdgeMeshUrl) {
-					if (mesh.meshStatus == 'error') {
-						this.log(`${chalk.bold(`Edge Mesh:`)} build has errors.`);
-						this.log(mesh.error);
-					} else {
-						const meshDeployments = await getMeshDeployments(
-							imsOrgCode,
-							projectId,
-							workspaceId,
-							meshId,
-						);
-
-						switch (String(meshDeployments.status).toLowerCase()) {
-							case 'success':
-								this.log(`${chalk.bold(`Edge Mesh:`)} has been successfully built.`);
-								break;
-							case 'provisioning':
-								this.log(
-									`${chalk.bold(
-										`Edge Mesh:`,
-									)} is currently being provisioned. Please wait a few minutes before checking again.`,
-								);
-								break;
-							case 'de-provisioning':
-								this.log(
-									`${chalk.bold(
-										`Edge Mesh:`,
-									)} is currently being de-provisioned. Please wait a few minutes before checking again.`,
-								);
-								break;
-							case 'error':
-								if (meshDeployments.error.includes(`Mesh status is not available`))
-									this.log(`${chalk.bold(`Edge Mesh:`)} ${meshDeployments.error}`);
-								else {
-									this.log(`${chalk.bold(`Edge Mesh:`)} build has errors.`);
-									this.log(meshDeployments.error);
-								}
-								break;
-							default:
-								this.log(
-									`${chalk.bold(
-										`Edge Mesh:`,
-									)} Mesh status is not available. Please wait for a while and try again.`,
-								);
-						}
-					}
+					await this.displayEdgeMeshStatus(mesh, imsOrgCode, projectId, workspaceId);
 				}
-				this.log(
-					'******************************************************************************************************',
-				);
+				this.log(''.padEnd(102, '*'));
 			} catch (err) {
 				this.log(err.message);
-
 				this.error(
 					`Unable to get the mesh status. If the error persists please contact support. RequestId: ${global.requestId}`,
 				);
@@ -131,6 +61,88 @@ class StatusCommand extends Command {
 			this.error(
 				`Unable to get mesh status. No mesh found for Org(${imsOrgId}) -> Project(${projectId}) -> Workspace(${workspaceId}). Please check the details and try again.`,
 			);
+		}
+	}
+
+	/**
+	 * Display the status of the mesh.
+	 *
+	 * @param mesh - Mesh data
+	 * @param meshLabel - Label to display for the mesh based on the mesh type
+	 */
+	displayMeshStatus(mesh, meshLabel = 'Your mesh') {
+		switch (mesh.meshStatus) {
+			case 'success':
+				this.log(`${meshLabel} has been successfully built.`);
+				break;
+			case 'pending':
+				this.log(`${meshLabel} is awaiting processing.`);
+				break;
+			case 'building':
+				this.log(
+					`${meshLabel} is currently being provisioned. Please wait a few minutes before checking again.`,
+				);
+				break;
+			case 'error':
+				this.log(
+					meshLabel === 'Your mesh'
+						? `${meshLabel} errored out with the following error.`
+						: `${meshLabel} build has errors.`,
+				);
+				this.log(mesh.error);
+				break;
+		}
+	}
+
+	/**
+	 * Display the status of the edge mesh.
+	 *
+	 * While the mesh is not successfully built, the edge mesh status will match the legacy mesh status.
+	 * Once the build is successful, the edge mesh status will reflect the deployment status
+	 * @param mesh
+	 * @param imsOrgCode
+	 * @param projectId
+	 * @param workspaceId
+	 * @returns {Promise<void>}
+	 */
+	async displayEdgeMeshStatus(mesh, imsOrgCode, projectId, workspaceId) {
+		const edgeMeshLabel = chalk.bold(`Edge Mesh:`);
+		const buildStatus = mesh.meshStatus;
+
+		if (buildStatus !== 'success') {
+			this.displayMeshStatus(mesh, edgeMeshLabel);
+		} else {
+			const meshDeployments = await getMeshDeployments(
+				imsOrgCode,
+				projectId,
+				workspaceId,
+				mesh.meshId,
+			);
+
+			const edgeDeploymentStatus = String(meshDeployments.status).toLowerCase();
+
+			switch (edgeDeploymentStatus) {
+				case 'success':
+					this.log(`${edgeMeshLabel} has been successfully built.`);
+					break;
+				case 'provisioning':
+					this.log(
+						`${edgeMeshLabel} is currently being provisioned. Please wait a few minutes before checking again.`,
+					);
+					break;
+				case 'de-provisioning':
+					this.log(
+						`${edgeMeshLabel} is currently being de-provisioned. Please wait a few minutes before checking again.`,
+					);
+					break;
+				case 'error':
+					this.log(`${edgeMeshLabel} ${meshDeployments.error}`);
+					break;
+				default:
+					this.log(
+						`${edgeMeshLabel} status is not available. Please wait for a while and try again.`,
+					);
+			}
 		}
 	}
 }
