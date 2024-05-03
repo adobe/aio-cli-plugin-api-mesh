@@ -116,7 +116,6 @@ class CreateCommand extends Command {
 				cli: false,
 			});
 			const secrets = YAML.parse(compiledSecretsFileContent);
-			console.log('Secrets', secrets);
 			data.secrets = secrets;
 		}
 

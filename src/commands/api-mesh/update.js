@@ -10,6 +10,8 @@ governing permissions and limitations under the License.
 */
 
 const { Command } = require('@oclif/command');
+const parseEnv = require('envsub/js/envsub-parser');
+const YAML = require('yaml');
 
 const logger = require('../../classes/logger');
 const { initSdk, initRequestId, promptConfirm, importFiles } = require('../../helpers');
@@ -17,6 +19,7 @@ const {
 	ignoreCacheFlag,
 	autoConfirmActionFlag,
 	envFileFlag,
+	secretsFlag,
 	checkPlaceholders,
 	readFileContents,
 	validateAndInterpolateMesh,
@@ -30,6 +33,7 @@ class UpdateCommand extends Command {
 		ignoreCache: ignoreCacheFlag,
 		autoConfirmAction: autoConfirmActionFlag,
 		env: envFileFlag,
+		secrets: secretsFlag,
 	};
 
 	async run() {
@@ -48,6 +52,7 @@ class UpdateCommand extends Command {
 		const ignoreCache = await flags.ignoreCache;
 		const autoConfirmAction = await flags.autoConfirmAction;
 		const envFilePath = await flags.env;
+		const secretsFilePath = await flags.secrets;
 
 		const { imsOrgId, projectId, workspaceId } = await initSdk({
 			ignoreCache,
@@ -99,6 +104,22 @@ class UpdateCommand extends Command {
 					'Unable to import the files in the mesh config. Please check the file and try again.',
 				);
 			}
+		}
+
+		if (secretsFilePath) {
+			const secretsFileContent = await readFileContents(secretsFilePath, this, 'secrets');
+			const compiledSecretsFileContent = parseEnv(secretsFileContent, {
+				outputFile: null,
+				options: {
+					all: false,
+					diff: false,
+					protect: false,
+					syntax: 'dollar-basic',
+				},
+				cli: false,
+			});
+			const secrets = YAML.parse(compiledSecretsFileContent);
+			data.secrets = secrets;
 		}
 
 		if (meshId) {
