@@ -24,7 +24,6 @@ class StatusCommand extends Command {
 
 		const { flags } = await this.parse(StatusCommand);
 		const ignoreCache = await flags.ignoreCache;
-
 		const { imsOrgId, imsOrgCode, projectId, workspaceId, workspaceName } = await initSdk({
 			ignoreCache,
 		});
@@ -44,28 +43,33 @@ class StatusCommand extends Command {
 			try {
 				const { showCloudflareURL: showEdgeMeshUrl } = await getTenantFeatures(imsOrgCode);
 				const mesh = await getMesh(imsOrgId, projectId, workspaceId, workspaceName, meshId);
+				const meshLabel = showEdgeMeshUrl ? `${chalk.bold('Legacy Mesh:')}` : 'Your mesh';
+
 				this.log(
 					'******************************************************************************************************',
 				);
 				switch (mesh.meshStatus) {
 					case 'success':
-						this.log(`${chalk.bold(`Legacy Mesh:`)} has been successfully built.`);
+						this.log(`${meshLabel} has been successfully built.`);
 						break;
 					case 'pending':
-						this.log(`${chalk.bold(`Legacy Mesh:`)} is awaiting processing.`);
+						this.log(`${meshLabel} is awaiting processing.`);
 						break;
 					case 'building':
 						this.log(
-							`${chalk.bold(
-								`Legacy Mesh:`,
-							)} is currently being provisioned. Please wait a few minutes before checking again.`,
+							`${meshLabel} is currently being provisioned. Please wait a few minutes before checking again.`,
 						);
 						break;
 					case 'error':
-						this.log(`${chalk.bold(`Legacy Mesh:`)} build has errors.`);
+						this.log(
+							showEdgeMeshUrl
+								? `${meshLabel} build has errors.`
+								: `${meshLabel} errored out with the following error.`,
+						);
 						this.log(mesh.error);
 						break;
 				}
+
 				if (showEdgeMeshUrl) {
 					if (mesh.meshStatus == 'error') {
 						this.log(`${chalk.bold(`Edge Mesh:`)} build has errors.`);
@@ -77,6 +81,7 @@ class StatusCommand extends Command {
 							workspaceId,
 							meshId,
 						);
+
 						switch (String(meshDeployments.status).toLowerCase()) {
 							case 'success':
 								this.log(`${chalk.bold(`Edge Mesh:`)} has been successfully built.`);
