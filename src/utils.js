@@ -399,7 +399,7 @@ async function validateAndInterpolateMesh(inputMeshData, envFilePath, command) {
 	}
 }
 
-async function validateAndInterpolateSecrets(secretsFilePath, command){
+async function validateAndInterpolateSecrets(secretsFilePath, command) {
 	const secretsContent = await readFileContents(secretsFilePath, command, 'secrets');
 	const compiledSecretsFileContent = parseEnv(secretsContent, {
 		outputFile: null,

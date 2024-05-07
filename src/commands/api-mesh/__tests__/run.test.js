@@ -167,8 +167,8 @@ describe('run command tests', () => {
 		const yamlContent = `
             secretKey: mockSecretValue
         `;
-        // Parse the YAML content
-        const parsedData = yaml.parse(yamlContent);
+		// Parse the YAML content
+		const parsedData = yaml.parse(yamlContent);
 		const parseOutput = {
 			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
 			flags: { port: 6000, debug: false, secrets: parsedData },
@@ -189,8 +189,8 @@ describe('run command tests', () => {
 		const yamlContent = `
             secretKey: mockSecretValue
         `;
-        // Parse the YAML content
-        const parsedData = yaml.parse(yamlContent);
+		// Parse the YAML content
+		const parsedData = yaml.parse(yamlContent);
 		process.env = {
 			...originalEnv,
 			PORT: 7000,
@@ -204,15 +204,20 @@ describe('run command tests', () => {
 		parseSpy.mockResolvedValue(parseOutput);
 
 		await RunCommand.run();
-		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), process.env.PORT, false, parsedData);
+		expect(startGraphqlServer).toHaveBeenCalledWith(
+			expect.anything(),
+			process.env.PORT,
+			false,
+			parsedData,
+		);
 	});
 
 	test('should use the default port if port number is not provided explicitly', async () => {
 		const yamlContent = `
             secretKey: mockSecretValue
         `;
-        // Parse the YAML content
-        const parsedData = yaml.parse(yamlContent);
+		// Parse the YAML content
+		const parsedData = yaml.parse(yamlContent);
 		process.env = {
 			...originalEnv,
 		};
@@ -225,7 +230,12 @@ describe('run command tests', () => {
 		parseSpy.mockResolvedValue(parseOutput);
 
 		await RunCommand.run();
-		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), defaultPort, false, parsedData);
+		expect(startGraphqlServer).toHaveBeenCalledWith(
+			expect.anything(),
+			defaultPort,
+			false,
+			parsedData,
+		);
 	});
 
 	test('should return error for run command if the mesh has placeholders and env file provided using --env flag is not found', async () => {
@@ -363,14 +373,14 @@ describe('run command tests', () => {
 		const yamlContent = `
             secretKey: mockSecretValue
         `;
-        // Parse the YAML content
-        const parsedData = yaml.parse(yamlContent);
+		// Parse the YAML content
+		const parsedData = yaml.parse(yamlContent);
 		parseSpy.mockResolvedValueOnce({
 			args: { file: 'src/commands/__fixtures__/sample_mesh_with_placeholder' },
 			flags: {
 				env: 'src/commands/__fixtures__/env_valid',
 				debug: false,
-				secrets: parsedData
+				secrets: parsedData,
 			},
 		});
 
@@ -385,7 +395,12 @@ describe('run command tests', () => {
 		});
 
 		await RunCommand.run();
-		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), defaultPort, false, parsedData);
+		expect(startGraphqlServer).toHaveBeenCalledWith(
+			expect.anything(),
+			defaultPort,
+			false,
+			parsedData,
+		);
 	});
 
 	// file import tests
@@ -393,8 +408,8 @@ describe('run command tests', () => {
 		const yamlContent = `
             secretKey: mockSecretValue
         `;
-        // Parse the YAML content
-        const parsedData = yaml.parse(yamlContent);
+		// Parse the YAML content
+		const parsedData = yaml.parse(yamlContent);
 		let meshConfig = {
 			sources: [
 				{
@@ -428,7 +443,7 @@ describe('run command tests', () => {
 			flags: {
 				autoConfirmAction: Promise.resolve(true),
 				debug: false,
-				secrets: parsedData
+				secrets: parsedData,
 			},
 		});
 
@@ -437,7 +452,12 @@ describe('run command tests', () => {
 		});
 
 		await RunCommand.run();
-		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), defaultPort, false, parsedData);
+		expect(startGraphqlServer).toHaveBeenCalledWith(
+			expect.anything(),
+			defaultPort,
+			false,
+			parsedData,
+		);
 	});
 
 	test('should fail if the file name is more than 25 characters', async () => {
@@ -576,8 +596,8 @@ describe('run command tests', () => {
 		const yamlContent = `
             secretKey: mockSecretValue
         `;
-        // Parse the YAML content
-        const parsedData = yaml.parse(yamlContent);
+		// Parse the YAML content
+		const parsedData = yaml.parse(yamlContent);
 		let meshConfig = {
 			sources: [
 				{
@@ -614,20 +634,25 @@ describe('run command tests', () => {
 			args: { file: 'src/commands/__fixtures__/sample_mesh_with_files_array.json' },
 			flags: {
 				debug: false,
-				secrets: parsedData
+				secrets: parsedData,
 			},
 		});
 
 		await RunCommand.run();
-		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), defaultPort, false, parsedData);
+		expect(startGraphqlServer).toHaveBeenCalledWith(
+			expect.anything(),
+			defaultPort,
+			false,
+			parsedData,
+		);
 	});
 
 	test('should override if prompt returns Yes, if there is files array', async () => {
 		const yamlContent = `
             secretKey: mockSecretValue
         `;
-        // Parse the YAML content
-        const parsedData = yaml.parse(yamlContent);
+		// Parse the YAML content
+		const parsedData = yaml.parse(yamlContent);
 		let meshConfig = {
 			sources: [
 				{
@@ -662,7 +687,7 @@ describe('run command tests', () => {
 			args: { file: 'src/commands/__fixtures__/sample_mesh_with_files_array.json' },
 			flags: {
 				debug: false,
-				secrets: parsedData
+				secrets: parsedData,
 			},
 		});
 
@@ -672,15 +697,20 @@ describe('run command tests', () => {
 
 		await RunCommand.run();
 
-		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), defaultPort, false, parsedData);
+		expect(startGraphqlServer).toHaveBeenCalledWith(
+			expect.anything(),
+			defaultPort,
+			false,
+			parsedData,
+		);
 	});
 
 	test('should pass for a fully-qualified meshConfig even if the file does not exist in fileSystem', async () => {
 		const yamlContent = `
             secretKey: mockSecretValue
         `;
-        // Parse the YAML content
-        const parsedData = yaml.parse(yamlContent);
+		// Parse the YAML content
+		const parsedData = yaml.parse(yamlContent);
 		let meshConfig = {
 			sources: [
 				{
@@ -714,7 +744,7 @@ describe('run command tests', () => {
 			flags: {
 				autoConfirmAction: Promise.resolve(true),
 				debug: false,
-				secrets: parsedData
+				secrets: parsedData,
 			},
 		});
 
@@ -725,15 +755,20 @@ describe('run command tests', () => {
 		});
 
 		await RunCommand.run();
-		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), defaultPort, false, parsedData);
+		expect(startGraphqlServer).toHaveBeenCalledWith(
+			expect.anything(),
+			defaultPort,
+			false,
+			parsedData,
+		);
 	});
 
 	test('should pass if the file is located in subdirectory of mesh directory', async () => {
 		const yamlContent = `
             secretKey: mockSecretValue
         `;
-        // Parse the YAML content
-        const parsedData = yaml.parse(yamlContent);
+		// Parse the YAML content
+		const parsedData = yaml.parse(yamlContent);
 		let meshConfig = {
 			sources: [
 				{
@@ -767,7 +802,7 @@ describe('run command tests', () => {
 			flags: {
 				autoConfirmAction: Promise.resolve(true),
 				debug: false,
-				secrets: parsedData
+				secrets: parsedData,
 			},
 		});
 
@@ -777,7 +812,12 @@ describe('run command tests', () => {
 
 		await RunCommand.run();
 
-		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), defaultPort, false, parsedData);
+		expect(startGraphqlServer).toHaveBeenCalledWith(
+			expect.anything(),
+			defaultPort,
+			false,
+			parsedData,
+		);
 	});
 
 	test('should fail if the file is outside the workspace directory', async () => {

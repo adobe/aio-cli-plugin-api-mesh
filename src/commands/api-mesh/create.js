@@ -10,8 +10,6 @@ governing permissions and limitations under the License.
 */
 
 const { Command } = require('@oclif/core');
-const parseEnv = require('envsub/js/envsub-parser');
-const YAML = require('yaml');
 
 const { initSdk, initRequestId, promptConfirm, importFiles } = require('../../helpers');
 const logger = require('../../classes/logger');
@@ -106,7 +104,7 @@ class CreateCommand extends Command {
 
 		if (secretsFilePath) {
 			const secretsData = await validateAndInterpolateSecrets(secretsFilePath, this);
-			data.secrets = secretsData
+			data.secrets = secretsData;
 		}
 
 		let shouldContinue = true;
