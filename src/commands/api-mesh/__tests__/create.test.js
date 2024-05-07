@@ -168,6 +168,15 @@ describe('create command tests', () => {
 		    "parse": [Function],
 		    "type": "boolean",
 		  },
+		  "secrets": {
+		    "char": "s",
+		    "default": "secrets.yaml",
+		    "description": "Path to secrets file",
+		    "input": [],
+		    "multiple": false,
+		    "parse": [Function],
+		    "type": "option",
+		  },
 		}
 	`);
 		expect(CreateCommand.aliases).toMatchInlineSnapshot(`[]`);

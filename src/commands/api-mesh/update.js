@@ -24,6 +24,7 @@ const {
 	readFileContents,
 	validateAndInterpolateMesh,
 	getFilesInMeshConfig,
+	validateAndInterpolateSecrets,
 } = require('../../utils');
 const { getMeshId, updateMesh } = require('../../lib/devConsole');
 
@@ -107,19 +108,8 @@ class UpdateCommand extends Command {
 		}
 
 		if (secretsFilePath) {
-			const secretsFileContent = await readFileContents(secretsFilePath, this, 'secrets');
-			const compiledSecretsFileContent = parseEnv(secretsFileContent, {
-				outputFile: null,
-				options: {
-					all: false,
-					diff: false,
-					protect: false,
-					syntax: 'dollar-basic',
-				},
-				cli: false,
-			});
-			const secrets = YAML.parse(compiledSecretsFileContent);
-			data.secrets = secrets;
+			const secretsData = await validateAndInterpolateSecrets(secretsFilePath, this);
+			data.secrets = secretsData
 		}
 
 		if (meshId) {

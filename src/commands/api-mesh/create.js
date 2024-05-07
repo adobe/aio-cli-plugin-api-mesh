@@ -26,6 +26,7 @@ const {
 	checkPlaceholders,
 	readFileContents,
 	validateAndInterpolateMesh,
+	validateAndInterpolateSecrets,
 } = require('../../utils');
 const { getMesh, createMesh } = require('../../lib/devConsole');
 
@@ -104,19 +105,8 @@ class CreateCommand extends Command {
 		}
 
 		if (secretsFilePath) {
-			const secretsFileContent = await readFileContents(secretsFilePath, this, 'secrets');
-			const compiledSecretsFileContent = parseEnv(secretsFileContent, {
-				outputFile: null,
-				options: {
-					all: false,
-					diff: false,
-					protect: false,
-					syntax: 'dollar-basic',
-				},
-				cli: false,
-			});
-			const secrets = YAML.parse(compiledSecretsFileContent);
-			data.secrets = secrets;
+			const secretsData = await validateAndInterpolateSecrets(secretsFilePath, this);
+			data.secrets = secretsData
 		}
 
 		let shouldContinue = true;

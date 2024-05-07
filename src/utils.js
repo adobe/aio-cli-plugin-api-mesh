@@ -5,6 +5,8 @@ const { Flags } = require('@oclif/core');
 const { readFile } = require('fs/promises');
 const { interpolateMesh } = require('./helpers');
 const dotenv = require('dotenv');
+const YAML = require('yaml');
+const parseEnv = require('envsub/js/envsub-parser');
 
 /**
  * @returns returns the root directory of the project
@@ -397,6 +399,22 @@ async function validateAndInterpolateMesh(inputMeshData, envFilePath, command) {
 	}
 }
 
+async function validateAndInterpolateSecrets(secretsFilePath, command){
+	const secretsContent = await readFileContents(secretsFilePath, command, 'secrets');
+	const compiledSecretsFileContent = parseEnv(secretsContent, {
+		outputFile: null,
+		options: {
+			all: false,
+			diff: false,
+			protect: false,
+			syntax: 'dollar-basic',
+		},
+		cli: false,
+	});
+	const secrets = YAML.parse(compiledSecretsFileContent);
+	return secrets;
+}
+
 module.exports = {
 	ignoreCacheFlag,
 	autoConfirmActionFlag,
@@ -412,4 +430,5 @@ module.exports = {
 	debugFlag,
 	selectFlag,
 	secretsFlag,
+	validateAndInterpolateSecrets,
 };
