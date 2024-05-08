@@ -24,7 +24,7 @@ const {
 	checkPlaceholders,
 	readFileContents,
 	validateAndInterpolateMesh,
-	validateAndInterpolateSecrets,
+	interpolateSecrets,
 } = require('../../utils');
 const { getMesh, createMesh } = require('../../lib/devConsole');
 
@@ -103,8 +103,14 @@ class CreateCommand extends Command {
 		}
 
 		if (secretsFilePath) {
-			const secretsData = await validateAndInterpolateSecrets(secretsFilePath, this);
-			data.secrets = secretsData;
+			try {
+				data.secrets = await interpolateSecrets(secretsFilePath, this);
+			} catch (err) {
+				this.log(err.message);
+				this.error(
+					'Unable to import secrets in the mesh config. Please check the file and try again.',
+				);
+			}
 		}
 
 		let shouldContinue = true;

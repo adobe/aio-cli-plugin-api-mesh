@@ -7,6 +7,7 @@ const { interpolateMesh } = require('./helpers');
 const dotenv = require('dotenv');
 const YAML = require('yaml');
 const parseEnv = require('envsub/js/envsub-parser');
+const os = require('os');
 
 /**
  * @returns returns the root directory of the project
@@ -399,20 +400,53 @@ async function validateAndInterpolateMesh(inputMeshData, envFilePath, command) {
 	}
 }
 
-async function validateAndInterpolateSecrets(secretsFilePath, command) {
-	const secretsContent = await readFileContents(secretsFilePath, command, 'secrets');
-	const compiledSecretsFileContent = parseEnv(secretsContent, {
-		outputFile: null,
-		options: {
-			all: false,
-			diff: false,
-			protect: false,
-			syntax: 'dollar-basic',
-		},
-		cli: false,
-	});
-	const secrets = YAML.parse(compiledSecretsFileContent);
-	return secrets;
+/**
+ * Validate secrets file
+ *
+ * @param secretsFile Validates that secrets file extension is in yaml
+ */
+function validateSecrets(secretsFile) {
+	try {
+		const validExtensions = ['.yaml', '.yml'];
+		const fileExtension = secretsFile.split('.').pop().toLowerCase();
+		if (!validExtensions.includes('.' + fileExtension)) {
+			throw new Error('Invalid file format. Please provide a YAML file (.yaml or .yml).');
+		}
+	} catch (error) {
+		console.error('Secrets validation failed:', error.message);
+	}
+}
+
+/**
+ * Read the secrets file, checks validation and interpolate mesh
+ *
+ * @param secretsFilePath Secrets file path
+ * @param command
+ */
+async function interpolateSecrets(secretsFilePath, command) {
+	try {
+		validateSecrets(secretsFilePath);
+		const secretsContent = await readFileContents(secretsFilePath, command, 'secrets');
+		// Check if environment variables are used in the file content
+		if (os.platform() === 'win32' && /(\$[a-zA-Z_][a-zA-Z0-9_]*)/.test(secretsContent)) {
+			throw new Error('Environment variables are not supported in YAML files on Windows.');
+		}
+		const compiledSecretsFileContent = parseEnv(secretsContent, {
+			outputFile: null,
+			options: {
+				all: false,
+				diff: false,
+				protect: false,
+				syntax: 'dollar-basic',
+			},
+			cli: false,
+		});
+		const secrets = YAML.parse(compiledSecretsFileContent);
+		return secrets;
+	} catch (err) {
+		logger.error(err.message);
+		throw new Error(err.message);
+	}
 }
 
 module.exports = {
@@ -430,5 +464,5 @@ module.exports = {
 	debugFlag,
 	selectFlag,
 	secretsFlag,
-	validateAndInterpolateSecrets,
+	interpolateSecrets,
 };
