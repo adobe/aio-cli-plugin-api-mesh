@@ -102,6 +102,7 @@ class CreateCommand extends Command {
 			}
 		}
 
+		// if secrets is present, include that in data.secrets
 		if (secretsFilePath) {
 			try {
 				data.secrets = await interpolateSecrets(secretsFilePath, this);

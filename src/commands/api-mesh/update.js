@@ -105,9 +105,16 @@ class UpdateCommand extends Command {
 			}
 		}
 
+		// if secrets is present, include that in data.secrets
 		if (secretsFilePath) {
-			const secretsData = await interpolateSecrets(secretsFilePath, this);
-			data.secrets = secretsData;
+			try {
+				data.secrets = await interpolateSecrets(secretsFilePath, this);
+			} catch (err) {
+				this.log(err.message);
+				this.error(
+					'Unable to import secrets in the mesh config. Please check the file and try again.',
+				);
+			}
 		}
 
 		if (meshId) {
