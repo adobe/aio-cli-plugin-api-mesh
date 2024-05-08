@@ -47,7 +47,7 @@ const envFileFlag = Flags.string({
 const secretsFlag = Flags.string({
 	char: 's',
 	description: 'Path to secrets file',
-	default: 'secrets.yaml',
+	default: false,
 });
 
 const portNoFlag = Flags.integer({
