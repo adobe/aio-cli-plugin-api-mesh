@@ -170,7 +170,7 @@ describe('create command tests', () => {
 		  },
 		  "secrets": {
 		    "char": "s",
-		    "default": "secrets.yaml",
+		    "default": false,
 		    "description": "Path to secrets file",
 		    "input": [],
 		    "multiple": false,

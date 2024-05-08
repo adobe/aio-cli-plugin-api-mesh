@@ -10,7 +10,6 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const yaml = require('yaml');
 const RunCommand = require('../run');
 const {
 	startGraphqlServer,
@@ -122,15 +121,6 @@ describe('run command tests', () => {
 		    "parse": [Function],
 		    "type": "option",
 		  },
-		  "secrets": {
-		    "char": "s",
-		    "default": "secrets.yaml",
-		    "description": "Path to secrets file",
-		    "input": [],
-		    "multiple": false,
-		    "parse": [Function],
-		    "type": "option",
-		  },
 		  "select": {
 		    "allowNo": false,
 		    "default": false,
@@ -164,14 +154,9 @@ describe('run command tests', () => {
 	});
 
 	test('should use the port number provided in the flags for starting the server', async () => {
-		const yamlContent = `
-            secretKey: mockSecretValue
-        `;
-		// Parse the YAML content
-		const parsedData = yaml.parse(yamlContent);
 		const parseOutput = {
 			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
-			flags: { port: 6000, debug: false, secrets: parsedData },
+			flags: { port: 6000, debug: false },
 		};
 
 		parseSpy.mockResolvedValue(parseOutput);
@@ -181,16 +166,10 @@ describe('run command tests', () => {
 			expect.anything(),
 			parseOutput.flags.port,
 			false,
-			parsedData,
 		);
 	});
 
 	test('should use the port number provided in the .env file if there is no port', async () => {
-		const yamlContent = `
-            secretKey: mockSecretValue
-        `;
-		// Parse the YAML content
-		const parsedData = yaml.parse(yamlContent);
 		process.env = {
 			...originalEnv,
 			PORT: 7000,
@@ -198,44 +177,29 @@ describe('run command tests', () => {
 
 		const parseOutput = {
 			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
-			flags: { debug: false, secrets: parsedData },
+			flags: { debug: false },
 		};
 
 		parseSpy.mockResolvedValue(parseOutput);
 
 		await RunCommand.run();
-		expect(startGraphqlServer).toHaveBeenCalledWith(
-			expect.anything(),
-			process.env.PORT,
-			false,
-			parsedData,
-		);
+		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), process.env.PORT, false);
 	});
 
 	test('should use the default port if port number is not provided explicitly', async () => {
-		const yamlContent = `
-            secretKey: mockSecretValue
-        `;
-		// Parse the YAML content
-		const parsedData = yaml.parse(yamlContent);
 		process.env = {
 			...originalEnv,
 		};
 
 		const parseOutput = {
 			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
-			flags: { debug: false, secrets: parsedData },
+			flags: { debug: false },
 		};
 
 		parseSpy.mockResolvedValue(parseOutput);
 
 		await RunCommand.run();
-		expect(startGraphqlServer).toHaveBeenCalledWith(
-			expect.anything(),
-			defaultPort,
-			false,
-			parsedData,
-		);
+		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), defaultPort, false);
 	});
 
 	test('should return error for run command if the mesh has placeholders and env file provided using --env flag is not found', async () => {
@@ -370,17 +334,11 @@ describe('run command tests', () => {
 	});
 
 	test('should successfully run the mesh if provided env file is valid, mesh interpolation is successful and interpolated mesh is a valid JSON', async () => {
-		const yamlContent = `
-            secretKey: mockSecretValue
-        `;
-		// Parse the YAML content
-		const parsedData = yaml.parse(yamlContent);
 		parseSpy.mockResolvedValueOnce({
 			args: { file: 'src/commands/__fixtures__/sample_mesh_with_placeholder' },
 			flags: {
 				env: 'src/commands/__fixtures__/env_valid',
 				debug: false,
-				secrets: parsedData,
 			},
 		});
 
@@ -395,21 +353,11 @@ describe('run command tests', () => {
 		});
 
 		await RunCommand.run();
-		expect(startGraphqlServer).toHaveBeenCalledWith(
-			expect.anything(),
-			defaultPort,
-			false,
-			parsedData,
-		);
+		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), defaultPort, false);
 	});
 
 	// file import tests
 	test('should pass if there are local files in meshConfig i.e., the file is appended in files array', async () => {
-		const yamlContent = `
-            secretKey: mockSecretValue
-        `;
-		// Parse the YAML content
-		const parsedData = yaml.parse(yamlContent);
 		let meshConfig = {
 			sources: [
 				{
@@ -443,7 +391,6 @@ describe('run command tests', () => {
 			flags: {
 				autoConfirmAction: Promise.resolve(true),
 				debug: false,
-				secrets: parsedData,
 			},
 		});
 
@@ -452,12 +399,7 @@ describe('run command tests', () => {
 		});
 
 		await RunCommand.run();
-		expect(startGraphqlServer).toHaveBeenCalledWith(
-			expect.anything(),
-			defaultPort,
-			false,
-			parsedData,
-		);
+		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), defaultPort, false);
 	});
 
 	test('should fail if the file name is more than 25 characters', async () => {
@@ -593,11 +535,6 @@ describe('run command tests', () => {
 	});
 
 	test('should not override if prompt returns No, if there is files array', async () => {
-		const yamlContent = `
-            secretKey: mockSecretValue
-        `;
-		// Parse the YAML content
-		const parsedData = yaml.parse(yamlContent);
 		let meshConfig = {
 			sources: [
 				{
@@ -634,25 +571,14 @@ describe('run command tests', () => {
 			args: { file: 'src/commands/__fixtures__/sample_mesh_with_files_array.json' },
 			flags: {
 				debug: false,
-				secrets: parsedData,
 			},
 		});
 
 		await RunCommand.run();
-		expect(startGraphqlServer).toHaveBeenCalledWith(
-			expect.anything(),
-			defaultPort,
-			false,
-			parsedData,
-		);
+		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), defaultPort, false);
 	});
 
 	test('should override if prompt returns Yes, if there is files array', async () => {
-		const yamlContent = `
-            secretKey: mockSecretValue
-        `;
-		// Parse the YAML content
-		const parsedData = yaml.parse(yamlContent);
 		let meshConfig = {
 			sources: [
 				{
@@ -687,7 +613,6 @@ describe('run command tests', () => {
 			args: { file: 'src/commands/__fixtures__/sample_mesh_with_files_array.json' },
 			flags: {
 				debug: false,
-				secrets: parsedData,
 			},
 		});
 
@@ -697,20 +622,10 @@ describe('run command tests', () => {
 
 		await RunCommand.run();
 
-		expect(startGraphqlServer).toHaveBeenCalledWith(
-			expect.anything(),
-			defaultPort,
-			false,
-			parsedData,
-		);
+		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), defaultPort, false);
 	});
 
 	test('should pass for a fully-qualified meshConfig even if the file does not exist in fileSystem', async () => {
-		const yamlContent = `
-            secretKey: mockSecretValue
-        `;
-		// Parse the YAML content
-		const parsedData = yaml.parse(yamlContent);
 		let meshConfig = {
 			sources: [
 				{
@@ -744,7 +659,6 @@ describe('run command tests', () => {
 			flags: {
 				autoConfirmAction: Promise.resolve(true),
 				debug: false,
-				secrets: parsedData,
 			},
 		});
 
@@ -755,20 +669,10 @@ describe('run command tests', () => {
 		});
 
 		await RunCommand.run();
-		expect(startGraphqlServer).toHaveBeenCalledWith(
-			expect.anything(),
-			defaultPort,
-			false,
-			parsedData,
-		);
+		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), defaultPort, false);
 	});
 
 	test('should pass if the file is located in subdirectory of mesh directory', async () => {
-		const yamlContent = `
-            secretKey: mockSecretValue
-        `;
-		// Parse the YAML content
-		const parsedData = yaml.parse(yamlContent);
 		let meshConfig = {
 			sources: [
 				{
@@ -802,7 +706,6 @@ describe('run command tests', () => {
 			flags: {
 				autoConfirmAction: Promise.resolve(true),
 				debug: false,
-				secrets: parsedData,
 			},
 		});
 
@@ -812,12 +715,7 @@ describe('run command tests', () => {
 
 		await RunCommand.run();
 
-		expect(startGraphqlServer).toHaveBeenCalledWith(
-			expect.anything(),
-			defaultPort,
-			false,
-			parsedData,
-		);
+		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), defaultPort, false);
 	});
 
 	test('should fail if the file is outside the workspace directory', async () => {

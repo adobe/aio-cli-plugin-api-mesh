@@ -15,7 +15,6 @@ const {
 	debugFlag,
 	selectFlag,
 	envFileFlag,
-	secretsFlag,
 	autoConfirmActionFlag,
 	readFileContents,
 	validateAndInterpolateMesh,
@@ -56,7 +55,6 @@ class RunCommand extends Command {
 		env: envFileFlag,
 		autoConfirmAction: autoConfirmActionFlag,
 		select: selectFlag,
-		secrets: secretsFlag,
 	};
 
 	static enableJsonFlag = true;
@@ -167,7 +165,6 @@ class RunCommand extends Command {
 				}
 
 				let portNo;
-				const secretsFilePath = await flags.secrets;
 
 				//To set the port number using the environment file
 				if (process.env.PORT !== undefined) {
@@ -189,7 +186,7 @@ class RunCommand extends Command {
 				}
 
 				this.log(`Starting server on port : ${portNo}`);
-				await startGraphqlServer(meshId, portNo, flags.debug, secretsFilePath);
+				await startGraphqlServer(meshId, portNo, flags.debug);
 			} else {
 				throw new Error(
 					'`aio api-mesh run` cannot be executed because there is no package.json file in the current directory. Use `aio api-mesh init` to set up a package.',
