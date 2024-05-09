@@ -413,7 +413,8 @@ function validateSecrets(secretsFile) {
 			throw new Error('Invalid file format. Please provide a YAML file (.yaml or .yml).');
 		}
 	} catch (error) {
-		console.error('Secrets validation failed:', error.message);
+		logger.error(error.message);
+		throw new Error(error.message);
 	}
 }
 
@@ -429,7 +430,7 @@ async function interpolateSecrets(secretsFilePath, command) {
 		const secretsContent = await readFileContents(secretsFilePath, command, 'secrets');
 		// Check if environment variables are used in the file content
 		if (os.platform() === 'win32' && /(\$[a-zA-Z_][a-zA-Z0-9_]*)/.test(secretsContent)) {
-			throw new Error('Environment variables are not supported in YAML files on Windows.');
+			throw new Error('Batch variables are not supported in YAML files on Windows.');
 		}
 		const compiledSecretsFileContent = parseEnv(secretsContent, {
 			outputFile: null,
