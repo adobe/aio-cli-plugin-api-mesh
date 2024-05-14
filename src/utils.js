@@ -5,6 +5,9 @@ const { Flags } = require('@oclif/core');
 const { readFile } = require('fs/promises');
 const { interpolateMesh } = require('./helpers');
 const dotenv = require('dotenv');
+const YAML = require('yaml');
+const parseEnv = require('envsub/js/envsub-parser');
+const os = require('os');
 
 /**
  * @returns returns the root directory of the project
@@ -39,6 +42,12 @@ const envFileFlag = Flags.string({
 	char: 'e',
 	description: 'Path to env file',
 	default: '.env',
+});
+
+const secretsFlag = Flags.string({
+	char: 's',
+	description: 'Path to secrets file',
+	default: false,
 });
 
 const portNoFlag = Flags.integer({
@@ -391,6 +400,71 @@ async function validateAndInterpolateMesh(inputMeshData, envFilePath, command) {
 	}
 }
 
+/**
+ * Validate secrets file
+ *
+ * @param secretsFile Validates that secrets file extension is in yaml
+ */
+async function validateSecretsFile(secretsFile) {
+	try {
+		const validExtensions = ['.yaml', '.yml'];
+		const fileExtension = secretsFile.split('.').pop().toLowerCase();
+		if (!validExtensions.includes('.' + fileExtension)) {
+			throw new Error('Invalid file format. Please provide a YAML file (.yaml or .yml).');
+		}
+	} catch (error) {
+		logger.error(error.message);
+		throw new Error(error.message);
+	}
+}
+
+/**
+ * Read the secrets file, checks validation and interpolate mesh
+ *
+ * @param secretsFilePath Secrets file path
+ * @param command
+ */
+async function interpolateSecrets(secretsFilePath, command) {
+	try {
+		const secretsContent = await readFileContents(secretsFilePath, command, 'secrets');
+		// Check if environment variables are used in the file content
+		if (os.platform() === 'win32' && /(\$[a-zA-Z_][a-zA-Z0-9_]*)/.test(secretsContent)) {
+			throw new Error('Batch variables are not supported in YAML files on Windows.');
+		}
+		const secrets = await parseSecrets(secretsContent);
+		return secrets;
+	} catch (err) {
+		logger.error(err.message);
+		throw new Error(err.message);
+	}
+}
+
+/**
+ * Parse secrets YAML content.
+ *
+ * @param secretsFilePath Secrets file path
+ */
+async function parseSecrets(secretsContent) {
+	try {
+		const envParserConfig = {
+			outputFile: null,
+			options: {
+				all: false,
+				diff: false,
+				protect: false,
+				syntax: 'dollar-both',
+			},
+			cli: false,
+		};
+		const compiledSecretsFileContent = parseEnv(secretsContent, envParserConfig);
+		const parsedSecrets = YAML.parse(compiledSecretsFileContent);
+		return parsedSecrets;
+	} catch (err) {
+		logger.error(err);
+		throw new Error(err.message);
+	}
+}
+
 module.exports = {
 	ignoreCacheFlag,
 	autoConfirmActionFlag,
@@ -405,4 +479,7 @@ module.exports = {
 	portNoFlag,
 	debugFlag,
 	selectFlag,
+	secretsFlag,
+	interpolateSecrets,
+	validateSecretsFile,
 };

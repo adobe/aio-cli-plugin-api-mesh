@@ -17,10 +17,13 @@ const {
 	ignoreCacheFlag,
 	autoConfirmActionFlag,
 	envFileFlag,
+	secretsFlag,
 	checkPlaceholders,
 	readFileContents,
 	validateAndInterpolateMesh,
 	getFilesInMeshConfig,
+	interpolateSecrets,
+	validateSecretsFile,
 } = require('../../utils');
 const { getMeshId, updateMesh } = require('../../lib/devConsole');
 
@@ -30,6 +33,7 @@ class UpdateCommand extends Command {
 		ignoreCache: ignoreCacheFlag,
 		autoConfirmAction: autoConfirmActionFlag,
 		env: envFileFlag,
+		secrets: secretsFlag,
 	};
 
 	async run() {
@@ -48,6 +52,7 @@ class UpdateCommand extends Command {
 		const ignoreCache = await flags.ignoreCache;
 		const autoConfirmAction = await flags.autoConfirmAction;
 		const envFilePath = await flags.env;
+		const secretsFilePath = await flags.secrets;
 
 		const { imsOrgId, projectId, workspaceId } = await initSdk({
 			ignoreCache,
@@ -98,6 +103,17 @@ class UpdateCommand extends Command {
 				this.error(
 					'Unable to import the files in the mesh config. Please check the file and try again.',
 				);
+			}
+		}
+
+		// if secrets is present, include that in data.secrets
+		if (secretsFilePath) {
+			try {
+				await validateSecretsFile(secretsFilePath);
+				data.secrets = await interpolateSecrets(secretsFilePath, this);
+			} catch (err) {
+				this.log(err.message);
+				this.error('Unable to import secrets. Please check the file and try again.');
 			}
 		}
 

@@ -10,6 +10,7 @@ governing permissions and limitations under the License.
 */
 
 const { Command } = require('@oclif/core');
+
 const { initSdk, initRequestId, promptConfirm, importFiles } = require('../../helpers');
 const logger = require('../../classes/logger');
 const CONSTANTS = require('../../constants');
@@ -19,9 +20,12 @@ const {
 	jsonFlag,
 	getFilesInMeshConfig,
 	envFileFlag,
+	secretsFlag,
 	checkPlaceholders,
 	readFileContents,
 	validateAndInterpolateMesh,
+	interpolateSecrets,
+	validateSecretsFile,
 } = require('../../utils');
 const { getMesh, createMesh } = require('../../lib/devConsole');
 
@@ -34,6 +38,7 @@ class CreateCommand extends Command {
 		autoConfirmAction: autoConfirmActionFlag,
 		json: jsonFlag,
 		env: envFileFlag,
+		secrets: secretsFlag,
 	};
 
 	static enableJsonFlag = true;
@@ -54,6 +59,8 @@ class CreateCommand extends Command {
 		const ignoreCache = await flags.ignoreCache;
 		const autoConfirmAction = await flags.autoConfirmAction;
 		const envFilePath = await flags.env;
+		const secretsFilePath = await flags.secrets;
+
 		const { imsOrgId, projectId, workspaceId, workspaceName } = await initSdk({
 			ignoreCache,
 		});
@@ -93,6 +100,17 @@ class CreateCommand extends Command {
 				this.error(
 					'Unable to import the files in the mesh config. Please check the file and try again.',
 				);
+			}
+		}
+
+		// if secrets is present, include that in data.secrets
+		if (secretsFilePath) {
+			try {
+				await validateSecretsFile(secretsFilePath);
+				data.secrets = await interpolateSecrets(secretsFilePath, this);
+			} catch (err) {
+				this.log(err.message);
+				this.error('Unable to import secrets. Please check the file and try again.');
 			}
 		}
 
