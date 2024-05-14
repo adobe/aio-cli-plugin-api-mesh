@@ -8,6 +8,7 @@ const dotenv = require('dotenv');
 const YAML = require('yaml');
 const parseEnv = require('envsub/js/envsub-parser');
 const os = require('os');
+const chalk = require('chalk');
 
 /**
  * @returns returns the root directory of the project
@@ -460,8 +461,23 @@ async function parseSecrets(secretsContent) {
 		const parsedSecrets = YAML.parse(compiledSecretsFileContent);
 		return parsedSecrets;
 	} catch (err) {
-		logger.error(err);
-		throw new Error(err.message);
+		secretsParseError = getSecretsYamlParseError(err);
+		throw new Error(chalk.red(secretsParseError));
+	}
+}
+
+/**
+ * This function returns user friendly errors that occurs while YAML.parse
+ *
+ * @param error errors from YAML.parse
+ */
+function getSecretsYamlParseError(error) {
+	if(error.code === 'BAD_INDENT') {
+        return "Bad indentation error occurred while parsing YAML data: " + error.message;
+	} else if(error.code === 'DUPLICATE_KEY') {
+        return "Duplicate Keys found while parsing YARN data: " + error.message;
+	} else {
+		return "An unexpected error occurred: " + error.message;
 	}
 }
 
