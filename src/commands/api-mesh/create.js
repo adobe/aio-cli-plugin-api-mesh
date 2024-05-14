@@ -25,7 +25,7 @@ const {
 	readFileContents,
 	validateAndInterpolateMesh,
 	interpolateSecrets,
-	validateSecrets,
+	validateSecretsFile,
 } = require('../../utils');
 const { getMesh, createMesh } = require('../../lib/devConsole');
 
@@ -106,7 +106,7 @@ class CreateCommand extends Command {
 		// if secrets is present, include that in data.secrets
 		if (secretsFilePath) {
 			try {
-				await validateSecrets(secretsFilePath);
+				await validateSecretsFile(secretsFilePath);
 				data.secrets = await interpolateSecrets(secretsFilePath, this);
 			} catch (err) {
 				this.log(err.message);

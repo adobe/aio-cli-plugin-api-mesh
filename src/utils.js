@@ -405,7 +405,7 @@ async function validateAndInterpolateMesh(inputMeshData, envFilePath, command) {
  *
  * @param secretsFile Validates that secrets file extension is in yaml
  */
-async function validateSecrets(secretsFile) {
+async function validateSecretsFile(secretsFile) {
 	try {
 		const validExtensions = ['.yaml', '.yml'];
 		const fileExtension = secretsFile.split('.').pop().toLowerCase();
@@ -481,5 +481,5 @@ module.exports = {
 	selectFlag,
 	secretsFlag,
 	interpolateSecrets,
-	validateSecrets,
+	validateSecretsFile,
 };
