@@ -23,6 +23,7 @@ const {
 	validateAndInterpolateMesh,
 	getFilesInMeshConfig,
 	interpolateSecrets,
+	validateSecrets,
 } = require('../../utils');
 const { getMeshId, updateMesh } = require('../../lib/devConsole');
 
@@ -108,6 +109,7 @@ class UpdateCommand extends Command {
 		// if secrets is present, include that in data.secrets
 		if (secretsFilePath) {
 			try {
+				await validateSecrets(secretsFilePath);
 				data.secrets = await interpolateSecrets(secretsFilePath, this);
 			} catch (err) {
 				this.log(err.message);
