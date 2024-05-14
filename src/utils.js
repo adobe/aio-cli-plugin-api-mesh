@@ -426,6 +426,26 @@ async function validateSecrets(secretsFile) {
  */
 async function interpolateSecrets(secretsFilePath, command) {
 	try {
+		const secretsContent = await readFileContents(secretsFilePath, command, 'secrets');
+		// Check if environment variables are used in the file content
+		if (os.platform() === 'win32' && /(\$[a-zA-Z_][a-zA-Z0-9_]*)/.test(secretsContent)) {
+			throw new Error('Batch variables are not supported in YAML files on Windows.');
+		}
+		const secrets = await parseSecrets(secretsContent);
+		return secrets;
+	} catch (err) {
+		logger.error(err.message);
+		throw new Error(err.message);
+	}
+}
+
+/**
+ * Parse secrets YAML content.
+ *
+ * @param secretsFilePath Secrets file path
+ */
+async function parseSecrets(secretsContent) {
+	try {
 		const envParserConfig = {
 			outputFile: null,
 			options: {
@@ -436,16 +456,11 @@ async function interpolateSecrets(secretsFilePath, command) {
 			},
 			cli: false,
 		};
-		const secretsContent = await readFileContents(secretsFilePath, command, 'secrets');
-		// Check if environment variables are used in the file content
-		if (os.platform() === 'win32' && /(\$[a-zA-Z_][a-zA-Z0-9_]*)/.test(secretsContent)) {
-			throw new Error('Batch variables are not supported in YAML files on Windows.');
-		}
 		const compiledSecretsFileContent = parseEnv(secretsContent, envParserConfig);
-		const secrets = YAML.parse(compiledSecretsFileContent);
-		return secrets;
+		const parsedSecrets = YAML.parse(compiledSecretsFileContent);
+		return parsedSecrets;
 	} catch (err) {
-		logger.error(err.message);
+		logger.error(err);
 		throw new Error(err.message);
 	}
 }
