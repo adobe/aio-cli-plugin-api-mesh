@@ -459,10 +459,10 @@ async function parseSecrets(secretsContent) {
 		};
 		const compiledSecretsFileContent = parseEnv(secretsContent, envParserConfig);
 		const parsedSecrets = YAML.parse(compiledSecretsFileContent);
-		return parsedSecrets;
+
+		return YAML.stringify(parsedSecrets);
 	} catch (err) {
-		secretsParseError = getSecretsYamlParseError(err);
-		throw new Error(chalk.red(secretsParseError));
+		throw new Error(chalk.red(getSecretsYamlParseError(err)));
 	}
 }
 
@@ -472,12 +472,12 @@ async function parseSecrets(secretsContent) {
  * @param error errors from YAML.parse
  */
 function getSecretsYamlParseError(error) {
-	if(error.code === 'BAD_INDENT') {
-        return "Bad indentation error occurred while parsing YAML data: " + error.message;
-	} else if(error.code === 'DUPLICATE_KEY') {
-        return "Duplicate Keys found while parsing YARN data: " + error.message;
+	if (error.code === 'BAD_INDENT') {
+		return 'Bad indentation error occurred while parsing YAML data: ' + error.message;
+	} else if (error.code === 'DUPLICATE_KEY') {
+		return 'Duplicate Keys found while parsing YARN data: ' + error.message;
 	} else {
-		return "An unexpected error occurred: " + error.message;
+		return 'An unexpected error occurred: ' + error.message;
 	}
 }
 

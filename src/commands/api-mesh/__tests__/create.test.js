@@ -1751,4 +1751,90 @@ describe('create command tests', () => {
 		]
 	`);
 	});
+
+	test('should return error if mesh has placeholders and the provided secrets file is invalid', async () => {
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_secrets_mesh.json' },
+			flags: {
+				ignoreCache: mockIgnoreCacheFlag,
+				autoConfirmAction: Promise.resolve(true),
+				secrets: 'src/commands/__fixtures__/secrets_invalid.yaml',
+			},
+		});
+
+		const runResult = CreateCommand.run();
+
+		await expect(runResult).rejects.toEqual(
+			new Error('Unable to import secrets. Please check the file and try again.'),
+		);
+
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Unable to import secrets. Please check the file and try again.",
+		  ],
+		]
+	`);
+	});
+
+	test('should return error if mesh has placeholders and the provided secrets file is not yaml or yml', async () => {
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_secrets_mesh.json' },
+			flags: {
+				ignoreCache: mockIgnoreCacheFlag,
+				autoConfirmAction: Promise.resolve(true),
+				secrets: 'src/commands/__fixtures__/.secrets_file.env',
+			},
+		});
+
+		const runResult = CreateCommand.run();
+
+		await expect(runResult).rejects.toEqual(
+			new Error('Unable to import secrets. Please check the file and try again.'),
+		);
+
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Unable to import secrets. Please check the file and try again.",
+		  ],
+		]
+	`);
+	});
+
+	test('should successfully create a mesh if provided secrets file is valid', async () => {
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_secrets_mesh.json' },
+			flags: {
+				ignoreCache: mockIgnoreCacheFlag,
+				autoConfirmAction: Promise.resolve(true),
+				secrets: 'src/commands/__fixtures__/secrets_valid.yaml',
+			},
+		});
+
+		const runResult = await CreateCommand.run();
+		expect(runResult).toMatchInlineSnapshot(`
+		{
+		  "apiKey": "dummy_api_key",
+		  "mesh": {
+		    "meshConfig": {
+		      "sources": [
+		        {
+		          "handler": {
+		            "graphql": {
+		              "endpoint": "<gql_endpoint>",
+		            },
+		          },
+		          "name": "<api_name>",
+		        },
+		      ],
+		    },
+		    "meshId": "dummy_mesh_id",
+		  },
+		  "sdkList": [
+		    "dummy_service",
+		  ],
+		}
+	`);
+	});
 });
