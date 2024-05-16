@@ -411,7 +411,9 @@ async function validateSecretsFile(secretsFile) {
 		const validExtensions = ['.yaml', '.yml'];
 		const fileExtension = secretsFile.split('.').pop().toLowerCase();
 		if (!validExtensions.includes('.' + fileExtension)) {
-			throw new Error('Invalid file format. Please provide a YAML file (.yaml or .yml).');
+			throw new Error(
+				chalk.red('Invalid file format. Please provide a YAML file (.yaml or .yml).'),
+			);
 		}
 	} catch (error) {
 		logger.error(error.message);
@@ -428,6 +430,7 @@ async function validateSecretsFile(secretsFile) {
 async function interpolateSecrets(secretsFilePath, command) {
 	try {
 		const secretsContent = await readFileContents(secretsFilePath, command, 'secrets');
+
 		// Check if environment variables are used in the file content
 		if (os.platform() === 'win32' && /(\$[a-zA-Z_][a-zA-Z0-9_]*)/.test(secretsContent)) {
 			throw new Error('Batch variables are not supported in YAML files on Windows.');
@@ -459,8 +462,20 @@ async function parseSecrets(secretsContent) {
 		};
 		const compiledSecretsFileContent = parseEnv(secretsContent, envParserConfig);
 		const parsedSecrets = YAML.parse(compiledSecretsFileContent);
-
-		return YAML.stringify(parsedSecrets);
+		//check if secrets file is empty
+		if (!parsedSecrets) {
+			throw new Error(
+				chalk.red('Please check if your secrets YAML file is not empty and is valid.'),
+			);
+		}
+		//check if parsedSecrets is string and not in k:v pair
+		if (typeof parsedSecrets === 'string') {
+			throw new Error(
+				chalk.red('Please provide a valid YAML in key:value format and not as string.'),
+			);
+		}
+		const secretsYamlString = YAML.stringify(parsedSecrets);
+		return secretsYamlString; //TODO: here we will encrypt secrets and return.
 	} catch (err) {
 		throw new Error(chalk.red(getSecretsYamlParseError(err)));
 	}
