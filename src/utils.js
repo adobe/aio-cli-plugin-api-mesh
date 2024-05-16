@@ -432,8 +432,8 @@ async function interpolateSecrets(secretsFilePath, command) {
 		const secretsContent = await readFileContents(secretsFilePath, command, 'secrets');
 
 		// Check if environment variables are used in the file content
-		if (os.platform() === 'win32' && /(\$[a-zA-Z_][a-zA-Z0-9_]*)/.test(secretsContent)) {
-			throw new Error('Batch variables are not supported in YAML files on Windows.');
+		if (os.platform() === 'win32' && /\$({)?[a-zA-Z_][a-zA-Z0-9_]*}?/.test(secretsContent)) {
+			throw new Error(chalk.red('Batch variables are not supported in YAML files on Windows.'));
 		}
 		const secrets = await parseSecrets(secretsContent);
 		return secrets;
