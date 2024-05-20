@@ -1926,4 +1926,41 @@ describe('create command tests', () => {
 		}
 	`);
 	});
+
+	test('should pass if ran against darwin(macOS) platform with batch variables', async () => {
+		platformSpy.mockReturnValue('darwin');
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_secrets_mesh.json' },
+			flags: {
+				ignoreCache: mockIgnoreCacheFlag,
+				autoConfirmAction: Promise.resolve(true),
+				secrets: 'src/commands/__fixtures__/secrets_with_batch_variables.yaml',
+			},
+		});
+
+		const runResult = await CreateCommand.run();
+		expect(runResult).toMatchInlineSnapshot(`
+		{
+		  "apiKey": "dummy_api_key",
+		  "mesh": {
+		    "meshConfig": {
+		      "sources": [
+		        {
+		          "handler": {
+		            "graphql": {
+		              "endpoint": "<gql_endpoint>",
+		            },
+		          },
+		          "name": "<api_name>",
+		        },
+		      ],
+		    },
+		    "meshId": "dummy_mesh_id",
+		  },
+		  "sdkList": [
+		    "dummy_service",
+		  ],
+		}
+	`);
+	});
 });
