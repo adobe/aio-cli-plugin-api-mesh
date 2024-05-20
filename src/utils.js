@@ -465,13 +465,13 @@ async function parseSecrets(secretsContent) {
 		//check if secrets file is empty
 		if (!parsedSecrets) {
 			throw new Error(
-				chalk.red('Please check if your secrets YAML file is not empty and is valid.'),
+				chalk.red('Invalid YAML file contents. Please verify and try again.'),
 			);
 		}
 		//check if parsedSecrets is string and not in k:v pair
 		if (typeof parsedSecrets === 'string') {
 			throw new Error(
-				chalk.red('Please provide a valid YAML in key:value format and not as string.'),
+				chalk.red('Please provide a valid YAML in key:value format.'),
 			);
 		}
 		const secretsYamlString = YAML.stringify(parsedSecrets);
@@ -488,11 +488,11 @@ async function parseSecrets(secretsContent) {
  */
 function getSecretsYamlParseError(error) {
 	if (error.code === 'BAD_INDENT') {
-		return 'Bad indentation error occurred while parsing YAML data: ' + error.message;
+		return 'Invalid YAML - Bad Indentation: ' + error.message;
 	} else if (error.code === 'DUPLICATE_KEY') {
-		return 'Duplicate Keys found while parsing YARN data: ' + error.message;
+		return 'Invalid YAML - Found Duplicate Keys: ' + error.message;
 	} else {
-		return 'An unexpected error occurred: ' + error.message;
+		return 'Unexpected Error: ' + error.message;
 	}
 }
 

@@ -31,6 +31,8 @@ const {
 
 const selectedOrg = { id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' };
 
+const os = require('os');
+
 const selectedProject = { id: '5678', title: 'Project01' };
 
 const selectedWorkspace = { id: '123456789', title: 'Workspace01' };
@@ -52,11 +54,15 @@ jest.mock('../../../helpers', () => ({
 	importFiles: jest.fn().mockResolvedValue(),
 }));
 jest.mock('../../../lib/devConsole');
+jest.mock('chalk', () => ({
+	red: jest.fn(text => text), // Return the input text without any color formatting
+}));
 
 let logSpy = null;
 let errorLogSpy = null;
 
 let parseSpy = null;
+let platformSpy = null;
 
 const mockIgnoreCacheFlag = Promise.resolve(true);
 const mockAutoApproveAction = Promise.resolve(false);
@@ -74,6 +80,7 @@ describe('create command tests', () => {
 
 		logSpy = jest.spyOn(CreateCommand.prototype, 'log');
 		errorLogSpy = jest.spyOn(CreateCommand.prototype, 'error');
+		platformSpy = jest.spyOn(os, 'platform');
 
 		createMesh.mockResolvedValue({
 			mesh: {
@@ -104,6 +111,10 @@ describe('create command tests', () => {
 				autoConfirmAction: mockAutoApproveAction,
 			},
 		});
+	});
+
+	afterEach(() => {
+		platformSpy.mockRestore();
 	});
 
 	test('must return proper object structure used by adobe/generator-app-api-mesh', async () => {
@@ -1767,7 +1778,7 @@ describe('create command tests', () => {
 		await expect(runResult).rejects.toEqual(
 			new Error('Unable to import secrets. Please check the file and try again.'),
 		);
-
+		
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
 		[
 		  [
@@ -1793,6 +1804,14 @@ describe('create command tests', () => {
 			new Error('Unable to import secrets. Please check the file and try again.'),
 		);
 
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Invalid file format. Please provide a YAML file (.yaml or .yml).",
+		  ],
+		]
+	`);
+
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
 		[
 		  [
@@ -1809,6 +1828,76 @@ describe('create command tests', () => {
 				ignoreCache: mockIgnoreCacheFlag,
 				autoConfirmAction: Promise.resolve(true),
 				secrets: 'src/commands/__fixtures__/secrets_valid.yaml',
+			},
+		});
+
+		const runResult = await CreateCommand.run();
+		expect(runResult).toMatchInlineSnapshot(`
+		{
+		  "apiKey": "dummy_api_key",
+		  "mesh": {
+		    "meshConfig": {
+		      "sources": [
+		        {
+		          "handler": {
+		            "graphql": {
+		              "endpoint": "<gql_endpoint>",
+		            },
+		          },
+		          "name": "<api_name>",
+		        },
+		      ],
+		    },
+		    "meshId": "dummy_mesh_id",
+		  },
+		  "sdkList": [
+		    "dummy_service",
+		  ],
+		}
+	`);
+	});
+
+	test('should return error if ran against windows platform with batch variables', async () => {
+		platformSpy.mockReturnValue('win32');
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_secrets_mesh.json' },
+			flags: {
+				ignoreCache: mockIgnoreCacheFlag,
+				autoConfirmAction: Promise.resolve(true),
+				secrets: 'src/commands/__fixtures__/secrets_with_batch_variables.yaml',
+			},
+		});
+
+		const runResult = CreateCommand.run();
+
+		await expect(runResult).rejects.toEqual(
+			new Error('Unable to import secrets. Please check the file and try again.'),
+		);
+
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Batch variables are not supported in YAML files on Windows.",
+		  ],
+		]
+	`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Unable to import secrets. Please check the file and try again.",
+		  ],
+		]
+	`);
+	});
+
+	test('should pass if ran against linux platform with batch variables', async () => {
+		platformSpy.mockReturnValue('linux');
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_secrets_mesh.json' },
+			flags: {
+				ignoreCache: mockIgnoreCacheFlag,
+				autoConfirmAction: Promise.resolve(true),
+				secrets: 'src/commands/__fixtures__/secrets_with_batch_variables.yaml',
 			},
 		});
 
