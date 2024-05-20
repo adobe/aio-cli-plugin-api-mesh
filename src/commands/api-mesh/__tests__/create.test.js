@@ -1778,7 +1778,7 @@ describe('create command tests', () => {
 		await expect(runResult).rejects.toEqual(
 			new Error('Unable to import secrets. Please check the file and try again.'),
 		);
-		
+
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
 		[
 		  [

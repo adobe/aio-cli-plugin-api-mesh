@@ -464,15 +464,11 @@ async function parseSecrets(secretsContent) {
 		const parsedSecrets = YAML.parse(compiledSecretsFileContent);
 		//check if secrets file is empty
 		if (!parsedSecrets) {
-			throw new Error(
-				chalk.red('Invalid YAML file contents. Please verify and try again.'),
-			);
+			throw new Error(chalk.red('Invalid YAML file contents. Please verify and try again.'));
 		}
 		//check if parsedSecrets is string and not in k:v pair
 		if (typeof parsedSecrets === 'string') {
-			throw new Error(
-				chalk.red('Please provide a valid YAML in key:value format.'),
-			);
+			throw new Error(chalk.red('Please provide a valid YAML in key:value format.'));
 		}
 		const secretsYamlString = YAML.stringify(parsedSecrets);
 		return secretsYamlString; //TODO: here we will encrypt secrets and return.
