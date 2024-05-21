@@ -747,8 +747,8 @@ function updateFilesArray(data, file, meshConfigName, index, shouldMinifyJS = tr
  * @param port Port number at which the server is to be started
  * @param debug Boolean flag to set the debug mode
  */
-function startGraphqlServer(meshId, port, debug, secretsFilePath) {
-	const serverPath = `${__dirname}/server.js ${meshId} ${port} ${secretsFilePath}`;
+function startGraphqlServer(meshId, port, debug) {
+	const serverPath = `${__dirname}/server.js ${meshId} ${port}`;
 	const command = debug
 		? `node --inspect-brk --trace-warnings ${serverPath}`
 		: `node ${serverPath}`;
@@ -857,6 +857,14 @@ async function setUpTenantFiles(meshId) {
 	}
 }
 
+async function importSecrets(secretsData, meshId) {
+	const secretsFileName = 'secrets.yaml';
+	const folderPath = path.join(process.cwd(), 'mesh-artifact', meshId);
+	const filePath = path.join(folderPath, secretsFileName);
+
+	fs.writeFileSync(filePath, secretsData);
+}
+
 module.exports = {
 	objToString,
 	promptInput,
@@ -873,4 +881,5 @@ module.exports = {
 	updateFilesArray,
 	startGraphqlServer,
 	setUpTenantFiles,
+	importSecrets,
 };

@@ -7,16 +7,13 @@ const fastify = require(fastifyPath);
 const { createYoga } = require(yogaPath);
 const logger = require('./classes/logger');
 
-const parseEnv = require('envsub/js/envsub-parser');
-const fs = require('fs');
-const YAML = require('yaml');
-
 //Load the functions from serverUtils.js
 const {
 	readMeshConfig,
 	removeRequestHeaders,
 	prepSourceResponseHeaders,
 	processResponseHeaders,
+	readSecretsFile,
 } = require('./serverUtils');
 
 let yogaServer = null;
@@ -40,9 +37,6 @@ const meshId = process.argv[2];
 // get PORT number from command line arguments
 const portNo = parseInt(process.argv[3]);
 
-// get secretsFilePath from command line arguments
-const secretsFilePath = process.argv[4];
-
 const getCORSOptions = () => {
 	try {
 		const currentWorkingDirectory = process.cwd();
@@ -58,28 +52,6 @@ const getCORSOptions = () => {
 	}
 };
 
-const getSecrets = () => {
-	let secrets = {};
-
-	if (secretsFilePath && fs.existsSync(secretsFilePath)) {
-		const secretsFileContent = fs.readFileSync(secretsFilePath).toString();
-		const compiledSecretsFileContent = parseEnv(secretsFileContent, {
-			outputFile: null,
-			options: {
-				all: false,
-				diff: false,
-				protect: false,
-				syntax: 'dollar-both',
-			},
-			cli: false,
-		});
-		secrets = YAML.parse(compiledSecretsFileContent);
-	}
-	console.log('Secrets', secrets);
-
-	return secrets;
-}
-
 const getYogaServer = async () => {
 	if (yogaServer) {
 		return yogaServer;
@@ -93,7 +65,7 @@ const getYogaServer = async () => {
 		const tenantMesh = await getBuiltMesh();
 		const corsOptions = getCORSOptions();
 
-		const secrets = getSecrets();
+		const secrets = readSecretsFile(meshId);
 
 		logger.info('Creating graphQL server');
 

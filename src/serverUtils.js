@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const LRUCache = require('lru-cache');
 const logger = require('./classes/logger');
+const YAML = require('yaml');
 
 const headersCache = new LRUCache({
 	max: parseInt(process.env.CACHE_OPT_MAX || '500', 10),
@@ -315,9 +316,19 @@ function ccDirectivesToString(directives) {
 	return chStr.toString();
 }
 
+function readSecretsFile(meshId){
+	const filePath = path.resolve(process.cwd(), 'mesh-artifact', `${meshId}`, 'secrets.yaml');
+	if (fs.existsSync(filePath)) {
+		const secretsFile = fs.readFileSync(filePath, 'utf8');
+
+		return YAML.parse(secretsFile);
+	}
+}
+
 module.exports = {
 	readMeshConfig,
 	removeRequestHeaders,
 	prepSourceResponseHeaders,
 	processResponseHeaders,
+	readSecretsFile,
 };

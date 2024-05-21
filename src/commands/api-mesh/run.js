@@ -21,6 +21,8 @@ const {
 	validateAndInterpolateMesh,
 	checkPlaceholders,
 	getFilesInMeshConfig,
+	validateSecretsFile,
+	interpolateSecrets,
 } = require('../../utils');
 const meshBuilder = require('@adobe-apimesh/mesh-builder');
 const fs = require('fs');
@@ -32,6 +34,7 @@ const {
 	startGraphqlServer,
 	importFiles,
 	setUpTenantFiles,
+	importSecrets,
 } = require('../../helpers');
 const logger = require('../../classes/logger');
 const { getMeshId, getMeshArtifact } = require('../../lib/devConsole');
@@ -69,6 +72,7 @@ class RunCommand extends Command {
 		logger.info(`RequestId: ${global.requestId}`);
 
 		const { args, flags } = await this.parse(RunCommand);
+		const secretsFilePath = await flags.secrets;
 
 		//Initialize the meshId based on
 		let meshId = null;
@@ -167,7 +171,9 @@ class RunCommand extends Command {
 				}
 
 				let portNo;
-				const secretsFilePath = await flags.secrets;
+				await validateSecretsFile(secretsFilePath);
+				const stringifiedSecrets = await interpolateSecrets(secretsFilePath, this);
+				await importSecrets(stringifiedSecrets, meshId);
 
 				//To set the port number using the environment file
 				if (process.env.PORT !== undefined) {
@@ -189,7 +195,7 @@ class RunCommand extends Command {
 				}
 
 				this.log(`Starting server on port : ${portNo}`);
-				await startGraphqlServer(meshId, portNo, flags.debug, secretsFilePath);
+				await startGraphqlServer(meshId, portNo, flags.debug);
 			} else {
 				throw new Error(
 					'`aio api-mesh run` cannot be executed because there is no package.json file in the current directory. Use `aio api-mesh init` to set up a package.',
