@@ -8,6 +8,7 @@ const dotenv = require('dotenv');
 const YAML = require('yaml');
 const parseEnv = require('envsub/js/envsub-parser');
 const os = require('os');
+const chalk = require('chalk');
 
 /**
  * @returns returns the root directory of the project
@@ -410,7 +411,9 @@ async function validateSecretsFile(secretsFile) {
 		const validExtensions = ['.yaml', '.yml'];
 		const fileExtension = secretsFile.split('.').pop().toLowerCase();
 		if (!validExtensions.includes('.' + fileExtension)) {
-			throw new Error('Invalid file format. Please provide a YAML file (.yaml or .yml).');
+			throw new Error(
+				chalk.red('Invalid file format. Please provide a YAML file (.yaml or .yml).'),
+			);
 		}
 	} catch (error) {
 		logger.error(error.message);
@@ -427,9 +430,10 @@ async function validateSecretsFile(secretsFile) {
 async function interpolateSecrets(secretsFilePath, command) {
 	try {
 		const secretsContent = await readFileContents(secretsFilePath, command, 'secrets');
+
 		// Check if environment variables are used in the file content
-		if (os.platform() === 'win32' && /(\$[a-zA-Z_][a-zA-Z0-9_]*)/.test(secretsContent)) {
-			throw new Error('Batch variables are not supported in YAML files on Windows.');
+		if (os.platform() === 'win32' && /\$({)?[a-zA-Z_][a-zA-Z0-9_]*}?/.test(secretsContent)) {
+			throw new Error(chalk.red('Batch variables are not supported in YAML files on Windows.'));
 		}
 		const secrets = await parseSecrets(secretsContent);
 		return secrets;
@@ -458,10 +462,33 @@ async function parseSecrets(secretsContent) {
 		};
 		const compiledSecretsFileContent = parseEnv(secretsContent, envParserConfig);
 		const parsedSecrets = YAML.parse(compiledSecretsFileContent);
-		return parsedSecrets;
+		//check if secrets file is empty
+		if (!parsedSecrets) {
+			throw new Error(chalk.red('Invalid YAML file contents. Please verify and try again.'));
+		}
+		//check if parsedSecrets is string and not in k:v pair
+		if (typeof parsedSecrets === 'string') {
+			throw new Error(chalk.red('Please provide a valid YAML in key:value format.'));
+		}
+		const secretsYamlString = YAML.stringify(parsedSecrets);
+		return secretsYamlString; //TODO: here we will encrypt secrets and return.
 	} catch (err) {
-		logger.error(err);
-		throw new Error(err.message);
+		throw new Error(chalk.red(getSecretsYamlParseError(err)));
+	}
+}
+
+/**
+ * This function returns user friendly errors that occurs while YAML.parse
+ *
+ * @param error errors from YAML.parse
+ */
+function getSecretsYamlParseError(error) {
+	if (error.code === 'BAD_INDENT') {
+		return 'Invalid YAML - Bad Indentation: ' + error.message;
+	} else if (error.code === 'DUPLICATE_KEY') {
+		return 'Invalid YAML - Found Duplicate Keys: ' + error.message;
+	} else {
+		return 'Unexpected Error: ' + error.message;
 	}
 }
 
