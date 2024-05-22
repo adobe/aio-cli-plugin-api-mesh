@@ -863,7 +863,7 @@ async function setUpTenantFiles(meshId) {
  * @secretsData secretsData
  * @meshId meshId
  */
-async function importSecrets(secretsData, meshId) {
+async function writeSecretsFile(secretsData, meshId) {
 	if (!fs.existsSync(path.resolve(process.cwd(), 'mesh-artifact', meshId))) {
 		throw new Error(`Unexpected Error: issue in creating secrets file.`);
 	}
@@ -893,5 +893,5 @@ module.exports = {
 	updateFilesArray,
 	startGraphqlServer,
 	setUpTenantFiles,
-	importSecrets,
+	writeSecretsFile,
 };

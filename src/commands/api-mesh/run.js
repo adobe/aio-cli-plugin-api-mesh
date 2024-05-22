@@ -34,7 +34,7 @@ const {
 	startGraphqlServer,
 	importFiles,
 	setUpTenantFiles,
-	importSecrets,
+	writeSecretsFile,
 } = require('../../helpers');
 const logger = require('../../classes/logger');
 const { getMeshId, getMeshArtifact } = require('../../lib/devConsole');
@@ -176,7 +176,7 @@ class RunCommand extends Command {
 					try {
 						await validateSecretsFile(secretsFilePath);
 						const stringifiedSecrets = await interpolateSecrets(secretsFilePath, this);
-						await importSecrets(stringifiedSecrets, meshId);
+						await writeSecretsFile(stringifiedSecrets, meshId);
 					} catch (error) {
 						this.log(error.message);
 						this.error('Unable to import secrets. Please check the file and try again.');

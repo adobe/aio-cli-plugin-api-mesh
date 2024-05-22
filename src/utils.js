@@ -492,10 +492,6 @@ function getSecretsYamlParseError(error) {
 	}
 }
 
-function test() {
-	console.log('test narendra func');
-}
-
 module.exports = {
 	ignoreCacheFlag,
 	autoConfirmActionFlag,
@@ -513,5 +509,4 @@ module.exports = {
 	secretsFlag,
 	interpolateSecrets,
 	validateSecretsFile,
-	test,
 };
