@@ -323,9 +323,14 @@ function ccDirectivesToString(directives) {
  */
 function readSecretsFile(meshId) {
 	let secrets = {};
-	const filePath = path.resolve(process.cwd(), 'mesh-artifact', `${meshId}`, 'secrets.yaml');
-	if (fs.existsSync(filePath)) {
-		secrets = YAML.parse(fs.readFileSync(filePath, 'utf8'));
+	try {
+		const filePath = path.resolve(process.cwd(), 'mesh-artifact', `${meshId}`, 'secrets.yaml');
+		if (fs.existsSync(filePath)) {
+			secrets = YAML.parse(fs.readFileSync(filePath, 'utf8'));
+		}
+	} catch (error) {
+		logger.error('Unexpected error: not able to locate secrets file.');
+		throw new Error(error.message);
 	}
 	return secrets;
 }
