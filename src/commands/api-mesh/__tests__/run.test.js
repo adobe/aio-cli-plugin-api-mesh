@@ -906,8 +906,8 @@ describe('run command tests', () => {
 		});
 
 		await RunCommand.run();
+		expect(writeSecretsFile).toHaveBeenCalled();
 		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), defaultPort, false);
-		
 	});
 
 	test('should return error if ran against windows platform with batch variables', async () => {
@@ -920,7 +920,6 @@ describe('run command tests', () => {
 		});
 
 		const runResult = RunCommand.run();
-
 		await expect(runResult).rejects.toEqual(
 			new Error('Unable to import secrets. Please check the file and try again.'),
 		);
@@ -945,6 +944,7 @@ describe('run command tests', () => {
 		});
 
 		await RunCommand.run();
+		expect(writeSecretsFile).toHaveBeenCalled();
 		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), defaultPort, false);
 	});
 
@@ -959,6 +959,7 @@ describe('run command tests', () => {
 		});
 
 		await RunCommand.run();
+		expect(writeSecretsFile).toHaveBeenCalled();
 		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), defaultPort, false);
 	});
 });
