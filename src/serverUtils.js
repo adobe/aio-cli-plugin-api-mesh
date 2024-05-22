@@ -322,16 +322,12 @@ function ccDirectivesToString(directives) {
  * @returns
  */
 function readSecretsFile(meshId) {
+	let secrets = {};
 	const filePath = path.resolve(process.cwd(), 'mesh-artifact', `${meshId}`, 'secrets.yaml');
-	if (!fs.existsSync(filePath)) {
-		throw new Error(`Unexpected error: issue in reading secrets file`);
+	if (fs.existsSync(filePath)) {
+		secrets = YAML.parse(fs.readFileSync(filePath, 'utf8'));
 	}
-	try {
-		const secrets = YAML.parse(fs.readFileSync(filePath, 'utf8'));
-		return secrets;
-	} catch (error) {
-		throw new Error(error.message);
-	}
+	return secrets;
 }
 
 module.exports = {
