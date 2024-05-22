@@ -316,6 +316,11 @@ function ccDirectivesToString(directives) {
 	return chStr.toString();
 }
 
+/**
+ * Returns secrets content from artifacts
+ * @param meshId
+ * @returns
+ */
 function readSecretsFile(meshId) {
 	const filePath = path.resolve(process.cwd(), 'mesh-artifact', `${meshId}`, 'secrets.yaml');
 	if (!fs.existsSync(filePath)) {
