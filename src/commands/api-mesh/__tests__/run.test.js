@@ -910,7 +910,7 @@ describe('run command tests', () => {
 		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), defaultPort, false);
 	});
 
-	test('should return error if ran against windows platform with batch variables', async () => {
+	test('should return error if ran with secrets against windows platform with batch variables', async () => {
 		platformSpy.mockReturnValue('win32');
 		parseSpy.mockResolvedValueOnce({
 			args: { file: 'src/commands/__fixtures__/sample_secrets_mesh.json' },
@@ -933,7 +933,7 @@ describe('run command tests', () => {
 	`);
 	});
 
-	test('should pass if ran against linux platform with batch variables', async () => {
+	test('should pass if ran with secrets against linux platform with batch variables', async () => {
 		platformSpy.mockReturnValue('linux');
 		parseSpy.mockResolvedValueOnce({
 			args: { file: 'src/commands/__fixtures__/sample_secrets_mesh.json' },
@@ -948,7 +948,7 @@ describe('run command tests', () => {
 		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), defaultPort, false);
 	});
 
-	test('should pass if ran against darwin(macOS) platform with batch variables', async () => {
+	test('should pass if ran with secrets against darwin(macOS) platform with batch variables', async () => {
 		platformSpy.mockReturnValue('darwin');
 		parseSpy.mockResolvedValueOnce({
 			args: { file: 'src/commands/__fixtures__/sample_secrets_mesh.json' },
