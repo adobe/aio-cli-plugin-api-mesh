@@ -316,12 +316,16 @@ function ccDirectivesToString(directives) {
 	return chStr.toString();
 }
 
-function readSecretsFile(meshId){
+function readSecretsFile(meshId) {
 	const filePath = path.resolve(process.cwd(), 'mesh-artifact', `${meshId}`, 'secrets.yaml');
-	if (fs.existsSync(filePath)) {
-		const secretsFile = fs.readFileSync(filePath, 'utf8');
-
-		return YAML.parse(secretsFile);
+	if (!fs.existsSync(filePath)) {
+		throw new Error(`Unexpected error: issue in reading secrets file`);
+	}
+	try {
+		const secrets = YAML.parse(fs.readFileSync(filePath, 'utf8'));
+		return secrets;
+	} catch (error) {
+		throw new Error(error.message);
 	}
 }
 

@@ -121,6 +121,15 @@ describe('run command tests', () => {
 		    "parse": [Function],
 		    "type": "option",
 		  },
+		  "secrets": {
+		    "char": "s",
+		    "default": false,
+		    "description": "Path to secrets file",
+		    "input": [],
+		    "multiple": false,
+		    "parse": [Function],
+		    "type": "option",
+		  },
 		  "select": {
 		    "allowNo": false,
 		    "default": false,

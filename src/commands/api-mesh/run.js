@@ -171,9 +171,17 @@ class RunCommand extends Command {
 				}
 
 				let portNo;
-				await validateSecretsFile(secretsFilePath);
-				const stringifiedSecrets = await interpolateSecrets(secretsFilePath, this);
-				await importSecrets(stringifiedSecrets, meshId);
+				//secrets management
+				if (secretsFilePath) {
+					try {
+						await validateSecretsFile(secretsFilePath);
+						const stringifiedSecrets = await interpolateSecrets(secretsFilePath, this);
+						await importSecrets(stringifiedSecrets, meshId);
+					} catch (error) {
+						this.log(error.message);
+						this.error('Unable to import secrets. Please check the file and try again.');
+					}
+				}
 
 				//To set the port number using the environment file
 				if (process.env.PORT !== undefined) {
