@@ -18,6 +18,7 @@ const {
 	promptConfirm,
 	setUpTenantFiles,
 	initSdk,
+	writeSecretsFile,
 } = require('../../../helpers');
 const { getMeshId, getMeshArtifact } = require('../../../lib/devConsole');
 require('@adobe-apimesh/mesh-builder');
@@ -35,11 +36,15 @@ jest.mock('../../../helpers', () => ({
 	importFiles: jest.fn().mockResolvedValue(),
 	promptConfirm: jest.fn().mockResolvedValue(true),
 	setUpTenantFiles: jest.fn().mockResolvedValue(),
+	writeSecretsFile: jest.fn().mockResolvedValue(),
 }));
 
 jest.mock('../../../lib/devConsole', () => ({
 	getMeshId: jest.fn().mockResolvedValue('mockMeshId'),
 	getMeshArtifact: jest.fn().mockResolvedValue(),
+}));
+jest.mock('chalk', () => ({
+	red: jest.fn(text => text), // Return the input text without any color formatting
 }));
 
 jest.mock('@adobe-apimesh/mesh-builder', () => {
@@ -55,12 +60,15 @@ jest.mock('@adobe-apimesh/mesh-builder', () => {
 let logSpy = null;
 let errorLogSpy = null;
 let parseSpy = null;
+let platformSpy = null;
 
 const originalEnv = {
 	API_MESH_TIER: 'NON-TI',
 };
 
 const defaultPort = 5000;
+const os = require('os');
+
 describe('run command tests', () => {
 	beforeEach(() => {
 		global.requestId = 'dummy_request_id';
@@ -68,9 +76,13 @@ describe('run command tests', () => {
 		logSpy = jest.spyOn(RunCommand.prototype, 'log');
 		errorLogSpy = jest.spyOn(RunCommand.prototype, 'error');
 		parseSpy = jest.spyOn(RunCommand.prototype, 'parse');
+		platformSpy = jest.spyOn(os, 'platform');
 		process.env = {
 			...originalEnv,
 		};
+	});
+	afterEach(() => {
+		platformSpy.mockRestore();
 	});
 
 	test('snapshot run command description', () => {
@@ -116,6 +128,15 @@ describe('run command tests', () => {
 		  "port": {
 		    "char": "p",
 		    "description": "Port number for the local dev server",
+		    "input": [],
+		    "multiple": false,
+		    "parse": [Function],
+		    "type": "option",
+		  },
+		  "secrets": {
+		    "char": "s",
+		    "default": false,
+		    "description": "Path to secrets file",
 		    "input": [],
 		    "multiple": false,
 		    "parse": [Function],
@@ -835,5 +856,110 @@ describe('run command tests', () => {
 			'mockMeshId',
 		);
 		expect(setUpTenantFiles).toHaveBeenCalled();
+	});
+
+	test('should return error for run command if mesh has placeholders and the provided secrets file is invalid', async () => {
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_secrets_mesh.json' },
+			flags: {
+				secrets: 'src/commands/__fixtures__/secrets_invalid.yaml',
+			},
+		});
+
+		const runResult = RunCommand.run();
+
+		await expect(runResult).rejects.toEqual(
+			new Error('Unable to import secrets. Please check the file and try again.'),
+		);
+	});
+
+	test('should return error for run command if mesh has placeholders and the provided secrets file is not yaml or yml', async () => {
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_secrets_mesh.json' },
+			flags: {
+				secrets: 'src/commands/__fixtures__/.secrets_file.env',
+			},
+		});
+
+		const runResult = RunCommand.run();
+
+		await expect(runResult).rejects.toEqual(
+			new Error('Unable to import secrets. Please check the file and try again.'),
+		);
+
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Invalid file format. Please provide a YAML file (.yaml or .yml).",
+		  ],
+		]
+	`);
+	});
+
+	test('should successfully run the mesh if provided secrets file is valid', async () => {
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_secrets_mesh.json' },
+			flags: {
+				secrets: 'src/commands/__fixtures__/secrets_valid.yaml',
+				debug: false,
+			},
+		});
+
+		await RunCommand.run();
+		expect(writeSecretsFile).toHaveBeenCalled();
+		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), defaultPort, false);
+	});
+
+	test('should return error if ran with secrets against windows platform with batch variables', async () => {
+		platformSpy.mockReturnValue('win32');
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_secrets_mesh.json' },
+			flags: {
+				secrets: 'src/commands/__fixtures__/secrets_with_batch_variables.yaml',
+			},
+		});
+
+		const runResult = RunCommand.run();
+		await expect(runResult).rejects.toEqual(
+			new Error('Unable to import secrets. Please check the file and try again.'),
+		);
+
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Batch variables are not supported in YAML files on Windows.",
+		  ],
+		]
+	`);
+	});
+
+	test('should pass if ran with secrets against linux platform with batch variables', async () => {
+		platformSpy.mockReturnValue('linux');
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_secrets_mesh.json' },
+			flags: {
+				secrets: 'src/commands/__fixtures__/secrets_with_batch_variables.yaml',
+				debug: false,
+			},
+		});
+
+		await RunCommand.run();
+		expect(writeSecretsFile).toHaveBeenCalled();
+		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), defaultPort, false);
+	});
+
+	test('should pass if ran with secrets against darwin(macOS) platform with batch variables', async () => {
+		platformSpy.mockReturnValue('darwin');
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_secrets_mesh.json' },
+			flags: {
+				secrets: 'src/commands/__fixtures__/secrets_with_batch_variables.yaml',
+				debug: false,
+			},
+		});
+
+		await RunCommand.run();
+		expect(writeSecretsFile).toHaveBeenCalled();
+		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), defaultPort, false);
 	});
 });

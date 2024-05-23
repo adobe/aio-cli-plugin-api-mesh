@@ -857,6 +857,26 @@ async function setUpTenantFiles(meshId) {
 	}
 }
 
+/**
+ * This function is to create secrets.yaml in mesh-artifacts for respective meshId. Used for local development run command
+ *
+ * @secretsData secretsData
+ * @meshId meshId
+ */
+async function writeSecretsFile(secretsData, meshId) {
+	if (!fs.existsSync(path.resolve(process.cwd(), 'mesh-artifact', meshId))) {
+		throw new Error(`Unexpected Error: issue creating secrets file.`);
+	}
+	try {
+		const secretsFileName = 'secrets.yaml';
+		const folderPath = path.join(process.cwd(), 'mesh-artifact', meshId);
+		const filePath = path.join(folderPath, secretsFileName);
+		fs.writeFileSync(filePath, secretsData);
+	} catch (error) {
+		throw new Error(error.message);
+	}
+}
+
 module.exports = {
 	objToString,
 	promptInput,
@@ -873,4 +893,5 @@ module.exports = {
 	updateFilesArray,
 	startGraphqlServer,
 	setUpTenantFiles,
+	writeSecretsFile,
 };
