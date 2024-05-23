@@ -329,7 +329,7 @@ function readSecretsFile(meshId) {
 			secrets = YAML.parse(fs.readFileSync(filePath, 'utf8'));
 		}
 	} catch (error) {
-		logger.error('Unexpected error: not able to locate secrets file.');
+		logger.error('Unexpected error: unable to locate secrets file in mesh artifacts.');
 		throw new Error(error.message);
 	}
 	return secrets;
