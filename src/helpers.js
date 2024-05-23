@@ -865,7 +865,7 @@ async function setUpTenantFiles(meshId) {
  */
 async function writeSecretsFile(secretsData, meshId) {
 	if (!fs.existsSync(path.resolve(process.cwd(), 'mesh-artifact', meshId))) {
-		throw new Error(`Unexpected Error: issue in creating secrets file.`);
+		throw new Error(`Unexpected Error: issue creating secrets file.`);
 	}
 	try {
 		const secretsFileName = 'secrets.yaml';
