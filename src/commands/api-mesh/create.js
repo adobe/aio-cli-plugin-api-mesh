@@ -10,10 +10,9 @@ governing permissions and limitations under the License.
 */
 
 const { Command } = require('@oclif/core');
-
+const chalk = require('chalk');
 const { initSdk, initRequestId, promptConfirm, importFiles } = require('../../helpers');
 const logger = require('../../classes/logger');
-const CONSTANTS = require('../../constants');
 const {
 	ignoreCacheFlag,
 	autoConfirmActionFlag,
@@ -27,9 +26,8 @@ const {
 	interpolateSecrets,
 	validateSecretsFile,
 } = require('../../utils');
-const { getMesh, createMesh } = require('../../lib/devConsole');
-
-const { MULTITENANT_GRAPHQL_SERVER_BASE_URL } = CONSTANTS;
+const { createMesh, getTenantFeatures } = require('../../lib/devConsole');
+const { buildEdgeMeshUrl, buildMeshUrl } = require('../../urlBuilder');
 
 class CreateCommand extends Command {
 	static args = [{ name: 'file' }];
@@ -60,8 +58,15 @@ class CreateCommand extends Command {
 		const autoConfirmAction = await flags.autoConfirmAction;
 		const envFilePath = await flags.env;
 		const secretsFilePath = await flags.secrets;
-
-		const { imsOrgId, projectId, workspaceId, workspaceName } = await initSdk({
+		const {
+			imsOrgId,
+			imsOrgCode,
+			projectId,
+			workspaceId,
+			workspaceName,
+			orgName,
+			projectName,
+		} = await initSdk({
 			ignoreCache,
 		});
 
@@ -127,6 +132,8 @@ class CreateCommand extends Command {
 					projectId,
 					workspaceId,
 					workspaceName,
+					orgName,
+					projectName,
 					data,
 				);
 
@@ -150,25 +157,23 @@ class CreateCommand extends Command {
 						if (sdkList) {
 							this.log('Successfully subscribed API Key %s to API Mesh service', apiKey);
 
-							const { meshURL } = await getMesh(
+							const meshUrl = await buildMeshUrl(
 								imsOrgId,
 								projectId,
 								workspaceId,
 								workspaceName,
 								mesh.meshId,
+								apiKey,
 							);
-							const meshUrl =
-								meshURL === '' || meshURL === undefined
-									? MULTITENANT_GRAPHQL_SERVER_BASE_URL
-									: meshURL;
 
-							if (apiKey && MULTITENANT_GRAPHQL_SERVER_BASE_URL.includes(meshUrl)) {
-								this.log(
-									'Mesh Endpoint: %s\n',
-									`${meshUrl}/${mesh.meshId}/graphql?api_key=${apiKey}`,
-								);
+							const { showCloudflareURL: showEdgeMeshUrl } = await getTenantFeatures(imsOrgCode);
+
+							if (showEdgeMeshUrl) {
+								const edgeMeshUrl = buildEdgeMeshUrl(mesh.meshId, workspaceName);
+								this.log('Legacy Mesh Endpoint: %s', meshUrl);
+								this.log(chalk.bold('Edge Mesh Endpoint: %s\n'), edgeMeshUrl);
 							} else {
-								this.log('Mesh Endpoint: %s\n', `${meshUrl}/${mesh.meshId}/graphql`);
+								this.log('Mesh Endpoint: %s\n', meshUrl);
 							}
 						} else {
 							this.log('Unable to subscribe API Key %s to API Mesh service', apiKey);

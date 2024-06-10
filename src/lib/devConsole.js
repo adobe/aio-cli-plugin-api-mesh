@@ -11,7 +11,7 @@ const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 const contentDisposition = require('content-disposition');
 
-const { DEV_CONSOLE_TRANSPORTER_API_KEY } = CONSTANTS;
+const { DEV_CONSOLE_TRANSPORTER_API_KEY, SMS_BASE_URL } = CONSTANTS;
 
 const { objToString, getDevConsoleConfig } = require('../helpers');
 
@@ -193,7 +193,15 @@ const getMesh = async (organizationId, projectId, workspaceId, workspaceName, me
 	}
 };
 
-const createMesh = async (organizationId, projectId, workspaceId, workspaceName, data) => {
+const createMesh = async (
+	organizationId,
+	projectId,
+	workspaceId,
+	workspaceName,
+	orgName,
+	projectName,
+	data,
+) => {
 	const { baseUrl: devConsoleUrl, accessToken, apiKey } = await getDevConsoleConfig();
 	const config = {
 		method: 'post',
@@ -202,6 +210,9 @@ const createMesh = async (organizationId, projectId, workspaceId, workspaceName,
 			'Authorization': `Bearer ${accessToken}`,
 			'Content-Type': 'application/json',
 			'x-request-id': global.requestId,
+			'workspaceName': workspaceName,
+			'orgName': orgName,
+			'projectName': projectName,
 		},
 		data: JSON.stringify(data),
 	};
@@ -314,7 +325,28 @@ const createMesh = async (organizationId, projectId, workspaceId, workspaceName,
 	}
 };
 
-const updateMesh = async (organizationId, projectId, workspaceId, meshId, data) => {
+/**
+ * Update an API Mesh.
+ * @param {string} organizationId Organization identifier.
+ * @param {string} projectId Project identifier.
+ * @param {string} workspaceId Workspace identifier.
+ * @param {string} workspaceName Workspace Name.
+ * @param {string} orgName Organization name.
+ * @param {string} projectName Project name.
+ * @param {string} meshId Mesh identifier.
+ * @param {unknown} data Mesh configuration data.
+ * @returns {Promise<any>}
+ */
+const updateMesh = async (
+	organizationId,
+	projectId,
+	workspaceId,
+	workspaceName,
+	orgName,
+	projectName,
+	meshId,
+	data,
+) => {
 	const { baseUrl: devConsoleUrl, accessToken, apiKey } = await getDevConsoleConfig();
 	const config = {
 		method: 'put',
@@ -323,6 +355,9 @@ const updateMesh = async (organizationId, projectId, workspaceId, meshId, data) 
 			'Authorization': `Bearer ${accessToken}`,
 			'Content-Type': 'application/json',
 			'x-request-id': global.requestId,
+			'workspaceName': workspaceName,
+			'orgName': orgName,
+			'projectName': projectName,
 		},
 		data: JSON.stringify(data),
 	};
@@ -821,6 +856,118 @@ const getMeshArtifact = async (organizationId, projectId, workspaceId, workspace
 	}
 };
 
+/**
+ * Gets the enabled features for the tenant.
+ *
+ * This request bypasses the Dev Console and is sent directly to the Schema Management Service.
+ * As a result, we provide the orgCode instead of orgId since Dev Console usually performs the translation.
+ * The near-term goal is to stop using Dev Console as a proxy for all routes.
+ * @param organizationCode
+ * @returns {Promise<Object>}
+ */
+const getTenantFeatures = async organizationCode => {
+	const { accessToken, apiKey } = await getDevConsoleConfig();
+	const config = {
+		method: 'get',
+		url: `${SMS_BASE_URL}/organizations/${organizationCode}/features?API_KEY=${apiKey}`,
+		headers: {
+			'Authorization': `Bearer ${accessToken}`,
+			'x-request-id': global.requestId,
+		},
+	};
+
+	logger.info(
+		'Initiating GET %s',
+		`${SMS_BASE_URL}/organizations/${organizationCode}/features?API_KEY=${apiKey}`,
+	);
+
+	try {
+		const response = await axios(config);
+
+		logger.info('Response from GET %s', response.status);
+
+		if (response?.status === 200) {
+			logger.info(`Tenant Features : ${objToString(response, ['data'])}`);
+
+			return response.data;
+		} else {
+			let errorMessage = `Something went wrong: ${objToString(
+				response,
+				['data'],
+				'Unable to get tenant features.',
+			)}`;
+			logger.error(`${errorMessage}. Received ${response.status} response instead of 200`);
+
+			throw new Error(errorMessage);
+		}
+	} catch (error) {
+		logger.error(`Error getting features for organization: ${organizationCode}`);
+
+		return {
+			imsOrgId: organizationCode,
+			showCloudflareURL: false,
+		};
+	}
+};
+
+/**
+ * Gets the deployments value for mesh.
+ *
+ * This request bypasses the Dev Console and is sent directly to the Schema Management Service.
+ * As a result, we provide the orgCode instead of orgId since Dev Console usually performs the translation.
+ * The near-term goal is to stop using Dev Console as a proxy for all routes.
+ * @param organizationCode
+ * @param projectId
+ * @param workspaceId
+ * @param meshId
+ * @returns {Promise<Object>}
+ */
+const getMeshDeployments = async (organizationCode, projectId, workspaceId, meshId) => {
+	const { accessToken, apiKey } = await getDevConsoleConfig();
+	const config = {
+		method: 'get',
+		url: `${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/deployments/latest?API_KEY=${apiKey}`,
+		headers: {
+			'Authorization': `Bearer ${accessToken}`,
+			'x-request-id': global.requestId,
+		},
+	};
+
+	logger.info(
+		'Initiating GET %s',
+		`${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/deployments/latest?API_KEY=${apiKey}`,
+	);
+
+	try {
+		const response = await axios(config);
+
+		logger.info('Response from GET %s', response.status);
+
+		if (response?.status === 200) {
+			logger.info(`Tenant mesh deployments : ${objToString(response, ['data'])}`);
+
+			return response.data;
+		} else {
+			let errorMessage = `Something went wrong: ${objToString(
+				response,
+				['data'],
+				'Unable to get mesh deployment.',
+			)}`;
+			logger.error(`${errorMessage}. Received ${response.status} response instead of 200`);
+
+			throw new Error(errorMessage);
+		}
+	} catch (error) {
+		logger.error(`Error fetching deployments for mesh: ${meshId}`);
+
+		return {
+			status: 'ERROR',
+			meshId: meshId,
+			error: 'Mesh status is not available.',
+		};
+	}
+};
+
 module.exports = {
 	getApiKeyCredential,
 	describeMesh,
@@ -835,4 +982,6 @@ module.exports = {
 	subscribeCredentialToMeshService,
 	unsubscribeCredentialFromMeshService,
 	getMeshArtifact,
+	getTenantFeatures,
+	getMeshDeployments,
 };
