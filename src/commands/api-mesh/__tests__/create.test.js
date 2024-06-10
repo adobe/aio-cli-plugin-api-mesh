@@ -72,7 +72,7 @@ jest.mock('../../../helpers', () => ({
 jest.mock('../../../lib/devConsole');
 jest.mock('chalk', () => ({
 	red: jest.fn(text => text), // Return the input text without any color formatting
-	bold: jest.fn(text => text)
+	bold: jest.fn(text => text),
 }));
 
 let logSpy = null;
