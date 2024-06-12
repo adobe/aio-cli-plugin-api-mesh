@@ -25,8 +25,9 @@ const {
 	validateAndInterpolateMesh,
 	interpolateSecrets,
 	validateSecretsFile,
+	encryptSecret,
 } = require('../../utils');
-const { createMesh, getTenantFeatures } = require('../../lib/devConsole');
+const { createMesh, getTenantFeatures, getPublicEncryptionKey } = require('../../lib/devConsole');
 const { buildEdgeMeshUrl, buildMeshUrl } = require('../../urlBuilder');
 
 class CreateCommand extends Command {
@@ -111,10 +112,12 @@ class CreateCommand extends Command {
 		// if secrets is present, include that in data.secrets
 		if (secretsFilePath) {
 			try {
+				const publicKey = await getPublicEncryptionKey(imsOrgCode);
 				await validateSecretsFile(secretsFilePath);
-				data.secrets = await interpolateSecrets(secretsFilePath, this);
+				const secrets = await interpolateSecrets(secretsFilePath, this);
+				const encryptedSecrets = await encryptSecret(publicKey, secrets);
+				data.secrets = encryptedSecrets;
 			} catch (err) {
-				this.log(err.message);
 				this.error('Unable to import secrets. Please check the file and try again.');
 			}
 		}

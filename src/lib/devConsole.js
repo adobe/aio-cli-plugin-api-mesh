@@ -911,6 +911,55 @@ const getTenantFeatures = async organizationCode => {
 };
 
 /**
+ * Gets the public key to encrypt secrets.
+ *
+ * This request bypasses the Dev Console and is sent directly to the Schema Management Service.
+ * As a result, we provide the publicKey used for secrets encryption.
+ * The near-term goal is to stop using Dev Console as a proxy for all routes.
+ * @param organizationCode
+ * @returns string
+ */
+const getPublicEncryptionKey = async organizationCode => {
+	const { accessToken, apiKey } = await getDevConsoleConfig();
+
+	const config = {
+		method: 'get',
+		url: `${SMS_BASE_URL}/organizations/${organizationCode}/getPublicKey?API_KEY=${apiKey}`,
+		headers: {
+			'Authorization': `Bearer ${accessToken}`,
+			'x-request-id': global.requestId,
+		},
+	};
+
+	logger.info(
+		'Initiating GET %s',
+		`${SMS_BASE_URL}/organizations/${organizationCode}/getPublicKey?API_KEY=${apiKey}`,
+	);
+
+	try {
+		const response = await axios(config);
+
+		logger.info('Response from GET %s', response.status);
+		if (response.status == 200) {
+			let publicKey = '';
+			logger.info(`Public secrets : ${objToString(response, ['data'])}`);
+			if (response.data.publicKey) {
+				publicKey = response.data.publicKey.replace(/\\n/g, '\n');
+			}
+			return publicKey;
+		} else {
+			let errorMessage = `Something went wrong while fetching public key for secrets encryption.`;
+			logger.error(`${errorMessage}. Received ${response.status} response instead of 200`);
+
+			throw new Error(errorMessage);
+		}
+	} catch (error) {
+		logger.error(`Error getting public secrets key for secrets encryption.`);
+		return '';
+	}
+};
+
+/**
  * Gets the deployments value for mesh.
  *
  * This request bypasses the Dev Console and is sent directly to the Schema Management Service.
@@ -984,4 +1033,5 @@ module.exports = {
 	getMeshArtifact,
 	getTenantFeatures,
 	getMeshDeployments,
+	getPublicEncryptionKey,
 };
