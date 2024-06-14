@@ -111,8 +111,13 @@ class CreateCommand extends Command {
 
 		// if secrets is present, include that in data.secrets
 		if (secretsFilePath) {
+			let publicKey;
 			try {
-				const publicKey = await getPublicEncryptionKey(imsOrgCode);
+				publicKey = await getPublicEncryptionKey(imsOrgCode);
+			} catch (err) {
+				this.error(`Something went wrong in secrets encryption. Please try after some time.`);
+			}
+			try {
 				await validateSecretsFile(secretsFilePath);
 				const secrets = await interpolateSecrets(secretsFilePath, this);
 				const encryptedSecrets = await encryptSecret(publicKey, secrets);

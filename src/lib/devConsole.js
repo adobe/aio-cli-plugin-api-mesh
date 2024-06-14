@@ -920,23 +920,20 @@ const getTenantFeatures = async organizationCode => {
  * @returns string
  */
 const getPublicEncryptionKey = async organizationCode => {
-	const { accessToken, apiKey } = await getDevConsoleConfig();
-
-	const config = {
-		method: 'get',
-		url: `${SMS_BASE_URL}/organizations/${organizationCode}/getPublicKey?API_KEY=${apiKey}`,
-		headers: {
-			'Authorization': `Bearer ${accessToken}`,
-			'x-request-id': global.requestId,
-		},
-	};
-
-	logger.info(
-		'Initiating GET %s',
-		`${SMS_BASE_URL}/organizations/${organizationCode}/getPublicKey?API_KEY=${apiKey}`,
-	);
-
 	try {
+		const { accessToken, apiKey } = await getDevConsoleConfig();
+		const config = {
+			method: 'get',
+			url: `${SMS_BASE_URL}/organizations/${organizationCode}/getPublicKey?API_KEY=${apiKey}`,
+			headers: {
+				'Authorization': `Bearer ${accessToken}`,
+				'x-request-id': global.requestId,
+			},
+		};
+		logger.info(
+			'Initiating GET %s',
+			`${SMS_BASE_URL}/organizations/${organizationCode}/getPublicKey?API_KEY=${apiKey}`,
+		);
 		const response = await axios(config);
 
 		logger.info('Response from GET %s', response.status);
@@ -948,14 +945,14 @@ const getPublicEncryptionKey = async organizationCode => {
 			}
 			return publicKey;
 		} else {
-			let errorMessage = `Something went wrong while fetching public key for secrets encryption.`;
+			let errorMessage = `Something went wrong in secrets encryption. Please try after some time.`;
 			logger.error(`${errorMessage}. Received ${response.status} response instead of 200`);
-
 			throw new Error(errorMessage);
 		}
 	} catch (error) {
-		logger.error(`Error getting public secrets key for secrets encryption.`);
-		return '';
+		let errorMessage = `Something went wrong in secerts encryption. Please try after some time.`;
+		logger.error(errorMessage);
+		throw new Error(errorMessage);
 	}
 };
 

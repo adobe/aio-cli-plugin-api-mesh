@@ -418,7 +418,7 @@ async function validateSecretsFile(secretsFile) {
 		}
 	} catch (error) {
 		logger.error(error.message);
-		throw new Error(error.message);
+		throw new Error(chalk.red(error.message));
 	}
 }
 
