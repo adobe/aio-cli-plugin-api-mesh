@@ -10,6 +10,7 @@ const fs = require('fs');
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 const contentDisposition = require('content-disposition');
+const chalk = require('chalk');
 
 const { DEV_CONSOLE_TRANSPORTER_API_KEY, SMS_BASE_URL } = CONSTANTS;
 
@@ -968,6 +969,52 @@ const getMeshDeployments = async (organizationCode, projectId, workspaceId, mesh
 	}
 };
 
+/**
+ * Gets the public key to encrypt secrets.
+ *
+ * This request bypasses the Dev Console and is sent directly to the Schema Management Service.
+ * As a result, we provide the publicKey used for secrets encryption.
+ * The near-term goal is to stop using Dev Console as a proxy for all routes.
+ * @param organizationCode
+ * @returns string
+ */
+const getPublicEncryptionKey = async organizationCode => {
+	const { accessToken, apiKey } = await getDevConsoleConfig();
+	const config = {
+		method: 'get',
+		url: `${SMS_BASE_URL}/organizations/${organizationCode}/getPublicKey?API_KEY=${apiKey}`,
+		headers: {
+			'Authorization': `Bearer ${accessToken}`,
+			'x-request-id': global.requestId,
+		},
+	};
+	logger.info(
+		'Initiating GET %s',
+		`${SMS_BASE_URL}/organizations/${organizationCode}/getPublicKey?API_KEY=${apiKey}`,
+	);
+	try {
+		const response = await axios(config);
+
+		logger.info('Response from GET %s', response.status);
+		if (response.status == 200) {
+			let publicKey = '';
+			logger.info(`Public secrets : ${objToString(response, ['data'])}`);
+			if (response.data.publicKey) {
+				publicKey = response.data.publicKey.replace(/\\n/g, '\n');
+			}
+			return publicKey;
+		} else {
+			let errorMessage = `Failed to load encryption keys. Please contact support.`;
+			logger.error(`${errorMessage}. Received ${response.status} response instead of 200`);
+			throw new Error(chalk.red(errorMessage));
+		}
+	} catch (error) {
+		let errorMessage = `Something went wrong in secerts encryption. Please try after some time.`;
+		logger.error(errorMessage);
+		throw new Error(chalk.red(errorMessage));
+	}
+};
+
 module.exports = {
 	getApiKeyCredential,
 	describeMesh,
@@ -984,4 +1031,5 @@ module.exports = {
 	getMeshArtifact,
 	getTenantFeatures,
 	getMeshDeployments,
+	getPublicEncryptionKey,
 };
