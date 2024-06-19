@@ -496,7 +496,7 @@ function getSecretsYamlParseError(error) {
 /**
  * Performs hybrid encryption of secrets(AES + RSA)
  *
- * @param publicKey Public key for RSA encryption
+ * @param publicKey Public key for (AES + RSA) encryption
  * @param secrets Secrets Data that needs encryption
  */
 async function encryptSecret(publicKey, secrets) {
@@ -522,7 +522,6 @@ async function encryptSecret(publicKey, secrets) {
 			key: encryptedAesKey.toString('base64'),
 			data: encryptedData,
 		};
-		console.log(JSON.stringify(encryptedPackage));
 		return JSON.stringify(encryptedPackage);
 	} catch (error) {
 		logger.error('Error generating AES key, IV OR encryption package:', error.message);

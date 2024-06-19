@@ -998,9 +998,9 @@ const getPublicEncryptionKey = async organizationCode => {
 		logger.info('Response from GET %s', response.status);
 		if (response.status == 200) {
 			let publicKey = '';
-			logger.info(`Public secrets : ${objToString(response, ['data'])}`);
+			logger.info(`Public key for encryption: ${objToString(response, ['data'])}`);
 			if (response.data.publicKey) {
-				publicKey = response.data.publicKey.replace(/\\n/g, '\n');
+				publicKey = response.data.publicKey.replace(/\\n/g, '\n');//correcting public key format
 			}
 			return publicKey;
 		} else {
