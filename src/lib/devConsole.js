@@ -1000,7 +1000,7 @@ const getPublicEncryptionKey = async organizationCode => {
 			let publicKey = '';
 			logger.info(`Public key for encryption: ${objToString(response, ['data'])}`);
 			if (response.data.publicKey) {
-				publicKey = response.data.publicKey.replace(/\\n/g, '\n');//correcting public key format
+				publicKey = response.data.publicKey.replace(/\\n/g, '\n'); //correcting public key format
 			}
 			return publicKey;
 		} else {
