@@ -2102,4 +2102,31 @@ describe('create command tests', () => {
 		}
 	`);
 	});
+
+	test('should return error if secrets file is valid but public key for encryption is empty', async () => {
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_secrets_mesh.json' },
+			flags: {
+				ignoreCache: mockIgnoreCacheFlag,
+				autoConfirmAction: Promise.resolve(true),
+				secrets: 'src/commands/__fixtures__/secrets_valid.yaml',
+			},
+		});
+		getPublicEncryptionKey.mockResolvedValue('');
+
+		crypto.randomBytes.mockReturnValueOnce(mockAesKey).mockReturnValueOnce(mockIv);
+		crypto.createCipheriv.mockReturnValueOnce(mockCipher);
+
+		const runResult = CreateCommand.run();
+		await expect(runResult).rejects.toEqual(
+			new Error('Unable to import secrets. Please check the file and try again.'),
+		);
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Something went wrong in secerts encryption. Invalid publicKey provided.",
+		  ],
+		]
+	`);
+	});
 });

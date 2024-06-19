@@ -500,6 +500,11 @@ function getSecretsYamlParseError(error) {
  * @param secrets Secrets Data that needs encryption
  */
 async function encryptSecret(publicKey, secrets) {
+	if (!publicKey || typeof publicKey !== 'string' || !publicKey.trim()) {
+		throw new Error(
+			chalk.red('Something went wrong in secerts encryption. Invalid publicKey provided.'),
+		);
+	}
 	try {
 		// Generate a random AES key and IV
 		const aesKey = crypto.randomBytes(32); // 256-bit key for AES-256
