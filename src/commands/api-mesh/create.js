@@ -25,7 +25,7 @@ const {
 	validateAndInterpolateMesh,
 	interpolateSecrets,
 	validateSecretsFile,
-	encryptSecret,
+	encryptSecrets,
 } = require('../../utils');
 const { createMesh, getTenantFeatures, getPublicEncryptionKey } = require('../../lib/devConsole');
 const { buildEdgeMeshUrl, buildMeshUrl } = require('../../urlBuilder');
@@ -113,9 +113,9 @@ class CreateCommand extends Command {
 		if (secretsFilePath) {
 			try {
 				await validateSecretsFile(secretsFilePath);
-				const publicKey = await getPublicEncryptionKey(imsOrgCode);
 				const secretsData = await interpolateSecrets(secretsFilePath, this);
-				const encryptedSecrets = await encryptSecret(publicKey, secretsData);
+				const publicKey = await getPublicEncryptionKey(imsOrgCode);
+				const encryptedSecrets = await encryptSecrets(publicKey, secretsData);
 				data.secrets = encryptedSecrets;
 			} catch (err) {
 				this.log(err.message);

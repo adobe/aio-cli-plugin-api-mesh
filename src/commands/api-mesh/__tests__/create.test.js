@@ -2124,7 +2124,7 @@ describe('create command tests', () => {
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
 		[
 		  [
-		    "Something went wrong in secerts encryption. Invalid publicKey provided.",
+		    "Unable to encrypt secerts. Invalid Public Key.",
 		  ],
 		]
 	`);

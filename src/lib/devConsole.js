@@ -1005,11 +1005,11 @@ const getPublicEncryptionKey = async organizationCode => {
 			return publicKey;
 		} else {
 			let errorMessage = `Failed to load encryption keys. Please contact support.`;
-			logger.error(`${errorMessage}. Received ${response.status} response instead of 200`);
+			logger.error(`${errorMessage}. Received ${response.status}, expected 200`);
 			throw new Error(chalk.red(errorMessage));
 		}
 	} catch (error) {
-		let errorMessage = `Something went wrong in secerts encryption. Please try after some time.`;
+		let errorMessage = `Something went wrong while encrypting secrets. Please try again.`;
 		logger.error(errorMessage);
 		throw new Error(chalk.red(errorMessage));
 	}

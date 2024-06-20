@@ -24,7 +24,7 @@ const {
 	getFilesInMeshConfig,
 	interpolateSecrets,
 	validateSecretsFile,
-	encryptSecret,
+	encryptSecrets,
 } = require('../../utils');
 const { getMeshId, updateMesh, getPublicEncryptionKey } = require('../../lib/devConsole');
 
@@ -119,9 +119,9 @@ class UpdateCommand extends Command {
 		if (secretsFilePath) {
 			try {
 				await validateSecretsFile(secretsFilePath);
-				const publicKey = await getPublicEncryptionKey(imsOrgCode);
 				const secretsData = await interpolateSecrets(secretsFilePath, this);
-				const encryptedSecrets = await encryptSecret(publicKey, secretsData);
+				const publicKey = await getPublicEncryptionKey(imsOrgCode);
+				const encryptedSecrets = await encryptSecrets(publicKey, secretsData);
 				data.secrets = encryptedSecrets;
 			} catch (err) {
 				this.log(err.message);

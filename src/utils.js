@@ -499,11 +499,9 @@ function getSecretsYamlParseError(error) {
  * @param publicKey Public key for (AES + RSA) encryption
  * @param secrets Secrets Data that needs encryption
  */
-async function encryptSecret(publicKey, secrets) {
+async function encryptSecrets(publicKey, secrets) {
 	if (!publicKey || typeof publicKey !== 'string' || !publicKey.trim()) {
-		throw new Error(
-			chalk.red('Something went wrong in secerts encryption. Invalid publicKey provided.'),
-		);
+		throw new Error(chalk.red('Unable to encrypt secerts. Invalid Public Key.'));
 	}
 	try {
 		// Generate a random AES key and IV
@@ -529,8 +527,8 @@ async function encryptSecret(publicKey, secrets) {
 		};
 		return JSON.stringify(encryptedPackage);
 	} catch (error) {
-		logger.error('Error generating AES key, IV OR encryption package:', error.message);
-		throw new Error(chalk.red(`Failed to generate encryption parameters. Please try again.`));
+		logger.error('Unable to encrypt secrets. Please try again. :', error.message);
+		throw new Error(`Unable to encrypt secerts. ${error.message}`);
 	}
 }
 
@@ -551,5 +549,5 @@ module.exports = {
 	secretsFlag,
 	interpolateSecrets,
 	validateSecretsFile,
-	encryptSecret,
+	encryptSecrets,
 };
