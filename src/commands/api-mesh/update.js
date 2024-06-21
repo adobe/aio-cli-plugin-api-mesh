@@ -24,8 +24,9 @@ const {
 	getFilesInMeshConfig,
 	interpolateSecrets,
 	validateSecretsFile,
+	encryptSecrets,
 } = require('../../utils');
-const { getMeshId, updateMesh } = require('../../lib/devConsole');
+const { getMeshId, updateMesh, getPublicEncryptionKey } = require('../../lib/devConsole');
 
 class UpdateCommand extends Command {
 	static args = [{ name: 'file' }];
@@ -54,11 +55,17 @@ class UpdateCommand extends Command {
 		const envFilePath = await flags.env;
 		const secretsFilePath = await flags.secrets;
 
-		const { imsOrgId, projectId, workspaceId, orgName, projectName, workspaceName } = await initSdk(
-			{
-				ignoreCache,
-			},
-		);
+		const {
+			imsOrgId,
+			imsOrgCode,
+			projectId,
+			workspaceId,
+			orgName,
+			projectName,
+			workspaceName,
+		} = await initSdk({
+			ignoreCache,
+		});
 
 		//Input the mesh data from the input file
 		let inputMeshData = await readFileContents(args.file, this, 'mesh');
@@ -112,7 +119,10 @@ class UpdateCommand extends Command {
 		if (secretsFilePath) {
 			try {
 				await validateSecretsFile(secretsFilePath);
-				data.secrets = await interpolateSecrets(secretsFilePath, this);
+				const secretsData = await interpolateSecrets(secretsFilePath, this);
+				const publicKey = await getPublicEncryptionKey(imsOrgCode);
+				const encryptedSecrets = await encryptSecrets(publicKey, secretsData);
+				data.secrets = encryptedSecrets;
 			} catch (err) {
 				this.log(err.message);
 				this.error('Unable to import secrets. Please check the file and try again.');

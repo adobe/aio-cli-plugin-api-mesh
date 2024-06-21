@@ -11,6 +11,7 @@ governing permissions and limitations under the License.
 */
 
 const mockConsoleCLIInstance = {};
+const crypto = require('crypto');
 
 jest.mock('axios');
 jest.mock('@adobe/aio-lib-ims');
@@ -44,6 +45,7 @@ const {
 	createAPIMeshCredentials,
 	subscribeCredentialToMeshService,
 	getTenantFeatures,
+	getPublicEncryptionKey,
 } = require('../../../lib/devConsole');
 
 const selectedOrg = { id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' };
@@ -74,6 +76,7 @@ jest.mock('chalk', () => ({
 	red: jest.fn(text => text), // Return the input text without any color formatting
 	bold: jest.fn(text => text),
 }));
+jest.mock('crypto');
 
 let logSpy = null;
 let errorLogSpy = null;
@@ -82,6 +85,15 @@ let platformSpy = null;
 
 const mockIgnoreCacheFlag = Promise.resolve(true);
 const mockAutoApproveAction = Promise.resolve(false);
+
+// Mock randomBytes for aesKey and iv
+const mockAesKey = Buffer.from('mockAesKey');
+const mockIv = Buffer.from('mockIv');
+const mockEncryptedAesKey = Buffer.from('mockEncryptedAesKey');
+const mockCipher = {
+	update: jest.fn().mockReturnValueOnce('mockEncryptedData'),
+	final: jest.fn().mockReturnValueOnce(''),
+};
 
 describe('create command tests', () => {
 	beforeEach(() => {
@@ -127,6 +139,7 @@ describe('create command tests', () => {
 			showCloudflareURL: false,
 		});
 
+		getPublicEncryptionKey.mockResolvedValue('dummy_public_key');
 		global.requestId = 'dummy_request_id';
 
 		logSpy = jest.spyOn(CreateCommand.prototype, 'log');
@@ -1945,6 +1958,10 @@ describe('create command tests', () => {
 			},
 		});
 
+		crypto.randomBytes.mockReturnValueOnce(mockAesKey).mockReturnValueOnce(mockIv);
+		crypto.createCipheriv.mockReturnValueOnce(mockCipher);
+		crypto.publicEncrypt.mockReturnValueOnce(mockEncryptedAesKey);
+
 		const runResult = await CreateCommand.run();
 		expect(runResult).toMatchInlineSnapshot(`
 		{
@@ -2015,6 +2032,10 @@ describe('create command tests', () => {
 			},
 		});
 
+		crypto.randomBytes.mockReturnValueOnce(mockAesKey).mockReturnValueOnce(mockIv);
+		crypto.createCipheriv.mockReturnValueOnce(mockCipher);
+		crypto.publicEncrypt.mockReturnValueOnce(mockEncryptedAesKey);
+
 		const runResult = await CreateCommand.run();
 		expect(runResult).toMatchInlineSnapshot(`
 		{
@@ -2052,6 +2073,10 @@ describe('create command tests', () => {
 			},
 		});
 
+		crypto.randomBytes.mockReturnValueOnce(mockAesKey).mockReturnValueOnce(mockIv);
+		crypto.createCipheriv.mockReturnValueOnce(mockCipher);
+		crypto.publicEncrypt.mockReturnValueOnce(mockEncryptedAesKey);
+
 		const runResult = await CreateCommand.run();
 		expect(runResult).toMatchInlineSnapshot(`
 		{
@@ -2075,6 +2100,33 @@ describe('create command tests', () => {
 		    "dummy_service",
 		  ],
 		}
+	`);
+	});
+
+	test('should return error if secrets file is valid but public key for encryption is empty', async () => {
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_secrets_mesh.json' },
+			flags: {
+				ignoreCache: mockIgnoreCacheFlag,
+				autoConfirmAction: Promise.resolve(true),
+				secrets: 'src/commands/__fixtures__/secrets_valid.yaml',
+			},
+		});
+		getPublicEncryptionKey.mockResolvedValue('');
+
+		crypto.randomBytes.mockReturnValueOnce(mockAesKey).mockReturnValueOnce(mockIv);
+		crypto.createCipheriv.mockReturnValueOnce(mockCipher);
+
+		const runResult = CreateCommand.run();
+		await expect(runResult).rejects.toEqual(
+			new Error('Unable to import secrets. Please check the file and try again.'),
+		);
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Unable to encrypt secerts. Invalid Public Key.",
+		  ],
+		]
 	`);
 	});
 });

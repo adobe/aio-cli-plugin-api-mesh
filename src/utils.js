@@ -9,6 +9,7 @@ const YAML = require('yaml');
 const parseEnv = require('envsub/js/envsub-parser');
 const os = require('os');
 const chalk = require('chalk');
+const crypto = require('crypto');
 
 /**
  * @returns returns the root directory of the project
@@ -492,6 +493,45 @@ function getSecretsYamlParseError(error) {
 	}
 }
 
+/**
+ * Performs hybrid encryption of secrets(AES + RSA)
+ *
+ * @param publicKey Public key for (AES + RSA) encryption
+ * @param secrets Secrets Data that needs encryption
+ */
+async function encryptSecrets(publicKey, secrets) {
+	if (!publicKey || typeof publicKey !== 'string' || !publicKey.trim()) {
+		throw new Error(chalk.red('Unable to encrypt secerts. Invalid Public Key.'));
+	}
+	try {
+		// Generate a random AES key and IV
+		const aesKey = crypto.randomBytes(32); // 256-bit key for AES-256
+		const iv = crypto.randomBytes(16); // Initialization vector
+		// Encrypt the secrets using AES-256-CBC
+		const cipher = crypto.createCipheriv('aes-256-cbc', aesKey, iv);
+		let encryptedData = cipher.update(secrets, 'utf8', 'base64');
+		encryptedData += cipher.final('base64');
+		// Encrypt the AES key using RSA with OAEP padding
+		const encryptedAesKey = crypto.publicEncrypt(
+			{
+				key: publicKey,
+				padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+			},
+			aesKey,
+		);
+		// Package the encrypted AES key, IV, and encrypted data
+		const encryptedPackage = {
+			iv: iv.toString('base64'),
+			key: encryptedAesKey.toString('base64'),
+			data: encryptedData,
+		};
+		return JSON.stringify(encryptedPackage);
+	} catch (error) {
+		logger.error('Unable to encrypt secrets. Please try again. :', error.message);
+		throw new Error(`Unable to encrypt secerts. ${error.message}`);
+	}
+}
+
 module.exports = {
 	ignoreCacheFlag,
 	autoConfirmActionFlag,
@@ -509,4 +549,5 @@ module.exports = {
 	secretsFlag,
 	interpolateSecrets,
 	validateSecretsFile,
+	encryptSecrets,
 };
