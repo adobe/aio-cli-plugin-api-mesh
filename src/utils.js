@@ -329,7 +329,8 @@ function validateEnvFileFormat(envContent) {
 		if (!trimmedLine.includes('=')) {
 			errors.push(`Invalid format << ${trimmedLine} >> on line ${index + 1}`);
 		} else {
-			const [key, value] = trimmedLine.split('=', 2);
+			const [key, ...values] = trimmedLine.split('=');
+            const value = values.join();
 			if (!envKeyRegex.test(key) || !envValueRegex.test(value)) {
 				// invalid format: key or value does not match regex
 				errors.push(`Invalid format for key/value << ${trimmedLine} >> on line ${index + 1}`);
