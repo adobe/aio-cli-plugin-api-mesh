@@ -311,7 +311,7 @@ function validateEnvFileFormat(envContent) {
 	/*
 	The above regex matches one or more of below :
 	(?:"(?:\\.|[^\\"])*"|'(?:\\.|[^\\'])*'|[^'"\s])
-	which is 
+	which is
 	1. ?:"(?:\\.|[^\\"])*" : Non capturing group starts and ends with '"'
 	*/
 	const envDict = {};
@@ -330,7 +330,7 @@ function validateEnvFileFormat(envContent) {
 			errors.push(`Invalid format << ${trimmedLine} >> on line ${index + 1}`);
 		} else {
 			const [key, ...values] = trimmedLine.split('=');
-            const value = values.join();
+			const value = values.join();
 			if (!envKeyRegex.test(key) || !envValueRegex.test(value)) {
 				// invalid format: key or value does not match regex
 				errors.push(`Invalid format for key/value << ${trimmedLine} >> on line ${index + 1}`);
