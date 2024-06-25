@@ -1,1 +1,5 @@
 node_modules
+mesh-artifact
+meshes
+tempfiles
+*.txt

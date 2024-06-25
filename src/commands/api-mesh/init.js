@@ -70,16 +70,10 @@ class InitCommand extends Command {
 		await fs.writeFile(filePath, JSON.stringify(pkgJSON, null, 2), 'utf8', { mode: 'w' });
 	}
 
-	async createDotNpmrcFile(templatePath, filePath) {
+	async cloneFile(templatePath, filePath) {
 		const dotNpmrcFile = await fs.readFile(templatePath, 'utf8');
 
 		await fs.writeFile(filePath, dotNpmrcFile, 'utf8', { mode: 'w' });
-	}
-
-	async createGitIgnoreFile(templatePath, filePath) {
-		const gitIgnoreFile = await fs.readFile(templatePath, 'utf8');
-
-		await fs.writeFile(filePath, gitIgnoreFile, 'utf8', { mode: 'w' });
 	}
 
 	async run() {
@@ -94,6 +88,10 @@ class InitCommand extends Command {
 		let packageManagerChoice = flags.packageManager;
 		const packageJsonTemplate = `${getAppRootDir()}/src/templates/package.json`;
 		const dotNpmrcPath = `${getAppRootDir()}/src/templates/npmrc`;
+		const vsCodeLaunchJsonPath = `${getAppRootDir()}/src/templates/vscode_launch.json`;
+		const devContainerJsonPath = `${getAppRootDir()}/src/templates/devcontainer.json`;
+		const sampleENVPath = `${getAppRootDir()}/src/templates/sample.env`;
+		const githubWorkflowPath = `${getAppRootDir()}/src/templates/deployWorkflow.yaml`;
 		const shouldCreateWorkspace = await promptConfirm(
 			`Do you want to create the workspace in ${absolutePath}`,
 		);
@@ -140,15 +138,12 @@ class InitCommand extends Command {
 					const gitIgnoreTemplatePath = `${getAppRootDir()}/src/templates/gitignore`;
 					const gitIgnoreFilePath = `${absolutePath}/.gitignore`;
 
-					await this.createGitIgnoreFile(gitIgnoreTemplatePath, gitIgnoreFilePath);
+					await this.cloneFile(gitIgnoreTemplatePath, gitIgnoreFilePath);
+					await this.cloneFile(githubWorkflowPath, `${absolutePath}/.github/workflows/deploy.yaml`);
 				} catch (error) {
 					this.error(error);
 				}
 			}
-
-			await fs.writeFile(`${absolutePath}/.env`, '', 'utf8', { mode: 'w' });
-
-			this.log(`Installing dependencies`);
 
 			await this.createPackageJson(
 				packageJsonTemplate,
@@ -156,7 +151,12 @@ class InitCommand extends Command {
 				args.projectName,
 			);
 
-			await this.createDotNpmrcFile(dotNpmrcPath, `${absolutePath}/.npmrc`);
+			await this.cloneFile(dotNpmrcPath, `${absolutePath}/.npmrc`);
+			await this.cloneFile(vsCodeLaunchJsonPath, `${absolutePath}/.vscode/launch.json`);
+			await this.cloneFile(devContainerJsonPath, `${absolutePath}/.devcontainer/devcontainer.json`);
+			await this.cloneFile(sampleENVPath, `${absolutePath}/.env`);
+
+			this.log(`Installing dependencies`);
 
 			if (packageManagerChoice === 'npm') {
 				try {
