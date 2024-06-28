@@ -10,7 +10,7 @@
 	},
 	"forwardPorts": [5000],
 	"postAttachCommand": {
-		"server": "yarn start"
+		"server": "yarn start mesh.json"
 	},
 	"postCreateCommand": "yarn install && yarn devcontainer:setup",
 	"portsAttributes": {

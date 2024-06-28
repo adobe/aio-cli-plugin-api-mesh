@@ -43,8 +43,8 @@
 	],
 	"license": "Apache-2.0",
 	"scripts": {
-		"start": "nodemon --watch mesh.json --watch .env node_modules/.bin/aio api-mesh run mesh.json",
-		"debug": "nodemon --watch mesh.json --watch .env node_modules/.bin/aio api-mesh run mesh.json --debug",
+		"start": "nodemon --watch $1 --watch .env -e js,json,yaml node_modules/.bin/aio api-mesh run $1",
+		"debug": "nodemon --watch $1 --watch .env -e js,json,yaml node_modules/.bin/aio api-mesh run $1 --debug",
 		"setupTelemetry": "echo {aio-cli-telemetry: {optOut: false}} > ~/.config/aio",
 		"devcontainer:setup": "yarn setupTelemetry & aio plugins:install @adobe/aio-cli-plugin-api-mesh"
 	},
