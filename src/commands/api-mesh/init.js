@@ -86,12 +86,16 @@ class InitCommand extends Command {
 		let absolutePath = resolve(flags.path);
 		let shouldCreateGit = gitFlagOptions[flags.git];
 		let packageManagerChoice = flags.packageManager;
+
 		const packageJsonTemplate = `${getAppRootDir()}/src/templates/package.json`;
 		const dotNpmrcPath = `${getAppRootDir()}/src/templates/npmrc`;
 		const vsCodeLaunchJsonPath = `${getAppRootDir()}/src/templates/vscode_launch.json`;
 		const devContainerJsonPath = `${getAppRootDir()}/src/templates/devcontainer.json`;
 		const sampleENVPath = `${getAppRootDir()}/src/templates/sample.env`;
 		const githubWorkflowPath = `${getAppRootDir()}/src/templates/deployWorkflow.yaml`;
+		const readmePath = `${getAppRootDir()}/src/templates/readme.md`;
+		const sampleMeshConfigPath = `${getAppRootDir()}/src/templates/mesh.json`;
+
 		const shouldCreateWorkspace = await promptConfirm(
 			`Do you want to create the workspace in ${absolutePath}`,
 		);
@@ -155,6 +159,8 @@ class InitCommand extends Command {
 			await this.cloneFile(vsCodeLaunchJsonPath, `${absolutePath}/.vscode/launch.json`);
 			await this.cloneFile(devContainerJsonPath, `${absolutePath}/.devcontainer/devcontainer.json`);
 			await this.cloneFile(sampleENVPath, `${absolutePath}/.env`);
+			await this.cloneFile(readmePath, `${absolutePath}/README.md`);
+			await this.cloneFile(sampleMeshConfigPath, `${absolutePath}/mesh.json`);
 
 			this.log(`Installing dependencies`);
 
