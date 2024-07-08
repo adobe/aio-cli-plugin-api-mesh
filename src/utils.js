@@ -297,61 +297,6 @@ function validateFileName(filesList) {
 	}
 }
 
-/**validates the environment file content
- * @param {string} envContent
- * @returns {object} containing the status of validation
- * If validation is failed then the error property including the formatting errors is returned.
- */
-function validateEnvFileFormat(envContent) {
-	//Key should start with a underscore or an alphabet followed by underscore/alphanumeric characters
-	const envKeyRegex = /^[a-zA-Z_]+[a-zA-Z0-9_]*$/;
-
-	const envValueRegex = /^(?:"(?:\\.|[^\\"])*"|'(?:\\.|[^\\'])*'|[^'"\s])+$/;
-
-	/*
-	The above regex matches one or more of below :
-	(?:"(?:\\.|[^\\"])*"|'(?:\\.|[^\\'])*'|[^'"\s])
-	which is 
-	1. ?:"(?:\\.|[^\\"])*" : Non capturing group starts and ends with '"'
-	*/
-	const envDict = {};
-	const lines = envContent.split(/\r?\n/);
-	const errors = [];
-
-	for (let index = 0; index < lines.length; index++) {
-		const line = lines[index];
-		const trimmedLine = line.trim();
-		if (trimmedLine.startsWith('#') || trimmedLine === '') {
-			// ignore comment or empty lines
-			continue;
-		}
-
-		if (!trimmedLine.includes('=')) {
-			errors.push(`Invalid format << ${trimmedLine} >> on line ${index + 1}`);
-		} else {
-			const [key, value] = trimmedLine.split('=', 2);
-			if (!envKeyRegex.test(key) || !envValueRegex.test(value)) {
-				// invalid format: key or value does not match regex
-				errors.push(`Invalid format for key/value << ${trimmedLine} >> on line ${index + 1}`);
-			}
-			if (key in envDict) {
-				// duplicate key found
-				errors.push(`Duplicate key << ${key} >> on line ${index + 1}`);
-			}
-			envDict[key] = value;
-		}
-	}
-	if (errors.length) {
-		return {
-			valid: false,
-			error: errors.toString(),
-		};
-	}
-	return {
-		valid: true,
-	};
-}
-
 /**
  * Read the environment file, checks for validation status and interpolate mesh
  * @param {string} inputMeshData
@@ -364,10 +309,10 @@ async function validateAndInterpolateMesh(inputMeshData, envFilePath, command) {
 	const envFileContent = await readFileContents(envFilePath, command, 'env');
 
 	//Validate the environment file
-	const envFileValidity = validateEnvFileFormat(envFileContent);
-	if (envFileValidity.valid) {
+	try {
 		//load env file using dotenv and add 'env' as the root property in the object
-		const envObj = { env: dotenv.config({ path: envFilePath }).parsed };
+		const config = dotenv.parse(envFileContent);
+		const envObj = { env: config };
 		const { interpolationStatus, missingKeys, interpolatedMeshData } = await interpolateMesh(
 			inputMeshData,
 			envObj,
@@ -386,8 +331,8 @@ async function validateAndInterpolateMesh(inputMeshData, envFilePath, command) {
 			command.log(interpolatedMeshData);
 			command.error('Interpolated mesh is not a valid JSON. Please check the generated json file.');
 		}
-	} else {
-		command.error(`Issue in ${envFilePath} file - ` + envFileValidity.error);
+	} catch (err) {
+		command.error(`Issue in ${envFilePath} file - ` + err.message);
 	}
 }
 
@@ -399,7 +344,6 @@ module.exports = {
 	envFileFlag,
 	checkPlaceholders,
 	readFileContents,
-	validateEnvFileFormat,
 	validateAndInterpolateMesh,
 	getAppRootDir,
 	portNoFlag,
