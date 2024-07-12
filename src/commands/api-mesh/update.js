@@ -17,12 +17,16 @@ const {
 	ignoreCacheFlag,
 	autoConfirmActionFlag,
 	envFileFlag,
+	secretsFlag,
 	checkPlaceholders,
 	readFileContents,
 	validateAndInterpolateMesh,
 	getFilesInMeshConfig,
+	interpolateSecrets,
+	validateSecretsFile,
+	encryptSecrets,
 } = require('../../utils');
-const { getMeshId, updateMesh } = require('../../lib/devConsole');
+const { getMeshId, updateMesh, getPublicEncryptionKey } = require('../../lib/devConsole');
 
 class UpdateCommand extends Command {
 	static args = [{ name: 'file' }];
@@ -30,6 +34,7 @@ class UpdateCommand extends Command {
 		ignoreCache: ignoreCacheFlag,
 		autoConfirmAction: autoConfirmActionFlag,
 		env: envFileFlag,
+		secrets: secretsFlag,
 	};
 
 	async run() {
@@ -48,12 +53,19 @@ class UpdateCommand extends Command {
 		const ignoreCache = await flags.ignoreCache;
 		const autoConfirmAction = await flags.autoConfirmAction;
 		const envFilePath = await flags.env;
+		const secretsFilePath = await flags.secrets;
 
-		const { imsOrgId, projectId, workspaceId, orgName, projectName, workspaceName } = await initSdk(
-			{
-				ignoreCache,
-			},
-		);
+		const {
+			imsOrgId,
+			imsOrgCode,
+			projectId,
+			workspaceId,
+			orgName,
+			projectName,
+			workspaceName,
+		} = await initSdk({
+			ignoreCache,
+		});
 
 		//Input the mesh data from the input file
 		let inputMeshData = await readFileContents(args.file, this, 'mesh');
@@ -100,6 +112,20 @@ class UpdateCommand extends Command {
 				this.error(
 					'Unable to import the files in the mesh config. Please check the file and try again.',
 				);
+			}
+		}
+
+		// if secrets is present, include that in data.secrets
+		if (secretsFilePath) {
+			try {
+				await validateSecretsFile(secretsFilePath);
+				const secretsData = await interpolateSecrets(secretsFilePath, this);
+				const publicKey = await getPublicEncryptionKey(imsOrgCode);
+				const encryptedSecrets = await encryptSecrets(publicKey, secretsData);
+				data.secrets = encryptedSecrets;
+			} catch (err) {
+				this.log(err.message);
+				this.error('Unable to import secrets. Please check the file and try again.');
 			}
 		}
 

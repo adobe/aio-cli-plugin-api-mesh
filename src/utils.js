@@ -5,6 +5,11 @@ const { Flags } = require('@oclif/core');
 const { readFile } = require('fs/promises');
 const { interpolateMesh } = require('./helpers');
 const dotenv = require('dotenv');
+const YAML = require('yaml');
+const parseEnv = require('envsub/js/envsub-parser');
+const os = require('os');
+const chalk = require('chalk');
+const crypto = require('crypto');
 
 /**
  * @returns returns the root directory of the project
@@ -39,6 +44,12 @@ const envFileFlag = Flags.string({
 	char: 'e',
 	description: 'Path to env file',
 	default: '.env',
+});
+
+const secretsFlag = Flags.string({
+	char: 's',
+	description: 'Path to secrets file',
+	default: false,
 });
 
 const portNoFlag = Flags.integer({
@@ -336,6 +347,136 @@ async function validateAndInterpolateMesh(inputMeshData, envFilePath, command) {
 	}
 }
 
+/**
+ * Validate secrets file
+ *
+ * @param secretsFile Validates that secrets file extension is in yaml
+ */
+async function validateSecretsFile(secretsFile) {
+	try {
+		const validExtensions = ['.yaml', '.yml'];
+		const fileExtension = secretsFile.split('.').pop().toLowerCase();
+		if (!validExtensions.includes('.' + fileExtension)) {
+			throw new Error(
+				chalk.red('Invalid file format. Please provide a YAML file (.yaml or .yml).'),
+			);
+		}
+	} catch (error) {
+		logger.error(error.message);
+		throw new Error(error.message);
+	}
+}
+
+/**
+ * Read the secrets file, checks validation and interpolate mesh
+ *
+ * @param secretsFilePath Secrets file path
+ * @param command
+ */
+async function interpolateSecrets(secretsFilePath, command) {
+	try {
+		const secretsContent = await readFileContents(secretsFilePath, command, 'secrets');
+
+		// Check if environment variables are used in the file content
+		if (os.platform() === 'win32' && /\$({)?[a-zA-Z_][a-zA-Z0-9_]*}?/.test(secretsContent)) {
+			throw new Error(chalk.red('Batch variables are not supported in YAML files on Windows.'));
+		}
+		const secrets = await parseSecrets(secretsContent);
+		return secrets;
+	} catch (err) {
+		logger.error(err.message);
+		throw new Error(err.message);
+	}
+}
+
+/**
+ * Parse secrets YAML content.
+ *
+ * @param secretsFilePath Secrets file path
+ */
+async function parseSecrets(secretsContent) {
+	try {
+		const envParserConfig = {
+			outputFile: null,
+			options: {
+				all: false,
+				diff: false,
+				protect: false,
+				syntax: 'dollar-both',
+			},
+			cli: false,
+		};
+		const compiledSecretsFileContent = parseEnv(secretsContent, envParserConfig);
+		const parsedSecrets = YAML.parse(compiledSecretsFileContent);
+		//check if secrets file is empty
+		if (!parsedSecrets) {
+			throw new Error(chalk.red('Invalid YAML file contents. Please verify and try again.'));
+		}
+		//check if parsedSecrets is string and not in k:v pair
+		if (typeof parsedSecrets === 'string') {
+			throw new Error(chalk.red('Please provide a valid YAML in key:value format.'));
+		}
+		const secretsYamlString = YAML.stringify(parsedSecrets);
+		return secretsYamlString; //TODO: here we will encrypt secrets and return.
+	} catch (err) {
+		throw new Error(chalk.red(getSecretsYamlParseError(err)));
+	}
+}
+
+/**
+ * This function returns user friendly errors that occurs while YAML.parse
+ *
+ * @param error errors from YAML.parse
+ */
+function getSecretsYamlParseError(error) {
+	if (error.code === 'BAD_INDENT') {
+		return 'Invalid YAML - Bad Indentation: ' + error.message;
+	} else if (error.code === 'DUPLICATE_KEY') {
+		return 'Invalid YAML - Found Duplicate Keys: ' + error.message;
+	} else {
+		return 'Unexpected Error: ' + error.message;
+	}
+}
+
+/**
+ * Performs hybrid encryption of secrets(AES + RSA)
+ *
+ * @param publicKey Public key for (AES + RSA) encryption
+ * @param secrets Secrets Data that needs encryption
+ */
+async function encryptSecrets(publicKey, secrets) {
+	if (!publicKey || typeof publicKey !== 'string' || !publicKey.trim()) {
+		throw new Error(chalk.red('Unable to encrypt secerts. Invalid Public Key.'));
+	}
+	try {
+		// Generate a random AES key and IV
+		const aesKey = crypto.randomBytes(32); // 256-bit key for AES-256
+		const iv = crypto.randomBytes(16); // Initialization vector
+		// Encrypt the secrets using AES-256-CBC
+		const cipher = crypto.createCipheriv('aes-256-cbc', aesKey, iv);
+		let encryptedData = cipher.update(secrets, 'utf8', 'base64');
+		encryptedData += cipher.final('base64');
+		// Encrypt the AES key using RSA with OAEP padding
+		const encryptedAesKey = crypto.publicEncrypt(
+			{
+				key: publicKey,
+				padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+			},
+			aesKey,
+		);
+		// Package the encrypted AES key, IV, and encrypted data
+		const encryptedPackage = {
+			iv: iv.toString('base64'),
+			key: encryptedAesKey.toString('base64'),
+			data: encryptedData,
+		};
+		return JSON.stringify(encryptedPackage);
+	} catch (error) {
+		logger.error('Unable to encrypt secrets. Please try again. :', error.message);
+		throw new Error(`Unable to encrypt secerts. ${error.message}`);
+	}
+}
+
 module.exports = {
 	ignoreCacheFlag,
 	autoConfirmActionFlag,
@@ -349,4 +490,8 @@ module.exports = {
 	portNoFlag,
 	debugFlag,
 	selectFlag,
+	secretsFlag,
+	interpolateSecrets,
+	validateSecretsFile,
+	encryptSecrets,
 };

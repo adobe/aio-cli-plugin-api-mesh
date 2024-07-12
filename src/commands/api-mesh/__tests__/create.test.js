@@ -11,6 +11,7 @@ governing permissions and limitations under the License.
 */
 
 const mockConsoleCLIInstance = {};
+const crypto = require('crypto');
 
 jest.mock('axios');
 jest.mock('@adobe/aio-lib-ims');
@@ -44,18 +45,55 @@ const {
 	createAPIMeshCredentials,
 	subscribeCredentialToMeshService,
 	getTenantFeatures,
+	getPublicEncryptionKey,
 } = require('../../../lib/devConsole');
 
 const selectedOrg = { id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' };
+
+const os = require('os');
+
 const selectedProject = { id: '5678', title: 'Project01' };
 const selectedWorkspace = { id: '123456789', title: 'Workspace01' };
+
+jest.mock('@adobe/aio-cli-lib-console', () => ({
+	init: jest.fn().mockResolvedValue(mockConsoleCLIInstance),
+	cleanStdOut: jest.fn(),
+}));
+
+jest.mock('axios');
+jest.mock('@adobe/aio-lib-ims');
+jest.mock('@adobe/aio-lib-env');
+jest.mock('@adobe/aio-cli-lib-console');
+jest.mock('../../../helpers', () => ({
+	initSdk: jest.fn().mockResolvedValue({}),
+	initRequestId: jest.fn().mockResolvedValue({}),
+	promptConfirm: jest.fn().mockResolvedValue(true),
+	interpolateMesh: jest.fn().mockResolvedValue({}),
+	importFiles: jest.fn().mockResolvedValue(),
+}));
+jest.mock('../../../lib/devConsole');
+jest.mock('chalk', () => ({
+	red: jest.fn(text => text), // Return the input text without any color formatting
+	bold: jest.fn(text => text),
+}));
+jest.mock('crypto');
 
 let logSpy = null;
 let errorLogSpy = null;
 let parseSpy = null;
+let platformSpy = null;
 
 const mockIgnoreCacheFlag = Promise.resolve(true);
 const mockAutoApproveAction = Promise.resolve(false);
+
+// Mock randomBytes for aesKey and iv
+const mockAesKey = Buffer.from('mockAesKey');
+const mockIv = Buffer.from('mockIv');
+const mockEncryptedAesKey = Buffer.from('mockEncryptedAesKey');
+const mockCipher = {
+	update: jest.fn().mockReturnValueOnce('mockEncryptedData'),
+	final: jest.fn().mockReturnValueOnce(''),
+};
 
 describe('create command tests', () => {
 	beforeEach(() => {
@@ -68,6 +106,12 @@ describe('create command tests', () => {
 			orgName: selectedOrg.name,
 			projectName: selectedProject.title,
 		});
+
+		global.requestId = 'dummy_request_id';
+
+		logSpy = jest.spyOn(CreateCommand.prototype, 'log');
+		errorLogSpy = jest.spyOn(CreateCommand.prototype, 'error');
+		platformSpy = jest.spyOn(os, 'platform');
 
 		createMesh.mockResolvedValue({
 			mesh: {
@@ -95,6 +139,7 @@ describe('create command tests', () => {
 			showCloudflareURL: false,
 		});
 
+		getPublicEncryptionKey.mockResolvedValue('dummy_public_key');
 		global.requestId = 'dummy_request_id';
 
 		logSpy = jest.spyOn(CreateCommand.prototype, 'log');
@@ -107,6 +152,10 @@ describe('create command tests', () => {
 				autoConfirmAction: mockAutoApproveAction,
 			},
 		});
+	});
+
+	afterEach(() => {
+		platformSpy.mockRestore();
 	});
 
 	test('must return proper object structure used by adobe/generator-app-api-mesh', async () => {
@@ -170,6 +219,15 @@ describe('create command tests', () => {
 		    "description": "Output JSON",
 		    "parse": [Function],
 		    "type": "boolean",
+		  },
+		  "secrets": {
+		    "char": "s",
+		    "default": false,
+		    "description": "Path to secrets file",
+		    "input": [],
+		    "multiple": false,
+		    "parse": [Function],
+		    "type": "option",
 		  },
 		}
 	`);
@@ -1843,5 +1901,245 @@ describe('create command tests', () => {
 			expect.stringContaining('Mesh Endpoint:'),
 			'https://graph.adobe.io/api/dummy_mesh_id/graphql?api_key=dummy_api_key',
 		);
+	});
+
+	test('should return error if mesh has placeholders and the provided secrets file is invalid', async () => {
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_secrets_mesh.json' },
+			flags: {
+				ignoreCache: mockIgnoreCacheFlag,
+				autoConfirmAction: Promise.resolve(true),
+				secrets: 'src/commands/__fixtures__/secrets_invalid.yaml',
+			},
+		});
+
+		const runResult = CreateCommand.run();
+
+		await expect(runResult).rejects.toEqual(
+			new Error('Unable to import secrets. Please check the file and try again.'),
+		);
+
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Unable to import secrets. Please check the file and try again.",
+		  ],
+		]
+	`);
+	});
+
+	test('should return error if mesh has placeholders and the provided secrets file is not yaml or yml', async () => {
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_secrets_mesh.json' },
+			flags: {
+				ignoreCache: mockIgnoreCacheFlag,
+				autoConfirmAction: Promise.resolve(true),
+				secrets: 'src/commands/__fixtures__/.secrets_file.env',
+			},
+		});
+
+		const runResult = CreateCommand.run();
+
+		await expect(runResult).rejects.toEqual(
+			new Error('Unable to import secrets. Please check the file and try again.'),
+		);
+
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Invalid file format. Please provide a YAML file (.yaml or .yml).",
+		  ],
+		]
+	`);
+
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Unable to import secrets. Please check the file and try again.",
+		  ],
+		]
+	`);
+	});
+
+	test('should successfully create a mesh if provided secrets file is valid', async () => {
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_secrets_mesh.json' },
+			flags: {
+				ignoreCache: mockIgnoreCacheFlag,
+				autoConfirmAction: Promise.resolve(true),
+				secrets: 'src/commands/__fixtures__/secrets_valid.yaml',
+			},
+		});
+
+		crypto.randomBytes.mockReturnValueOnce(mockAesKey).mockReturnValueOnce(mockIv);
+		crypto.createCipheriv.mockReturnValueOnce(mockCipher);
+		crypto.publicEncrypt.mockReturnValueOnce(mockEncryptedAesKey);
+
+		const runResult = await CreateCommand.run();
+		expect(runResult).toMatchInlineSnapshot(`
+		{
+		  "apiKey": "dummy_api_key",
+		  "mesh": {
+		    "meshConfig": {
+		      "sources": [
+		        {
+		          "handler": {
+		            "graphql": {
+		              "endpoint": "<gql_endpoint>",
+		            },
+		          },
+		          "name": "<api_name>",
+		        },
+		      ],
+		    },
+		    "meshId": "dummy_mesh_id",
+		  },
+		  "sdkList": [
+		    "dummy_service",
+		  ],
+		}
+	`);
+	});
+
+	test('should return error if ran against windows platform with batch variables', async () => {
+		platformSpy.mockReturnValue('win32');
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_secrets_mesh.json' },
+			flags: {
+				ignoreCache: mockIgnoreCacheFlag,
+				autoConfirmAction: Promise.resolve(true),
+				secrets: 'src/commands/__fixtures__/secrets_with_batch_variables.yaml',
+			},
+		});
+
+		const runResult = CreateCommand.run();
+
+		await expect(runResult).rejects.toEqual(
+			new Error('Unable to import secrets. Please check the file and try again.'),
+		);
+
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Batch variables are not supported in YAML files on Windows.",
+		  ],
+		]
+	`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Unable to import secrets. Please check the file and try again.",
+		  ],
+		]
+	`);
+	});
+
+	test('should pass if ran against linux platform with batch variables', async () => {
+		platformSpy.mockReturnValue('linux');
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_secrets_mesh.json' },
+			flags: {
+				ignoreCache: mockIgnoreCacheFlag,
+				autoConfirmAction: Promise.resolve(true),
+				secrets: 'src/commands/__fixtures__/secrets_with_batch_variables.yaml',
+			},
+		});
+
+		crypto.randomBytes.mockReturnValueOnce(mockAesKey).mockReturnValueOnce(mockIv);
+		crypto.createCipheriv.mockReturnValueOnce(mockCipher);
+		crypto.publicEncrypt.mockReturnValueOnce(mockEncryptedAesKey);
+
+		const runResult = await CreateCommand.run();
+		expect(runResult).toMatchInlineSnapshot(`
+		{
+		  "apiKey": "dummy_api_key",
+		  "mesh": {
+		    "meshConfig": {
+		      "sources": [
+		        {
+		          "handler": {
+		            "graphql": {
+		              "endpoint": "<gql_endpoint>",
+		            },
+		          },
+		          "name": "<api_name>",
+		        },
+		      ],
+		    },
+		    "meshId": "dummy_mesh_id",
+		  },
+		  "sdkList": [
+		    "dummy_service",
+		  ],
+		}
+	`);
+	});
+
+	test('should pass if ran against darwin(macOS) platform with batch variables', async () => {
+		platformSpy.mockReturnValue('darwin');
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_secrets_mesh.json' },
+			flags: {
+				ignoreCache: mockIgnoreCacheFlag,
+				autoConfirmAction: Promise.resolve(true),
+				secrets: 'src/commands/__fixtures__/secrets_with_batch_variables.yaml',
+			},
+		});
+
+		crypto.randomBytes.mockReturnValueOnce(mockAesKey).mockReturnValueOnce(mockIv);
+		crypto.createCipheriv.mockReturnValueOnce(mockCipher);
+		crypto.publicEncrypt.mockReturnValueOnce(mockEncryptedAesKey);
+
+		const runResult = await CreateCommand.run();
+		expect(runResult).toMatchInlineSnapshot(`
+		{
+		  "apiKey": "dummy_api_key",
+		  "mesh": {
+		    "meshConfig": {
+		      "sources": [
+		        {
+		          "handler": {
+		            "graphql": {
+		              "endpoint": "<gql_endpoint>",
+		            },
+		          },
+		          "name": "<api_name>",
+		        },
+		      ],
+		    },
+		    "meshId": "dummy_mesh_id",
+		  },
+		  "sdkList": [
+		    "dummy_service",
+		  ],
+		}
+	`);
+	});
+
+	test('should return error if secrets file is valid but public key for encryption is empty', async () => {
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_secrets_mesh.json' },
+			flags: {
+				ignoreCache: mockIgnoreCacheFlag,
+				autoConfirmAction: Promise.resolve(true),
+				secrets: 'src/commands/__fixtures__/secrets_valid.yaml',
+			},
+		});
+		getPublicEncryptionKey.mockResolvedValue('');
+
+		crypto.randomBytes.mockReturnValueOnce(mockAesKey).mockReturnValueOnce(mockIv);
+		crypto.createCipheriv.mockReturnValueOnce(mockCipher);
+
+		const runResult = CreateCommand.run();
+		await expect(runResult).rejects.toEqual(
+			new Error('Unable to import secrets. Please check the file and try again.'),
+		);
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Unable to encrypt secerts. Invalid Public Key.",
+		  ],
+		]
+	`);
 	});
 });
