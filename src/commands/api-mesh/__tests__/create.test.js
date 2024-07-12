@@ -774,7 +774,7 @@ describe('create command tests', () => {
 	`);
 	});
 
-	test('should return error if mesh has placeholders and the provided env file is invalid', async () => {
+	test('should return error if mesh has placeholders and the provided env file is invalid and parsed to {}', async () => {
 		parseSpy.mockResolvedValueOnce({
 			args: { file: 'src/commands/__fixtures__/sample_mesh_with_placeholder' },
 			flags: {
@@ -788,14 +788,17 @@ describe('create command tests', () => {
 
 		await expect(runResult).rejects.toEqual(
 			new Error(
-				"Issue in src/commands/__fixtures__/env_invalid file - Duplicate key << key1 >> on line 3,Invalid format for key/value << key2=='value3' >> on line 5,Invalid format << key3 >> on line 6,Invalid format for key/value << key4='value4 >> on line 7",
+				'Issue in src/commands/__fixtures__/env_invalid file - Interpolated mesh is not a valid JSON. Please check the generated json file.',
 			),
 		);
 
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
 		[
 		  [
-		    "Issue in src/commands/__fixtures__/env_invalid file - Duplicate key << key1 >> on line 3,Invalid format for key/value << key2=='value3' >> on line 5,Invalid format << key3 >> on line 6,Invalid format for key/value << key4='value4 >> on line 7",
+		    "Interpolated mesh is not a valid JSON. Please check the generated json file.",
+		  ],
+		  [
+		    "Issue in src/commands/__fixtures__/env_invalid file - Interpolated mesh is not a valid JSON. Please check the generated json file.",
 		  ],
 		]
 	`);
@@ -819,13 +822,18 @@ describe('create command tests', () => {
 
 		const runResult = CreateCommand.run();
 		await expect(runResult).rejects.toEqual(
-			new Error('The mesh file cannot be interpolated due to missing keys : newKey1 , newKey2'),
+			new Error(
+				'Issue in src/commands/__fixtures__/env_valid file - The mesh file cannot be interpolated due to missing keys : newKey1 , newKey2',
+			),
 		);
 
 		await expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
 		[
 		  [
 		    "The mesh file cannot be interpolated due to missing keys : newKey1 , newKey2",
+		  ],
+		  [
+		    "Issue in src/commands/__fixtures__/env_valid file - The mesh file cannot be interpolated due to missing keys : newKey1 , newKey2",
 		  ],
 		]
 	`);
@@ -853,13 +861,18 @@ describe('create command tests', () => {
 
 		const runResult = CreateCommand.run();
 		await expect(runResult).rejects.toEqual(
-			new Error('Interpolated mesh is not a valid JSON. Please check the generated json file.'),
+			new Error(
+				'Issue in src/commands/__fixtures__/env_valid file - Interpolated mesh is not a valid JSON. Please check the generated json file.',
+			),
 		);
 
 		await expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
 		[
 		  [
 		    "Interpolated mesh is not a valid JSON. Please check the generated json file.",
+		  ],
+		  [
+		    "Issue in src/commands/__fixtures__/env_valid file - Interpolated mesh is not a valid JSON. Please check the generated json file.",
 		  ],
 		]
 	`);
