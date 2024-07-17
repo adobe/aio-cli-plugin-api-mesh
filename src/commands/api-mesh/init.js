@@ -10,12 +10,13 @@ governing permissions and limitations under the License.
 */
 
 const { Command, Flags } = require('@oclif/core');
-const resolve = require('path').resolve;
+const path = require('path');
+const fs = require('fs/promises');
 
 const { promptConfirm, promptSelect, runCliCommand } = require('../../helpers');
 const { getAppRootDir } = require('../../utils');
 
-const fs = require('fs/promises');
+const { resolve } = path;
 
 class InitCommand extends Command {
 	static summary = 'Initiate API Mesh workspace';
@@ -71,9 +72,17 @@ class InitCommand extends Command {
 	}
 
 	async cloneFile(templatePath, filePath) {
-		const dotNpmrcFile = await fs.readFile(templatePath, 'utf8');
+		const templateFileContents = await fs.readFile(templatePath, 'utf8');
 
-		await fs.writeFile(filePath, dotNpmrcFile, 'utf8', { mode: 'w' });
+		const dirPath = path.dirname(filePath);
+
+		try {
+			await fs.access(dirPath);
+		} catch {
+			await fs.mkdir(dirPath, { recursive: true });
+		}
+
+		await fs.writeFile(filePath, templateFileContents, 'utf8', { mode: 'w' });
 	}
 
 	async run() {
