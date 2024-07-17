@@ -1,6 +1,6 @@
 {
 	"name": "@adobe/aio-cli-plugin-api-mesh",
-	"version": "3.4.0",
+	"version": "3.5.0-beta.1",
 	"description": "Adobe I/O CLI plugin to develop and manage API mesh sources",
 	"keywords": [
 		"oclif-plugin"
@@ -37,13 +37,13 @@
 		"version": "oclif-dev readme && git add README.md"
 	},
 	"dependencies": {
-		"@adobe-apimesh/mesh-builder": "1.5.0",
+		"@adobe-apimesh/mesh-builder": "1.6.0",
 		"@adobe/aio-cli-lib-console": "^4.0.0",
 		"@adobe/aio-lib-core-config": "^3.0.0",
 		"@adobe/aio-lib-core-logging": "^2.0.0",
 		"@adobe/aio-lib-env": "^2.0.0",
 		"@adobe/aio-lib-ims": "^6.0.1",
-		"@adobe/plugin-hooks": "0.1.1",
+		"@adobe/plugin-hooks": "0.3.0",
 		"@adobe/plugin-on-fetch": "0.1.0",
 		"@graphql-mesh/cli": "0.82.30",
 		"@graphql-mesh/graphql": "0.34.13",
@@ -52,6 +52,7 @@
 		"@graphql-mesh/plugin-http-details-extensions": "0.1.21",
 		"@graphql-mesh/runtime": "0.46.21",
 		"@graphql-mesh/soap": "0.14.25",
+		"@graphql-mesh/store": "0.9.20",
 		"@graphql-mesh/transform-encapsulate": "0.4.21",
 		"@graphql-mesh/transform-federation": "0.11.14",
 		"@graphql-mesh/transform-filter-schema": "0.15.23",
@@ -64,7 +65,6 @@
 		"@graphql-mesh/transform-resolvers-composition": "0.13.20",
 		"@graphql-mesh/transform-type-merging": "0.5.20",
 		"@graphql-mesh/types": "0.91.12",
-		"@graphql-mesh/store": "0.9.20",
 		"@oclif/command": "^1.6.1",
 		"@oclif/config": "^1.15.1",
 		"@oclif/core": "^1.14.1",
@@ -74,6 +74,7 @@
 		"child_process": "^1.0.2",
 		"content-disposition": "^0.5.4",
 		"dotenv": "^16.0.3",
+		"envsub": "^4.1.0",
 		"eslint-plugin-promise": "^6.0.0",
 		"eslint-plugin-security": "^1.5.0",
 		"eslint-plugin-sonarjs": "^0.16.0",
@@ -92,7 +93,8 @@
 		"pupa": "^3.1.0",
 		"source-registry-storage-adapter": "github:devx-services/source-registry-storage-adapter#main",
 		"util": "^0.12.5",
-		"uuid": "^8.3.2"
+		"uuid": "^8.3.2",
+		"yaml": "^2.4.2"
 	},
 	"devDependencies": {
 		"@babel/eslint-parser": "^7.15.8",

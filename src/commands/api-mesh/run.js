@@ -15,11 +15,14 @@ const {
 	debugFlag,
 	selectFlag,
 	envFileFlag,
+	secretsFlag,
 	autoConfirmActionFlag,
 	readFileContents,
 	validateAndInterpolateMesh,
 	checkPlaceholders,
 	getFilesInMeshConfig,
+	validateSecretsFile,
+	interpolateSecrets,
 } = require('../../utils');
 const meshBuilder = require('@adobe-apimesh/mesh-builder');
 const fs = require('fs');
@@ -31,6 +34,7 @@ const {
 	startGraphqlServer,
 	importFiles,
 	setUpTenantFiles,
+	writeSecretsFile,
 } = require('../../helpers');
 const logger = require('../../classes/logger');
 const { getMeshId, getMeshArtifact } = require('../../lib/devConsole');
@@ -55,6 +59,7 @@ class RunCommand extends Command {
 		env: envFileFlag,
 		autoConfirmAction: autoConfirmActionFlag,
 		select: selectFlag,
+		secrets: secretsFlag,
 	};
 
 	static enableJsonFlag = true;
@@ -67,6 +72,7 @@ class RunCommand extends Command {
 		logger.info(`RequestId: ${global.requestId}`);
 
 		const { args, flags } = await this.parse(RunCommand);
+		const secretsFilePath = await flags.secrets;
 
 		//Initialize the meshId based on
 		let meshId = null;
@@ -165,6 +171,17 @@ class RunCommand extends Command {
 				}
 
 				let portNo;
+				//secrets management
+				if (secretsFilePath) {
+					try {
+						await validateSecretsFile(secretsFilePath);
+						const stringifiedSecrets = await interpolateSecrets(secretsFilePath, this);
+						await writeSecretsFile(stringifiedSecrets, meshId);
+					} catch (error) {
+						this.log(error.message);
+						this.error('Unable to import secrets. Please check the file and try again.');
+					}
+				}
 
 				//To set the port number using the environment file
 				if (process.env.PORT !== undefined) {

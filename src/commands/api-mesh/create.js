@@ -19,11 +19,15 @@ const {
 	jsonFlag,
 	getFilesInMeshConfig,
 	envFileFlag,
+	secretsFlag,
 	checkPlaceholders,
 	readFileContents,
 	validateAndInterpolateMesh,
+	interpolateSecrets,
+	validateSecretsFile,
+	encryptSecrets,
 } = require('../../utils');
-const { createMesh, getTenantFeatures } = require('../../lib/devConsole');
+const { createMesh, getTenantFeatures, getPublicEncryptionKey } = require('../../lib/devConsole');
 const { buildEdgeMeshUrl, buildMeshUrl } = require('../../urlBuilder');
 
 class CreateCommand extends Command {
@@ -33,6 +37,7 @@ class CreateCommand extends Command {
 		autoConfirmAction: autoConfirmActionFlag,
 		json: jsonFlag,
 		env: envFileFlag,
+		secrets: secretsFlag,
 	};
 
 	static enableJsonFlag = true;
@@ -53,6 +58,7 @@ class CreateCommand extends Command {
 		const ignoreCache = await flags.ignoreCache;
 		const autoConfirmAction = await flags.autoConfirmAction;
 		const envFilePath = await flags.env;
+		const secretsFilePath = await flags.secrets;
 		const {
 			imsOrgId,
 			imsOrgCode,
@@ -100,6 +106,20 @@ class CreateCommand extends Command {
 				this.error(
 					'Unable to import the files in the mesh config. Please check the file and try again.',
 				);
+			}
+		}
+
+		// if secrets is present, include that in data.secrets
+		if (secretsFilePath) {
+			try {
+				await validateSecretsFile(secretsFilePath);
+				const secretsData = await interpolateSecrets(secretsFilePath, this);
+				const publicKey = await getPublicEncryptionKey(imsOrgCode);
+				const encryptedSecrets = await encryptSecrets(publicKey, secretsData);
+				data.secrets = encryptedSecrets;
+			} catch (err) {
+				this.log(err.message);
+				this.error('Unable to import secrets. Please check the file and try again.');
 			}
 		}
 
