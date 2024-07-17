@@ -32,6 +32,8 @@ class GetCommand extends Command {
 
 		logger.info(`RequestId: ${global.requestId}`);
 
+		this.log("hello world")
+
 		const { args, flags } = await this.parse(GetCommand);
 
 		const ignoreCache = await flags.ignoreCache;

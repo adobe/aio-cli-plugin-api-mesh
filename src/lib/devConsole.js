@@ -112,6 +112,36 @@ const describeMesh = async (organizationId, projectId, workspaceId, workspaceNam
 	}
 };
 
+const fetchLogs = async (organizationId, projectId, workspaceId, workspaceName) => {
+	logger.info('Initiating Describe Mesh');
+
+	try {
+		const meshId = await getMeshId(organizationId, projectId, workspaceId, workspaceName);
+
+		logger.info('Response from getMeshId %s', meshId);
+
+		if (meshId) {
+			const credential = await getApiKeyCredential(organizationId, projectId, workspaceId);
+
+			if (credential) {
+				return { meshId, apiKey: credential.client_id };
+			} else {
+				logger.error('API Key credential not found on workspace');
+
+				return { meshId, apiKey: null };
+			}
+		} else {
+			logger.error(`Unable to retrieve meshId.`);
+
+			throw new Error(`Unable to retrieve meshId.`);
+		}
+	} catch (error) {
+		logger.error(error);
+
+		return null;
+	}
+};
+
 const getMesh = async (organizationId, projectId, workspaceId, workspaceName, meshId) => {
 	const { baseUrl: devConsoleUrl, accessToken, apiKey } = await getDevConsoleConfig();
 	const config = {
@@ -1015,6 +1045,7 @@ const getPublicEncryptionKey = async organizationCode => {
 	}
 };
 
+
 module.exports = {
 	getApiKeyCredential,
 	describeMesh,
@@ -1032,4 +1063,5 @@ module.exports = {
 	getTenantFeatures,
 	getMeshDeployments,
 	getPublicEncryptionKey,
+	fetchLogs,
 };
