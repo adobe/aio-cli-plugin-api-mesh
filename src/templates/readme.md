@@ -1,9 +1,21 @@
-# Adobe API Mesh Starter Kit
+# Adobe API Mesh
 
-Bootstrap your Adobe API Mesh development with ease.
+API Mesh enables developers to integrate third-party APIs with other Adobe products, like App Builder, Adobe IO Gateway, or other serverless technologies.
 
-Simply use the template to create a new repo and get started with Github Codespaces to write, test and deploy from the browser.
+Use this repo to bootstrap Adobe API Mesh development with ease. Use this repo to test, create and maintain meshes on your local and GitHub codespaces.
 
-This repo comes with all the files necessary to get started with API Mesh.
+This repo comes with all the files and dependencies necessary to get started with API Mesh.
 
-Check out the [documentation](https://developer.adobe.com/graphql-mesh-gateway/mesh/template) for further details.
+# Local Dev
+
+`yarn start mesh.json` - to start the local dev server in watch mode
+
+`yarn debug mesh.json` - to start the local dev server in debug mode
+
+`yarn aio api-mesh run mesh.json` - to start the local dev server in non-watch mode
+
+`yarn aio api-mesh run mesh.json --debug` - to start the local dev server in non-watch debug mode
+
+# Documentation
+
+Check out the [documentation](https://developer.adobe.com/graphql-mesh-gateway/mesh/basic/create-mesh/) for further details on how to create and maintain meshes.
