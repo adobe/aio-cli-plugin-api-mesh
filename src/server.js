@@ -52,19 +52,19 @@ const getCORSOptions = () => {
 	}
 };
 
- // Custom get secrets handler
- const getSecretsHandler = {
-	get: function(target, prop, receiver) {
-	if (prop in target) {
-		return Reflect.get(target, prop, receiver);
-	} else {
-		throw new Error(`The secret ${String(prop)} is not available.`);
-	}
+// Custom get secrets handler
+const getSecretsHandler = {
+	get: function (target, prop, receiver) {
+		if (prop in target) {
+			return Reflect.get(target, prop, receiver);
+		} else {
+			throw new Error(`The secret ${String(prop)} is not available.`);
+		}
 	},
-	set: function() {
-	throw new Error('Setting secrets is not allowed');
-	}
-   };
+	set: function () {
+		throw new Error('Setting secrets is not allowed');
+	},
+};
 
 const getYogaServer = async () => {
 	if (yogaServer) {
