@@ -406,13 +406,10 @@ async function parseSecrets(secretsContent) {
 			},
 			cli: false,
 		};
-		
+
 		const [newSecretsContent, placeholderMap] = replaceEscapedVariables(secretsContent);
 		const compiledContent = parseEnv(newSecretsContent, envParserConfig);
-		const compiledSecretsFileContent = replacePlaceholders(
-			compiledContent,
-			placeholderMap,
-		);
+		const compiledSecretsFileContent = replacePlaceholders(compiledContent, placeholderMap);
 		const parsedSecrets = YAML.parse(compiledSecretsFileContent);
 
 		//check if secrets file is empty
