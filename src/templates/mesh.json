@@ -1,0 +1,14 @@
+{
+	"meshConfig": {
+		"sources": [
+			{
+				"name": "AdobeCommerceAPI",
+				"handler": {
+					"graphql": {
+						"endpoint": "{{env.COMMERCE_ENDPOINT}}"
+					}
+				}
+			}
+		]
+	}
+}

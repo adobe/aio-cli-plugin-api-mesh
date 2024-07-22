@@ -42,7 +42,16 @@
 		"api-mesh"
 	],
 	"license": "Apache-2.0",
-	"scripts": {},
+	"scripts": {
+		"start": "nodemon --watch .env -e js,json,yaml node_modules/.bin/aio api-mesh run",
+		"debug": "nodemon --watch .env -e js,json,yaml node_modules/.bin/aio api-mesh run --debug",
+		"setupTelemetry": "echo {aio-cli-telemetry: {optOut: false}} > ~/.config/aio",
+		"devcontainer:setup": "yarn setupTelemetry & aio plugins:install @adobe/aio-cli-plugin-api-mesh"
+	},
 	"description": "API mesh starter template",
-	"author": "Adobe Inc."
+	"author": "Adobe Inc.",
+	"devDependencies": {
+		"@adobe/aio-cli": "^10.0.0",
+		"nodemon": "^3.1.3"
+	}
 }
