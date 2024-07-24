@@ -95,8 +95,7 @@
 		"util": "^0.12.5",
 		"uuid": "^8.3.2",
 		"yaml": "^2.4.2",
-		"newrelic": "^11.0.0",
-		"@graphql-mesh/http": "0.3.26"
+		"newrelic": "^11.0.0"
 	},
 	"devDependencies": {
 		"@babel/eslint-parser": "^7.15.8",
