@@ -1,6 +1,6 @@
 {
 	"name": "@adobe/aio-cli-plugin-api-mesh",
-	"version": "3.6.0",
+	"version": "3.6.1-beta.1",
 	"description": "Adobe I/O CLI plugin to develop and manage API mesh sources",
 	"keywords": [
 		"oclif-plugin"
@@ -94,7 +94,8 @@
 		"source-registry-storage-adapter": "github:devx-services/source-registry-storage-adapter#main",
 		"util": "^0.12.5",
 		"uuid": "^8.3.2",
-		"yaml": "^2.4.2"
+		"yaml": "^2.4.2",
+		"newrelic": "^11.0.0"
 	},
 	"devDependencies": {
 		"@babel/eslint-parser": "^7.15.8",
