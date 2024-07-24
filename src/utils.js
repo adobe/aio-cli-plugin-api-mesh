@@ -407,7 +407,7 @@ async function parseSecrets(secretsContent) {
 			cli: false,
 		};
 
-		const [newSecretsContent, placeholderMap] = replaceEscapedVariables(secretsContent);
+		const { secrets: newSecretsContent, placeholderMap } = replaceEscapedVariables(secretsContent);
 		const compiledContent = parseEnv(newSecretsContent, envParserConfig);
 		const compiledSecretsFileContent = replacePlaceholders(compiledContent, placeholderMap);
 		const parsedSecrets = YAML.parse(compiledSecretsFileContent);
@@ -484,7 +484,8 @@ async function encryptSecrets(publicKey, secrets) {
 // Function to replace escaped variables with placeholders
 const replaceEscapedVariables = content => {
 	const placeholderMap = {};
-	const newContent = content.replace(/\\+[$](([a-zA-Z]+)|([{][a-zA-Z]+[}]))/g, matched => {
+	const escapeDollarRegex = /\\+[$](([a-zA-Z]+)|([{][a-zA-Z]+[}]))/g;
+	const newContent = content.replace(escapeDollarRegex, matched => {
 		const slashCount = (matched.match(/\\/g) || []).length;
 		if (slashCount % 2 !== 0) {
 			const placeholder = `__PLACEHOLDER_${Math.random().toString(36).substr(2, 9)}__`;
@@ -495,7 +496,10 @@ const replaceEscapedVariables = content => {
 			return reduceConsecutiveBackslashes(matched);
 		}
 	});
-	return [newContent, placeholderMap];
+	return {
+		secrets: newContent,
+		placeholderMap,
+	};
 };
 
 // Function to replace placeholders back with original variables
