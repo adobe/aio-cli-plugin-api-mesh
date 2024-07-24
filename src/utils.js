@@ -406,8 +406,12 @@ async function parseSecrets(secretsContent) {
 			},
 			cli: false,
 		};
-		const compiledSecretsFileContent = parseEnv(secretsContent, envParserConfig);
+
+		const { secrets: newSecretsContent, placeholderMap } = replaceEscapedVariables(secretsContent);
+		const compiledContent = parseEnv(newSecretsContent, envParserConfig);
+		const compiledSecretsFileContent = replacePlaceholders(compiledContent, placeholderMap);
 		const parsedSecrets = YAML.parse(compiledSecretsFileContent);
+
 		//check if secrets file is empty
 		if (!parsedSecrets) {
 			throw new Error(chalk.red('Invalid YAML file contents. Please verify and try again.'));
@@ -475,6 +479,59 @@ async function encryptSecrets(publicKey, secrets) {
 		logger.error('Unable to encrypt secrets. Please try again. :', error.message);
 		throw new Error(`Unable to encrypt secerts. ${error.message}`);
 	}
+}
+
+// Function to replace escaped variables with placeholders
+const replaceEscapedVariables = content => {
+	const placeholderMap = {};
+	const escapeDollarRegex = /\\+[$](([a-zA-Z]+)|([{][a-zA-Z]+[}]))/g;
+	const newContent = content.replace(escapeDollarRegex, matched => {
+		const slashCount = (matched.match(/\\/g) || []).length;
+		if (slashCount % 2 !== 0) {
+			const placeholder = `__PLACEHOLDER_${Math.random().toString(36).substr(2, 9)}__`;
+			const newValue = reduceConsecutiveBackslashes(matched);
+			placeholderMap[placeholder] = newValue;
+			return placeholder;
+		} else {
+			return reduceConsecutiveBackslashes(matched);
+		}
+	});
+	return {
+		secrets: newContent,
+		placeholderMap,
+	};
+};
+
+// Function to replace placeholders back with original variables
+const replacePlaceholders = (content, placeholderMap) => {
+	let newContent = content;
+	for (const [key, value] of Object.entries(placeholderMap)) {
+		newContent = newContent.replaceAll(key, value);
+	}
+	return newContent;
+};
+
+// Function to reduce the backslashes
+function reduceConsecutiveBackslashes(str) {
+	let result = '';
+	let i = 0;
+
+	while (i < str.length) {
+		if (str[i] === '\\') {
+			let count = 0;
+			// Count consecutive backslashes
+			while (i < str.length && str[i] === '\\') {
+				count++;
+				i++;
+			}
+			// Append half the count of backslashes (rounded down)
+			result += '\\'.repeat(Math.floor(count / 2));
+		} else {
+			result += str[i];
+			i++;
+		}
+	}
+	return result;
 }
 
 module.exports = {
