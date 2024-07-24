@@ -111,37 +111,6 @@ const describeMesh = async (organizationId, projectId, workspaceId, workspaceNam
 		return null;
 	}
 };
-
-const fetchLogs = async (organizationId, projectId, workspaceId, workspaceName) => {
-	logger.info('Initiating Describe Mesh');
-
-	try {
-		const meshId = await getMeshId(organizationId, projectId, workspaceId, workspaceName);
-
-		logger.info('Response from getMeshId %s', meshId);
-
-		if (meshId) {
-			const credential = await getApiKeyCredential(organizationId, projectId, workspaceId);
-
-			if (credential) {
-				return { meshId, apiKey: credential.client_id };
-			} else {
-				logger.error('API Key credential not found on workspace');
-
-				return { meshId, apiKey: null };
-			}
-		} else {
-			logger.error(`Unable to retrieve meshId.`);
-
-			throw new Error(`Unable to retrieve meshId.`);
-		}
-	} catch (error) {
-		logger.error(error);
-
-		return null;
-	}
-};
-
 const getMesh = async (organizationId, projectId, workspaceId, workspaceName, meshId) => {
 	const { baseUrl: devConsoleUrl, accessToken, apiKey } = await getDevConsoleConfig();
 	const config = {
@@ -221,6 +190,51 @@ const getMesh = async (organizationId, projectId, workspaceId, workspaceName, me
 
 			throw new Error('Unable to get mesh from Schema Management Service: %s', error.message);
 		}
+	}
+};
+
+/**
+* Fetches logs for a given mesh.
+*
+* This request bypasses the Dev Console and is sent directly to the Schema Management Service.
+* @param organizationId
+* @param projectId
+* @param workspaceId
+* @param workspaceName
+* @param meshId
+* @returns {Promise<Object>}
+*/
+const fetchLogs = async (organizationId, projectId, workspaceId, workspaceName, meshId) => {
+   const { accessToken, apiKey } = await getDevConsoleConfig();
+   const config = {
+	   method: 'get',
+	   url:  `${SMS_BASE_URL}organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/57ec1546-9b09-4ef5-bb71-76d47e2d5e5b/rayIds?API_KEY=${apiKey}`,
+	   headers: {
+		   'Authorization': `Bearer ${accessToken}`,
+		   'x-request-id': global.requestId,
+		   'workspaceName': workspaceName,
+	   },
+   };
+
+   console.log(config.url)
+   console.log(`${SMS_BASE_URL}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/rayIds?API_KEY=${apiKey}`)
+
+
+   try {
+	   const response = await axios(config);
+
+	   logger.info('Response from GET %s', response.status);
+
+	   if (response?.status === 200) {
+		   //logger.info(`Fetched logs: ${JSON.stringify(response.data, null, 2)}`);
+		   return response.data;
+	   } else {
+		   return "logs could not be found"
+	   }
+	}
+	catch (error) {
+		logger.error(`Error while fetching logs: ${error}`);
+		throw "response error"
 	}
 };
 
@@ -998,6 +1012,20 @@ const getMeshDeployments = async (organizationCode, projectId, workspaceId, mesh
 		};
 	}
 };
+
+
+/**
+ * Gets the deployments value for mesh.
+ *
+ * This request bypasses the Dev Console and is sent directly to the Schema Management Service.
+ * As a result, we provide the orgCode instead of orgId since Dev Console usually performs the translation.
+ * The near-term goal is to stop using Dev Console as a proxy for all routes.
+ * @param organizationCode
+ * @param projectId
+ * @param workspaceId
+ * @param meshId
+ * @returns {Promise<Object>}
+ */
 
 /**
  * Gets the public key to encrypt secrets.
