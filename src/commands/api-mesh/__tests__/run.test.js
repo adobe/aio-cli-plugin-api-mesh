@@ -58,7 +58,7 @@ jest.mock('@adobe-apimesh/mesh-builder', () => {
 });
 
 jest.mock('envsub/js/envsub-parser', () => {
-	return (contents, args) => {
+	return (contents) => {
 		return contents.replaceAll('$HOME', 'rootPath');
 	};
 });
@@ -982,7 +982,7 @@ describe('run command tests', () => {
 		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), defaultPort, false);
 	});
 
-	test('should escape variables that are preceded by "\" ', async () => {
+	test('should escape variables that are preceded by backslash symbol', async () => {
 		parseSpy.mockResolvedValueOnce({
 			args: { file: 'src/commands/__fixtures__/sample_mesh_with_escaped_secrets.json' },
 			flags: {
