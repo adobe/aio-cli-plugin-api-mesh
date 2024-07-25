@@ -984,7 +984,7 @@ describe('run command tests', () => {
 
 	test('should escape variables that are preceded by "\" ', async () => {
 		parseSpy.mockResolvedValueOnce({
-			args: { file: 'src/commands/__fixtures__/sample_secrets_mesh.json' },
+			args: { file: 'src/commands/__fixtures__/sample_mesh_with_escaped_secrets.json' },
 			flags: {
 				secrets: 'src/commands/__fixtures__/secrets_with_escaped_variables.yaml',
 				debug: false,
