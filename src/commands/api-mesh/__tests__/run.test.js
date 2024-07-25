@@ -58,7 +58,7 @@ jest.mock('@adobe-apimesh/mesh-builder', () => {
 });
 
 jest.mock('envsub/js/envsub-parser', () => {
-	return (contents) => {
+	return contents => {
 		return contents.replaceAll('$HOME', 'rootPath');
 	};
 });
