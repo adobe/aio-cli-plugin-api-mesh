@@ -208,7 +208,7 @@ const fetchLogs = async (organizationId, projectId, workspaceId, workspaceName, 
    const { accessToken, apiKey } = await getDevConsoleConfig();
    const config = {
 	   method: 'get',
-	   url:  `${SMS_BASE_URL}organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/57ec1546-9b09-4ef5-bb71-76d47e2d5e5b/rayIds?API_KEY=${apiKey}`,
+	   url:  `http://localhost:8081/v2/organizations/testOrganization/projects/testProject/workspaces/testWorkspace/meshes/6646c42e-590e-4c0e-a2b7-ef3310213f87/rayIds`,
 	   headers: {
 		   'Authorization': `Bearer ${accessToken}`,
 		   'x-request-id': global.requestId,
@@ -237,6 +237,41 @@ const fetchLogs = async (organizationId, projectId, workspaceId, workspaceName, 
 		throw "response error"
 	}
 };
+
+const getLogsByRayId = async (organizationId, projectId, workspaceId, workspaceName, meshId) => {
+	const { accessToken, apiKey } = await getDevConsoleConfig();
+	const config = {
+		method: 'get',
+		url:  `https://zumvsh7c7i.execute-api.us-east-1.amazonaws.com/Stage/meshes/23184cda-00fd-400f-bcac-01bb6438f5a8/logs/8ab5b34b0d769e6e`,
+		headers: {
+			'Authorization': `Bearer ${accessToken}`,
+			'x-request-id': global.requestId,
+			'workspaceName': workspaceName,
+		},
+	};
+ 
+	console.log(config.url)
+	console.log(`${SMS_BASE_URL}organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/rayIds?API_KEY=${apiKey}`)
+ 
+ 
+	try {
+		const response = await axios(config);
+ 
+		logger.info('Response from GET %s', response.status);
+		//console.log(response)
+ 
+		if (response?.status === 200) {
+			//logger.info(`Fetched logs: ${JSON.stringify(response.data, null, 2)}`);
+			return response.data
+		} else {
+			return "logs could not be found"
+		}
+	 }
+	 catch (error) {
+		 logger.error(`Error while fetching logs: ${error}`);
+		 throw "response error"
+	 }
+ };
 
 const createMesh = async (
 	organizationId,
@@ -1092,4 +1127,5 @@ module.exports = {
 	getMeshDeployments,
 	getPublicEncryptionKey,
 	fetchLogs,
+	getLogsByRayId
 };

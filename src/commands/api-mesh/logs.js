@@ -15,7 +15,7 @@ const { writeFile } = require('fs/promises');
 const logger = require('../../classes/logger');
 const { initSdk, initRequestId } = require('../../helpers');
 const { ignoreCacheFlag, jsonFlag } = require('../../utils');
-const { getMeshId, getMesh, fetchLogs} = require('../../lib/devConsole');
+const { getMeshId, getMesh, fetchLogs, getLogsByRayId} = require('../../lib/devConsole');
 
 require('dotenv').config();
 class FetchLogsCommand extends Command {
@@ -55,45 +55,20 @@ class FetchLogsCommand extends Command {
 		}
 		if (meshId) {
 			try {
-				const mesh = await fetchLogs(imsOrgId, projectId, workspaceId, workspaceName, meshId);
-				const meshString = JSON.stringify(mesh, null, 2);
-				const meshObject = JSON.parse(meshString)
-				const data = JSON.stringify(meshObject.data);
+				const mesh = await getLogsByRayId(imsOrgId, projectId, workspaceId, workspaceName, meshId);
 
 				console.log(mesh)
 
 				if (mesh) {
-					this.log('Successfully retrieved mesh %s', data);
+					this.log('Successfully retrieved mesh %s', mesh.data);
 
+					console.log("------")
+					console.log(mesh)
+					console.log("------")
+					//console.log(mesh["EventTimeStampMs"])
 
-					console.log(mesh.data)
-					// Check if 'data' is an array
-					if (Array.isArray(mesh.data)) {
-						const data = mesh.data;
-					
-						// Function to pad strings to a fixed length
-						const padString = (str, length) => {
-							return (str || '').padEnd(length);
-						};
-					
-						// Function to format a log entry
-						const formatLogEntry = (entry) => {
-							return `${padString(entry.datetime, 15)} ${padString(entry.status.toString(), 9)} ${padString(entry.method, 9)} ${padString(entry.rayID, 38)}`;
-						};
-					
-						// Print the header
-						this.log(`${padString('Datetime', 15)} ${padString('Status', 9)} ${padString('Method', 9)} ${padString('RayID', 38)}`);
-					
-						// Print a separator line
-						this.log(`${'-'.repeat(15)} ${'-'.repeat(9)} ${'-'.repeat(9)} ${'-'.repeat(20)}`);
-					
-						// Loop through the 'data' array and print each log entry
-						data.forEach((entry) => {
-						this.log(formatLogEntry(entry));
-						});
-				} else {
-					console.log('The "data" field is not an array.');
-				}
+					// Log the object keys and values side by side
+					console.table(mesh);
 				} else {
 					console.log(`Unable to get mesh with the ID ${meshId}. Please check the mesh ID and try again. RequestId: ${global.requestId}`);
 				}
