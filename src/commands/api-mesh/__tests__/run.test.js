@@ -57,6 +57,12 @@ jest.mock('@adobe-apimesh/mesh-builder', () => {
 	};
 });
 
+jest.mock('envsub/js/envsub-parser', () => {
+	return contents => {
+		return contents.replaceAll('$HOME', 'rootPath');
+	};
+});
+
 let logSpy = null;
 let errorLogSpy = null;
 let parseSpy = null;
@@ -973,6 +979,23 @@ describe('run command tests', () => {
 
 		await RunCommand.run();
 		expect(writeSecretsFile).toHaveBeenCalled();
+		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), defaultPort, false);
+	});
+
+	test('should escape variables that are preceded by backslash symbol', async () => {
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_mesh_with_escaped_secrets.json' },
+			flags: {
+				secrets: 'src/commands/__fixtures__/secrets_with_escaped_variables.yaml',
+				debug: false,
+			},
+		});
+
+		await RunCommand.run();
+		expect(writeSecretsFile).toHaveBeenCalledWith(
+			'Home: rootPath\nHomeString: $HOME\nHomeWithSlash: \\rootPath\nHomeStringWithSlash: \\$HOME\n',
+			expect.anything(),
+		);
 		expect(startGraphqlServer).toHaveBeenCalledWith(expect.anything(), defaultPort, false);
 	});
 });
