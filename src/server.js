@@ -58,7 +58,7 @@ const getSecretsHandler = {
 		if (prop === 'toJSON') {
 			// Handle the toJSON case
 			return () => target;
-	   	} 
+		}
 		if (Object.keys(target).length === 0) {
 			return undefined;
 		}
