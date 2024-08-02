@@ -1,0 +1,27 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/typescript-node
+{
+	"name": "API Mesh Dev Container",
+	"image": "mcr.microsoft.com/devcontainers/typescript-node:1-20-bookworm",
+	"hostRequirements": {
+		"cpus": 2,
+		"memory": "8gb",
+		"storage": "32gb"
+	},
+	"forwardPorts": [5000],
+	"postAttachCommand": {
+		"server": "yarn start mesh.json"
+	},
+	"postCreateCommand": "yarn install && yarn devcontainer:setup",
+	"portsAttributes": {
+		"5000": {
+			"label": "Mesh GraphQL Server",
+			"onAutoForward": "openPreview"
+		}
+	},
+	"customizations": {
+		"codespaces": {
+			"openFiles": ["README.md", "mesh.json"]
+		}
+	}
+}

@@ -10,12 +10,13 @@ governing permissions and limitations under the License.
 */
 
 const { Command, Flags } = require('@oclif/core');
-const resolve = require('path').resolve;
+const path = require('path');
+const fs = require('fs/promises');
 
 const { promptConfirm, promptSelect, runCliCommand } = require('../../helpers');
 const { getAppRootDir } = require('../../utils');
 
-const fs = require('fs/promises');
+const { resolve } = path;
 
 class InitCommand extends Command {
 	static summary = 'Initiate API Mesh workspace';
@@ -70,16 +71,18 @@ class InitCommand extends Command {
 		await fs.writeFile(filePath, JSON.stringify(pkgJSON, null, 2), 'utf8', { mode: 'w' });
 	}
 
-	async createDotNpmrcFile(templatePath, filePath) {
-		const dotNpmrcFile = await fs.readFile(templatePath, 'utf8');
+	async cloneFile(templatePath, filePath) {
+		const templateFileContents = await fs.readFile(templatePath, 'utf8');
 
-		await fs.writeFile(filePath, dotNpmrcFile, 'utf8', { mode: 'w' });
-	}
+		const dirPath = path.dirname(filePath);
 
-	async createGitIgnoreFile(templatePath, filePath) {
-		const gitIgnoreFile = await fs.readFile(templatePath, 'utf8');
+		try {
+			await fs.access(dirPath);
+		} catch {
+			await fs.mkdir(dirPath, { recursive: true });
+		}
 
-		await fs.writeFile(filePath, gitIgnoreFile, 'utf8', { mode: 'w' });
+		await fs.writeFile(filePath, templateFileContents, 'utf8', { mode: 'w' });
 	}
 
 	async run() {
@@ -92,8 +95,16 @@ class InitCommand extends Command {
 		let absolutePath = resolve(flags.path);
 		let shouldCreateGit = gitFlagOptions[flags.git];
 		let packageManagerChoice = flags.packageManager;
+
 		const packageJsonTemplate = `${getAppRootDir()}/src/templates/package.json`;
 		const dotNpmrcPath = `${getAppRootDir()}/src/templates/npmrc`;
+		const vsCodeLaunchJsonPath = `${getAppRootDir()}/src/templates/vscode_launch.json`;
+		const devContainerJsonPath = `${getAppRootDir()}/src/templates/devcontainer.json`;
+		const sampleENVPath = `${getAppRootDir()}/src/templates/sample.env`;
+		const githubWorkflowPath = `${getAppRootDir()}/src/templates/deployWorkflow.yaml`;
+		const readmePath = `${getAppRootDir()}/src/templates/readme.md`;
+		const sampleMeshConfigPath = `${getAppRootDir()}/src/templates/mesh.json`;
+
 		const shouldCreateWorkspace = await promptConfirm(
 			`Do you want to create the workspace in ${absolutePath}`,
 		);
@@ -140,15 +151,12 @@ class InitCommand extends Command {
 					const gitIgnoreTemplatePath = `${getAppRootDir()}/src/templates/gitignore`;
 					const gitIgnoreFilePath = `${absolutePath}/.gitignore`;
 
-					await this.createGitIgnoreFile(gitIgnoreTemplatePath, gitIgnoreFilePath);
+					await this.cloneFile(gitIgnoreTemplatePath, gitIgnoreFilePath);
+					await this.cloneFile(githubWorkflowPath, `${absolutePath}/.github/workflows/deploy.yaml`);
 				} catch (error) {
 					this.error(error);
 				}
 			}
-
-			await fs.writeFile(`${absolutePath}/.env`, '', 'utf8', { mode: 'w' });
-
-			this.log(`Installing dependencies`);
 
 			await this.createPackageJson(
 				packageJsonTemplate,
@@ -156,7 +164,14 @@ class InitCommand extends Command {
 				args.projectName,
 			);
 
-			await this.createDotNpmrcFile(dotNpmrcPath, `${absolutePath}/.npmrc`);
+			await this.cloneFile(dotNpmrcPath, `${absolutePath}/.npmrc`);
+			await this.cloneFile(vsCodeLaunchJsonPath, `${absolutePath}/.vscode/launch.json`);
+			await this.cloneFile(devContainerJsonPath, `${absolutePath}/.devcontainer/devcontainer.json`);
+			await this.cloneFile(sampleENVPath, `${absolutePath}/.env`);
+			await this.cloneFile(readmePath, `${absolutePath}/README.md`);
+			await this.cloneFile(sampleMeshConfigPath, `${absolutePath}/mesh.json`);
+
+			this.log(`Installing dependencies`);
 
 			if (packageManagerChoice === 'npm') {
 				try {

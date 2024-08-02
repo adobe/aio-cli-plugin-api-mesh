@@ -13,6 +13,7 @@ const {
 	removeRequestHeaders,
 	prepSourceResponseHeaders,
 	processResponseHeaders,
+	readSecretsFile,
 } = require('./serverUtils');
 
 let yogaServer = null;
@@ -64,6 +65,8 @@ const getYogaServer = async () => {
 		const tenantMesh = await getBuiltMesh();
 		const corsOptions = getCORSOptions();
 
+		const secrets = readSecretsFile(meshId);
+
 		logger.info('Creating graphQL server');
 
 		meshConfig = readMeshConfig(meshId);
@@ -73,6 +76,10 @@ const getYogaServer = async () => {
 			graphqlEndpoint: `/graphql`,
 			graphiql: true,
 			cors: corsOptions,
+			context: initialContext => ({
+				...initialContext,
+				secrets,
+			}),
 		});
 
 		return yogaServer;

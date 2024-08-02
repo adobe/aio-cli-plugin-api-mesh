@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const LRUCache = require('lru-cache');
 const logger = require('./classes/logger');
+const YAML = require('yaml');
 
 const headersCache = new LRUCache({
 	max: parseInt(process.env.CACHE_OPT_MAX || '500', 10),
@@ -315,9 +316,29 @@ function ccDirectivesToString(directives) {
 	return chStr.toString();
 }
 
+/**
+ * Returns secrets content from artifacts
+ * @param meshId
+ * @returns
+ */
+function readSecretsFile(meshId) {
+	let secrets = {};
+	try {
+		const filePath = path.resolve(process.cwd(), 'mesh-artifact', `${meshId}`, 'secrets.yaml');
+		if (fs.existsSync(filePath)) {
+			secrets = YAML.parse(fs.readFileSync(filePath, 'utf8'));
+		}
+	} catch (error) {
+		logger.error('Unexpected error: unable to locate secrets file in mesh artifacts.');
+		throw new Error(error.message);
+	}
+	return secrets;
+}
+
 module.exports = {
 	readMeshConfig,
 	removeRequestHeaders,
 	prepSourceResponseHeaders,
 	processResponseHeaders,
+	readSecretsFile,
 };
