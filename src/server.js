@@ -55,6 +55,10 @@ const getCORSOptions = () => {
 // Custom get secrets handler
 const getSecretsHandler = {
 	get: function (target, prop, receiver) {
+		if (prop === 'toJSON') {
+			// Handle the toJSON case
+			return () => target;
+		}
 		if (prop in target) {
 			return Reflect.get(target, prop, receiver);
 		} else {
