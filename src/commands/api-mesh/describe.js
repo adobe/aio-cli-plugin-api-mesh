@@ -32,7 +32,7 @@ class DescribeCommand extends Command {
 
 		const { flags } = await this.parse(DescribeCommand);
 		const ignoreCache = await flags.ignoreCache;
-		const { imsOrgId, imsOrgCode, projectId, workspaceId, workspaceName } = await initSdk({
+		const { imsOrgId, projectId, workspaceId, workspaceName } = await initSdk({
 			ignoreCache,
 		});
 

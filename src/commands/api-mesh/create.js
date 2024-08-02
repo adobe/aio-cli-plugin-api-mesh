@@ -173,7 +173,6 @@ class CreateCommand extends Command {
 							const edgeMeshUrl = buildEdgeMeshUrl(mesh.meshId, workspaceName);
 							this.log('Legacy Mesh Endpoint: %s', meshUrl);
 							this.log(chalk.bold('Edge Mesh Endpoint: %s\n'), edgeMeshUrl);
-							
 						} else {
 							this.log('Unable to subscribe API Key %s to API Mesh service', apiKey);
 						}
