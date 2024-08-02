@@ -27,7 +27,7 @@ const {
 	validateSecretsFile,
 	encryptSecrets,
 } = require('../../utils');
-const { createMesh, getTenantFeatures, getPublicEncryptionKey } = require('../../lib/devConsole');
+const { createMesh, getPublicEncryptionKey } = require('../../lib/devConsole');
 const { buildEdgeMeshUrl, buildMeshUrl } = require('../../urlBuilder');
 
 class CreateCommand extends Command {
@@ -170,15 +170,10 @@ class CreateCommand extends Command {
 								apiKey,
 							);
 
-							const { showCloudflareURL: showEdgeMeshUrl } = await getTenantFeatures(imsOrgCode);
-
-							if (showEdgeMeshUrl) {
-								const edgeMeshUrl = buildEdgeMeshUrl(mesh.meshId, workspaceName);
-								this.log('Legacy Mesh Endpoint: %s', meshUrl);
-								this.log(chalk.bold('Edge Mesh Endpoint: %s\n'), edgeMeshUrl);
-							} else {
-								this.log('Mesh Endpoint: %s\n', meshUrl);
-							}
+							const edgeMeshUrl = buildEdgeMeshUrl(mesh.meshId, workspaceName);
+							this.log('Legacy Mesh Endpoint: %s', meshUrl);
+							this.log(chalk.bold('Edge Mesh Endpoint: %s\n'), edgeMeshUrl);
+							
 						} else {
 							this.log('Unable to subscribe API Key %s to API Mesh service', apiKey);
 						}

@@ -15,7 +15,7 @@ const chalk = require('chalk');
 const logger = require('../../classes/logger');
 const { initSdk, initRequestId } = require('../../helpers');
 const { ignoreCacheFlag } = require('../../utils');
-const { describeMesh, getTenantFeatures } = require('../../lib/devConsole');
+const { describeMesh } = require('../../lib/devConsole');
 const { buildMeshUrl, buildEdgeMeshUrl } = require('../../urlBuilder');
 
 require('dotenv').config();
@@ -41,7 +41,6 @@ class DescribeCommand extends Command {
 
 			if (meshDetails) {
 				const { meshId, apiKey } = meshDetails;
-				const { showCloudflareURL: showEdgeMeshUrl } = await getTenantFeatures(imsOrgCode);
 
 				if (meshId) {
 					const meshUrl = await buildMeshUrl(
@@ -59,13 +58,9 @@ class DescribeCommand extends Command {
 					this.log('Workspace ID: %s', workspaceId);
 					this.log('Mesh ID: %s', meshId);
 
-					if (showEdgeMeshUrl) {
-						const edgeMeshUrl = buildEdgeMeshUrl(meshId, workspaceName);
-						this.log('Legacy Mesh Endpoint: %s', meshUrl);
-						this.log(chalk.bold('Edge Mesh Endpoint: %s\n'), edgeMeshUrl);
-					} else {
-						this.log('Mesh Endpoint: %s\n', meshUrl);
-					}
+					const edgeMeshUrl = buildEdgeMeshUrl(meshId, workspaceName);
+					this.log('Legacy Mesh Endpoint: %s', meshUrl);
+					this.log(chalk.bold('Edge Mesh Endpoint: %s\n'), edgeMeshUrl);
 
 					return meshDetails;
 				} else {

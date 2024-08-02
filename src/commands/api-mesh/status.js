@@ -6,7 +6,6 @@ const { initRequestId, initSdk } = require('../../helpers');
 const {
 	getMeshId,
 	getMesh,
-	getTenantFeatures,
 	getMeshDeployments,
 } = require('../../lib/devConsole');
 const { ignoreCacheFlag } = require('../../utils');
@@ -41,15 +40,12 @@ class StatusCommand extends Command {
 
 		if (meshId) {
 			try {
-				const { showCloudflareURL: showEdgeMeshUrl } = await getTenantFeatures(imsOrgCode);
 				const mesh = await getMesh(imsOrgId, projectId, workspaceId, workspaceName, meshId);
-				const meshLabel = showEdgeMeshUrl ? chalk.bold(`Legacy Mesh:`) : 'Your mesh';
+				const meshLabel = chalk.bold(`Legacy Mesh:`);
 
 				this.log(''.padEnd(102, '*'));
 				this.displayMeshStatus(mesh, meshLabel);
-				if (showEdgeMeshUrl) {
-					await this.displayEdgeMeshStatus(mesh, imsOrgCode, projectId, workspaceId);
-				}
+				await this.displayEdgeMeshStatus(mesh, imsOrgCode, projectId, workspaceId);
 				this.log(''.padEnd(102, '*'));
 			} catch (err) {
 				this.log(err.message);
