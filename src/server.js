@@ -52,6 +52,24 @@ const getCORSOptions = () => {
 	}
 };
 
+// Custom get secrets handler
+const getSecretsHandler = {
+	get: function (target, prop, receiver) {
+		if (prop === 'toJSON') {
+			// Handle the toJSON case
+			return () => target;
+		}
+		if (prop in target) {
+			return Reflect.get(target, prop, receiver);
+		} else {
+			throw new Error(`The secret ${String(prop)} is not available.`);
+		}
+	},
+	set: function () {
+		throw new Error('Setting secrets is not allowed');
+	},
+};
+
 const getYogaServer = async () => {
 	if (yogaServer) {
 		return yogaServer;
@@ -67,6 +85,8 @@ const getYogaServer = async () => {
 
 		const secrets = readSecretsFile(meshId);
 
+		const secretsProxy = new Proxy(secrets, getSecretsHandler);
+
 		logger.info('Creating graphQL server');
 
 		meshConfig = readMeshConfig(meshId);
@@ -78,7 +98,7 @@ const getYogaServer = async () => {
 			cors: corsOptions,
 			context: initialContext => ({
 				...initialContext,
-				secrets,
+				secrets: secretsProxy,
 			}),
 		});
 
