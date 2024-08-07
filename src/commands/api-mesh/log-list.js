@@ -70,27 +70,39 @@ class FetchLogsCommand extends Command {
 					// Check if 'data' is an array
 					if (Array.isArray(mesh.data)) {
 						const data = mesh.data;
-					
-						// Function to pad strings to a fixed length
+						//write to file if greater than 15 and gile arg is provided
+						//const data = mesh.data.slice(0, 15);
+
+						// Sort the data array by datetime in descending order
+						//data.prototype.sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
+						// Sort the data array by datetime in descending order
+						let filteredData = data.sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
+
+						filteredData = filteredData.slice(0, 15);
+
+
+
 						const padString = (str, length) => {
-							return (str || '').padEnd(length);
-						};
-					
-						// Function to format a log entry
-						const formatLogEntry = (entry) => {
-							return `${padString(entry.datetime, 15)} ${padString(entry.status.toString(), 9)} ${padString(entry.method, 9)} ${padString(entry.rayID, 38)}`;
-						};
-					
-						// Print the header
-						this.log(`${padString('Datetime', 15)} ${padString('Status', 9)} ${padString('Method', 9)} ${padString('RayID', 38)}`);
-					
-						// Print a separator line
-						this.log(`${'-'.repeat(15)} ${'-'.repeat(9)} ${'-'.repeat(9)} ${'-'.repeat(20)}`);
-					
-						// Loop through the 'data' array and print each log entry
-						data.forEach((entry) => {
-						this.log(formatLogEntry(entry));
-						});
+							return (str === null || str === undefined ? ''.padEnd(length) : String(str).padEnd(length));
+						  };
+						  
+						  // Function to format a log entry
+						  const formatLogEntry = (entry) => {
+							return `${padString(entry.datetime, 15)} ${padString(entry.status, 10)} ${padString(entry.method, 9)} ${padString(entry.rayID, 38)}`;
+						  };
+						  
+						  // Print the header
+						  this.log(`${padString('Datetime', 15)} ${padString('Status', 10)} ${padString('Method', 9)} ${padString('RayID', 38)}`);
+						  
+						  // Print a separator line
+						  this.log(`${'-'.repeat(15)} ${'-'.repeat(10)} ${'-'.repeat(9)} ${'-'.repeat(38)}`);
+						  
+						  // Loop through the 'data' array and print each log entry
+						  filteredData.forEach((entry) => {
+							this.log(formatLogEntry(entry));
+						  });
+						  
+
 				} else {
 					console.log('The "data" field is not an array.');
 				}

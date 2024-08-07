@@ -208,7 +208,7 @@ const fetchLogs = async (organizationId, projectId, workspaceId, workspaceName, 
    const { accessToken, apiKey } = await getDevConsoleConfig();
    const config = {
 	   method: 'get',
-	   url:  `http://localhost:8081/v2/organizations/testOrganization/projects/testProject/workspaces/testWorkspace/meshes/6646c42e-590e-4c0e-a2b7-ef3310213f87/rayIds`,
+	   url:  `http://localhost:8081/v2/organizations/testOrganization/projects/testProject/workspaces/testWorkspace/meshes/a615e80d-24d0-44ba-8f3c-07704489affd/rayIds`,
 	   headers: {
 		   'Authorization': `Bearer ${accessToken}`,
 		   'x-request-id': global.requestId,
