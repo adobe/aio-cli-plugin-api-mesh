@@ -13,7 +13,7 @@ const { Command } = require('@oclif/command');
 const chalk = require('chalk');
 
 const logger = require('../../classes/logger');
-const { initSdk, initRequestId } = require('../../helpers');
+const { initSdk, initRequestId, createNotice } = require('../../helpers');
 const { ignoreCacheFlag } = require('../../utils');
 const { describeMesh } = require('../../lib/devConsole');
 const { buildMeshUrl, buildEdgeMeshUrl } = require('../../urlBuilder');
@@ -59,8 +59,22 @@ class DescribeCommand extends Command {
 					this.log('Mesh ID: %s', meshId);
 
 					const edgeMeshUrl = buildEdgeMeshUrl(meshId, workspaceName);
+					this.log(
+						await createNotice(
+							`API Mesh now runs at the edge and legacy mesh URLs will be deprecated.\nUse the following link to find more information on how to migrate your mesh:\n${chalk.underline.blue(
+								'https://developer.adobe.com/graphql-mesh-gateway/mesh/release/migration',
+							)}`,
+						),
+					);
 					this.log('Legacy Mesh Endpoint: %s', meshUrl);
 					this.log(chalk.bold('Edge Mesh Endpoint: %s\n'), edgeMeshUrl);
+
+					// this.log(chalk.bgYellow('Make sure that you update your mesh before using the edge mesh endpoint. You can validate your edge mesh status using the status command.'));
+					this.log(
+						await createNotice(
+							`Make sure that you update your mesh before using the edge mesh endpoint.\nYou can validate your edge mesh status using the status command.`,
+						),
+					);
 
 					return meshDetails;
 				} else {

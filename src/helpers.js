@@ -17,6 +17,7 @@ const { getToken, context } = require('@adobe/aio-lib-ims');
 const { CLI } = require('@adobe/aio-lib-ims/src/context');
 const libConsoleCLI = require('@adobe/aio-cli-lib-console');
 const { getCliEnv } = require('@adobe/aio-lib-env');
+const chalk = require('chalk');
 
 const logger = require('../src/classes/logger');
 const { UUID } = require('./classes/UUID');
@@ -880,6 +881,21 @@ async function writeSecretsFile(secretsData, meshId) {
 	}
 }
 
+// Function to generate the notice message with multiline support
+async function createNotice(message) {
+	const lines = message.split('\n');
+	const maxLength = Math.max(...lines.map(line => line.length));
+	const border = chalk.yellow('='.repeat(maxLength + 12));
+
+	const formattedLines = lines.map(line => {
+		const padding = ' '.repeat(maxLength - line.length);
+		return `${chalk.whiteBright(line)}${padding}`;
+	});
+
+	const noticeMessage = formattedLines.join('\n');
+	return `${border}\n${chalk.blueBright.bold('ⓘ')} ${noticeMessage} \n${border}`;
+}
+
 module.exports = {
 	objToString,
 	promptInput,
@@ -897,4 +913,5 @@ module.exports = {
 	startGraphqlServer,
 	setUpTenantFiles,
 	writeSecretsFile,
+	createNotice,
 };
