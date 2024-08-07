@@ -2,7 +2,7 @@ const { Command } = require('@oclif/core');
 const chalk = require('chalk');
 
 const logger = require('../../classes/logger');
-const { initRequestId, initSdk } = require('../../helpers');
+const { initRequestId, initSdk, createNotice } = require('../../helpers');
 const { getMeshId, getMesh, getMeshDeployments } = require('../../lib/devConsole');
 const { ignoreCacheFlag } = require('../../utils');
 
@@ -37,6 +37,25 @@ class StatusCommand extends Command {
 		if (meshId) {
 			try {
 				const mesh = await getMesh(imsOrgId, projectId, workspaceId, workspaceName, meshId);
+				
+				// this.log(
+				// 	await createNotice(
+				// 		`API Mesh now runs at the edge and legacy mesh URLs will be deprecated.\nUse the following link to find more information on how to migrate your mesh:\n${chalk.underline.blue(
+				// 			'https://developer.adobe.com/graphql-mesh-gateway/mesh/release/migration',
+				// 		)}`,
+				// 	),
+				// );
+
+				this.log(
+					chalk.bgYellow(
+						`\nAPI Mesh now runs at the edge and legacy mesh URLs will be deprecated.\nUse the following link to find more information on how to migrate your mesh:`,
+					),
+				);
+				this.log(
+					chalk.underline.blue(
+						'https://developer.adobe.com/graphql-mesh-gateway/mesh/release/migration\n',
+					),
+				);
 				const meshLabel = chalk.bold(`Legacy Mesh:`);
 
 				this.log(''.padEnd(102, '*'));
