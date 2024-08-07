@@ -10,6 +10,7 @@ const parseEnv = require('envsub/js/envsub-parser');
 const os = require('os');
 const chalk = require('chalk');
 const crypto = require('crypto');
+const { start } = require('repl');
 
 /**
  * @returns returns the root directory of the project
@@ -64,6 +65,20 @@ const debugFlag = Flags.boolean({
 
 const selectFlag = Flags.boolean({
 	description: 'Retrieve existing artifacts from the mesh',
+	default: false,
+});
+
+const startTimeFlag = Flags.string({
+	description: 'Start time of the operation',
+	default: false,
+});
+
+const endTimeFlag = Flags.string({
+	description: 'End time of the operation',
+	default: false,
+});
+const fileNameFlag = Flags.string({
+	description: 'End time of the operation',
 	default: false,
 });
 
@@ -494,4 +509,7 @@ module.exports = {
 	interpolateSecrets,
 	validateSecretsFile,
 	encryptSecrets,
+	startTimeFlag,
+	endTimeFlag,
+	fileNameFlag
 };
