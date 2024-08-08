@@ -32,8 +32,6 @@ class FetchLogsCommand extends Command {
 
 		logger.info(`RequestId: ${global.requestId}`);
 
-		this.log("hello world")
-
 		const { args, flags } = await this.parse(FetchLogsCommand);
 
 		const ignoreCache = await flags.ignoreCache;
@@ -57,14 +55,14 @@ class FetchLogsCommand extends Command {
 			try {
 				const mesh = await getLogsByRayId(imsOrgId, projectId, workspaceId, workspaceName, meshId);
 
-				console.log(mesh)
+				//console.log(mesh)
 
 				if (mesh) {
-					this.log('Successfully retrieved mesh %s', mesh.data);
+					this.log('Successfully retrieved mesh %s:');
 
-					console.log("------")
-					console.log(mesh)
-					console.log("------")
+					//console.log("------")
+					//console.log(mesh)
+					//console.log("------")
 					//console.log(mesh["EventTimeStampMs"])
 
 					// Log the object keys and values side by side

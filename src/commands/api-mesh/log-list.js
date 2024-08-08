@@ -97,23 +97,16 @@ class FetchLogsCommand extends Command {
 								//console.log(entryTime >= startTime)
 								return entryTime >= startTimeMs && entryTime <= endTimeMs;
 							});
-						}else {
-							data.sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
-
-							filteredData = filteredData.slice(0, 15);
 						}
 
-						if(fileNameFlag){
-							this.log('Writing to file:', fileName);
+						if (fileName) {
 							filteredData = data.filter(entry => {
-								//const entryTime = entry.datetime;
-								//this.log('Entry Time:', entryTime, new Date(entryTime).getTime());
-								//filteredData.append(entry)
-								//console.log(startTimeMs, entryTime, endTimMs)
-								//console.log(entryTime >= startTime)
-								return entry
+								return entry;
 							});
+
 						}
+
+						
 
 						const padString = (str, length) => {
 							return (str === null || str === undefined ? ''.padEnd(length) : String(str).padEnd(length));

@@ -81,6 +81,10 @@ const fileNameFlag = Flags.string({
 	description: 'End time of the operation',
 	default: false,
 });
+const rayIdeFlag = Flags.string({
+	description: 'Ray ID',
+	default: false,
+});
 
 /**
  * Parse the meshConfig and get the list of (local) files to be imported
