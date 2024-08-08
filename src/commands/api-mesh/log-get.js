@@ -14,7 +14,7 @@ const { writeFile } = require('fs/promises');
 
 const logger = require('../../classes/logger');
 const { initSdk, initRequestId } = require('../../helpers');
-const { ignoreCacheFlag, jsonFlag } = require('../../utils');
+const { ignoreCacheFlag, jsonFlag, rayIdFlag } = require('../../utils');
 const { getMeshId, getMesh, fetchLogs, getLogsByRayId} = require('../../lib/devConsole');
 
 require('dotenv').config();
@@ -23,6 +23,7 @@ class FetchLogsCommand extends Command {
 	static flags = {
 		ignoreCache: ignoreCacheFlag,
 		json: jsonFlag,
+		rayId: rayIdFlag
 	};
 
 	static enableJsonFlag = true;
@@ -36,16 +37,19 @@ class FetchLogsCommand extends Command {
 
 		const ignoreCache = await flags.ignoreCache;
 		const json = await flags.json;
+		const rayId = await flags.rayId;
 
-		const { imsOrgId, projectId, workspaceId, workspaceName } = await initSdk({
+		const { imsOrgId, projectId, workspaceId } = await initSdk({
 			ignoreCache,
 			verbose: !json,
 		});
 
 		let meshId = null;
 
+		//console.log('rayid', rayId);
+
 		try {
-			meshId = await getMeshId(imsOrgId, projectId, workspaceId, workspaceName);
+			meshId = await getMeshId(imsOrgId, projectId, workspaceId, meshId);
 		} catch (err) {
 			this.error(
 				`Unable to get mesh ID. Please check the details and try again. RequestId: ${global.requestId}`,
@@ -53,20 +57,25 @@ class FetchLogsCommand extends Command {
 		}
 		if (meshId) {
 			try {
-				const mesh = await getLogsByRayId(imsOrgId, projectId, workspaceId, workspaceName, meshId);
+				const mesh = await getLogsByRayId(imsOrgId, projectId, workspaceId, meshId, rayId);
 
 				//console.log(mesh)
 
 				if (mesh) {
-					this.log('Successfully retrieved mesh %s:');
+					this.log('Successfully retrieved mesh %s');
+					//console.log(mesh);
 
-					//console.log("------")
-					//console.log(mesh)
-					//console.log("------")
-					//console.log(mesh["EventTimeStampMs"])
+					const result = Object.entries(mesh).map(([key, value]) => ({ [key]: value[0] }));
 
-					// Log the object keys and values side by side
-					console.table(mesh);
+					const flattenedResult = result.reduce((acc, curr) => {
+						const [key, value] = Object.entries(curr)[0];
+						acc[key] = value;
+						return acc;
+					}, {});
+
+					console.table([flattenedResult]);
+
+					//console.table(result);
 				} else {
 					console.log(`Unable to get mesh with the ID ${meshId}. Please check the mesh ID and try again. RequestId: ${global.requestId}`);
 				}

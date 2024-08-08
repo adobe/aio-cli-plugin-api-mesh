@@ -195,7 +195,7 @@ const getMesh = async (organizationId, projectId, workspaceId, workspaceName, me
 
 /**
 * Fetches logs for a given mesh.
-* log-list command
+*
 * This request bypasses the Dev Console and is sent directly to the Schema Management Service.
 * @param organizationId
 * @param projectId
@@ -239,16 +239,15 @@ const fetchLogs = async (organizationId, projectId, workspaceId, workspaceName, 
 };
 
 
-//log-get command
-const getLogsByRayId = async (organizationId, projectId, workspaceId, workspaceName, meshId) => {
+//log-get
+const getLogsByRayId = async (organizationId, projectId, workspaceId, meshId, rayId) => {
 	const { accessToken, apiKey } = await getDevConsoleConfig();
 	const config = {
 		method: 'get',
-		url:  `https://zumvsh7c7i.execute-api.us-east-1.amazonaws.com/Stage/meshes/ef46a973-d808-4132-8242-22154a6cee2f/logs/8afe0b6d7d9667bb`,
+		url:  `https://zumvsh7c7i.execute-api.us-east-1.amazonaws.com/Stage/meshes/ef46a973-d808-4132-8242-22154a6cee2f/logs/${rayId}`,
 		headers: {
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
-			'workspaceName': workspaceName,
 		},
 	};
  

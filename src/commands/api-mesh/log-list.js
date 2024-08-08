@@ -14,7 +14,7 @@ const { writeFile } = require('fs/promises');
 
 const logger = require('../../classes/logger');
 const { initSdk, initRequestId } = require('../../helpers');
-const { ignoreCacheFlag, jsonFlag, startTimeFlag, endTimeFlag, fileNameFlag} = require('../../utils');
+const { ignoreCacheFlag, jsonFlag, fileNameFlag} = require('../../utils');
 const { getMeshId, getMesh, fetchLogs} = require('../../lib/devConsole');
 
 require('dotenv').config();
@@ -23,8 +23,6 @@ class FetchLogsCommand extends Command {
 	static flags = {
 		ignoreCache: ignoreCacheFlag,
 		json: jsonFlag,
-		startTime: startTimeFlag,
-		endTime: endTimeFlag,
 		fileName: fileNameFlag
 		
 	};
@@ -36,14 +34,12 @@ class FetchLogsCommand extends Command {
 
 		logger.info(`RequestId: ${global.requestId}`);
 
-		this.log("hello world")
-
 		const { args, flags } = await this.parse(FetchLogsCommand);
 
 		const ignoreCache = await flags.ignoreCache;
 		const json = await flags.json;
-		const startTime = await flags.startTime;
-		const endTime = await flags.endTime;
+		//const startTime = await flags.startTime;
+		//const endTime = await flags.endTime;
 		const fileName = await flags.fileName;
 
 		const { imsOrgId, projectId, workspaceId, workspaceName } = await initSdk({
@@ -69,10 +65,10 @@ class FetchLogsCommand extends Command {
 
 				//console.log(mesh)
 
-				console.log('Start Time:', startTime, new Date(startTime).getTime());
-        		console.log('End Time:', endTime, new Date(endTime).getTime());
-				let startTimeMs = new Date(startTime).getTime();
-				let endTimeMs = new Date(endTime).getTime();
+				//console.log('Start Time:', startTime, new Date(startTime).getTime());
+        		//console.log('End Time:', endTime, new Date(endTime).getTime());
+				//let startTimeMs = new Date(startTime).getTime();
+				//let endTimeMs = new Date(endTime).getTime();
 
 				if (mesh) {
 					this.log('Successfully retrieved mesh %s');
@@ -88,7 +84,8 @@ class FetchLogsCommand extends Command {
 
 						let filteredData = []
 
-						if (startTime && endTime) {
+						/**
+						 * if (startTime && endTime) {
 							filteredData = data.filter(entry => {
 								const entryTime = entry.datetime;
 								//this.log('Entry Time:', entryTime, new Date(entryTime).getTime());
@@ -98,13 +95,26 @@ class FetchLogsCommand extends Command {
 								return entryTime >= startTimeMs && entryTime <= endTimeMs;
 							});
 						}
+						 */
+						
+						filteredData = data.slice(0,15).filter(entry => {
+							return entry;
+						});
+						//console.log(filteredData)
 
 						if (fileName) {
-							filteredData = data.filter(entry => {
-								return entry;
-							});
-
+							try {
+								await writeFile(fileName, data.map(entry => Object.values(entry).join(',')).join('\n'));
+								this.log(`Logs written to file: ${fileName}`);
+							} catch (error) {
+								this.error(`Unable to write logs to file: ${fileName}`);
+							}
 						}
+
+						
+
+					
+						
 
 						
 

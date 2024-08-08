@@ -81,7 +81,7 @@ const fileNameFlag = Flags.string({
 	description: 'End time of the operation',
 	default: false,
 });
-const rayIdeFlag = Flags.string({
+const rayIdFlag = Flags.string({
 	description: 'Ray ID',
 	default: false,
 });
@@ -515,5 +515,6 @@ module.exports = {
 	encryptSecrets,
 	startTimeFlag,
 	endTimeFlag,
-	fileNameFlag
+	fileNameFlag,
+	rayIdFlag
 };
