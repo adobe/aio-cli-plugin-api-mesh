@@ -36,6 +36,8 @@ class FetchLogsCommand extends Command {
 
 		logger.info(`RequestId: ${global.requestId}`);
 
+		this.log("hello world")
+
 		const { args, flags } = await this.parse(FetchLogsCommand);
 
 		const ignoreCache = await flags.ignoreCache;
@@ -103,6 +105,14 @@ class FetchLogsCommand extends Command {
 
 						if(fileNameFlag){
 							this.log('Writing to file:', fileName);
+							filteredData = data.filter(entry => {
+								//const entryTime = entry.datetime;
+								//this.log('Entry Time:', entryTime, new Date(entryTime).getTime());
+								//filteredData.append(entry)
+								//console.log(startTimeMs, entryTime, endTimMs)
+								//console.log(entryTime >= startTime)
+								return entry
+							});
 						}
 
 						const padString = (str, length) => {

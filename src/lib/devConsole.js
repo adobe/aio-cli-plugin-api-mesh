@@ -216,8 +216,8 @@ const fetchLogs = async (organizationId, projectId, workspaceId, workspaceName, 
 	   },
    };
 
-   console.log(config.url)
-   console.log(`${SMS_BASE_URL}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/rayIds?API_KEY=${apiKey}`)
+   //console.log(config.url)
+   //console.log(`${SMS_BASE_URL}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/rayIds?API_KEY=${apiKey}`)
 
 
    try {

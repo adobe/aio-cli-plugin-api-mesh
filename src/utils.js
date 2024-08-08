@@ -70,7 +70,7 @@ const selectFlag = Flags.boolean({
 
 const startTimeFlag = Flags.string({
 	description: 'Start time of the operation',
-	default: false,
+	default: true,
 });
 
 const endTimeFlag = Flags.string({
