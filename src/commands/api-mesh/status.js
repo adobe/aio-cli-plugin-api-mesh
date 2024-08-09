@@ -3,12 +3,7 @@ const chalk = require('chalk');
 
 const logger = require('../../classes/logger');
 const { initRequestId, initSdk } = require('../../helpers');
-const {
-	getMeshId,
-	getMesh,
-	getTenantFeatures,
-	getMeshDeployments,
-} = require('../../lib/devConsole');
+const { getMeshId, getMesh, getMeshDeployments } = require('../../lib/devConsole');
 const { ignoreCacheFlag } = require('../../utils');
 
 require('dotenv').config();
@@ -41,15 +36,22 @@ class StatusCommand extends Command {
 
 		if (meshId) {
 			try {
-				const { showCloudflareURL: showEdgeMeshUrl } = await getTenantFeatures(imsOrgCode);
 				const mesh = await getMesh(imsOrgId, projectId, workspaceId, workspaceName, meshId);
-				const meshLabel = showEdgeMeshUrl ? chalk.bold(`Legacy Mesh:`) : 'Your mesh';
+				this.log(
+					chalk.bgYellow(
+						`\nAPI Mesh now runs at the edge and legacy mesh URLs will be deprecated.\nUse the following link to find more information on how to migrate your mesh:`,
+					),
+				);
+				this.log(
+					chalk.underline.blue(
+						'https://developer.adobe.com/graphql-mesh-gateway/mesh/release/migration\n',
+					),
+				);
+				const meshLabel = chalk.bold(`Legacy Mesh:`);
 
 				this.log(''.padEnd(102, '*'));
 				this.displayMeshStatus(mesh, meshLabel);
-				if (showEdgeMeshUrl) {
-					await this.displayEdgeMeshStatus(mesh, imsOrgCode, projectId, workspaceId);
-				}
+				await this.displayEdgeMeshStatus(mesh, imsOrgCode, projectId, workspaceId);
 				this.log(''.padEnd(102, '*'));
 			} catch (err) {
 				this.log(err.message);
