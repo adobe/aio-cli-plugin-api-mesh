@@ -179,9 +179,26 @@ describe('describe command tests', () => {
 		    "dummy_meshId",
 		  ],
 		  [
-		    "Mesh Endpoint: %s
-		",
+		    "[43m[49m
+		[43mAPI Mesh now runs at the edge and legacy mesh URLs will be deprecated.[49m
+		[43mUse the following link to find more information on how to migrate your mesh:[49m",
+		  ],
+		  [
+		    "[4m[34mhttps://developer.adobe.com/graphql-mesh-gateway/mesh/release/migration[39m[24m
+		[4m[34m[39m[24m",
+		  ],
+		  [
+		    "Legacy Mesh Endpoint: %s",
 		    "https://graph.adobe.io/api/dummy_meshId/graphql",
+		  ],
+		  [
+		    "[1mEdge Mesh Endpoint: %s[22m
+		[1m[22m",
+		    "https://edge-sandbox-graph.adobe.io/api/dummy_meshId/graphql",
+		  ],
+		  [
+		    "[43mMake sure that you update your mesh before using the edge mesh endpoint.[49m
+		[43mYou can validate your edge mesh status using the status command.[49m",
 		  ],
 		]
 	`);
@@ -227,9 +244,26 @@ describe('describe command tests', () => {
 		    "dummy_meshId",
 		  ],
 		  [
-		    "Mesh Endpoint: %s
-		",
+		    "[43m[49m
+		[43mAPI Mesh now runs at the edge and legacy mesh URLs will be deprecated.[49m
+		[43mUse the following link to find more information on how to migrate your mesh:[49m",
+		  ],
+		  [
+		    "[4m[34mhttps://developer.adobe.com/graphql-mesh-gateway/mesh/release/migration[39m[24m
+		[4m[34m[39m[24m",
+		  ],
+		  [
+		    "Legacy Mesh Endpoint: %s",
 		    "https://graph.adobe.io/api/dummy_meshId/graphql?api_key=dummy_apiKey",
+		  ],
+		  [
+		    "[1mEdge Mesh Endpoint: %s[22m
+		[1m[22m",
+		    "https://edge-sandbox-graph.adobe.io/api/dummy_meshId/graphql",
+		  ],
+		  [
+		    "[43mMake sure that you update your mesh before using the edge mesh endpoint.[49m
+		[43mYou can validate your edge mesh status using the status command.[49m",
 		  ],
 		]
 	`);
@@ -279,9 +313,26 @@ describe('describe command tests', () => {
 		    "dummy_meshId",
 		  ],
 		  [
-		    "Mesh Endpoint: %s
-		",
+		    "[43m[49m
+		[43mAPI Mesh now runs at the edge and legacy mesh URLs will be deprecated.[49m
+		[43mUse the following link to find more information on how to migrate your mesh:[49m",
+		  ],
+		  [
+		    "[4m[34mhttps://developer.adobe.com/graphql-mesh-gateway/mesh/release/migration[39m[24m
+		[4m[34m[39m[24m",
+		  ],
+		  [
+		    "Legacy Mesh Endpoint: %s",
 		    "https://tigraph.adobe.io/dummy_meshId/graphql",
+		  ],
+		  [
+		    "[1mEdge Mesh Endpoint: %s[22m
+		[1m[22m",
+		    "https://edge-sandbox-graph.adobe.io/api/dummy_meshId/graphql",
+		  ],
+		  [
+		    "[43mMake sure that you update your mesh before using the edge mesh endpoint.[49m
+		[43mYou can validate your edge mesh status using the status command.[49m",
 		  ],
 		]
 	`);
@@ -335,26 +386,6 @@ describe('describe command tests', () => {
 		expect(logSpy).toHaveBeenCalledWith(
 			expect.stringContaining('Edge Mesh Endpoint:'),
 			'https://edge-sandbox-graph.adobe.io/api/dummy_meshId/graphql',
-		);
-	});
-
-	test('should not show edge mesh url if feature is disabled', async () => {
-		// mock the edge mesh url feature to be disabled
-		getTenantFeatures.mockResolvedValueOnce({
-			imsOrgId: selectedOrg.code,
-			showCloudflareURL: false,
-		});
-
-		await DescribeCommand.run();
-
-		expect(logSpy).not.toHaveBeenCalledWith(
-			expect.stringContaining('Edge Mesh Endpoint:'),
-			expect.any(String),
-		);
-
-		expect(logSpy).toHaveBeenCalledWith(
-			expect.stringContaining('Mesh Endpoint:'),
-			'https://graph.adobe.io/api/dummy_meshId/graphql?api_key=dummy_apiKey',
 		);
 	});
 });
