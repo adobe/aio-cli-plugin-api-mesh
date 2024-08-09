@@ -11,7 +11,7 @@ governing permissions and limitations under the License.
 
 const { Command } = require('@oclif/core');
 const chalk = require('chalk');
-const { initSdk, initRequestId, promptConfirm, importFiles, createNotice } = require('../../helpers');
+const { initSdk, initRequestId, promptConfirm, importFiles } = require('../../helpers');
 const logger = require('../../classes/logger');
 const {
 	ignoreCacheFlag,
@@ -171,14 +171,6 @@ class CreateCommand extends Command {
 							);
 
 							const edgeMeshUrl = buildEdgeMeshUrl(mesh.meshId, workspaceName);
-							// this.log(
-							// 	await createNotice(
-							// 		`API Mesh now runs at the edge and legacy mesh URLs will be deprecated.\nUse the following link to find more information on how to migrate your mesh:\n${chalk.underline.blue(
-							// 			'https://developer.adobe.com/graphql-mesh-gateway/mesh/release/migration',
-							// 		)}`,
-							// 	),
-							// );
-
 							this.log(
 								chalk.yellow(
 									`\nAPI Mesh now runs at the edge and legacy mesh URLs will be deprecated.\nUse the following link to find more information on how to migrate your mesh:`,
@@ -189,7 +181,6 @@ class CreateCommand extends Command {
 									'https://developer.adobe.com/graphql-mesh-gateway/mesh/release/migration\n',
 								),
 							);
-
 							this.log('Legacy Mesh Endpoint: %s', meshUrl);
 							this.log(chalk.bold('Edge Mesh Endpoint: %s\n'), edgeMeshUrl);
 						} else {
