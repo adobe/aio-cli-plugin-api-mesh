@@ -172,7 +172,7 @@ class CreateCommand extends Command {
 
 							const edgeMeshUrl = buildEdgeMeshUrl(mesh.meshId, workspaceName);
 							this.log(
-								chalk.yellow(
+								chalk.bgYellow(
 									`\nAPI Mesh now runs at the edge and legacy mesh URLs will be deprecated.\nUse the following link to find more information on how to migrate your mesh:`,
 								),
 							);
