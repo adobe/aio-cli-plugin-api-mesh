@@ -24,6 +24,13 @@ jest.mock('@adobe/aio-cli-lib-console', () => ({
 	cleanStdOut: jest.fn(),
 }));
 jest.mock('../../../lib/devConsole');
+jest.mock('chalk', () => ({
+	bold: jest.fn(text => text), // Return the input text without any color formatting
+	underline: {
+		blue: jest.fn(text => text),
+	},
+	bgYellow: jest.fn(text => text),
+}));
 
 const DescribeCommand = require('../describe');
 const { initSdk, initRequestId } = require('../../../helpers');
@@ -179,26 +186,26 @@ describe('describe command tests', () => {
 		    "dummy_meshId",
 		  ],
 		  [
-		    "[43m[49m
-		[43mAPI Mesh now runs at the edge and legacy mesh URLs will be deprecated.[49m
-		[43mUse the following link to find more information on how to migrate your mesh:[49m",
+		    "
+		API Mesh now runs at the edge and legacy mesh URLs will be deprecated.
+		Use the following link to find more information on how to migrate your mesh:",
 		  ],
 		  [
-		    "[4m[34mhttps://developer.adobe.com/graphql-mesh-gateway/mesh/release/migration[39m[24m
-		[4m[34m[39m[24m",
+		    "https://developer.adobe.com/graphql-mesh-gateway/mesh/release/migration
+		",
 		  ],
 		  [
 		    "Legacy Mesh Endpoint: %s",
 		    "https://graph.adobe.io/api/dummy_meshId/graphql",
 		  ],
 		  [
-		    "[1mEdge Mesh Endpoint: %s[22m
-		[1m[22m",
+		    "Edge Mesh Endpoint: %s
+		",
 		    "https://edge-sandbox-graph.adobe.io/api/dummy_meshId/graphql",
 		  ],
 		  [
-		    "[43mMake sure that you update your mesh before using the edge mesh endpoint.[49m
-		[43mYou can validate your edge mesh status using the status command.[49m",
+		    "Make sure that you update your mesh before using the edge mesh endpoint.
+		You can validate your edge mesh status using the status command.",
 		  ],
 		]
 	`);
@@ -244,26 +251,26 @@ describe('describe command tests', () => {
 		    "dummy_meshId",
 		  ],
 		  [
-		    "[43m[49m
-		[43mAPI Mesh now runs at the edge and legacy mesh URLs will be deprecated.[49m
-		[43mUse the following link to find more information on how to migrate your mesh:[49m",
+		    "
+		API Mesh now runs at the edge and legacy mesh URLs will be deprecated.
+		Use the following link to find more information on how to migrate your mesh:",
 		  ],
 		  [
-		    "[4m[34mhttps://developer.adobe.com/graphql-mesh-gateway/mesh/release/migration[39m[24m
-		[4m[34m[39m[24m",
+		    "https://developer.adobe.com/graphql-mesh-gateway/mesh/release/migration
+		",
 		  ],
 		  [
 		    "Legacy Mesh Endpoint: %s",
 		    "https://graph.adobe.io/api/dummy_meshId/graphql?api_key=dummy_apiKey",
 		  ],
 		  [
-		    "[1mEdge Mesh Endpoint: %s[22m
-		[1m[22m",
+		    "Edge Mesh Endpoint: %s
+		",
 		    "https://edge-sandbox-graph.adobe.io/api/dummy_meshId/graphql",
 		  ],
 		  [
-		    "[43mMake sure that you update your mesh before using the edge mesh endpoint.[49m
-		[43mYou can validate your edge mesh status using the status command.[49m",
+		    "Make sure that you update your mesh before using the edge mesh endpoint.
+		You can validate your edge mesh status using the status command.",
 		  ],
 		]
 	`);
@@ -313,26 +320,26 @@ describe('describe command tests', () => {
 		    "dummy_meshId",
 		  ],
 		  [
-		    "[43m[49m
-		[43mAPI Mesh now runs at the edge and legacy mesh URLs will be deprecated.[49m
-		[43mUse the following link to find more information on how to migrate your mesh:[49m",
+		    "
+		API Mesh now runs at the edge and legacy mesh URLs will be deprecated.
+		Use the following link to find more information on how to migrate your mesh:",
 		  ],
 		  [
-		    "[4m[34mhttps://developer.adobe.com/graphql-mesh-gateway/mesh/release/migration[39m[24m
-		[4m[34m[39m[24m",
+		    "https://developer.adobe.com/graphql-mesh-gateway/mesh/release/migration
+		",
 		  ],
 		  [
 		    "Legacy Mesh Endpoint: %s",
 		    "https://tigraph.adobe.io/dummy_meshId/graphql",
 		  ],
 		  [
-		    "[1mEdge Mesh Endpoint: %s[22m
-		[1m[22m",
+		    "Edge Mesh Endpoint: %s
+		",
 		    "https://edge-sandbox-graph.adobe.io/api/dummy_meshId/graphql",
 		  ],
 		  [
-		    "[43mMake sure that you update your mesh before using the edge mesh endpoint.[49m
-		[43mYou can validate your edge mesh status using the status command.[49m",
+		    "Make sure that you update your mesh before using the edge mesh endpoint.
+		You can validate your edge mesh status using the status command.",
 		  ],
 		]
 	`);
@@ -388,4 +395,5 @@ describe('describe command tests', () => {
 			'https://edge-sandbox-graph.adobe.io/api/dummy_meshId/graphql',
 		);
 	});
+
 });

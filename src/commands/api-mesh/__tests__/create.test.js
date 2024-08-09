@@ -78,7 +78,7 @@ jest.mock('chalk', () => ({
 	underline: {
 		blue: jest.fn(text => text),
 	},
-	yellow: jest.fn(text => text),
+	bgYellow: jest.fn(text => text),
 }));
 jest.mock('crypto');
 
