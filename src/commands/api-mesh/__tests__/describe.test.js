@@ -395,5 +395,4 @@ describe('describe command tests', () => {
 			'https://edge-sandbox-graph.adobe.io/api/dummy_meshId/graphql',
 		);
 	});
-
 });
