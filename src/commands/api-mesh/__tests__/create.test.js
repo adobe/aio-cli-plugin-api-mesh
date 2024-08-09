@@ -75,6 +75,10 @@ jest.mock('../../../lib/devConsole');
 jest.mock('chalk', () => ({
 	red: jest.fn(text => text), // Return the input text without any color formatting
 	bold: jest.fn(text => text),
+	underline: {
+		blue: jest.fn(text => text),
+	},
+	bgYellow: jest.fn(text => text),
 }));
 jest.mock('crypto');
 
@@ -409,9 +413,22 @@ describe('create command tests', () => {
 		    "dummy_api_key",
 		  ],
 		  [
-		    "Mesh Endpoint: %s
+		    "
+		API Mesh now runs at the edge and legacy mesh URLs will be deprecated.
+		Use the following link to find more information on how to migrate your mesh:",
+		  ],
+		  [
+		    "https://developer.adobe.com/graphql-mesh-gateway/mesh/release/migration
 		",
+		  ],
+		  [
+		    "Legacy Mesh Endpoint: %s",
 		    "https://graph.adobe.io/api/dummy_mesh_id/graphql?api_key=dummy_api_key",
+		  ],
+		  [
+		    "Edge Mesh Endpoint: %s
+		",
+		    "https://edge-sandbox-graph.adobe.io/api/dummy_mesh_id/graphql",
 		  ],
 		]
 	`);
@@ -502,9 +519,22 @@ describe('create command tests', () => {
 		    "dummy_api_key",
 		  ],
 		  [
-		    "Mesh Endpoint: %s
+		    "
+		API Mesh now runs at the edge and legacy mesh URLs will be deprecated.
+		Use the following link to find more information on how to migrate your mesh:",
+		  ],
+		  [
+		    "https://developer.adobe.com/graphql-mesh-gateway/mesh/release/migration
 		",
+		  ],
+		  [
+		    "Legacy Mesh Endpoint: %s",
 		    "https://tigraph.adobe.io/dummy_mesh_id/graphql",
+		  ],
+		  [
+		    "Edge Mesh Endpoint: %s
+		",
+		    "https://edge-sandbox-graph.adobe.io/api/dummy_mesh_id/graphql",
 		  ],
 		]
 	`);
@@ -693,9 +723,22 @@ describe('create command tests', () => {
 		    "dummy_api_key",
 		  ],
 		  [
-		    "Mesh Endpoint: %s
+		    "
+		API Mesh now runs at the edge and legacy mesh URLs will be deprecated.
+		Use the following link to find more information on how to migrate your mesh:",
+		  ],
+		  [
+		    "https://developer.adobe.com/graphql-mesh-gateway/mesh/release/migration
 		",
+		  ],
+		  [
+		    "Legacy Mesh Endpoint: %s",
 		    "https://graph.adobe.io/api/dummy_mesh_id/graphql?api_key=dummy_api_key",
+		  ],
+		  [
+		    "Edge Mesh Endpoint: %s
+		",
+		    "https://edge-sandbox-graph.adobe.io/api/dummy_mesh_id/graphql",
 		  ],
 		]
 	`);
@@ -1880,26 +1923,6 @@ describe('create command tests', () => {
 		expect(logSpy).toHaveBeenCalledWith(
 			expect.stringContaining('Edge Mesh Endpoint:'),
 			'https://edge-sandbox-graph.adobe.io/api/dummy_mesh_id/graphql',
-		);
-	});
-
-	test('should not show edge mesh url if feature is disabled', async () => {
-		// mock the edge mesh url feature to be disabled
-		getTenantFeatures.mockResolvedValueOnce({
-			imsOrgId: selectedOrg.code,
-			showCloudflareURL: false,
-		});
-
-		await CreateCommand.run();
-
-		expect(logSpy).not.toHaveBeenCalledWith(
-			expect.stringContaining('Edge Mesh Endpoint:'),
-			expect.any(String),
-		);
-
-		expect(logSpy).toHaveBeenCalledWith(
-			expect.stringContaining('Mesh Endpoint:'),
-			'https://graph.adobe.io/api/dummy_mesh_id/graphql?api_key=dummy_api_key',
 		);
 	});
 
