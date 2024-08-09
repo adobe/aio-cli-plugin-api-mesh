@@ -97,9 +97,7 @@ class FetchLogsCommand extends Command {
 						}
 						 */
 						
-						filteredData = data.slice(0,15).filter(entry => {
-							return entry;
-						});
+						filteredData = data.slice(0, 15).sort((a, b) => new Date(b.datetime) - new Date(a.datetime));
 						//console.log(filteredData)
 
 						if (fileName) {

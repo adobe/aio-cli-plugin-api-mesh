@@ -244,7 +244,7 @@ const getLogsByRayId = async (organizationId, projectId, workspaceId, meshId, ra
 	const { accessToken, apiKey } = await getDevConsoleConfig();
 	const config = {
 		method: 'get',
-		url:  `https://zumvsh7c7i.execute-api.us-east-1.amazonaws.com/Stage/meshes/ef46a973-d808-4132-8242-22154a6cee2f/logs/${rayId}`,
+		url:  `https://zumvsh7c7i.execute-api.us-east-1.amazonaws.com/Stage/meshes/c3ee0d11-ce14-4817-8fb4-b5dd0442d272/logs/${rayId}`,
 		headers: {
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
