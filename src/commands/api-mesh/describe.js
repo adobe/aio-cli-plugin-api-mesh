@@ -73,7 +73,7 @@ class DescribeCommand extends Command {
 					this.log(chalk.bold('Edge Mesh Endpoint: %s\n'), edgeMeshUrl);
 					this.log(
 						chalk.bgYellow(
-							'Make sure that you update your mesh before using the edge mesh endpoint.\nYou can validate your edge mesh status using the status command.',
+							'Update your mesh before using the edge mesh endpoint.\nYou can validate your edge mesh status using the aio api-mesh status command.',
 						),
 					);
 					return meshDetails;

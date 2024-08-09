@@ -204,8 +204,8 @@ describe('describe command tests', () => {
 		    "https://edge-sandbox-graph.adobe.io/api/dummy_meshId/graphql",
 		  ],
 		  [
-		    "Make sure that you update your mesh before using the edge mesh endpoint.
-		You can validate your edge mesh status using the status command.",
+		    "Update your mesh before using the edge mesh endpoint.
+		You can validate your edge mesh status using the aio api-mesh status command.",
 		  ],
 		]
 	`);
@@ -269,8 +269,8 @@ describe('describe command tests', () => {
 		    "https://edge-sandbox-graph.adobe.io/api/dummy_meshId/graphql",
 		  ],
 		  [
-		    "Make sure that you update your mesh before using the edge mesh endpoint.
-		You can validate your edge mesh status using the status command.",
+		    "Update your mesh before using the edge mesh endpoint.
+		You can validate your edge mesh status using the aio api-mesh status command.",
 		  ],
 		]
 	`);
@@ -338,8 +338,8 @@ describe('describe command tests', () => {
 		    "https://edge-sandbox-graph.adobe.io/api/dummy_meshId/graphql",
 		  ],
 		  [
-		    "Make sure that you update your mesh before using the edge mesh endpoint.
-		You can validate your edge mesh status using the status command.",
+		    "Update your mesh before using the edge mesh endpoint.
+		You can validate your edge mesh status using the aio api-mesh status command.",
 		  ],
 		]
 	`);
