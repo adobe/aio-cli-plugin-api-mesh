@@ -20,8 +20,9 @@ const downloadFile = async url => {
 const downloadFilesSequentially = async logFilepath => {
 	try {
 		// Fetch the array of presigned URL objects from the endpoint
-		//const response = await axios.get(endpoint);
-		const response = await axios.get('http://127.0.0.1:8080/health');
+		const response = await axios.get(
+			'http://localhost:8080/v2/organizations/612C2F3061FAE7720A494230@AdobeOrg/projects/test-project/workspaces/tpw5/meshes/f0ec3633-7377-4533-8788-484d2b65f4bc/logs?startDateTime=20240814T110101&endDateTime=20240814T220101',
+		);
 		if (response?.status === 200) {
 			//console.log(`Presigned urls objects in string format: ${objToString(response, ['data'])}` );
 			const presignedUrls = response.data;
@@ -57,7 +58,6 @@ const downloadFilesSequentially = async logFilepath => {
 };
 
 //const endpoint = 'http://127.0.0.1:8080';
-const downloadDir = '/Users/dthampy/Downloads';
 const logFilepath = path.join(__dirname, 'logfiles.json');
 
 downloadFilesSequentially(logFilepath);
