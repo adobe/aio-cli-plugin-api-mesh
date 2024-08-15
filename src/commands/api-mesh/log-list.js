@@ -109,6 +109,7 @@ class FetchLogsCommand extends Command {
 							}
 						}
 
+
 						
 
 					

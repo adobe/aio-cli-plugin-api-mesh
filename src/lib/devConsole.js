@@ -217,6 +217,8 @@ const fetchLogs = async (organizationId, projectId, workspaceId, workspaceName, 
    };
 
    //console.log(config.url)
+
+   //switch out url to vvv
    //console.log(`${SMS_BASE_URL}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/rayIds?API_KEY=${apiKey}`)
 
 
@@ -244,7 +246,7 @@ const getLogsByRayId = async (organizationId, projectId, workspaceId, meshId, ra
 	const { accessToken, apiKey } = await getDevConsoleConfig();
 	const config = {
 		method: 'get',
-		url:  `https://zumvsh7c7i.execute-api.us-east-1.amazonaws.com/Stage/meshes/c3ee0d11-ce14-4817-8fb4-b5dd0442d272/logs/${rayId}`,
+		url:  `${SMS_BASE_URL}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/logs/${rayId}?API_KEY=${apiKey}`,
 		headers: {
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
