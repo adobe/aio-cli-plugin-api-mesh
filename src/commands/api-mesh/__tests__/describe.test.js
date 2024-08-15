@@ -24,6 +24,13 @@ jest.mock('@adobe/aio-cli-lib-console', () => ({
 	cleanStdOut: jest.fn(),
 }));
 jest.mock('../../../lib/devConsole');
+jest.mock('chalk', () => ({
+	bold: jest.fn(text => text), // Return the input text without any color formatting
+	underline: {
+		blue: jest.fn(text => text),
+	},
+	bgYellow: jest.fn(text => text),
+}));
 
 const DescribeCommand = require('../describe');
 const { initSdk, initRequestId } = require('../../../helpers');
@@ -179,9 +186,26 @@ describe('describe command tests', () => {
 		    "dummy_meshId",
 		  ],
 		  [
-		    "Mesh Endpoint: %s
+		    "
+		API Mesh now runs at the edge and legacy mesh URLs will be deprecated.
+		Use the following link to find more information on how to migrate your mesh:",
+		  ],
+		  [
+		    "https://developer.adobe.com/graphql-mesh-gateway/mesh/release/migration
 		",
+		  ],
+		  [
+		    "Legacy Mesh Endpoint: %s",
 		    "https://graph.adobe.io/api/dummy_meshId/graphql",
+		  ],
+		  [
+		    "Edge Mesh Endpoint: %s
+		",
+		    "https://edge-sandbox-graph.adobe.io/api/dummy_meshId/graphql",
+		  ],
+		  [
+		    "Update your mesh before using the edge mesh endpoint.
+		You can validate your edge mesh status using the aio api-mesh status command.",
 		  ],
 		]
 	`);
@@ -227,9 +251,26 @@ describe('describe command tests', () => {
 		    "dummy_meshId",
 		  ],
 		  [
-		    "Mesh Endpoint: %s
+		    "
+		API Mesh now runs at the edge and legacy mesh URLs will be deprecated.
+		Use the following link to find more information on how to migrate your mesh:",
+		  ],
+		  [
+		    "https://developer.adobe.com/graphql-mesh-gateway/mesh/release/migration
 		",
+		  ],
+		  [
+		    "Legacy Mesh Endpoint: %s",
 		    "https://graph.adobe.io/api/dummy_meshId/graphql?api_key=dummy_apiKey",
+		  ],
+		  [
+		    "Edge Mesh Endpoint: %s
+		",
+		    "https://edge-sandbox-graph.adobe.io/api/dummy_meshId/graphql",
+		  ],
+		  [
+		    "Update your mesh before using the edge mesh endpoint.
+		You can validate your edge mesh status using the aio api-mesh status command.",
 		  ],
 		]
 	`);
@@ -279,9 +320,26 @@ describe('describe command tests', () => {
 		    "dummy_meshId",
 		  ],
 		  [
-		    "Mesh Endpoint: %s
+		    "
+		API Mesh now runs at the edge and legacy mesh URLs will be deprecated.
+		Use the following link to find more information on how to migrate your mesh:",
+		  ],
+		  [
+		    "https://developer.adobe.com/graphql-mesh-gateway/mesh/release/migration
 		",
+		  ],
+		  [
+		    "Legacy Mesh Endpoint: %s",
 		    "https://tigraph.adobe.io/dummy_meshId/graphql",
+		  ],
+		  [
+		    "Edge Mesh Endpoint: %s
+		",
+		    "https://edge-sandbox-graph.adobe.io/api/dummy_meshId/graphql",
+		  ],
+		  [
+		    "Update your mesh before using the edge mesh endpoint.
+		You can validate your edge mesh status using the aio api-mesh status command.",
 		  ],
 		]
 	`);
@@ -335,26 +393,6 @@ describe('describe command tests', () => {
 		expect(logSpy).toHaveBeenCalledWith(
 			expect.stringContaining('Edge Mesh Endpoint:'),
 			'https://edge-sandbox-graph.adobe.io/api/dummy_meshId/graphql',
-		);
-	});
-
-	test('should not show edge mesh url if feature is disabled', async () => {
-		// mock the edge mesh url feature to be disabled
-		getTenantFeatures.mockResolvedValueOnce({
-			imsOrgId: selectedOrg.code,
-			showCloudflareURL: false,
-		});
-
-		await DescribeCommand.run();
-
-		expect(logSpy).not.toHaveBeenCalledWith(
-			expect.stringContaining('Edge Mesh Endpoint:'),
-			expect.any(String),
-		);
-
-		expect(logSpy).toHaveBeenCalledWith(
-			expect.stringContaining('Mesh Endpoint:'),
-			'https://graph.adobe.io/api/dummy_meshId/graphql?api_key=dummy_apiKey',
 		);
 	});
 });

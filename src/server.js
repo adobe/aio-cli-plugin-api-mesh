@@ -95,6 +95,7 @@ const getYogaServer = async () => {
 			plugins: tenantMesh.plugins,
 			graphqlEndpoint: `/graphql`,
 			graphiql: true,
+			maskedErrors: false,
 			cors: corsOptions,
 			context: initialContext => ({
 				...initialContext,
