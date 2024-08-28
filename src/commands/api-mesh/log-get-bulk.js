@@ -25,12 +25,30 @@ class GetBulkLogCommand extends Command {
 		logger.info(`RequestId: ${global.requestId}`);
 		const { flags } = await this.parse(GetBulkLogCommand);
 		const ignoreCache = await flags.ignoreCache;
-		const startTime = await flags.startTime.replace(/-|:|Z/g, '').replace('T', 'T');
-		const endTime = await flags.endTime.replace(/-|:|Z/g, '').replace('T', 'T');
+
 		const filename = await flags.filename;
-		const { imsOrgId, imsOrgCode, projectId, workspaceId, workspaceName } = await initSdk({
-			ignoreCache,
-		});
+		// Regular expression to validate the date format YYYY-MM-DDTHH:MM:SSZ
+		const dateTimeRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/;
+
+		// Validate startTime format
+		if (!dateTimeRegex.test(flags.startTime)) {
+			this.error('Invalid startTime format. Please use the format YYYY-MM-DDTHH:MM:SSZ');
+			return;
+		}
+
+		// Validate endTime format
+		if (!dateTimeRegex.test(flags.endTime)) {
+			this.error('Invalid endTime format. Please use the format YYYY-MM-DDTHH:MM:SSZ');
+			return;
+		}
+
+		// Properly format startTime and endTime strings before handing it over to SMS api
+		const formattedStartTime = flags.startTime.replace(/-|:|Z/g, '').replace('T', 'T');
+		const formattedEndTime = flags.endTime.replace(/-|:|Z/g, '').replace('T', 'T');
+
+		// Convert formatted times to Date objects for comparison
+		const startTime = new Date(flags.startTime);
+		const endTime = new Date(flags.endTime);
 
 		// 1. Require both startTime and endTime
 		if (!startTime || !endTime) {
@@ -38,20 +56,45 @@ class GetBulkLogCommand extends Command {
 			return;
 		}
 
-		// 2. Validate filepath
+		// Validate filepath
 		if (!filename) {
 			this.error(
 				'Missing file path. Please provide a valid file in the current working directory.',
 			);
 			return;
 		}
+		// truncate milliseconds to ensure comparison is up to seconds
+		startTime.setMilliseconds(0);
+		endTime.setMilliseconds(0);
 
-		// 3. Validate startTime < endTime
+		// Validate startTime < endTime
 		if (startTime > endTime) {
 			this.error('endTime should be greater than startTime');
 		}
 
-		// 4. Retrieve meshId
+		// 4. Check if the duration between start and end times is greater than 30 minutes (1800 seconds)
+		const timeDifferenceInSeconds = (endTime.getTime() - startTime.getTime()) / 1000;
+
+		if (timeDifferenceInSeconds > 1800) {
+			const hours = Math.floor(timeDifferenceInSeconds / 3600); //hours calculation
+			const minutes = Math.floor((timeDifferenceInSeconds % 3600) / 60); //minutes calculation
+			const seconds = timeDifferenceInSeconds % 60; //seconds calculation
+
+			this.error(
+				`Max duration between startTime and endTime should be 30 minutes. Current duration is ${hours} hour${
+					hours !== 1 ? 's' : ''
+				} ${minutes} minute${minutes !== 1 ? 's' : ''} and ${seconds} second${
+					seconds !== 1 ? 's' : ''
+				}.`,
+			);
+			return;
+		}
+
+		const { imsOrgId, imsOrgCode, projectId, workspaceId, workspaceName } = await initSdk({
+			ignoreCache,
+		});
+
+		// Retrieve meshId
 		let meshId = null;
 		try {
 			meshId = await getMeshId(imsOrgId, projectId, workspaceId, workspaceName);
@@ -69,8 +112,8 @@ class GetBulkLogCommand extends Command {
 			projectId,
 			workspaceId,
 			meshId,
-			startTime,
-			endTime,
+			formattedStartTime,
+			formattedEndTime,
 		);
 		//If presigned URLs are not found, throw error saying that no logs are found
 		if (!presignedUrls || presignedUrls.length === 0) {
