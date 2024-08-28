@@ -10,14 +10,6 @@ const { ignoreCacheFlag, startTimeFlag, endTimeFlag, logFilenameFlag } = require
 require('dotenv').config();
 
 class GetBulkLogCommand extends Command {
-	/*
-	static args = [
-		{ name: 'startTime', required: true, description: 'Start time in UTC' },
-		{ name: 'endTime', required: true, description: 'End time in UTC' },
-		{ name: 'filename', required: true, description: 'Output filename' },
-	];
-	*/
-
 	static flags = {
 		ignoreCache: ignoreCacheFlag,
 		startTime: startTimeFlag,
@@ -26,6 +18,9 @@ class GetBulkLogCommand extends Command {
 	};
 
 	async run() {
+		// Column headers to be written as the first row in the output file
+		const columnHeaders =
+			'EventTimestampMs,Exceptions,Logs,Outcome,MeshId,RayID,URL,Request Method,Response Status,Level';
 		await initRequestId();
 		logger.info(`RequestId: ${global.requestId}`);
 		const { flags } = await this.parse(GetBulkLogCommand);
@@ -101,6 +96,9 @@ class GetBulkLogCommand extends Command {
 				} else {
 					throw new Error(`Specified file doesn't exist in the ${process.cwd()}`);
 				}
+
+				// Write the column headers before appending the log content
+				writer.write(`${columnHeaders}\n`);
 
 				// 8. Stream the data from the signed URLs consecutively
 				for (const urlObj of presignedUrls) {
