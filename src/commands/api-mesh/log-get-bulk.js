@@ -21,13 +21,14 @@ class GetBulkLogCommand extends Command {
 		// Column headers to be written as the first row in the output file
 		const columnHeaders =
 			'EventTimestampMs,Exceptions,Logs,Outcome,MeshId,RayID,URL,Request Method,Response Status,Level';
+
 		await initRequestId();
 		logger.info(`RequestId: ${global.requestId}`);
 		const { flags } = await this.parse(GetBulkLogCommand);
 		const ignoreCache = await flags.ignoreCache;
 
 		const filename = await flags.filename;
-		// Regular expression to validate the date format YYYY-MM-DDTHH:MM:SSZ
+		// Regular expression to validate the input date format YYYY-MM-DDTHH:MM:SSZ
 		const dateTimeRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/;
 
 		// Validate startTime format
@@ -42,7 +43,7 @@ class GetBulkLogCommand extends Command {
 			return;
 		}
 
-		// Properly format startTime and endTime strings before handing it over to SMS api
+		// Properly format startTime and endTime strings before handing it over to SMS
 		const formattedStartTime = flags.startTime.replace(/-|:|Z/g, '').replace('T', 'T');
 		const formattedEndTime = flags.endTime.replace(/-|:|Z/g, '').replace('T', 'T');
 
@@ -50,9 +51,19 @@ class GetBulkLogCommand extends Command {
 		const startTime = new Date(flags.startTime);
 		const endTime = new Date(flags.endTime);
 
-		// 1. Require both startTime and endTime
+		// Require both startTime and endTime
 		if (!startTime || !endTime) {
 			this.error('Provide both startTime and endTime');
+			return;
+		}
+
+		// Get the current date and calculate the date 30 days ago, both in UTC
+		const today = new Date();
+		const thirtyDaysAgo = new Date(today);
+		thirtyDaysAgo.setUTCDate(today.getUTCDate() - 30);
+		// Validate that logs from beyond 30 days from today are not available
+		if (startTime < thirtyDaysAgo || endTime < thirtyDaysAgo) {
+			this.error('Cannot get logs older than 30 days from today. Please adjust your time range.');
 			return;
 		}
 
@@ -63,7 +74,20 @@ class GetBulkLogCommand extends Command {
 			);
 			return;
 		}
-		// truncate milliseconds to ensure comparison is up to seconds
+
+		// Check if the file exists
+		const outputFile = path.resolve(process.cwd(), filename);
+
+		// Ensure file exists and is empty before proceeding
+		if (!fs.existsSync(outputFile)) {
+			throw new Error(`Specified file doesn't exist in the ${process.cwd()}`);
+		}
+
+		const stats = fs.statSync(outputFile);
+		if (stats.size > 0) {
+			throw new Error(`Please make sure that file: ${filename} is empty`);
+		}
+		// truncate milliseconds to ensure comparison is only done up to seconds
 		startTime.setMilliseconds(0);
 		endTime.setMilliseconds(0);
 
@@ -128,24 +152,14 @@ class GetBulkLogCommand extends Command {
 				`Expected file size is ${totalSizeKB} KB. Please confirm to output to file ${filename} (y/n)`,
 			);
 			if (shouldDownload) {
-				// 7. Check if the file exists
-				const outputFile = path.resolve(process.cwd(), filename);
+				//create a writer and proceed with download
 				const writer = fs.createWriteStream(outputFile, { flags: 'a' });
-				if (fs.existsSync(outputFile)) {
-					const stats = fs.statSync(outputFile);
-					if (stats.size > 0) {
-						throw new Error('File is not empty. Overwrite not allowed.');
-					}
-				} else {
-					throw new Error(`Specified file doesn't exist in the ${process.cwd()}`);
-				}
 
 				// Write the column headers before appending the log content
 				writer.write(`${columnHeaders}\n`);
 
-				// 8. Stream the data from the signed URLs consecutively
+				// Stream the data from the signed URLs
 				for (const urlObj of presignedUrls) {
-					//await this.downloadAndAppend(url, outputFile);
 					const { key, url } = urlObj;
 					logger.info(`Downloading ${key} and appending to ${outputFile}...`);
 
@@ -157,7 +171,7 @@ class GetBulkLogCommand extends Command {
 							fileContentStream.on('end', resolve);
 							fileContentStream.on('error', reject);
 						});
-						// We can write a newline after each file write
+						// write a newline after each file write
 						writer.write('\n');
 
 						logger.info(`${key} content appended successfully.`);
