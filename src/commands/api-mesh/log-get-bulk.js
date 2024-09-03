@@ -28,6 +28,12 @@ class GetBulkLogCommand extends Command {
 		const ignoreCache = await flags.ignoreCache;
 
 		const filename = await flags.filename;
+
+		// Only supports files that end with .csv
+		if (!filename || path.extname(filename).toLowerCase() !== '.csv') {
+			this.error('Invalid file type. Provide a filename with a .csv extension.');
+			return;
+		}
 		// Regular expression to validate the input date format YYYY-MM-DDTHH:MM:SSZ
 		const dateTimeRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/;
 
