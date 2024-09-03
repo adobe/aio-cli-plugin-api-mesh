@@ -69,9 +69,7 @@ class GetBulkLogCommand extends Command {
 
 		// Validate filepath
 		if (!filename) {
-			this.error(
-				'Missing file path. Provide a valid file in the current working directory.',
-			);
+			this.error('Missing file path. Provide a valid file in the current working directory.');
 			return;
 		}
 
