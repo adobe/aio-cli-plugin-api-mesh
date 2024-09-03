@@ -2,7 +2,7 @@ const { Command } = require('@oclif/core');
 const path = require('path');
 const fs = require('fs');
 const { initRequestId, initSdk, promptConfirm } = require('../../helpers');
-const { getMeshId, downloadFilesSequentially } = require('../../lib/devConsole');
+const { getMeshId, getPresignedUrls } = require('../../lib/devConsole');
 const logger = require('../../classes/logger');
 const axios = require('axios');
 const { ignoreCacheFlag, startTimeFlag, endTimeFlag, logFilenameFlag } = require('../../utils');
@@ -33,13 +33,13 @@ class GetBulkLogCommand extends Command {
 
 		// Validate startTime format
 		if (!dateTimeRegex.test(flags.startTime)) {
-			this.error('Invalid startTime format. Please use the format YYYY-MM-DDTHH:MM:SSZ');
+			this.error('Invalid startTime format. Use the format YYYY-MM-DDTHH:MM:SSZ');
 			return;
 		}
 
 		// Validate endTime format
 		if (!dateTimeRegex.test(flags.endTime)) {
-			this.error('Invalid endTime format. Please use the format YYYY-MM-DDTHH:MM:SSZ');
+			this.error('Invalid endTime format. Use the format YYYY-MM-DDTHH:MM:SSZ');
 			return;
 		}
 
@@ -53,7 +53,7 @@ class GetBulkLogCommand extends Command {
 
 		// Require both startTime and endTime
 		if (!startTime || !endTime) {
-			this.error('Provide both startTime and endTime');
+			this.error('Provide both startTime and endTime.');
 			return;
 		}
 
@@ -63,14 +63,14 @@ class GetBulkLogCommand extends Command {
 		thirtyDaysAgo.setUTCDate(today.getUTCDate() - 30);
 		// Validate that logs from beyond 30 days from today are not available
 		if (startTime < thirtyDaysAgo || endTime < thirtyDaysAgo) {
-			this.error('Cannot get logs older than 30 days from today. Please adjust your time range.');
+			this.error('Cannot get logs more than 30 days old. Adjust your time range.');
 			return;
 		}
 
 		// Validate filepath
 		if (!filename) {
 			this.error(
-				'Missing file path. Please provide a valid file in the current working directory.',
+				'Missing file path. Provide a valid file in the current working directory.',
 			);
 			return;
 		}
@@ -93,7 +93,7 @@ class GetBulkLogCommand extends Command {
 
 		// Validate startTime < endTime
 		if (startTime > endTime) {
-			this.error('endTime should be greater than startTime');
+			this.error('endTime must be greater than startTime');
 		}
 
 		// 4. Check if the duration between start and end times is greater than 30 minutes (1800 seconds)
@@ -113,7 +113,7 @@ class GetBulkLogCommand extends Command {
 			);
 			return;
 		}
-
+		logger.log('Calling initSdk...');
 		const { imsOrgId, imsOrgCode, projectId, workspaceId, workspaceName } = await initSdk({
 			ignoreCache,
 		});
@@ -123,7 +123,7 @@ class GetBulkLogCommand extends Command {
 		try {
 			meshId = await getMeshId(imsOrgId, projectId, workspaceId, workspaceName);
 		} catch (err) {
-			this.error(`Unable to get mesh ID: ${err.message}`);
+			this.error(`Unable to get mesh ID: ${err.message}.`);
 		}
 
 		if (!meshId) {
@@ -131,7 +131,7 @@ class GetBulkLogCommand extends Command {
 		}
 
 		// 5. Call downloadFiles
-		const { presignedUrls, totalSize } = await downloadFilesSequentially(
+		const { presignedUrls, totalSize } = await getPresignedUrls(
 			imsOrgCode,
 			projectId,
 			workspaceId,
@@ -180,7 +180,7 @@ class GetBulkLogCommand extends Command {
 					}
 				}
 
-				this.log(`Successfully downloaded the logs to ${filename}`);
+				this.log(`Successfully downloaded the logs to ${filename}.`);
 			} else {
 				this.log('Log files are not downloaded.');
 			}
@@ -188,6 +188,12 @@ class GetBulkLogCommand extends Command {
 			this.error('No logs to download');
 		}
 	}
+	/**
+	 * Downloads the content of a file from the provided presigned URL.
+	 *
+	 * @param {string} url  - presigned URL to download the log from
+	 * @returns {Promise<Stream.Readable>} - A promise that resolves to a readable stream of the file content
+	 */
 
 	async downloadFileContent(url) {
 		return axios({
@@ -203,6 +209,6 @@ class GetBulkLogCommand extends Command {
 	}
 }
 
-GetBulkLogCommand.description = 'Download logs in bulk';
+GetBulkLogCommand.description = 'Download all mesh logs for a selected time period.';
 
 module.exports = GetBulkLogCommand;

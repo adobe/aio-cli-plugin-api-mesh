@@ -1015,7 +1015,7 @@ const getPublicEncryptionKey = async organizationCode => {
 	}
 };
 
-const downloadFilesSequentially = async (
+const getPresignedUrls = async (
 	organizationCode,
 	projectId,
 	workspaceId,
@@ -1079,5 +1079,5 @@ module.exports = {
 	getTenantFeatures,
 	getMeshDeployments,
 	getPublicEncryptionKey,
-	downloadFilesSequentially,
+	getPresignedUrls,
 };
