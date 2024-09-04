@@ -67,6 +67,10 @@ const selectFlag = Flags.boolean({
 	default: false,
 });
 
+const fileNameFlag = Flags.string({
+	description: 'Name of Csv file for logs'
+});
+
 /**
  * Parse the meshConfig and get the list of (local) files to be imported
  *
@@ -548,6 +552,7 @@ module.exports = {
 	debugFlag,
 	selectFlag,
 	secretsFlag,
+	fileNameFlag,
 	interpolateSecrets,
 	validateSecretsFile,
 	encryptSecrets,
