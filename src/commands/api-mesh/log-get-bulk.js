@@ -117,7 +117,7 @@ class GetBulkLogCommand extends Command {
 			);
 			return;
 		}
-		logger.log('Calling initSdk...');
+		logger.info('Calling initSdk...');
 		const { imsOrgId, imsOrgCode, projectId, workspaceId, workspaceName } = await initSdk({
 			ignoreCache,
 		});
@@ -186,7 +186,7 @@ class GetBulkLogCommand extends Command {
 
 				this.log(`Successfully downloaded the logs to ${filename}.`);
 			} else {
-				this.log('Log files are not downloaded.');
+				this.log('Log files not downloaded.');
 			}
 		} else {
 			this.error('No logs to download');
