@@ -189,7 +189,7 @@ class GetBulkLogCommand extends Command {
 				this.log('Log files not downloaded.');
 			}
 		} else {
-			this.error('No logs to download');
+			this.error('No logs available to download');
 		}
 	}
 	/**
