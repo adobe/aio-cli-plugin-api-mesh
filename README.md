@@ -2,9 +2,9 @@
 
 ## Prerequisites
 
-* [aio-cli](https://github.com/adobe/aio-cli).
-* [node.js](https://nodejs.org/en/)
-* [yarn](https://classic.yarnpkg.com/lang/en/docs/install).
+- [aio-cli](https://github.com/adobe/aio-cli).
+- [node.js](https://nodejs.org/en/)
+- [yarn](https://classic.yarnpkg.com/lang/en/docs/install).
 
 To install a revision from this repository:
 

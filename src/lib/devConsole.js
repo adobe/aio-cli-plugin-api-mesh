@@ -112,48 +112,51 @@ const describeMesh = async (organizationId, projectId, workspaceId, workspaceNam
 	}
 };
 
-
 /**
  * List Recent Logs
  *
- * @param {*} organizationId 
- * @param {*} projectId 
- * @param {*} workspaceId 
- * @param {*} workspaceName 
- * @param {*} meshId 
- * @returns 
+ * @param {*} organizationId
+ * @param {*} projectId
+ * @param {*} workspaceId
+ * @param {*} workspaceName
+ * @param {*} meshId
+ * @returns
  */
 const listLogs = async (organizationId, projectId, workspaceId, workspaceName, meshId) => {
-   return [
-	{
-		"RayID": "8b9c7f590bb97f9d",
-		"EventTimestampMs": 1724766278577,
-		"Response Status": 200,
-		"Level": "log",
-		"file": "f0ec3633-7377-4533-8788-484d2b65f4bc/20240827/20240827T134612Z_20240827T134612Z_0e95854e.csv"
-	},
-	{
-		"RayID": "8b9c7f8ee9717f9d",
-		"EventTimestampMs": 1724766287188,
-		"Response Status": 200,
-		"Level": "log",
-		"file": "f0ec3633-7377-4533-8788-484d2b65f4bc/20240827/20240827T134612Z_20240827T134612Z_0e95854e.csv"
-	},
-	{
-		"RayID": "8b9c7f8db8107f9d",
-		"EventTimestampMs": 1724766286997,
-		"Response Status": 200,
-		"Level": "log",
-		"file": "f0ec3633-7377-4533-8788-484d2b65f4bc/20240827/20240827T134612Z_20240827T134612Z_0e95854e.csv"
-	},
-	{
-		"RayID": "8b9c7f670a917f9d",
-		"EventTimestampMs": 1724766280810,
-		"Response Status": 200,
-		"Level": "log",
-		"file": "f0ec3633-7377-4533-8788-484d2b65f4bc/20240827/20240827T134612Z_20240827T134612Z_0e95854e.csv"
-	}
-   ]
+	return [
+		{
+			'RayID': '8b9c7f590bb97f9d',
+			'EventTimestampMs': 1724766278577,
+			'Response Status': 200,
+			'Level': 'log',
+			'file':
+				'f0ec3633-7377-4533-8788-484d2b65f4bc/20240827/20240827T134612Z_20240827T134612Z_0e95854e.csv',
+		},
+		{
+			'RayID': '8b9c7f8ee9717f9d',
+			'EventTimestampMs': 1724766287188,
+			'Response Status': 200,
+			'Level': 'log',
+			'file':
+				'f0ec3633-7377-4533-8788-484d2b65f4bc/20240827/20240827T134612Z_20240827T134612Z_0e95854e.csv',
+		},
+		{
+			'RayID': '8b9c7f8db8107f9d',
+			'EventTimestampMs': 1724766286997,
+			'Response Status': 200,
+			'Level': 'log',
+			'file':
+				'f0ec3633-7377-4533-8788-484d2b65f4bc/20240827/20240827T134612Z_20240827T134612Z_0e95854e.csv',
+		},
+		{
+			'RayID': '8b9c7f670a917f9d',
+			'EventTimestampMs': 1724766280810,
+			'Response Status': 200,
+			'Level': 'log',
+			'file':
+				'f0ec3633-7377-4533-8788-484d2b65f4bc/20240827/20240827T134612Z_20240827T134612Z_0e95854e.csv',
+		},
+	];
 };
 
 const getMesh = async (organizationId, projectId, workspaceId, workspaceName, meshId) => {

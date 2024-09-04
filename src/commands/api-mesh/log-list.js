@@ -2,8 +2,8 @@ const { Command } = require('@oclif/core');
 
 const logger = require('../../classes/logger');
 const { initSdk, initRequestId } = require('../../helpers');
-const { ignoreCacheFlag, jsonFlag, fileNameFlag} = require('../../utils');
-const { getMeshId, listLogs} = require('../../lib/devConsole');
+const { ignoreCacheFlag, jsonFlag, fileNameFlag } = require('../../utils');
+const { getMeshId, listLogs } = require('../../lib/devConsole');
 const { appendFileSync } = require('fs');
 const { ux } = require('@oclif/core/lib/cli-ux');
 
@@ -13,7 +13,7 @@ class ListLogsCommand extends Command {
 	static flags = {
 		ignoreCache: ignoreCacheFlag,
 		json: jsonFlag,
-		filename: fileNameFlag
+		filename: fileNameFlag,
 	};
 
 	static enableJsonFlag = true;
@@ -48,39 +48,40 @@ class ListLogsCommand extends Command {
 				const logs = await listLogs(imsOrgId, projectId, workspaceId, workspaceName, meshId);
 
 				if (logs && logs.length > 0) {
-                   ux.table(logs,{
-                            "Ray ID": {
-                                minWidth: 7,
-                                get: (row) => row.RayID
-                            },
-                            "Timestamp": {
-                                minWidth: 7,
-                                get: (row) => row.EventTimestampMs
-                            },
-                            "Response Status": {
-                                minWidth: 7,
-                                get: (row) => row["Response Status"]
-                            },
-                            "Level": {
-                                minWidth: 7,
-                                get: (row) => row.Level
-                            },
-                        },
-                        {
-                            printLine: fileName ? (line) => appendFileSync(fileName || 'logs.csv', line + "\n"): (line) => this.log(line),
-                            ...flags
-                        }
-                   )
-					
-                } else {
-                    this.log('No logs found');
-                }
+					ux.table(
+						logs,
+						{
+							'Ray ID': {
+								minWidth: 7,
+								get: row => row.RayID,
+							},
+							'Timestamp': {
+								minWidth: 7,
+								get: row => row.EventTimestampMs,
+							},
+							'Response Status': {
+								minWidth: 7,
+								get: row => row['Response Status'],
+							},
+							'Level': {
+								minWidth: 7,
+								get: row => row.Level,
+							},
+						},
+						{
+							printLine: fileName
+								? line => appendFileSync(fileName || 'logs.csv', line + '\n')
+								: line => this.log(line),
+							csv: fileName,
+							...flags,
+						},
+					);
+				} else {
+					this.log('No logs found');
+				}
 			} catch (error) {
 				this.log(error.message);
-
-				this.error(
-					`Failed to fetch logs, RequestId: ${global.requestId}`,
-				);
+				this.error(`Failed to fetch logs, RequestId: ${global.requestId}`);
 			}
 		} else {
 			this.error(
