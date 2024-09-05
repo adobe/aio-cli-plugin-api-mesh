@@ -1015,6 +1015,51 @@ const getPublicEncryptionKey = async organizationCode => {
 	}
 };
 
+const getPresignedUrls = async (
+	organizationCode,
+	projectId,
+	workspaceId,
+	meshId,
+	startTime,
+	endTime,
+) => {
+	const { accessToken, apiKey } = await getDevConsoleConfig();
+	const config = {
+		method: 'get',
+		url: `${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/logs?startDateTime=${startTime}&endDateTime=${endTime}&API_KEY=${apiKey}`,
+		headers: {
+			'Authorization': `Bearer ${accessToken}`,
+			'x-request-id': global.requestId,
+		},
+	};
+
+	logger.info(
+		'Initiating GET %s',
+		`${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/logs?startDateTime=${startTime}&endDateTime=${endTime}&API_KEY=${apiKey}`,
+	);
+
+	try {
+		const response = await axios(config);
+
+		logger.info('Response from GET %s', response.status);
+
+		if (response?.status === 200) {
+			logger.info(`Presigned urls : ${objToString(response, ['data'])}`);
+			const { presignedUrls, totalSize } = response.data;
+			return {
+				presignedUrls,
+				totalSize,
+			};
+		}
+	} catch (error) {
+		logger.error(`Error fetching presigned urls: ${error}`);
+		return {
+			urls: {},
+			totalsize: 0,
+		};
+	}
+};
+
 module.exports = {
 	getApiKeyCredential,
 	describeMesh,
@@ -1032,4 +1077,5 @@ module.exports = {
 	getTenantFeatures,
 	getMeshDeployments,
 	getPublicEncryptionKey,
+	getPresignedUrls,
 };
