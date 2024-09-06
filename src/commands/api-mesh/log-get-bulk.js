@@ -5,7 +5,13 @@ const { initRequestId, initSdk, promptConfirm } = require('../../helpers');
 const { getMeshId, getPresignedUrls } = require('../../lib/devConsole');
 const logger = require('../../classes/logger');
 const axios = require('axios');
-const { ignoreCacheFlag, startTimeFlag, endTimeFlag, logFilenameFlag } = require('../../utils');
+const {
+	ignoreCacheFlag,
+	startTimeFlag,
+	endTimeFlag,
+	logFilenameFlag,
+	suggestCorrectedDateFormat,
+} = require('../../utils');
 
 require('dotenv').config();
 
@@ -37,15 +43,17 @@ class GetBulkLogCommand extends Command {
 		// Regular expression to validate the input date format YYYY-MM-DDTHH:MM:SSZ
 		const dateTimeRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/;
 
-		// Validate startTime format
+		// Validate user provided startTime format
 		if (!dateTimeRegex.test(flags.startTime)) {
-			this.error('Invalid startTime format. Use the format YYYY-MM-DDTHH:MM:SSZ');
+			const correctedStartTime = suggestCorrectedDateFormat(flags.startTime);
+			this.error(`Invalid startTime format. Did you mean ${correctedStartTime}?`);
 			return;
 		}
 
-		// Validate endTime format
+		// Validate user provided endTime format
 		if (!dateTimeRegex.test(flags.endTime)) {
-			this.error('Invalid endTime format. Use the format YYYY-MM-DDTHH:MM:SSZ');
+			const correctedEndTime = suggestCorrectedDateFormat(flags.endTime);
+			this.error(`Invalid endTime format. Did you mean ${correctedEndTime}?`);
 			return;
 		}
 
@@ -73,23 +81,24 @@ class GetBulkLogCommand extends Command {
 			return;
 		}
 
-		// Validate filepath
+		// Validate required filename flag
 		if (!filename) {
-			this.error('Missing file path. Provide a valid file in the current working directory.');
+			this.error('Missing filename. Provide a valid file in the current working directory.');
 			return;
 		}
 
 		// Check if the file exists
 		const outputFile = path.resolve(process.cwd(), filename);
 
-		// Ensure file exists and is empty before proceeding
+		// Check if file exists and if doesn't, create one in the cwd and continue
 		if (!fs.existsSync(outputFile)) {
-			throw new Error(`Specified file doesn't exist in the ${process.cwd()}`);
+			fs.writeFileSync(outputFile, '');
 		}
 
+		//check if the file is empty before proceeding
 		const stats = fs.statSync(outputFile);
 		if (stats.size > 0) {
-			throw new Error(`Please make sure that file: ${filename} is empty`);
+			throw new Error(`Make sure the file: ${filename} is empty`);
 		}
 		// truncate milliseconds to ensure comparison is only done up to seconds
 		startTime.setMilliseconds(0);
@@ -183,6 +192,8 @@ class GetBulkLogCommand extends Command {
 						logger.error(`Error downloading or appending content of ${key}:`, error);
 					}
 				}
+				// Ensure the stream is closed
+				writer.end();
 
 				this.log(`Successfully downloaded the logs to ${filename}.`);
 			} else {
