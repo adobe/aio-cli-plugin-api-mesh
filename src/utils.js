@@ -551,14 +551,18 @@ function reduceConsecutiveBackslashes(str) {
 
 /**
  * Helper function to suggest a corrected format for the user provided input date
- * @param inputDate
- * @returns {string}
+ * @param {string} inputDate
  */
-function suggestCorrectedFormat(inputDate) {
-	// Try to remove unwanted characters and match the format 'YYYY-MM-DDTHH:MM:SSZ'
-	return inputDate
-		.replace(/[^\dT:Z]/g, '') // Remove any non-numeric and non-T/Z characters
-		.replace(/(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})Z?/, '$1-$2-$3T$4:$5:$6Z');
+function suggestCorrectedDateFormat(inputDate) {
+	// Regular expression to validate the input date format YYYY-MM-DDTHH:MM:SSZ
+	// Remove any non-numeric characters except 'T' and 'Z'
+	let correctedDate = inputDate.replace(/[^\dTZ]/g, '');
+
+	// Add missing characters to match the correct format
+	return correctedDate.replace(
+		/(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})Z?/,
+		'$1-$2-$3T$4:$5:$6Z',
+	);
 }
 
 module.exports = {
@@ -581,5 +585,5 @@ module.exports = {
 	startTimeFlag,
 	endTimeFlag,
 	logFilenameFlag,
-	suggestCorrectedFormat,
+	suggestCorrectedDateFormat,
 };
