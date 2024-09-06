@@ -1015,6 +1015,56 @@ const getPublicEncryptionKey = async organizationCode => {
 	}
 };
 
+const getLogsByRayId = async (organizationId, projectId, workspaceId, meshId, rayId) => {
+	const { accessToken, apiKey } = await getDevConsoleConfig();
+	const config = {
+		method: 'get',
+		url: `${SMS_BASE_URL}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/logs/${rayId}?API_KEY=${apiKey}`,
+		headers: {
+			'Authorization': `Bearer ${accessToken}`,
+			'x-request-id': global.requestId,
+		},
+	};
+
+	logger.info(
+		'Initiating GET %s',
+		`${SMS_BASE_URL}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/logs/${rayId}?API_KEY=${apiKey}`,
+	);
+
+	try {
+		const response = await axios(config);
+
+		logger.info('Response from GET log %s', response.status);
+		if (response?.status === 200) {
+			logger.info(`Fetched log: ${objToString(response, ['data'])}`);
+			return response.data;
+		} else {
+			let errorMessage = `Unexpected response status: ${response.status}`;
+			logger.error(errorMessage);
+			throw new Error(errorMessage);
+		}
+	} catch (error) {
+		logger.info('Response from GET Logs %s', error.response.status);
+		if (error.response.status === 404) {
+			// The request was made and the server responded with a 404 status code
+			logger.error('Logs not found for the given Ray ID');
+
+			let errorMessage = `LogNotFound`;
+			logger.error(`${errorMessage}. Received ${error.response.status}, expected 200`);
+			throw new Error(errorMessage);
+		} else if (error.response.status === 500) {
+			// Handle 500 Internal Server Error
+			let errorMessage = `ServerError`;
+			logger.error(errorMessage);
+			throw new Error(errorMessage);
+		} else {
+			let errorMessage = `Something went wrong while getting logs. Received ${error.response.status}`;
+			logger.error(errorMessage);
+			throw new Error(errorMessage);
+		}
+	}
+};
+
 module.exports = {
 	getApiKeyCredential,
 	describeMesh,
@@ -1032,4 +1082,5 @@ module.exports = {
 	getTenantFeatures,
 	getMeshDeployments,
 	getPublicEncryptionKey,
+	getLogsByRayId,
 };
