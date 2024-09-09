@@ -41,19 +41,23 @@ class GetBulkLogCommand extends Command {
 			return;
 		}
 		// Regular expression to validate the input date format YYYY-MM-DDTHH:MM:SSZ
-		const dateTimeRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/;
+		const dateTimeRegex = /^(?:(\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])T(0[0-9]|1[0-9]|2[0-3]):([0-5]\d):([0-5]\d)Z)$/;
 
 		// Validate user provided startTime format
 		if (!dateTimeRegex.test(flags.startTime)) {
 			const correctedStartTime = suggestCorrectedDateFormat(flags.startTime);
-			this.error(`Invalid startTime format. Did you mean ${correctedStartTime}?`);
+			this.error(
+				`Use the format YYYY-MM-DDTHH:MM:SSZ for startTime. Did you mean ${correctedStartTime}?`,
+			);
 			return;
 		}
 
 		// Validate user provided endTime format
 		if (!dateTimeRegex.test(flags.endTime)) {
 			const correctedEndTime = suggestCorrectedDateFormat(flags.endTime);
-			this.error(`Invalid endTime format. Did you mean ${correctedEndTime}?`);
+			this.error(
+				`Use the format YYYY-MM-DDTHH:MM:SSZ for endTime. Did you mean ${correctedEndTime}?`,
+			);
 			return;
 		}
 
