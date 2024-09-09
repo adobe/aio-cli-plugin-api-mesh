@@ -147,13 +147,6 @@ describe('GetBulkLogCommand', () => {
 		);
 	});
 
-	/*test('throws an error if the filename is missing', () => {
-		command.flags.filename = '';
-		expect(command.run()).rejects.toThrow(
-			'Missing file path. Please provide a valid file in the current working directory.',
-		);
-	});*/
-
 	// Test for file creation and emptiness check
 	test('creates file if it does not exist and checks if file is empty before proceeding', async () => {
 		fs.existsSync.mockReturnValue(false); // Mock file does not exist
