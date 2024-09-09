@@ -166,7 +166,7 @@ class GetBulkLogCommand extends Command {
 			const totalSizeKB = (totalSize / 1024).toFixed(2); // Convert bytes to KB
 			// 7. Get user confirmation
 			shouldDownload = await promptConfirm(
-				`The expected file size is ${totalSizeKB} KB. Confirm ${filename} to download (y/n)`,
+				`The expected file size is ${totalSizeKB} KB. Confirm ${filename} download? (y/n)`,
 			);
 			if (shouldDownload) {
 				//create a writer and proceed with download
