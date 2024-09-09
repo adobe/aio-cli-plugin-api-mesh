@@ -56,11 +56,22 @@ describe('GetBulkLogCommand', () => {
 		// Mock the file system checks even if they are not the focus of this test
 		fs.existsSync.mockReturnValue(true); // Assume the file exists
 		fs.statSync.mockReturnValue({ size: 0 }); // Assume the file is empty
-		// Set a time difference to more than 30 minutes
+
+		// Get the current date and time
+		const now = new Date();
+
+		// Create dynamic startTime and endTime
+		const startTime = new Date(now);
+		const endTime = new Date(now);
+		endTime.setMinutes(startTime.getMinutes() + 45); // Set endTime to 45 minutes after startTime
+
+		const formattedStartTime = startTime.toISOString().slice(0, 19) + 'Z';
+		const formattedEndTime = endTime.toISOString().slice(0, 19) + 'Z';
+
 		parseSpy.mockResolvedValueOnce({
 			flags: {
-				startTime: '2024-08-29T12:00:00Z',
-				endTime: '2024-08-29T12:45:00Z', // 45 minutes difference
+				startTime: formattedStartTime,
+				endTime: formattedEndTime,
 				filename: 'test.csv',
 				ignoreCache: false,
 			},
