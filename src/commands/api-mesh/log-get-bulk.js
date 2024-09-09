@@ -46,18 +46,27 @@ class GetBulkLogCommand extends Command {
 		// Validate user provided startTime format
 		if (!dateTimeRegex.test(flags.startTime)) {
 			const correctedStartTime = suggestCorrectedDateFormat(flags.startTime);
-			this.error(
-				`Use the format YYYY-MM-DDTHH:MM:SSZ for startTime. Did you mean ${correctedStartTime}?`,
-			);
+			if (!correctedStartTime) {
+				this.error('Found invalid date components for startTime. Check and correct the date.');
+			} else {
+				this.error(
+					`Use the format YYYY-MM-DDTHH:MM:SSZ for startTime. Did you mean ${correctedStartTime}?`,
+				);
+			}
+
 			return;
 		}
 
 		// Validate user provided endTime format
 		if (!dateTimeRegex.test(flags.endTime)) {
 			const correctedEndTime = suggestCorrectedDateFormat(flags.endTime);
-			this.error(
-				`Use the format YYYY-MM-DDTHH:MM:SSZ for endTime. Did you mean ${correctedEndTime}?`,
-			);
+			if (!correctedEndTime) {
+				this.error('Found invalid date components for endTime. Check and correct the date.');
+			} else {
+				this.error(
+					`Use the format YYYY-MM-DDTHH:MM:SSZ for endTime. Did you mean ${correctedEndTime}?`,
+				);
+			}
 			return;
 		}
 

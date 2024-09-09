@@ -20,8 +20,6 @@ describe('GetBulkLogCommand', () => {
 
 	beforeEach(() => {
 		// Setup spies and mock functions
-		// let logSpy = jest.spyOn(GetBulkLogCommand.prototype, 'log');
-		// let errorLogSpy = jest.spyOn(GetBulkLogCommand.prototype, 'error');
 		parseSpy = jest.spyOn(GetBulkLogCommand.prototype, 'parse').mockResolvedValue({
 			flags: {
 				startTime: '2024-08-29T12:00:00Z',

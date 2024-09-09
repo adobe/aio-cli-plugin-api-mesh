@@ -553,13 +553,55 @@ function reduceConsecutiveBackslashes(str) {
  * Helper function to suggest a corrected format for the user provided input date
  * @param {string} inputDate
  */
+/*function suggestCorrectedDateFormat(inputDate) {
+	// Remove any non-numeric characters except 'T' and 'Z'
+	let correctedDate = inputDate.replace(/[^\dTZ]/g, '');
+
+	// If "T" is missing, insert it between the date and time
+	if (!/T/.test(correctedDate) && correctedDate.length >= 15) {
+		correctedDate = correctedDate.slice(0, 8) + 'T' + correctedDate.slice(8);
+	}
+
+	// Add missing characters to match the correct format
+	correctedDate = correctedDate.replace(
+		/(\d{4})(\d{2})(\d{2})T?(\d{2})(\d{2})(\d{2})Z?/,
+		'$1-$2-$3T$4:$5:$6Z',
+	);
+
+	return correctedDate;
+}*/
+
 function suggestCorrectedDateFormat(inputDate) {
 	// Remove any non-numeric characters except 'T' and 'Z'
 	let correctedDate = inputDate.replace(/[^\dTZ]/g, '');
 
-	// If 'T' is missing, insert it between the date and time
+	// If "T" is missing, insert it between the date and time
 	if (!/T/.test(correctedDate) && correctedDate.length >= 15) {
 		correctedDate = correctedDate.slice(0, 8) + 'T' + correctedDate.slice(8);
+	}
+
+	// Extract date components for validation
+	const month = parseInt(correctedDate.slice(4, 6), 10);
+	const day = parseInt(correctedDate.slice(6, 8), 10);
+	const hour = parseInt(correctedDate.slice(9, 11), 10);
+	const minute = parseInt(correctedDate.slice(11, 13), 10);
+	const second = parseInt(correctedDate.slice(13, 15), 10);
+
+	// Check for invalid month, day, hour, minute, second
+	const isValidDate =
+		month >= 1 &&
+		month <= 12 &&
+		day >= 1 &&
+		day <= 31 && // Note: Can be further validated by month and year
+		hour >= 0 &&
+		hour <= 23 &&
+		minute >= 0 &&
+		minute <= 59 &&
+		second >= 0 &&
+		second <= 59;
+
+	if (!isValidDate) {
+		return null; // Or return an error-specific message for better UX
 	}
 
 	// Add missing characters to match the correct format
