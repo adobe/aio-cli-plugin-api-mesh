@@ -121,7 +121,7 @@ const getMesh = async (organizationId, projectId, workspaceId, workspaceName, me
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
 			'workspaceName': workspaceName,
-			'x-api-key': apiKey
+			'x-api-key': apiKey,
 		},
 	};
 
@@ -215,7 +215,7 @@ const createMesh = async (
 			'workspaceName': workspaceName,
 			'orgName': orgName,
 			'projectName': projectName,
-			'x-api-key': apiKey
+			'x-api-key': apiKey,
 		},
 		data: JSON.stringify(data),
 	};
@@ -361,7 +361,7 @@ const updateMesh = async (
 			'workspaceName': workspaceName,
 			'orgName': orgName,
 			'projectName': projectName,
-			'x-api-key': apiKey
+			'x-api-key': apiKey,
 		},
 		data: JSON.stringify(data),
 	};
@@ -448,7 +448,7 @@ const deleteMesh = async (organizationId, projectId, workspaceId, meshId) => {
 		headers: {
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
-			'x-api-key': apiKey
+			'x-api-key': apiKey,
 		},
 	};
 
@@ -537,7 +537,7 @@ const getMeshId = async (organizationId, projectId, workspaceId, workspaceName) 
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
 			'workspaceName': workspaceName,
-			'x-api-key': apiKey
+			'x-api-key': apiKey,
 		},
 	};
 
@@ -823,7 +823,7 @@ const getMeshArtifact = async (organizationId, projectId, workspaceId, workspace
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
 			'workspaceName': workspaceName,
-			'x-api-key': apiKey
+			'x-api-key': apiKey,
 		},
 		responseType: 'arraybuffer',
 	};
@@ -880,14 +880,11 @@ const getTenantFeatures = async organizationCode => {
 		headers: {
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
-			'x-api-key': apiKey
+			'x-api-key': apiKey,
 		},
 	};
 
-	logger.info(
-		'Initiating GET %s',
-		`${SMS_BASE_URL}/organizations/${organizationCode}/features`,
-	);
+	logger.info('Initiating GET %s', `${SMS_BASE_URL}/organizations/${organizationCode}/features`);
 
 	try {
 		const response = await axios(config);
@@ -938,7 +935,7 @@ const getMeshDeployments = async (organizationCode, projectId, workspaceId, mesh
 		headers: {
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
-			'x-api-key': apiKey
+			'x-api-key': apiKey,
 		},
 	};
 
@@ -994,7 +991,7 @@ const getPublicEncryptionKey = async organizationCode => {
 		headers: {
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
-			'x-api-key': apiKey
+			'x-api-key': apiKey,
 		},
 	};
 	logger.info(
