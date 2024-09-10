@@ -8,7 +8,7 @@ const StageConstants = {
 	DEV_CONSOLE_API_KEY: 'adobe-api-manager-sms-stage',
 	DEV_CONSOLE_TRANSPORTER_API_KEY: 'UDPWeb1',
 	AIO_CLI_API_KEY: 'aio-cli-console-auth-stage',
-	SMS_BASE_URL: 'https://graph-stage.adobe.io/api-admin',
+	SMS_BASE_URL: 'https://schema-management-service-dev1-501va6-corp.commerce-gateway.com/api-admin',
 	EDGE_MESH_BASE_URL: 'https://edge-stage-graph.adobe.io/api',
 };
 

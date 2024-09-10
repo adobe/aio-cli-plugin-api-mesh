@@ -132,41 +132,32 @@ const listLogs = async (
 	fileName
 ) => {
 	const { accessToken, apiKey } = await getDevConsoleConfig();
-	const url = `${SMS_BASE_URL}/organizations/${organizationCode}/xprojects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/logs/list`;
+	organizationCode = "612C2F3061FAE7720A494230@AdobeOrg";
+	projectId = "test-project";
+	workspaceId = "tpw5";
+	meshId = "f0ec3633-7377-4533-8788-484d2b65f4bc";
+	const url = `${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/logs/list`;
 	const config = {
 		method: 'get',
 		url: fileName? url + `?filename=${fileName}` : url,
 		headers: {
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
-			'x-api-key': apiKey,
+			'x-api-key': "adobeio_onboarding",
 		},
 	};
 
-	logger.info(
-		'Initiating GET %s',
-		`${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/logs?startDateTime=${startTime}&endDateTime=${endTime}&API_KEY=${apiKey}`,
-	);
-
+	
 	try {
 		const response = await axios(config);
 
 		logger.info('Response from GET %s', response.status);
 
 		if (response?.status === 200) {
-			logger.info(`Presigned urls : ${objToString(response, ['data'])}`);
-			const { presignedUrls, totalSize } = response.data;
-			return {
-				presignedUrls,
-				totalSize,
-			};
+			return response.data;
 		}
 	} catch (error) {
-		logger.error(`Error fetching presigned urls: ${error}`);
-		return {
-			urls: {},
-			totalsize: 0,
-		};
+		logger.error(`Error fetching recent logs: ${error}`);
 	}
 };
 

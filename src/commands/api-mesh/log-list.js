@@ -45,27 +45,29 @@ class ListLogsCommand extends Command {
 		}
 		if (meshId) {
 			try {
-				const logs = await listLogs(imsOrgId, projectId, workspaceId, workspaceName, meshId, x);
-
+				const logs = await listLogs(imsOrgId, projectId, workspaceId, workspaceName, meshId, fileName);
+				// add a new line
+				this.log();
+				
 				if (logs && logs.length > 0) {
 					ux.table(
 						logs,
 						{
-							'Ray ID': {
-								minWidth: 7,
-								get: row => row.RayID,
+							rayId: {
+								header: 'Ray ID',
+								minWidth: 15,
 							},
-							'Timestamp': {
-								minWidth: 7,
-								get: row => row.EventTimestampMs,
+							timestamp: {
+								header: 'Timestamp',
+								minWidth: 15,
 							},
-							'Response Status': {
-								minWidth: 7,
-								get: row => row['Response Status'],
+							responseStatus: {
+								header: 'Response Status',
+								minWidth: 15,
 							},
-							'Level': {
-								minWidth: 7,
-								get: row => row.Level,
+							level: {
+								header: 'Level',
+								minWidth: 15,
 							},
 						},
 						{
