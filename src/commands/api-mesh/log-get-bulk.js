@@ -60,6 +60,7 @@ class GetBulkLogCommand extends Command {
 		// Validate user provided endTime format
 		if (!dateTimeRegex.test(flags.endTime)) {
 			const correctedEndTime = suggestCorrectedDateFormat(flags.endTime);
+			//check for incorrect date components
 			if (!correctedEndTime) {
 				this.error('Found invalid date components for endTime. Check and correct the date.');
 			} else {

@@ -3,6 +3,7 @@ const path = require('path');
 const GetBulkLogCommand = require('../log-get-bulk');
 const { initRequestId, initSdk, promptConfirm } = require('../../../helpers');
 const { getMeshId, getPresignedUrls } = require('../../../lib/devConsole');
+const { suggestCorrectedDateFormat } = require('../../../utils');
 
 jest.mock('fs');
 jest.mock('axios');
@@ -13,7 +14,6 @@ jest.mock('../../../helpers', () => ({
 }));
 jest.mock('../../../lib/devConsole');
 jest.mock('../../../classes/logger');
-// const mockIgnoreCacheFlag = Promise.resolve(true);
 
 describe('GetBulkLogCommand', () => {
 	let parseSpy;
@@ -84,7 +84,8 @@ describe('GetBulkLogCommand', () => {
 	test('throws an error if startTime format is invalid', async () => {
 		parseSpy.mockResolvedValueOnce({
 			flags: {
-				startTime: '20240809123456',
+				// startTime: '20240809123456',
+				startTime: '20241213223832',
 				endTime: '2024-08-29T12:30:00Z',
 				filename: 'test.csv',
 			},
@@ -93,7 +94,7 @@ describe('GetBulkLogCommand', () => {
 		const command = new GetBulkLogCommand([], {});
 
 		// Assuming your suggestCorrectedDateFormat function corrects the format to "2024-08-09T09:08:33Z"
-		const correctedStartTime = '2024-08-09T12:34:56Z'; // Use an appropriate correction
+		const correctedStartTime = '2024-12-13T22:38:32Z'; // Use an appropriate correction - 2024-08-09T12:34:56Z
 
 		await expect(command.run()).rejects.toThrow(
 			`Use the format YYYY-MM-DDTHH:MM:SSZ for startTime. Did you mean ${correctedStartTime}?`,
@@ -223,4 +224,32 @@ describe('GetBulkLogCommand', () => {
 		expect(mockWriteStream.write).toHaveBeenCalled();
 		expect(mockWriteStream.end).toHaveBeenCalled();
 	});
+});
+describe('GetBulkLogCommand startTime and endTime validation', () => {
+    // Define the test cases as an array of [inputDate, expectedOutput] pairs
+    const testCases = [
+        // Invalid formats that should be corrected
+        ['2024-0812T123445', '2024-08-12T12:34:45Z'],
+        ['2024:08:12-09-08-36Z', '2024-08-12T09:08:36Z'],
+        ['20241223T234556Z', '2024-12-23T23:45:56Z'],
+        ['20241213223832', '2024-12-13T22:38:32Z'],
+        ['2024-12-13T223832Z', '2024-12-13T22:38:32Z'],
+        ['2024-11-23T21:34:45', '2024-11-23T21:34:45Z'],
+
+        // Invalid date components that should not be corrected, but return null which lets the user know the date is invalid
+        ['20240834123456Z', null], // Invalid day (34)
+        ['2024-12-34T23:34:45Z', null], // Invalid day (34)
+        ['2024-13-23:21:34:45', null], // Invalid month (13)
+        ['2024-11-63T21:34:45', null], // Invalid day (13) and missing Z
+    ];
+
+    test.each(testCases)(
+        'suggestCorrectedDateFormat("%s") should return "%s"',
+        (inputDate, expectedOutput) => {
+            const correctedDate = suggestCorrectedDateFormat(inputDate);
+            expect(correctedDate).toBe(expectedOutput);
+        },
+    );
+
+    // Additional test cases can be added as necessary to cover other edge cases
 });

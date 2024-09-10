@@ -553,30 +553,12 @@ function reduceConsecutiveBackslashes(str) {
  * Helper function to suggest a corrected format for the user provided input date
  * @param {string} inputDate
  */
-/*function suggestCorrectedDateFormat(inputDate) {
-	// Remove any non-numeric characters except 'T' and 'Z'
-	let correctedDate = inputDate.replace(/[^\dTZ]/g, '');
-
-	// If "T" is missing, insert it between the date and time
-	if (!/T/.test(correctedDate) && correctedDate.length >= 15) {
-		correctedDate = correctedDate.slice(0, 8) + 'T' + correctedDate.slice(8);
-	}
-
-	// Add missing characters to match the correct format
-	correctedDate = correctedDate.replace(
-		/(\d{4})(\d{2})(\d{2})T?(\d{2})(\d{2})(\d{2})Z?/,
-		'$1-$2-$3T$4:$5:$6Z',
-	);
-
-	return correctedDate;
-}*/
-
 function suggestCorrectedDateFormat(inputDate) {
 	// Remove any non-numeric characters except 'T' and 'Z'
 	let correctedDate = inputDate.replace(/[^\dTZ]/g, '');
 
 	// If "T" is missing, insert it between the date and time
-	if (!/T/.test(correctedDate) && correctedDate.length >= 15) {
+	if (!/T/.test(correctedDate) && correctedDate.length >= 14) {
 		correctedDate = correctedDate.slice(0, 8) + 'T' + correctedDate.slice(8);
 	}
 
