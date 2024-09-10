@@ -122,41 +122,52 @@ const describeMesh = async (organizationId, projectId, workspaceId, workspaceNam
  * @param {*} meshId
  * @returns
  */
-const listLogs = async (organizationId, projectId, workspaceId, workspaceName, meshId) => {
-	return [
-		{
-			'RayID': '8b9c7f590bb97f9d',
-			'EventTimestampMs': 1724766278577,
-			'Response Status': 200,
-			'Level': 'log',
-			'file':
-				'f0ec3633-7377-4533-8788-484d2b65f4bc/20240827/20240827T134612Z_20240827T134612Z_0e95854e.csv',
+const listLogs = async (
+	organizationCode,
+	projectId,
+	workspaceId,
+	meshId,
+	startTime,
+	endTime,
+	fileName
+) => {
+	const { accessToken, apiKey } = await getDevConsoleConfig();
+	const url = `${SMS_BASE_URL}/organizations/${organizationCode}/xprojects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/logs/list`;
+	const config = {
+		method: 'get',
+		url: fileName? url + `?filename=${fileName}` : url,
+		headers: {
+			'Authorization': `Bearer ${accessToken}`,
+			'x-request-id': global.requestId,
+			'x-api-key': apiKey,
 		},
-		{
-			'RayID': '8b9c7f8ee9717f9d',
-			'EventTimestampMs': 1724766287188,
-			'Response Status': 200,
-			'Level': 'log',
-			'file':
-				'f0ec3633-7377-4533-8788-484d2b65f4bc/20240827/20240827T134612Z_20240827T134612Z_0e95854e.csv',
-		},
-		{
-			'RayID': '8b9c7f8db8107f9d',
-			'EventTimestampMs': 1724766286997,
-			'Response Status': 200,
-			'Level': 'log',
-			'file':
-				'f0ec3633-7377-4533-8788-484d2b65f4bc/20240827/20240827T134612Z_20240827T134612Z_0e95854e.csv',
-		},
-		{
-			'RayID': '8b9c7f670a917f9d',
-			'EventTimestampMs': 1724766280810,
-			'Response Status': 200,
-			'Level': 'log',
-			'file':
-				'f0ec3633-7377-4533-8788-484d2b65f4bc/20240827/20240827T134612Z_20240827T134612Z_0e95854e.csv',
-		},
-	];
+	};
+
+	logger.info(
+		'Initiating GET %s',
+		`${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/logs?startDateTime=${startTime}&endDateTime=${endTime}&API_KEY=${apiKey}`,
+	);
+
+	try {
+		const response = await axios(config);
+
+		logger.info('Response from GET %s', response.status);
+
+		if (response?.status === 200) {
+			logger.info(`Presigned urls : ${objToString(response, ['data'])}`);
+			const { presignedUrls, totalSize } = response.data;
+			return {
+				presignedUrls,
+				totalSize,
+			};
+		}
+	} catch (error) {
+		logger.error(`Error fetching presigned urls: ${error}`);
+		return {
+			urls: {},
+			totalsize: 0,
+		};
+	}
 };
 
 const getMesh = async (organizationId, projectId, workspaceId, workspaceName, meshId) => {
@@ -1062,6 +1073,51 @@ const getPublicEncryptionKey = async organizationCode => {
 	}
 };
 
+const getPresignedUrls = async (
+	organizationCode,
+	projectId,
+	workspaceId,
+	meshId,
+	startTime,
+	endTime,
+) => {
+	const { accessToken, apiKey } = await getDevConsoleConfig();
+	const config = {
+		method: 'get',
+		url: `${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/logs?startDateTime=${startTime}&endDateTime=${endTime}&API_KEY=${apiKey}`,
+		headers: {
+			'Authorization': `Bearer ${accessToken}`,
+			'x-request-id': global.requestId,
+		},
+	};
+
+	logger.info(
+		'Initiating GET %s',
+		`${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/logs?startDateTime=${startTime}&endDateTime=${endTime}&API_KEY=${apiKey}`,
+	);
+
+	try {
+		const response = await axios(config);
+
+		logger.info('Response from GET %s', response.status);
+
+		if (response?.status === 200) {
+			logger.info(`Presigned urls : ${objToString(response, ['data'])}`);
+			const { presignedUrls, totalSize } = response.data;
+			return {
+				presignedUrls,
+				totalSize,
+			};
+		}
+	} catch (error) {
+		logger.error(`Error fetching presigned urls: ${error}`);
+		return {
+			urls: {},
+			totalsize: 0,
+		};
+	}
+};
+
 module.exports = {
 	getApiKeyCredential,
 	describeMesh,
@@ -1080,4 +1136,5 @@ module.exports = {
 	getTenantFeatures,
 	getMeshDeployments,
 	getPublicEncryptionKey,
+	getPresignedUrls,
 };

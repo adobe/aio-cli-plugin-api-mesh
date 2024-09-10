@@ -71,6 +71,21 @@ const fileNameFlag = Flags.string({
 	description: 'Name of Csv file for logs',
 });
 
+const startTimeFlag = Flags.string({
+	description: 'Start time for the logs in UTC',
+	required: true,
+});
+
+const endTimeFlag = Flags.string({
+	description: 'End time for the logs in UTC',
+	required: true,
+});
+
+const logFilenameFlag = Flags.string({
+	description: 'Path to the output file for logs',
+	required: true,
+});
+
 /**
  * Parse the meshConfig and get the list of (local) files to be imported
  *
@@ -556,4 +571,7 @@ module.exports = {
 	interpolateSecrets,
 	validateSecretsFile,
 	encryptSecrets,
+	startTimeFlag,
+	endTimeFlag,
+	logFilenameFlag,
 };

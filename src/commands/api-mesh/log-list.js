@@ -45,7 +45,7 @@ class ListLogsCommand extends Command {
 		}
 		if (meshId) {
 			try {
-				const logs = await listLogs(imsOrgId, projectId, workspaceId, workspaceName, meshId);
+				const logs = await listLogs(imsOrgId, projectId, workspaceId, workspaceName, meshId, x);
 
 				if (logs && logs.length > 0) {
 					ux.table(
@@ -93,7 +93,5 @@ class ListLogsCommand extends Command {
 }
 
 ListLogsCommand.description = 'Get the rayIds of a given mesh';
-
-module.exports = ListLogsCommand;
 
 module.exports = ListLogsCommand;
