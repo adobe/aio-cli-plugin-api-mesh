@@ -226,30 +226,28 @@ describe('GetBulkLogCommand', () => {
 	});
 });
 describe('GetBulkLogCommand startTime and endTime validation', () => {
-    // Define the test cases as an array of [inputDate, expectedOutput] pairs
-    const testCases = [
-        // Invalid formats that should be corrected
-        ['2024-0812T123445', '2024-08-12T12:34:45Z'],
-        ['2024:08:12-09-08-36Z', '2024-08-12T09:08:36Z'],
-        ['20241223T234556Z', '2024-12-23T23:45:56Z'],
-        ['20241213223832', '2024-12-13T22:38:32Z'],
-        ['2024-12-13T223832Z', '2024-12-13T22:38:32Z'],
-        ['2024-11-23T21:34:45', '2024-11-23T21:34:45Z'],
+	// Define the test cases as an array of [inputDate, expectedOutput] pairs
+	const testCases = [
+		// Invalid formats that should be corrected
+		['2024-0812T123445', '2024-08-12T12:34:45Z'],
+		['2024:08:12-09-08-36Z', '2024-08-12T09:08:36Z'],
+		['20241223T234556Z', '2024-12-23T23:45:56Z'],
+		['20241213223832', '2024-12-13T22:38:32Z'],
+		['2024-12-13T223832Z', '2024-12-13T22:38:32Z'],
+		['2024-11-23T21:34:45', '2024-11-23T21:34:45Z'],
 
-        // Invalid date components that should not be corrected, but return null which lets the user know the date is invalid
-        ['20240834123456Z', null], // Invalid day (34)
-        ['2024-12-34T23:34:45Z', null], // Invalid day (34)
-        ['2024-13-23:21:34:45', null], // Invalid month (13)
-        ['2024-11-63T21:34:45', null], // Invalid day (13) and missing Z
-    ];
+		// Invalid date components that should not be corrected, but return null which lets the user know the date is invalid
+		['20240834123456Z', null], // Invalid day (34)
+		['2024-12-34T23:34:45Z', null], // Invalid day (34)
+		['2024-13-23:21:34:45', null], // Invalid month (13)
+		['2024-11-63T21:34:45', null], // Invalid day (13) and missing Z
+	];
 
-    test.each(testCases)(
-        'suggestCorrectedDateFormat("%s") should return "%s"',
-        (inputDate, expectedOutput) => {
-            const correctedDate = suggestCorrectedDateFormat(inputDate);
-            expect(correctedDate).toBe(expectedOutput);
-        },
-    );
-
-    // Additional test cases can be added as necessary to cover other edge cases
+	test.each(testCases)(
+		'suggestCorrectedDateFormat("%s") should return "%s"',
+		(inputDate, expectedOutput) => {
+			const correctedDate = suggestCorrectedDateFormat(inputDate);
+			expect(correctedDate).toBe(expectedOutput);
+		},
+	);
 });
