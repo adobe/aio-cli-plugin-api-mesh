@@ -12,7 +12,6 @@ const { Command } = require('@oclif/core');
 const logger = require('../../classes/logger');
 const { initSdk, initRequestId } = require('../../helpers');
 const { ignoreCacheFlag } = require('../../utils');
-const chalk = require('chalk');
 const { getMeshId, getLogsByRayId } = require('../../lib/devConsole');
 require('dotenv').config();
 
@@ -52,7 +51,6 @@ class FetchLogsCommand extends Command {
 			try {
 				const meshLog = await getLogsByRayId(imsOrgId, projectId, workspaceId, meshId, rayId);
 				if (meshLog) {
-					this.log(chalk.green(`\nSuccessfully retrieved mesh Log for given RayID ${rayId}\n`));
 					this.log('EventTimestampMs : %s', meshLog.eventTimestampMs);
 					this.log('Exceptions : %s', meshLog.exceptions);
 					this.log('Logs : %s', meshLog.logs);
@@ -66,7 +64,7 @@ class FetchLogsCommand extends Command {
 			} catch (error) {
 				if (error.message === 'LogNotFound') {
 					this.error(
-						`No logs found for RayId ${rayId}. Please check the details and try again. RequestId: ${global.requestId}`,
+						`No logs found for RayID ${rayId}. Check the RayID and try again. RequestId: ${global.requestId}. Alternatively, you can use the following command to get all logs for a 30 minute time period: \naio api-mesh log-get-bulk --startTime YYYY-MM-DDTHH:MM:SSZ --endTime YYYY-MM-DDTHH:MM:SSZ --filename mesh_logs.csv`,
 					);
 				} else if (error.message === 'ServerError') {
 					this.error(

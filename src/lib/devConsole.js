@@ -1015,11 +1015,11 @@ const getPublicEncryptionKey = async organizationCode => {
 	}
 };
 
-const getLogsByRayId = async (organizationId, projectId, workspaceId, meshId, rayId) => {
+const getLogsByRayId = async (organizationCode, projectId, workspaceId, meshId, rayId) => {
 	const { accessToken, apiKey } = await getDevConsoleConfig();
 	const config = {
 		method: 'get',
-		url: `${SMS_BASE_URL}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/logs/${rayId}?API_KEY=${apiKey}`,
+		url: `${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/logs/${rayId}?API_KEY=${apiKey}`,
 		headers: {
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
@@ -1028,7 +1028,7 @@ const getLogsByRayId = async (organizationId, projectId, workspaceId, meshId, ra
 
 	logger.info(
 		'Initiating GET %s',
-		`${SMS_BASE_URL}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/logs/${rayId}?API_KEY=${apiKey}`,
+		`${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/logs/${rayId}?API_KEY=${apiKey}`,
 	);
 
 	try {

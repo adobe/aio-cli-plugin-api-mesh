@@ -99,26 +99,26 @@ describe('FetchLogsCommand tests', () => {
 			`"Get the Log of a given mesh by RayId"`,
 		);
 		expect(FetchLogsCommand.args).toMatchInlineSnapshot(`
-        [
-          {
-            "description": "to fetch the log ",
-            "name": "rayId",
-            "required": true,
-          },
-        ]
-    `);
+		        [
+		          {
+		            "description": "to fetch the log ",
+		            "name": "rayId",
+		            "required": true,
+		          },
+		        ]
+	    `);
 		expect(FetchLogsCommand.flags).toMatchInlineSnapshot(`
-                {
-                  "ignoreCache": {
-                    "allowNo": false,
-                    "char": "i",
-                    "default": false,
-                    "description": "Ignore cache and force manual org -> project -> workspace selection",
-                    "parse": [Function],
-                    "type": "boolean",
-                  },
-                }
-        `);
+		                {
+		                  "ignoreCache": {
+		                    "allowNo": false,
+		                    "char": "i",
+		                    "default": false,
+		                    "description": "Ignore cache and force manual org -> project -> workspace selection",
+		                    "parse": [Function],
+		                    "type": "boolean",
+		                  },
+		                }
+	        `);
 		expect(FetchLogsCommand.aliases).toMatchInlineSnapshot(`[]`);
 	});
 });
@@ -129,17 +129,19 @@ test('should handle log not found error', async () => {
 	const runResult = FetchLogsCommand.run();
 
 	return runResult.catch(err => {
-		expect(err.message).toMatchInlineSnapshot(
-			`"No logs found for RayId ray1. Please check the details and try again. RequestId: dummy_request_id"`,
-		);
+		expect(err.message).toMatchInlineSnapshot(`
+		"No logs found for RayID ray1. Check the RayID and try again. RequestId: dummy_request_id. Alternatively, you can use the following command to get all logs for a 30 minute time period: 
+		aio api-mesh log-get-bulk --startTime YYYY-MM-DDTHH:MM:SSZ --endTime YYYY-MM-DDTHH:MM:SSZ --filename mesh_logs.csv"
+	`);
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`[]`);
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
-			[
-			  [
-			    "No logs found for RayId ray1. Please check the details and try again. RequestId: dummy_request_id",
-			  ],
-			]
-		`);
+		[
+		  [
+		    "No logs found for RayID ray1. Check the RayID and try again. RequestId: dummy_request_id. Alternatively, you can use the following command to get all logs for a 30 minute time period: 
+		aio api-mesh log-get-bulk --startTime YYYY-MM-DDTHH:MM:SSZ --endTime YYYY-MM-DDTHH:MM:SSZ --filename mesh_logs.csv",
+		  ],
+		]
+	`);
 	});
 });
 
