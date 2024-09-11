@@ -4,8 +4,9 @@ const logger = require('../../classes/logger');
 const { initSdk, initRequestId } = require('../../helpers');
 const { ignoreCacheFlag, jsonFlag, fileNameFlag } = require('../../utils');
 const { getMeshId, listLogs } = require('../../lib/devConsole');
-const { appendFileSync } = require('fs');
+const { appendFileSync, existsSync } = require('fs');
 const { ux } = require('@oclif/core/lib/cli-ux');
+const path = require('path');
 
 require('dotenv').config();
 class ListLogsCommand extends Command {
@@ -29,8 +30,14 @@ class ListLogsCommand extends Command {
 		const json = await flags.json;
 		const fileName = await flags.filename;
 
-		if (fileName && !fileName.endsWith('.csv')) {
-			this.error('Invalid file type. Provide a filename with a .csv extension.');
+		if (fileName) {
+			if (path.extname(fileName).toLowerCase() !== '.csv') {
+				this.error('Invalid file type. Provide a filename with a .csv extension.');
+			}
+			const file = path.resolve(process.cwd(), fileName);
+			if (existsSync(file)) {
+				this.error(`File ${fileName} already exists. Please provide a new file name.`);
+			}
 		}
 
 		const { imsOrgId, projectId, workspaceId, workspaceName } = await initSdk({
@@ -57,10 +64,10 @@ class ListLogsCommand extends Command {
 					meshId,
 					fileName,
 				);
-				// add a new line
-				this.log();
 
 				if (logs && logs.length > 0) {
+					// add a new line
+					this.log();
 					ux.table(
 						logs,
 						{
@@ -83,14 +90,14 @@ class ListLogsCommand extends Command {
 						},
 						{
 							printLine: fileName
-								? line => appendFileSync(fileName || 'logs.csv', line + '\n')
+								? line => appendFileSync(fileName, line + '\n')
 								: line => this.log(line),
 							csv: fileName,
 							...flags,
 						},
 					);
 				} else {
-					this.log('No logs found');
+					this.log('No logs found.');
 				}
 			} catch (error) {
 				this.log(error.message);
@@ -98,8 +105,7 @@ class ListLogsCommand extends Command {
 			}
 		} else {
 			this.error(
-				`Unable to get mesh config. No mesh found for Org(${imsOrgId}) -> Project(${projectId}) -> Workspace(${workspaceId}). Please check the details and try again.`,
-				{ exit: false },
+				`Unable to get mesh config. No mesh found for Org(${imsOrgId}) -> Project(${projectId}) -> Workspace(${workspaceId}). Please check the details and try again. RequestId: ${global.requestId}`,
 			);
 		}
 	}
