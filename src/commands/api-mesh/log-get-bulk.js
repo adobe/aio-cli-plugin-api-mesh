@@ -5,7 +5,13 @@ const { initRequestId, initSdk, promptConfirm } = require('../../helpers');
 const { getMeshId, getPresignedUrls } = require('../../lib/devConsole');
 const logger = require('../../classes/logger');
 const axios = require('axios');
-const { ignoreCacheFlag, startTimeFlag, endTimeFlag, logFilenameFlag } = require('../../utils');
+const {
+	ignoreCacheFlag,
+	startTimeFlag,
+	endTimeFlag,
+	logFilenameFlag,
+	suggestCorrectedDateFormat,
+} = require('../../utils');
 
 require('dotenv').config();
 
@@ -35,17 +41,33 @@ class GetBulkLogCommand extends Command {
 			return;
 		}
 		// Regular expression to validate the input date format YYYY-MM-DDTHH:MM:SSZ
-		const dateTimeRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/;
+		const dateTimeRegex = /^(?:(\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])T(0[0-9]|1[0-9]|2[0-3]):([0-5]\d):([0-5]\d)Z)$/;
 
-		// Validate startTime format
+		// Validate user provided startTime format
 		if (!dateTimeRegex.test(flags.startTime)) {
-			this.error('Invalid startTime format. Use the format YYYY-MM-DDTHH:MM:SSZ');
+			const correctedStartTime = suggestCorrectedDateFormat(flags.startTime);
+			if (!correctedStartTime) {
+				this.error('Found invalid date components for startTime. Check and correct the date.');
+			} else {
+				this.error(
+					`Use the format YYYY-MM-DDTHH:MM:SSZ for startTime. Did you mean ${correctedStartTime}?`,
+				);
+			}
+
 			return;
 		}
 
-		// Validate endTime format
+		// Validate user provided endTime format
 		if (!dateTimeRegex.test(flags.endTime)) {
-			this.error('Invalid endTime format. Use the format YYYY-MM-DDTHH:MM:SSZ');
+			const correctedEndTime = suggestCorrectedDateFormat(flags.endTime);
+			//check for incorrect date components
+			if (!correctedEndTime) {
+				this.error('Found invalid date components for endTime. Check and correct the date.');
+			} else {
+				this.error(
+					`Use the format YYYY-MM-DDTHH:MM:SSZ for endTime. Did you mean ${correctedEndTime}?`,
+				);
+			}
 			return;
 		}
 
@@ -73,23 +95,24 @@ class GetBulkLogCommand extends Command {
 			return;
 		}
 
-		// Validate filepath
+		// Validate required filename flag
 		if (!filename) {
-			this.error('Missing file path. Provide a valid file in the current working directory.');
+			this.error('Missing filename. Provide a valid file in the current working directory.');
 			return;
 		}
 
 		// Check if the file exists
 		const outputFile = path.resolve(process.cwd(), filename);
 
-		// Ensure file exists and is empty before proceeding
+		// Check if file exists and if doesn't, create one in the cwd and continue
 		if (!fs.existsSync(outputFile)) {
-			throw new Error(`Specified file doesn't exist in the ${process.cwd()}`);
+			fs.writeFileSync(outputFile, '');
 		}
 
+		//check if the file is empty before proceeding
 		const stats = fs.statSync(outputFile);
 		if (stats.size > 0) {
-			throw new Error(`Please make sure that file: ${filename} is empty`);
+			throw new Error(`Make sure the file: ${filename} is empty`);
 		}
 		// truncate milliseconds to ensure comparison is only done up to seconds
 		startTime.setMilliseconds(0);
@@ -153,7 +176,7 @@ class GetBulkLogCommand extends Command {
 			const totalSizeKB = (totalSize / 1024).toFixed(2); // Convert bytes to KB
 			// 7. Get user confirmation
 			shouldDownload = await promptConfirm(
-				`Expected file size is ${totalSizeKB} KB. Please confirm to output to file ${filename} (y/n)`,
+				`The expected file size is ${totalSizeKB} KB. Confirm ${filename} download? (y/n)`,
 			);
 			if (shouldDownload) {
 				//create a writer and proceed with download
@@ -183,6 +206,8 @@ class GetBulkLogCommand extends Command {
 						logger.error(`Error downloading or appending content of ${key}:`, error);
 					}
 				}
+				// Ensure the stream is closed
+				writer.end();
 
 				this.log(`Successfully downloaded the logs to ${filename}.`);
 			} else {
