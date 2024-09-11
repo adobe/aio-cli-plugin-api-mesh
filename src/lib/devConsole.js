@@ -1015,20 +1015,67 @@ const getPublicEncryptionKey = async organizationCode => {
 	}
 };
 
-const getLogsByRayId = async (organizationCode, projectId, workspaceId, meshId, rayId) => {
+const getPresignedUrls = async (
+	organizationCode,
+	projectId,
+	workspaceId,
+	meshId,
+	startTime,
+	endTime,
+) => {
 	const { accessToken, apiKey } = await getDevConsoleConfig();
 	const config = {
 		method: 'get',
-		url: `${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/logs/${rayId}?API_KEY=${apiKey}`,
+		url: `${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/logs?startDateTime=${startTime}&endDateTime=${endTime}`,
 		headers: {
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
+			'x-api-key': apiKey,
 		},
 	};
 
 	logger.info(
 		'Initiating GET %s',
-		`${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/logs/${rayId}?API_KEY=${apiKey}`,
+		`${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/logs?startDateTime=${startTime}&endDateTime=${endTime}`,
+	);
+
+	try {
+		const response = await axios(config);
+
+		logger.info('Response from GET %s', response.status);
+
+		if (response?.status === 200) {
+			logger.info(`Presigned urls : ${objToString(response, ['data'])}`);
+			const { presignedUrls, totalSize } = response.data;
+			return {
+				presignedUrls,
+				totalSize,
+			};
+		}
+	} catch (error) {
+		logger.error(`Error fetching presigned urls: ${error}`);
+		return {
+			urls: {},
+			totalsize: 0,
+		};
+	}
+};
+
+const getLogsByRayId = async (organizationCode, projectId, workspaceId, meshId, rayId) => {
+	const { accessToken, apiKey } = await getDevConsoleConfig();
+	const config = {
+		method: 'get',
+		url: `${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/logs/${rayId}`,
+		headers: {
+			'Authorization': `Bearer ${accessToken}`,
+			'x-request-id': global.requestId,
+			'x-api-key': apiKey,
+		},
+	};
+
+	logger.info(
+		'Initiating GET %s',
+		`${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/logs/${rayId}`,
 	);
 
 	try {
@@ -1082,5 +1129,6 @@ module.exports = {
 	getTenantFeatures,
 	getMeshDeployments,
 	getPublicEncryptionKey,
+	getPresignedUrls,
 	getLogsByRayId,
 };
