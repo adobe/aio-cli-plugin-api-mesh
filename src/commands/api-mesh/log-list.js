@@ -24,7 +24,7 @@ class ListLogsCommand extends Command {
 
 		logger.info(`RequestId: ${global.requestId}`);
 
-		const { args, flags } = await this.parse(ListLogsCommand);
+		const { flags } = await this.parse(ListLogsCommand);
 
 		const ignoreCache = await flags.ignoreCache;
 		const json = await flags.json;

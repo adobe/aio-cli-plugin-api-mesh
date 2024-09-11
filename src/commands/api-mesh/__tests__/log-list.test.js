@@ -16,7 +16,6 @@ jest.mock('../../../classes/logger');
 describe('List Logs Command', () => {
 	let parseSpy;
 	let logSpy;
-	let errorSpy;
 
 	beforeEach(() => {
 		// Setup spies and mock functions
@@ -28,7 +27,6 @@ describe('List Logs Command', () => {
 		});
 
 		logSpy = jest.spyOn(ListLogsCommand.prototype, 'log');
-		errorSpy = jest.spyOn(ListLogsCommand.prototype, 'error');
 
 		// initRequestId.mockResolvedValue();
 		initSdk.mockResolvedValue({
