@@ -29,6 +29,10 @@ class ListLogsCommand extends Command {
 		const json = await flags.json;
 		const fileName = await flags.filename;
 
+		if (fileName && !fileName.endsWith('.csv')) {
+			this.error('Invalid file type. Provide a filename with a .csv extension.');
+		}
+
 		const { imsOrgId, projectId, workspaceId, workspaceName } = await initSdk({
 			ignoreCache,
 			verbose: !json,
@@ -45,10 +49,17 @@ class ListLogsCommand extends Command {
 		}
 		if (meshId) {
 			try {
-				const logs = await listLogs(imsOrgId, projectId, workspaceId, workspaceName, meshId, fileName);
+				const logs = await listLogs(
+					imsOrgId,
+					projectId,
+					workspaceId,
+					workspaceName,
+					meshId,
+					fileName,
+				);
 				// add a new line
 				this.log();
-				
+
 				if (logs && logs.length > 0) {
 					ux.table(
 						logs,
@@ -94,6 +105,6 @@ class ListLogsCommand extends Command {
 	}
 }
 
-ListLogsCommand.description = 'Get the rayIds of a given mesh';
+ListLogsCommand.description = 'Get recent logs of requests made to the API Mesh.';
 
 module.exports = ListLogsCommand;

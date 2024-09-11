@@ -129,25 +129,24 @@ const listLogs = async (
 	meshId,
 	startTime,
 	endTime,
-	fileName
+	fileName,
 ) => {
 	const { accessToken, apiKey } = await getDevConsoleConfig();
-	organizationCode = "612C2F3061FAE7720A494230@AdobeOrg";
-	projectId = "test-project";
-	workspaceId = "tpw5";
-	meshId = "f0ec3633-7377-4533-8788-484d2b65f4bc";
+	organizationCode = '612C2F3061FAE7720A494230@AdobeOrg';
+	projectId = 'test-project';
+	workspaceId = 'tpw5';
+	meshId = 'f0ec3633-7377-4533-8788-484d2b65f4bc';
 	const url = `${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/logs/list`;
 	const config = {
 		method: 'get',
-		url: fileName? url + `?filename=${fileName}` : url,
+		url: fileName ? url + `?filename=${fileName}` : url,
 		headers: {
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
-			'x-api-key': "adobeio_onboarding",
+			'x-api-key': 'adobeio_onboarding',
 		},
 	};
 
-	
 	try {
 		const response = await axios(config);
 

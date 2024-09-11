@@ -68,7 +68,7 @@ const selectFlag = Flags.boolean({
 });
 
 const fileNameFlag = Flags.string({
-	description: 'Name of Csv file for logs',
+	description: 'Name of Csv file for the recent logs',
 });
 
 const startTimeFlag = Flags.string({
