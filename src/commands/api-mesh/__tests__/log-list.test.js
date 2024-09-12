@@ -132,7 +132,7 @@ describe('List Logs Command', () => {
 		const command = new ListLogsCommand([], {});
 		await command.run();
 		expect(fs.appendFileSync).not.toHaveBeenCalled();
-		expect(logSpy).toHaveBeenCalledWith('No logs found.');
+		expect(logSpy).toHaveBeenCalledWith(`No recent logs found. Alternatively, you can use the following command to get all logs for a 30 minute time period: \naio api-mesh log-get-bulk --startTime YYYY-MM-DDTHH:MM:SSZ --endTime YYYY-MM-DDTHH:MM:SSZ --filename mesh_logs.csv`);
 	});
 
 	test('No logs found message displayed when sms returns empty array', async () => {
@@ -144,7 +144,7 @@ describe('List Logs Command', () => {
 		listLogs.mockResolvedValue([]);
 		const command = new ListLogsCommand([], {});
 		await command.run();
-		expect(logSpy).toHaveBeenCalledWith('No logs found.');
+		expect(logSpy).toHaveBeenCalledWith(`No recent logs found. Alternatively, you can use the following command to get all logs for a 30 minute time period: \naio api-mesh log-get-bulk --startTime YYYY-MM-DDTHH:MM:SSZ --endTime YYYY-MM-DDTHH:MM:SSZ --filename mesh_logs.csv`);
 		expect(fs.appendFileSync).not.toHaveBeenCalled();
 	});
 
