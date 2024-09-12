@@ -122,20 +122,8 @@ const describeMesh = async (organizationId, projectId, workspaceId, workspaceNam
  * @param {*} meshId
  * @returns
  */
-const listLogs = async (
-	organizationCode,
-	projectId,
-	workspaceId,
-	meshId,
-	startTime,
-	endTime,
-	fileName,
-) => {
+const listLogs = async (organizationCode, projectId, workspaceId, meshId, fileName) => {
 	const { accessToken, apiKey } = await getDevConsoleConfig();
-	organizationCode = '612C2F3061FAE7720A494230@AdobeOrg';
-	projectId = 'test-project';
-	workspaceId = 'tpw5';
-	meshId = 'f0ec3633-7377-4533-8788-484d2b65f4bc';
 	const url = `${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/logs/list`;
 	const config = {
 		method: 'get',
@@ -147,6 +135,8 @@ const listLogs = async (
 		},
 	};
 
+	logger.info('Initiating GET %s', url);
+
 	try {
 		const response = await axios(config);
 
@@ -157,6 +147,7 @@ const listLogs = async (
 		}
 	} catch (error) {
 		logger.error(`Error fetching recent logs: ${error}`);
+		throw error;
 	}
 };
 

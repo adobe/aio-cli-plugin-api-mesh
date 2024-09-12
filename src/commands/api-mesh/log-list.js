@@ -56,14 +56,7 @@ class ListLogsCommand extends Command {
 		}
 		if (meshId) {
 			try {
-				const logs = await listLogs(
-					imsOrgId,
-					projectId,
-					workspaceId,
-					workspaceName,
-					meshId,
-					fileName,
-				);
+				const logs = await listLogs(imsOrgId, projectId, workspaceId, meshId, fileName);
 
 				if (logs && logs.length > 0) {
 					// add a new line
@@ -97,10 +90,11 @@ class ListLogsCommand extends Command {
 						},
 					);
 				} else {
-					this.log('No logs found.');
+					this.log(
+						'No recent logs found. Alternatively, you can use the following command to get all logs for a 30 minute time period: \naio api-mesh log-get-bulk --startTime YYYY-MM-DDTHH:MM:SSZ --endTime YYYY-MM-DDTHH:MM:SSZ --filename mesh_logs.csv',
+					);
 				}
 			} catch (error) {
-				this.log(error.message);
 				this.error(`Failed to fetch logs, RequestId: ${global.requestId}`);
 			}
 		} else {
