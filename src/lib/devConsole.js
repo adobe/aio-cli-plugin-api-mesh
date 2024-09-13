@@ -112,6 +112,45 @@ const describeMesh = async (organizationId, projectId, workspaceId, workspaceNam
 	}
 };
 
+/**
+ * List Recent Logs
+ *
+ * @param {*} organizationId
+ * @param {*} projectId
+ * @param {*} workspaceId
+ * @param {*} workspaceName
+ * @param {*} meshId
+ * @returns
+ */
+const listLogs = async (organizationCode, projectId, workspaceId, meshId, fileName) => {
+	const { accessToken, apiKey } = await getDevConsoleConfig();
+	const url = `${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/logs/list`;
+	const config = {
+		method: 'get',
+		url: fileName ? url + `?filename=${fileName}` : url,
+		headers: {
+			'Authorization': `Bearer ${accessToken}`,
+			'x-request-id': global.requestId,
+			'x-api-key': apiKey,
+		},
+	};
+
+	logger.info('Initiating GET %s', url);
+
+	try {
+		const response = await axios(config);
+
+		logger.info('Response from GET %s', response.status);
+
+		if (response?.status === 200) {
+			return response.data;
+		}
+	} catch (error) {
+		logger.error(`Error fetching recent logs: ${error}`);
+		throw error;
+	}
+};
+
 const getMesh = async (organizationId, projectId, workspaceId, workspaceName, meshId) => {
 	const { baseUrl: devConsoleUrl, accessToken, apiKey } = await getDevConsoleConfig();
 	const config = {
@@ -1068,6 +1107,7 @@ module.exports = {
 	updateMesh,
 	deleteMesh,
 	getMeshId,
+	listLogs,
 	createAPIMeshCredentials,
 	getListOfCurrentServices,
 	subscribeCredentialToServices,

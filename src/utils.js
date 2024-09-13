@@ -67,6 +67,10 @@ const selectFlag = Flags.boolean({
 	default: false,
 });
 
+const fileNameFlag = Flags.string({
+	description: 'Name of CSV file to export the recent logs to',
+});
+
 const startTimeFlag = Flags.string({
 	description: 'Start time for the logs in UTC',
 	required: true,
@@ -609,6 +613,7 @@ module.exports = {
 	debugFlag,
 	selectFlag,
 	secretsFlag,
+	fileNameFlag,
 	interpolateSecrets,
 	validateSecretsFile,
 	encryptSecrets,
