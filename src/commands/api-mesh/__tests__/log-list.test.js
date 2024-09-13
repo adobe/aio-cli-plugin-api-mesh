@@ -76,7 +76,7 @@ describe('List Logs Command', () => {
 
 	test('Throws an error if filename is not of csv extension', async () => {
 		// Mock the file system checks even if they are not the focus of this test
-		parseSpy.mockResolvedValueOnce({
+		parseSpy.mockResolvedValue({
 			flags: {
 				filename: 'test.txt',
 				ignoreCache: false,
@@ -105,7 +105,7 @@ describe('List Logs Command', () => {
 		const result = command.run();
 		result.catch(err => {
 			expect(err.message).toMatchInlineSnapshot(
-				`"Unable to get mesh config. No mesh found for Org(orgId) -> Project(projectId) -> Workspace(workspaceId). Please check the details and try again. RequestId: dummy_request_id"`,
+				`"Unable to get mesh config. No mesh found for Org(orgId) -> Project(projectId) -> Workspace(workspaceId). Check the details and try again. RequestId: dummy_request_id"`,
 			);
 		});
 	});
@@ -156,7 +156,7 @@ describe('List Logs Command', () => {
 		listLogs.mockRejectedValue(new Error('SMS call failed'));
 		const command = new ListLogsCommand([], {});
 		await expect(command.run()).rejects.toThrow(
-			'Failed to fetch logs, RequestId: dummy_request_id',
+			'Failed to list recent logs, RequestId: dummy_request_id',
 		);
 	});
 });

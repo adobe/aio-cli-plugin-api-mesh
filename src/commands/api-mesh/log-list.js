@@ -10,10 +10,9 @@ const path = require('path');
 
 require('dotenv').config();
 class ListLogsCommand extends Command {
-	//static args = [{ name: 'file' }];
+	
 	static flags = {
 		ignoreCache: ignoreCacheFlag,
-		json: jsonFlag,
 		filename: fileNameFlag,
 	};
 
@@ -26,23 +25,20 @@ class ListLogsCommand extends Command {
 
 		const { flags } = await this.parse(ListLogsCommand);
 
-		const ignoreCache = await flags.ignoreCache;
-		const json = await flags.json;
-		const fileName = await flags.filename;
+		const { ignoreCache, filename } = await flags;
 
-		if (fileName) {
-			if (path.extname(fileName).toLowerCase() !== '.csv') {
+		if (filename) {
+			if (path.extname(filename).toLowerCase() !== '.csv') {
 				this.error('Invalid file type. Provide a filename with a .csv extension.');
 			}
-			const file = path.resolve(process.cwd(), fileName);
+			const file = path.resolve(process.cwd(), filename);
 			if (existsSync(file)) {
-				this.error(`File ${fileName} already exists. Please provide a new file name.`);
+				this.error(`File ${filename} already exists. Please provide a new file name.`);
 			}
 		}
 
 		const { imsOrgId, projectId, workspaceId, workspaceName } = await initSdk({
-			ignoreCache,
-			verbose: !json,
+			ignoreCache
 		});
 
 		let meshId = null;
@@ -56,7 +52,7 @@ class ListLogsCommand extends Command {
 		}
 		if (meshId) {
 			try {
-				const logs = await listLogs(imsOrgId, projectId, workspaceId, meshId, fileName);
+				const logs = await listLogs(imsOrgId, projectId, workspaceId, meshId, filename);
 
 				if (logs && logs.length > 0) {
 					// add a new line
@@ -82,10 +78,10 @@ class ListLogsCommand extends Command {
 							},
 						},
 						{
-							printLine: fileName
-								? line => appendFileSync(fileName, line + '\n')
+							printLine: filename
+								? line => appendFileSync(filename, line + '\n')
 								: line => this.log(line),
-							csv: fileName,
+							csv: filename,
 							...flags,
 						},
 					);
@@ -95,11 +91,11 @@ class ListLogsCommand extends Command {
 					);
 				}
 			} catch (error) {
-				this.error(`Failed to fetch logs, RequestId: ${global.requestId}`);
+				this.error(`Failed to list recent logs, RequestId: ${global.requestId}`);
 			}
 		} else {
 			this.error(
-				`Unable to get mesh config. No mesh found for Org(${imsOrgId}) -> Project(${projectId}) -> Workspace(${workspaceId}). Please check the details and try again. RequestId: ${global.requestId}`,
+				`Unable to get mesh config. No mesh found for Org(${imsOrgId}) -> Project(${projectId}) -> Workspace(${workspaceId}). Check the details and try again. RequestId: ${global.requestId}`,
 			);
 		}
 	}
