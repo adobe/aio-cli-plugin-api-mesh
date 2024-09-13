@@ -32,7 +32,7 @@ class ListLogsCommand extends Command {
 			}
 			const file = path.resolve(process.cwd(), filename);
 			if (existsSync(file)) {
-				this.error(`File ${filename} already exists. Please provide a new file name.`);
+				this.error(`File ${filename} already exists. Provide a new file name.`);
 			}
 		}
 
@@ -46,7 +46,7 @@ class ListLogsCommand extends Command {
 			meshId = await getMeshId(imsOrgId, projectId, workspaceId, workspaceName);
 		} catch (err) {
 			this.error(
-				`Unable to get mesh ID. Please check the details and try again. RequestId: ${global.requestId}`,
+				`Unable to get mesh ID. Check the details and try again. RequestId: ${global.requestId}`,
 			);
 		}
 		if (meshId) {

@@ -94,7 +94,7 @@ describe('List Logs Command', () => {
 
 		const command = new ListLogsCommand([], {});
 		await expect(command.run()).rejects.toThrow(
-			'File test.csv already exists. Please provide a new file name.',
+			'File test.csv already exists. Provide a new file name.',
 		);
 	});
 
