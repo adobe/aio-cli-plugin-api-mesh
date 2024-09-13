@@ -26,15 +26,6 @@ jest.mock('../../../helpers', () => ({
 
 jest.mock('../../../lib/devConsole');
 
-jest.mock('chalk', () => ({
-	red: jest.fn(text => text), // Return the input text without any color formatting
-	bold: jest.fn(text => text),
-	underline: {
-		blue: jest.fn(text => text),
-	},
-	bgYellow: jest.fn(text => text),
-}));
-
 const mockConsoleCLIInstance = {};
 const selectedOrg = { id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' };
 const selectedProject = { id: '5678', title: 'Project01' };
@@ -99,14 +90,14 @@ describe('FetchLogsCommand tests', () => {
 			`"Get the Log of a given mesh by RayId"`,
 		);
 		expect(FetchLogsCommand.args).toMatchInlineSnapshot(`
-		        [
-		          {
-		            "description": "to fetch the log ",
-		            "name": "rayId",
-		            "required": true,
-		          },
-		        ]
-	    `);
+		[
+		  {
+		    "description": "Fetch a single log by rayID",
+		    "name": "rayId",
+		    "required": true,
+		  },
+		]
+	`);
 		expect(FetchLogsCommand.flags).toMatchInlineSnapshot(`
 		                {
 		                  "ignoreCache": {
@@ -146,7 +137,29 @@ test('should handle log not found error', async () => {
 });
 
 test('should handle server error', async () => {
-	getLogsByRayId.mockRejectedValue(new Error('Internal Server Error. Please try again later.'));
+	getLogsByRayId.mockRejectedValue(new Error('ServerError'));
+
+	const runResult = FetchLogsCommand.run();
+
+	return runResult.catch(err => {
+		expect(err.message).toMatchInlineSnapshot(
+			`"Server error while fetching logs for RayId ray1. Please try again later. RequestId: dummy_request_id"`,
+		);
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`[]`);
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Server error while fetching logs for RayId ray1. Please try again later. RequestId: dummy_request_id",
+		  ],
+		]
+	`);
+	});
+});
+
+test('should handle generic error', async () => {
+	getLogsByRayId.mockRejectedValue({
+		response: { status: 503, statusText: 'Service Unavailable' },
+	});
 
 	const runResult = FetchLogsCommand.run();
 
@@ -165,22 +178,57 @@ test('should handle server error', async () => {
 	});
 });
 
-test('should handle generic error', async () => {
-	getLogsByRayId.mockRejectedValue(new Error('Something went wrong'));
+test('should handle mesh ID not found error', async () => {
+	getMeshId.mockResolvedValue(null);
 
 	const runResult = FetchLogsCommand.run();
 
 	return runResult.catch(err => {
 		expect(err.message).toMatchInlineSnapshot(
-			`"Unable to get mesh logs. Please check the details and try again. If the error persists please contact support. RequestId: dummy_request_id"`,
+			`"Unable to get mesh ID. Please check the details and try again. RequestId: dummy_request_id"`,
 		);
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`[]`);
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
-			[
-			  [
-			    "Unable to get mesh logs. Please check the details and try again. If the error persists please contact support. RequestId: dummy_request_id",
-			  ],
-			]
-		`);
+		[
+		  [
+		    "Unable to get mesh ID. Please check the details and try again. RequestId: dummy_request_id",
+		  ],
+		]
+	`);
 	});
+});
+test('should fetch logs successfully', async () => {
+	getMeshId.mockResolvedValue('mesh1');
+	getLogsByRayId.mockResolvedValue({
+		eventTimestampMs: 1724660420904,
+		exceptions: '[]',
+		logs:
+			'[{\'Level\': \'log\', \'Message\': [\'[object Object]\'], \'TimestampMs\': 1724660422580}, {\'Level\': \'log\', \'Message\': [\'{"sources":[{"name":"venia","handler":{"graphql":{"useGETForQueries":true,"endpoint":"https://venia.magento.com/graphql","operationHeaders":{"x-test-header":"{context.headers[\\\'x-test-header\\\']}"}}}}],"responseConfig":{"includeHTTPDetails":true},"additionalResolvers":[],"plugins":[{"httpDetailsExtensions":{}}]}\'], \'TimestampMs\': 1724660422580}]',
+		outcome: 'ok',
+		meshId: 'mesh1',
+		rayId: 'ray1',
+		url: 'https://edge-dev1-graph.adobe.io/api/REDACTED/graphql',
+		requestMethod: 'POST',
+		responseStatus: 200,
+		level: 'log',
+	});
+
+	const command = new FetchLogsCommand(['ray1']);
+	await command.run();
+
+	expect(logSpy).toHaveBeenCalledWith('Event Timestamp : %s', 1724660420904);
+	expect(logSpy).toHaveBeenCalledWith('Exceptions : %s', '[]');
+	expect(logSpy).toHaveBeenCalledWith(
+		'Logs : %s',
+		'[{\'Level\': \'log\', \'Message\': [\'[object Object]\'], \'TimestampMs\': 1724660422580}, {\'Level\': \'log\', \'Message\': [\'{"sources":[{"name":"venia","handler":{"graphql":{"useGETForQueries":true,"endpoint":"https://venia.magento.com/graphql","operationHeaders":{"x-test-header":"{context.headers[\\\'x-test-header\\\']}"}}}}],"responseConfig":{"includeHTTPDetails":true},"additionalResolvers":[],"plugins":[{"httpDetailsExtensions":{}}]}\'], \'TimestampMs\': 1724660422580}]',
+	);
+	expect(logSpy).toHaveBeenCalledWith('Outcome : %s', 'ok');
+	expect(logSpy).toHaveBeenCalledWith('MeshId : %s', 'mesh1');
+	expect(logSpy).toHaveBeenCalledWith('RayId : %s', 'ray1');
+	expect(logSpy).toHaveBeenCalledWith(
+		'MeshUrl : %s',
+		'https://edge-dev1-graph.adobe.io/api/REDACTED/graphql',
+	);
+	expect(logSpy).toHaveBeenCalledWith('Request Method : %s', 'POST');
+	expect(logSpy).toHaveBeenCalledWith('Request Status : %s', 200);
 });

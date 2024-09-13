@@ -16,7 +16,7 @@ const { getMeshId, getLogsByRayId } = require('../../lib/devConsole');
 require('dotenv').config();
 
 class FetchLogsCommand extends Command {
-	static args = [{ name: 'rayId', required: true, description: 'to fetch the log ' }];
+	static args = [{ name: 'rayId', required: true, description: 'Fetch a single log by rayID' }];
 	static flags = {
 		ignoreCache: ignoreCacheFlag,
 	};
@@ -47,40 +47,33 @@ class FetchLogsCommand extends Command {
 			);
 		}
 
-		if (meshId) {
-			try {
-				const meshLog = await getLogsByRayId(imsOrgId, projectId, workspaceId, meshId, rayId);
-				if (meshLog) {
-					this.log('EventTimestampMs : %s', meshLog.eventTimestampMs);
-					this.log('Exceptions : %s', meshLog.exceptions);
-					this.log('Logs : %s', meshLog.logs);
-					this.log('Outcome : %s', meshLog.outcome);
-					this.log('MeshId : %s', meshLog.meshId);
-					this.log('RayId : %s', meshLog.rayId);
-					this.log('MeshUrl : %s', meshLog.url);
-					this.log('RequestMethod : %s', meshLog.requestMethod);
-					this.log('RequestStatus : %s', meshLog.responseStatus);
-				}
-			} catch (error) {
-				if (error.message === 'LogNotFound') {
-					this.error(
-						`No logs found for RayID ${rayId}. Check the RayID and try again. RequestId: ${global.requestId}. Alternatively, you can use the following command to get all logs for a 30 minute time period: \naio api-mesh log-get-bulk --startTime YYYY-MM-DDTHH:MM:SSZ --endTime YYYY-MM-DDTHH:MM:SSZ --filename mesh_logs.csv`,
-					);
-				} else if (error.message === 'ServerError') {
-					this.error(
-						`Server error while fetching logs for RayId ${rayId}. Please try again later. RequestId: ${global.requestId}`,
-					);
-				} else {
-					this.error(
-						`Unable to get mesh logs. Please check the details and try again. If the error persists please contact support. RequestId: ${global.requestId}`,
-					);
-				}
+		try {
+			const meshLog = await getLogsByRayId(imsOrgId, projectId, workspaceId, meshId, rayId);
+			if (meshLog) {
+				this.log('Event Timestamp : %s', meshLog.eventTimestampMs);
+				this.log('Exceptions : %s', meshLog.exceptions);
+				this.log('Logs : %s', meshLog.logs);
+				this.log('Outcome : %s', meshLog.outcome);
+				this.log('MeshId : %s', meshLog.meshId);
+				this.log('RayId : %s', meshLog.rayId);
+				this.log('MeshUrl : %s', meshLog.url);
+				this.log('Request Method : %s', meshLog.requestMethod);
+				this.log('Request Status : %s', meshLog.responseStatus);
 			}
-		} else {
-			this.error(
-				`Unable to get mesh. No mesh found for Org(${imsOrgId}) -> Project(${projectId}) -> Workspace(${workspaceId}). Please check the details and try again.`,
-				{ exit: false },
-			);
+		} catch (error) {
+			if (error.message === 'LogNotFound') {
+				this.error(
+					`No logs found for RayID ${rayId}. Check the RayID and try again. RequestId: ${global.requestId}. Alternatively, you can use the following command to get all logs for a 30 minute time period: \naio api-mesh log-get-bulk --startTime YYYY-MM-DDTHH:MM:SSZ --endTime YYYY-MM-DDTHH:MM:SSZ --filename mesh_logs.csv`,
+				);
+			} else if (error.message === 'ServerError') {
+				this.error(
+					`Server error while fetching logs for RayId ${rayId}. Please try again later. RequestId: ${global.requestId}`,
+				);
+			} else {
+				this.error(
+					`Unable to get mesh logs. Please check the details and try again. If the error persists please contact support. RequestId: ${global.requestId}`,
+				);
+			}
 		}
 	}
 }
