@@ -2,7 +2,7 @@ const { Command } = require('@oclif/core');
 
 const logger = require('../../classes/logger');
 const { initSdk, initRequestId } = require('../../helpers');
-const { ignoreCacheFlag, jsonFlag, fileNameFlag } = require('../../utils');
+const { ignoreCacheFlag, fileNameFlag } = require('../../utils');
 const { getMeshId, listLogs } = require('../../lib/devConsole');
 const { appendFileSync, existsSync } = require('fs');
 const { ux } = require('@oclif/core/lib/cli-ux');
@@ -10,7 +10,6 @@ const path = require('path');
 
 require('dotenv').config();
 class ListLogsCommand extends Command {
-	
 	static flags = {
 		ignoreCache: ignoreCacheFlag,
 		filename: fileNameFlag,
@@ -38,7 +37,7 @@ class ListLogsCommand extends Command {
 		}
 
 		const { imsOrgId, projectId, workspaceId, workspaceName } = await initSdk({
-			ignoreCache
+			ignoreCache,
 		});
 
 		let meshId = null;
