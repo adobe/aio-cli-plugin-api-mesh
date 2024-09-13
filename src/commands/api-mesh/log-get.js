@@ -54,9 +54,9 @@ class FetchLogsCommand extends Command {
 				this.log('Exceptions : %s', meshLog.exceptions);
 				this.log('Logs : %s', meshLog.logs);
 				this.log('Outcome : %s', meshLog.outcome);
-				this.log('MeshID : %s', meshLog.meshId);
+				this.log('Mesh ID : %s', meshLog.meshId);
 				this.log('RayId : %s', meshLog.rayId);
-				this.log('MeshURL : %s', meshLog.url);
+				this.log('Mesh URL : %s', meshLog.url);
 				this.log('Request Method : %s', meshLog.requestMethod);
 				this.log('Request Status : %s', meshLog.responseStatus);
 			}
