@@ -36,7 +36,7 @@ class ListLogsCommand extends Command {
 			}
 		}
 
-		const { imsOrgId, projectId, workspaceId, workspaceName } = await initSdk({
+		const { imsOrgId, imsOrgCode, projectId, workspaceId, workspaceName } = await initSdk({
 			ignoreCache,
 		});
 
@@ -51,7 +51,7 @@ class ListLogsCommand extends Command {
 		}
 		if (meshId) {
 			try {
-				const logs = await listLogs(imsOrgId, projectId, workspaceId, meshId, filename);
+				const logs = await listLogs(imsOrgCode, projectId, workspaceId, meshId, filename);
 
 				if (logs && logs.length > 0) {
 					// add a new line
