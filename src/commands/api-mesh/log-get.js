@@ -31,7 +31,7 @@ class FetchLogsCommand extends Command {
 		const ignoreCache = flags.ignoreCache;
 		const rayId = args.rayId;
 
-		const { imsOrgId, projectId, workspaceId } = await initSdk({
+		const { imsOrgId, imsOrgCode, projectId, workspaceId } = await initSdk({
 			ignoreCache,
 		});
 
@@ -48,7 +48,7 @@ class FetchLogsCommand extends Command {
 		}
 
 		try {
-			const meshLog = await getLogsByRayId(imsOrgId, projectId, workspaceId, meshId, rayId);
+			const meshLog = await getLogsByRayId(imsOrgCode, projectId, workspaceId, meshId, rayId);
 			if (meshLog) {
 				this.log('Event Timestamp : %s', meshLog.eventTimestampMs);
 				this.log('Exceptions : %s', meshLog.exceptions);
