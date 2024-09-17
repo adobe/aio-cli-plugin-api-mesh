@@ -61,7 +61,7 @@ describe('GetBulkLogCommand', () => {
 		// Create dynamic startTime and endTime
 		const startTime = new Date(now);
 		const endTime = new Date(now);
-		endTime.setMinutes(startTime.getMinutes() + 45); // Set endTime to 45 minutes after startTime
+		startTime.setMinutes(startTime.getMinutes() - 45); // Set endTime to 45 minutes after startTime
 
 		const formattedStartTime = startTime.toISOString().slice(0, 19) + 'Z';
 		const formattedEndTime = endTime.toISOString().slice(0, 19) + 'Z';
@@ -78,6 +78,37 @@ describe('GetBulkLogCommand', () => {
 		const command = new GetBulkLogCommand([], {});
 		await expect(command.run()).rejects.toThrow(
 			'Max duration between startTime and endTime should be 30 minutes. Current duration is 0 hours 45 minutes and 0 seconds.',
+		);
+	});
+
+	test('throws an error if the endTime is greater than current time(now)', async () => {
+		// Mock the file system checks even if they are not the focus of this test
+		fs.existsSync.mockReturnValue(true); // Assume the file exists
+		fs.statSync.mockReturnValue({ size: 0 }); // Assume the file is empty
+
+		// Get the current date and time
+		const now = new Date();
+
+		// Create dynamic startTime and endTime
+		const startTime = new Date(now);
+		const endTime = new Date(now);
+		endTime.setMinutes(startTime.getMinutes() + 45); // Set endTime to 45 minutes after startTime
+
+		const formattedStartTime = startTime.toISOString().slice(0, 19) + 'Z';
+		const formattedEndTime = endTime.toISOString().slice(0, 19) + 'Z';
+
+		parseSpy.mockResolvedValueOnce({
+			flags: {
+				startTime: formattedStartTime,
+				endTime: formattedEndTime,
+				filename: 'test.csv',
+				ignoreCache: false,
+			},
+		});
+
+		const command = new GetBulkLogCommand([], {});
+		await expect(command.run()).rejects.toThrow(
+			'endTime cannot be in the future. Provide a valid endTime.',
 		);
 	});
 
