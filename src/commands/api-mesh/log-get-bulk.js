@@ -78,6 +78,7 @@ class GetBulkLogCommand extends Command {
 		// Convert formatted times to Date objects for comparison
 		const startTime = new Date(flags.startTime);
 		const endTime = new Date(flags.endTime);
+		const now = new Date(); // Current time
 
 		// Require both startTime and endTime
 		if (!startTime || !endTime) {
@@ -121,6 +122,11 @@ class GetBulkLogCommand extends Command {
 		// Validate startTime < endTime
 		if (startTime > endTime) {
 			this.error('endTime must be greater than startTime');
+		}
+		// Validate that endTime is not greater than the current time (now)
+		if (endTime > now) {
+			this.error('endTime cannot be in the future. Provide a valid endTime.');
+			return;
 		}
 
 		// 4. Check if the duration between start and end times is greater than 30 minutes (1800 seconds)
@@ -198,8 +204,6 @@ class GetBulkLogCommand extends Command {
 							fileContentStream.on('end', resolve);
 							fileContentStream.on('error', reject);
 						});
-						// write a newline after each file write
-						writer.write('\n');
 
 						logger.info(`${key} content appended successfully.`);
 					} catch (error) {
