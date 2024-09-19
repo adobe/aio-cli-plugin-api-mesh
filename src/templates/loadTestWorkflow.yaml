@@ -44,7 +44,7 @@ jobs:
       - name: Echo FILENAME
         run: echo $FILENAME
       - name: Run K6
-        run: K6_WEB_DASHBOARD=${{vars.UPLOAD_REPORT}} K6_WEB_DASHBOARD_EXPORT=$FILENAME.html k6 run k6TestScript.js -e MESH_ENDPOINT=${{vars.MESH_ENDPOINT}} --vus ${{vars.VUS}} --duration ${{vars.DURATION}}s
+        run: K6_WEB_DASHBOARD=${{vars.UPLOAD_REPORT}} K6_WEB_DASHBOARD_EXPORT=$FILENAME.html k6 run k6Tests.js -e MESH_ENDPOINT=${{vars.MESH_ENDPOINT}} --vus ${{vars.VUS}} --duration ${{vars.DURATION}}s
       - name: Convert HTML to PDF
         run: |
           if [ "${{vars.UPLOAD_REPORT}}" == "true" ]; then

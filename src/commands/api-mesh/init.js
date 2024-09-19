@@ -103,7 +103,7 @@ class InitCommand extends Command {
 		const sampleENVPath = `${getAppRootDir()}/src/templates/sample.env`;
 		const deployWorkflowPath = `${getAppRootDir()}/src/templates/deployWorkflow.yaml`;
 		const loadTestWorkflowPath = `${getAppRootDir()}/src/templates/loadTestWorkflow.yaml`;
-		const k6TestScriptPath = `${getAppRootDir()}/src/templates/k6TestScript.js`;
+		const k6TestsPath = `${getAppRootDir()}/src/templates/k6Tests.js`;
 		const convertHTMLToPDFPath = `${getAppRootDir()}/src/templates/convertHTMLToPDF.js`;
 		const readmePath = `${getAppRootDir()}/src/templates/readme.md`;
 		const sampleMeshConfigPath = `${getAppRootDir()}/src/templates/mesh.json`;
@@ -160,7 +160,7 @@ class InitCommand extends Command {
 						loadTestWorkflowPath,
 						`${absolutePath}/.github/workflows/loadTest.yaml`,
 					);
-					await this.cloneFile(k6TestScriptPath, `${absolutePath}/k6TestScript.js`);
+					await this.cloneFile(k6TestsPath, `${absolutePath}/k6Tests.js`);
 					await this.cloneFile(convertHTMLToPDFPath, `${absolutePath}/convertHTMLToPDF.js`);
 				} catch (error) {
 					this.error(error);
