@@ -1,29 +1,29 @@
 {
-    "meshConfig":{
-       "sources":[
-          {
-             "name":"<json_source_name>",
-             "handler":{
-                "JsonSchema":{
-                   "baseUrl":"<json_source__baseurl>",
-                   "operations":[
-                      {
-                         "type":"Query",
-                         "field":"<query>",
-                         "path":"<query_path>",
-                         "method":"POST",
-                         "requestSchema":"./requestParams.json"
-                      }
-                   ]
-                }
-             }
-          }
-       ],
-       "files": [
-        {
-            "path": "./requestPARAMS.json",
-            "content": "{\"type\":\"dummyObject\"}"
-        }
-       ]
-    }
-  }
+	"meshConfig": {
+		"sources": [
+			{
+				"name": "<json_source_name>",
+				"handler": {
+					"JsonSchema": {
+						"baseUrl": "<json_source__baseurl>",
+						"operations": [
+							{
+								"type": "Query",
+								"field": "<query>",
+								"path": "<query_path>",
+								"method": "POST",
+								"requestSchema": "./requestParams.json"
+							}
+						]
+					}
+				}
+			}
+		],
+		"files": [
+			{
+				"path": "./requestPARAMS.json",
+				"content": "{\"type\":\"dummyObject\"}"
+			}
+		]
+	}
+}
