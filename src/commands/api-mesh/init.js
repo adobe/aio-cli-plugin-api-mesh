@@ -101,7 +101,10 @@ class InitCommand extends Command {
 		const vsCodeLaunchJsonPath = `${getAppRootDir()}/src/templates/vscode_launch.json`;
 		const devContainerJsonPath = `${getAppRootDir()}/src/templates/devcontainer.json`;
 		const sampleENVPath = `${getAppRootDir()}/src/templates/sample.env`;
-		const githubWorkflowPath = `${getAppRootDir()}/src/templates/deployWorkflow.yaml`;
+		const deployWorkflowPath = `${getAppRootDir()}/src/templates/deployWorkflow.yaml`;
+		const loadTestWorkflowPath = `${getAppRootDir()}/src/templates/loadTestWorkflow.yaml`;
+		const k6TestsPath = `${getAppRootDir()}/src/templates/k6Tests.js`;
+		const convertHTMLToPDFPath = `${getAppRootDir()}/src/templates/convertHTMLToPDF.js`;
 		const readmePath = `${getAppRootDir()}/src/templates/readme.md`;
 		const sampleMeshConfigPath = `${getAppRootDir()}/src/templates/mesh.json`;
 		const newRelicConfigPath = `${getAppRootDir()}/src/templates/newrelic.cjs`;
@@ -152,7 +155,13 @@ class InitCommand extends Command {
 					const gitIgnoreFilePath = `${absolutePath}/.gitignore`;
 
 					await this.cloneFile(gitIgnoreTemplatePath, gitIgnoreFilePath);
-					await this.cloneFile(githubWorkflowPath, `${absolutePath}/.github/workflows/deploy.yaml`);
+					await this.cloneFile(deployWorkflowPath, `${absolutePath}/.github/workflows/deploy.yaml`);
+					await this.cloneFile(
+						loadTestWorkflowPath,
+						`${absolutePath}/.github/workflows/loadTest.yaml`,
+					);
+					await this.cloneFile(k6TestsPath, `${absolutePath}/k6Tests.js`);
+					await this.cloneFile(convertHTMLToPDFPath, `${absolutePath}/convertHTMLToPDF.js`);
 				} catch (error) {
 					this.error(error);
 				}

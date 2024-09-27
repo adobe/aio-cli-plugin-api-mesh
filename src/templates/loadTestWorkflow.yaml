@@ -1,0 +1,90 @@
+name: Perform Load Test
+on: workflow_dispatch
+jobs:
+  runLoad:
+    name: Run K6 Load
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          sparse-checkout: |
+            script.js
+            convert.js
+            reports/
+      - name: Verify vars are set and fail if not
+        run: |
+          if [ -z "${{vars.VUS}}" ]; then
+            echo "Please set VUS in workflow variables"
+            exit 1
+          fi
+          if [ -z "${{vars.DURATION}}" ]; then
+            echo "Please set DURATION in workflow variables"
+            exit 1
+          fi
+          if [ -z "${{vars.MESH_ENDPOINT}}" ]; then
+            echo "Please set MESH_ENDPOINT in workflow variables"
+            exit 1
+          fi
+      - name: Install ca-certificates
+        run: sudo apt-get install -y ca-certificates
+      - name: Install gnupg2
+        run: sudo apt-get install -y gnupg2
+      - name: Download K6 AMD64 deb file
+        run: curl -o k6.deb -L https://github.com/grafana/k6/releases/download/v0.53.0/k6-v0.53.0-linux-amd64.deb
+      - name: Install K6
+        run: sudo apt-get install ./k6.deb
+      - name: Install Yarn
+        run: npm install -g yarn
+      - name: Install Packages
+        run: yarn install
+      - name: Create reports directory
+        run: mkdir -p reports
+      - name: Set FILENAME
+        run: echo "FILENAME=./reports/$(date '+%d-%m-%Y-%H:%M:%S')" >> $GITHUB_ENV
+      - name: Echo FILENAME
+        run: echo $FILENAME
+      - name: Run K6
+        run: K6_WEB_DASHBOARD=${{vars.UPLOAD_REPORT}} K6_WEB_DASHBOARD_EXPORT=$FILENAME.html k6 run k6Tests.js -e MESH_ENDPOINT=${{vars.MESH_ENDPOINT}} --vus ${{vars.VUS}} --duration ${{vars.DURATION}}s
+      - name: Convert HTML to PDF
+        run: |
+          if [ "${{vars.UPLOAD_REPORT}}" == "true" ]; then
+            node ./convertHTMLToPDF.js $FILENAME.html
+          else
+            exit 0
+          fi
+      - name: Update git config
+        run: |
+          if [ "${{vars.UPLOAD_REPORT}}" == "true" ]; then
+            git config user.email "dailyRunner@test.com"
+            git config user.name "Daily Performance Runner"
+          else
+            exit 0
+          fi
+      - name: Run git status
+        run: |
+          if [ "${{vars.UPLOAD_REPORT}}" == "true" ]; then
+            git status
+          else
+            exit 0
+          fi
+      - name: Run git add
+        run: |
+          if [ "${{vars.UPLOAD_REPORT}}" == "true" ]; then
+            git add $FILENAME.pdf
+          else
+            exit 0
+          fi
+      - name: Run git commit
+        run: |
+          if [ "${{vars.UPLOAD_REPORT}}" == "true" ]; then
+            git commit -am "Pushing Daily Report"
+          else
+            exit 0
+          fi
+      - name: Run git push
+        run: |
+          if [ "${{vars.UPLOAD_REPORT}}" == "true" ]; then
+            git push
+          else
+            exit 0
+          fi
