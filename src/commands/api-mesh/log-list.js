@@ -82,7 +82,7 @@ class ListLogsCommand extends Command {
 							...flags,
 						},
 					);
-					this.log(` Successfully downloaded the logs to ${filename}`)
+					this.log(` Successfully downloaded the logs to ${filename}`);
 				} else {
 					this.log(
 						'No recent logs found. Alternatively, you can use the following command to get all logs for a 30 minute time period: \naio api-mesh log-get-bulk --startTime YYYY-MM-DDTHH:MM:SSZ --endTime YYYY-MM-DDTHH:MM:SSZ --filename mesh_logs.csv',
