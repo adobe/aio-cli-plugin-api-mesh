@@ -19,11 +19,20 @@ describe('GetBulkLogCommand', () => {
 	let parseSpy;
 
 	beforeEach(() => {
+		// Generate dynamic startTime and endTime
+		const now = new Date(); // Get the current date and time
+		const startTime = new Date(now);
+		const endTime = new Date(now);
+		// Set startTime to 29 minutes ago and endTime to now
+		startTime.setMinutes(startTime.getMinutes() - 29);
+		const formattedStartTime = startTime.toISOString().slice(0, 19) + 'Z'; // Format as YYYY-MM-DDTHH:MM:SSZ
+		const formattedEndTime = endTime.toISOString().slice(0, 19) + 'Z';
+
 		// Setup spies and mock functions
 		parseSpy = jest.spyOn(GetBulkLogCommand.prototype, 'parse').mockResolvedValue({
 			flags: {
-				startTime: '2024-08-29T12:00:00Z',
-				endTime: '2024-08-29T12:30:00Z',
+				startTime: formattedStartTime,
+				endTime: formattedEndTime,
 				filename: 'test.csv',
 				ignoreCache: false,
 			},
