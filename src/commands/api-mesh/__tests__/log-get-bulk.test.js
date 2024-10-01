@@ -22,8 +22,8 @@ describe('GetBulkLogCommand', () => {
 		// Setup spies and mock functions
 		parseSpy = jest.spyOn(GetBulkLogCommand.prototype, 'parse').mockResolvedValue({
 			flags: {
-				startTime: '2024-08-29T12:00:00Z',
-				endTime: '2024-08-29T12:30:00Z',
+				startTime: '2024-09-29T12:00:00Z',
+				endTime: '2024-09-29T12:30:00Z',
 				filename: 'test.csv',
 				ignoreCache: false,
 			},
