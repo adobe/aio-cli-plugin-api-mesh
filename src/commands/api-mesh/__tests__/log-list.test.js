@@ -114,6 +114,8 @@ describe('List Logs Command', () => {
 		const command = new ListLogsCommand([], {});
 		await command.run();
 		expect(fs.appendFileSync).toHaveBeenCalled();
+		expect(logSpy).toHaveBeenCalledTimes(1);
+		expect(logSpy).toHaveBeenCalledWith(' Successfully downloaded the logs to test.csv');
 	});
 
 	test('Logs are listed successfully', async () => {
@@ -125,6 +127,22 @@ describe('List Logs Command', () => {
 		const command = new ListLogsCommand([], {});
 		await command.run();
 		expect(fs.appendFileSync).not.toHaveBeenCalled();
+		expect(logSpy).toHaveBeenCalledTimes(6);
+		expect(logSpy).toHaveBeenCalledWith(
+			` 8c171e8a9a47c16d 1726052061861  200             info           `,
+		);
+		expect(logSpy).toHaveBeenCalledWith(
+			` 8c171dd35860c16d 1726052032540  200             info           `,
+		);
+		expect(logSpy).toHaveBeenCalledWith(
+			` 8c171dd22f00c16d 1726052032348  200             info           `,
+		);
+		expect(logSpy).toHaveBeenCalledWith(
+			` 8c171dd10df2c16d 1726052032167  200             info           `,
+		);
+		expect(logSpy).not.toHaveBeenCalledWith(
+			expect.stringContaining('Successfully downloaded the logs'),
+		);
 	});
 
 	test('No logs found message displayed when sms returns empty array with file as output', async () => {
