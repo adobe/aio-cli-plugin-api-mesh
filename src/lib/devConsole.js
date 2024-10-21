@@ -112,6 +112,45 @@ const describeMesh = async (organizationId, projectId, workspaceId, workspaceNam
 	}
 };
 
+/**
+ * List Recent Logs
+ *
+ * @param {*} organizationId
+ * @param {*} projectId
+ * @param {*} workspaceId
+ * @param {*} workspaceName
+ * @param {*} meshId
+ * @returns
+ */
+const listLogs = async (organizationCode, projectId, workspaceId, meshId, fileName) => {
+	const { accessToken, apiKey } = await getDevConsoleConfig();
+	const url = `${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/logs/list`;
+	const config = {
+		method: 'get',
+		url: fileName ? url + `?filename=${fileName}` : url,
+		headers: {
+			'Authorization': `Bearer ${accessToken}`,
+			'x-request-id': global.requestId,
+			'x-api-key': apiKey,
+		},
+	};
+
+	logger.info('Initiating GET %s', url);
+
+	try {
+		const response = await axios(config);
+
+		logger.info('Response from GET %s', response.status);
+
+		if (response?.status === 200) {
+			return response.data;
+		}
+	} catch (error) {
+		logger.error(`Error fetching recent logs: ${error}`);
+		throw error;
+	}
+};
+
 const getMesh = async (organizationId, projectId, workspaceId, workspaceName, meshId) => {
 	const { baseUrl: devConsoleUrl, accessToken, apiKey } = await getDevConsoleConfig();
 	const config = {
@@ -1021,6 +1060,103 @@ const getPublicEncryptionKey = async organizationCode => {
 	}
 };
 
+const getPresignedUrls = async (
+	organizationCode,
+	projectId,
+	workspaceId,
+	meshId,
+	startTime,
+	endTime,
+) => {
+	const { accessToken, apiKey } = await getDevConsoleConfig();
+	const config = {
+		method: 'get',
+		url: `${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/logs?startDateTime=${startTime}&endDateTime=${endTime}`,
+		headers: {
+			'Authorization': `Bearer ${accessToken}`,
+			'x-request-id': global.requestId,
+			'x-api-key': apiKey,
+		},
+	};
+
+	logger.info(
+		'Initiating GET %s',
+		`${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/logs?startDateTime=${startTime}&endDateTime=${endTime}`,
+	);
+
+	try {
+		const response = await axios(config);
+
+		logger.info('Response from GET %s', response.status);
+
+		if (response?.status === 200) {
+			logger.info(`Presigned urls : ${objToString(response, ['data'])}`);
+			const { presignedUrls, totalSize } = response.data;
+			return {
+				presignedUrls,
+				totalSize,
+			};
+		}
+	} catch (error) {
+		logger.error(`Error fetching presigned urls: ${error}`);
+		return {
+			urls: {},
+			totalsize: 0,
+		};
+	}
+};
+
+const getLogsByRayId = async (organizationCode, projectId, workspaceId, meshId, rayId) => {
+	const { accessToken, apiKey } = await getDevConsoleConfig();
+	const config = {
+		method: 'get',
+		url: `${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/logs/${rayId}`,
+		headers: {
+			'Authorization': `Bearer ${accessToken}`,
+			'x-request-id': global.requestId,
+			'x-api-key': apiKey,
+		},
+	};
+
+	logger.info(
+		'Initiating GET %s',
+		`${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/logs/${rayId}`,
+	);
+
+	try {
+		const response = await axios(config);
+
+		logger.info('Response from GET log %s', response.status);
+		if (response?.status === 200) {
+			logger.info(`Fetched log: ${objToString(response, ['data'])}`);
+			return response.data;
+		} else {
+			let errorMessage = `Unexpected response status: ${response.status}`;
+			logger.error(errorMessage);
+			throw new Error(errorMessage);
+		}
+	} catch (error) {
+		logger.info('Response from GET Logs %s', error.response.status);
+		if (error.response.status === 404) {
+			// The request was made and the server responded with a 404 status code
+			logger.error('Logs not found for the given Ray ID');
+
+			let errorMessage = `LogNotFound`;
+			logger.error(`${errorMessage}. Received ${error.response.status}, expected 200`);
+			throw new Error(errorMessage);
+		} else if (error.response.status === 500) {
+			// Handle 500 Internal Server Error
+			let errorMessage = `ServerError`;
+			logger.error(errorMessage);
+			throw new Error(errorMessage);
+		} else {
+			let errorMessage = `Something went wrong while getting logs. Received ${error.response.status}`;
+			logger.error(errorMessage);
+			throw new Error(errorMessage);
+		}
+	}
+};
+
 module.exports = {
 	getApiKeyCredential,
 	describeMesh,
@@ -1029,6 +1165,7 @@ module.exports = {
 	updateMesh,
 	deleteMesh,
 	getMeshId,
+	listLogs,
 	createAPIMeshCredentials,
 	getListOfCurrentServices,
 	subscribeCredentialToServices,
@@ -1038,4 +1175,6 @@ module.exports = {
 	getTenantFeatures,
 	getMeshDeployments,
 	getPublicEncryptionKey,
+	getPresignedUrls,
+	getLogsByRayId,
 };

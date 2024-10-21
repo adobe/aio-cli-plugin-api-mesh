@@ -1,25 +1,25 @@
 {
-    "templateVersion": "0.2",
-    "product": {
-        "name": "API Mesh",
-        "description": "Aio cli plugin api mesh. CLI plugins for api-mesh installed with aio."
-    },
-    "contacts": {
-        "team": {
-            "name": "Star-Griffins",
-            "DL": "Grp-Star-Griffins",
-            "slackChannel": "star-griffins"
-        }
-    },
-    "ticketTracker": {
-        "functionalJiraQueue": {
-            "projectKey": "CEXT",
-            "component": ""
-        },
-        "securityJiraQueue": {
-            "projectKey": "MAGREQ",
-            "component": "MAGREQ/Magento Extensibility"
-        }
-    },
-    "productionCodeBranches": ["main"]
-} 
+	"templateVersion": "0.2",
+	"product": {
+		"name": "API Mesh",
+		"description": "Aio cli plugin api mesh. CLI plugins for api-mesh installed with aio."
+	},
+	"contacts": {
+		"team": {
+			"name": "Star-Griffins",
+			"DL": "Grp-Star-Griffins",
+			"slackChannel": "star-griffins"
+		}
+	},
+	"ticketTracker": {
+		"functionalJiraQueue": {
+			"projectKey": "CEXT",
+			"component": ""
+		},
+		"securityJiraQueue": {
+			"projectKey": "MAGREQ",
+			"component": "MAGREQ/Magento Extensibility"
+		}
+	},
+	"productionCodeBranches": ["main"]
+}
