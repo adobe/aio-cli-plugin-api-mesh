@@ -155,17 +155,18 @@ const getMesh = async (organizationId, projectId, workspaceId, workspaceName, me
 	const { baseUrl: devConsoleUrl, accessToken, apiKey } = await getDevConsoleConfig();
 	const config = {
 		method: 'get',
-		url: `${devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}?API_KEY=${apiKey}`,
+		url: `${devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}`,
 		headers: {
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
 			'workspaceName': workspaceName,
+			'x-api-key': apiKey,
 		},
 	};
 
 	logger.info(
 		'Initiating GET %s',
-		`${devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}?API_KEY=${apiKey}`,
+		`${devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}`,
 	);
 
 	try {
@@ -245,7 +246,7 @@ const createMesh = async (
 	const { baseUrl: devConsoleUrl, accessToken, apiKey } = await getDevConsoleConfig();
 	const config = {
 		method: 'post',
-		url: `${devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes?API_KEY=${apiKey}`,
+		url: `${devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes`,
 		headers: {
 			'Authorization': `Bearer ${accessToken}`,
 			'Content-Type': 'application/json',
@@ -253,13 +254,14 @@ const createMesh = async (
 			'workspaceName': workspaceName,
 			'orgName': orgName,
 			'projectName': projectName,
+			'x-api-key': apiKey,
 		},
 		data: JSON.stringify(data),
 	};
 
 	logger.info(
 		'Initiating POST %s',
-		`${devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes?API_KEY=${apiKey}`,
+		`${devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes`,
 	);
 
 	try {
@@ -390,7 +392,7 @@ const updateMesh = async (
 	const { baseUrl: devConsoleUrl, accessToken, apiKey } = await getDevConsoleConfig();
 	const config = {
 		method: 'put',
-		url: `${devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}?API_KEY=${apiKey}`,
+		url: `${devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}`,
 		headers: {
 			'Authorization': `Bearer ${accessToken}`,
 			'Content-Type': 'application/json',
@@ -398,13 +400,14 @@ const updateMesh = async (
 			'workspaceName': workspaceName,
 			'orgName': orgName,
 			'projectName': projectName,
+			'x-api-key': apiKey,
 		},
 		data: JSON.stringify(data),
 	};
 
 	logger.info(
 		'Initiating PUT %s',
-		`${devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}?API_KEY=${apiKey}`,
+		`${devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}`,
 	);
 
 	try {
@@ -480,16 +483,17 @@ const deleteMesh = async (organizationId, projectId, workspaceId, meshId) => {
 	const { baseUrl: devConsoleUrl, accessToken, apiKey } = await getDevConsoleConfig();
 	const config = {
 		method: 'delete',
-		url: `${devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}?API_KEY=${apiKey}`,
+		url: `${devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}`,
 		headers: {
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
+			'x-api-key': apiKey,
 		},
 	};
 
 	logger.info(
 		'Initiating DELETE %s',
-		`${devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}?API_KEY=${apiKey}`,
+		`${devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}`,
 	);
 
 	try {
@@ -567,17 +571,18 @@ const getMeshId = async (organizationId, projectId, workspaceId, workspaceName) 
 
 	const config = {
 		method: 'get',
-		url: `${devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/describe?API_KEY=${apiKey}`,
+		url: `${devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/describe`,
 		headers: {
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
 			'workspaceName': workspaceName,
+			'x-api-key': apiKey,
 		},
 	};
 
 	logger.info(
 		'Initiating GET %s',
-		`${devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/describe?API_KEY=${apiKey}`,
+		`${devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/describe`,
 	);
 
 	try {
@@ -852,18 +857,19 @@ const getMeshArtifact = async (organizationId, projectId, workspaceId, workspace
 	const { baseUrl: devConsoleUrl, accessToken, apiKey } = await getDevConsoleConfig();
 	const config = {
 		method: 'get',
-		url: `${devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/artifact?API_KEY=${apiKey}`,
+		url: `${devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/artifact`,
 		headers: {
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
 			'workspaceName': workspaceName,
+			'x-api-key': apiKey,
 		},
 		responseType: 'arraybuffer',
 	};
 
 	logger.info(
 		'Initiating GET %s',
-		`${devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/artifact?API_KEY=${apiKey}`,
+		`${devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/artifact`,
 	);
 
 	try {
@@ -909,17 +915,15 @@ const getTenantFeatures = async organizationCode => {
 	const { accessToken, apiKey } = await getDevConsoleConfig();
 	const config = {
 		method: 'get',
-		url: `${SMS_BASE_URL}/organizations/${organizationCode}/features?API_KEY=${apiKey}`,
+		url: `${SMS_BASE_URL}/organizations/${organizationCode}/features`,
 		headers: {
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
+			'x-api-key': apiKey,
 		},
 	};
 
-	logger.info(
-		'Initiating GET %s',
-		`${SMS_BASE_URL}/organizations/${organizationCode}/features?API_KEY=${apiKey}`,
-	);
+	logger.info('Initiating GET %s', `${SMS_BASE_URL}/organizations/${organizationCode}/features`);
 
 	try {
 		const response = await axios(config);
@@ -966,16 +970,17 @@ const getMeshDeployments = async (organizationCode, projectId, workspaceId, mesh
 	const { accessToken, apiKey } = await getDevConsoleConfig();
 	const config = {
 		method: 'get',
-		url: `${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/deployments/latest?API_KEY=${apiKey}`,
+		url: `${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/deployments/latest`,
 		headers: {
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
+			'x-api-key': apiKey,
 		},
 	};
 
 	logger.info(
 		'Initiating GET %s',
-		`${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/deployments/latest?API_KEY=${apiKey}`,
+		`${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/deployments/latest`,
 	);
 
 	try {
@@ -1021,15 +1026,16 @@ const getPublicEncryptionKey = async organizationCode => {
 	const { accessToken, apiKey } = await getDevConsoleConfig();
 	const config = {
 		method: 'get',
-		url: `${SMS_BASE_URL}/organizations/${organizationCode}/getPublicKey?API_KEY=${apiKey}`,
+		url: `${SMS_BASE_URL}/organizations/${organizationCode}/getPublicKey`,
 		headers: {
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
+			'x-api-key': apiKey,
 		},
 	};
 	logger.info(
 		'Initiating GET %s',
-		`${SMS_BASE_URL}/organizations/${organizationCode}/getPublicKey?API_KEY=${apiKey}`,
+		`${SMS_BASE_URL}/organizations/${organizationCode}/getPublicKey`,
 	);
 	try {
 		const response = await axios(config);
