@@ -43,7 +43,7 @@
 		"@adobe/aio-lib-core-logging": "^3.0.0",
 		"@adobe/aio-lib-env": "^3.0.0",
 		"@adobe/aio-lib-ims": "^7.0.1",
-		"@adobe/plugin-hooks": "0.3.0",
+		"@adobe/plugin-hooks": "0.3.1",
 		"@adobe/plugin-on-fetch": "0.1.0",
 		"@graphql-mesh/cli": "0.82.30",
 		"@graphql-mesh/graphql": "0.34.13",
