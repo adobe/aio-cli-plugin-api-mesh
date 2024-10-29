@@ -913,14 +913,11 @@ const getTenantFeatures = async organizationCode => {
 		headers: {
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
-			'X-Api-Key': apiKey
+			'X-Api-Key': apiKey,
 		},
 	};
 
-	logger.info(
-		'Initiating GET %s',
-		`${SMS_BASE_URL}/organizations/${organizationCode}/features`,
-	);
+	logger.info('Initiating GET %s', `${SMS_BASE_URL}/organizations/${organizationCode}/features`);
 
 	try {
 		const response = await axios(config);
@@ -971,7 +968,7 @@ const getMeshDeployments = async (organizationCode, projectId, workspaceId, mesh
 		headers: {
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
-			'X-Api-Key': apiKey
+			'X-Api-Key': apiKey,
 		},
 	};
 
@@ -1027,7 +1024,7 @@ const getPublicEncryptionKey = async organizationCode => {
 		headers: {
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
-			'X-Api-Key': apiKey
+			'X-Api-Key': apiKey,
 		},
 	};
 	logger.info(
