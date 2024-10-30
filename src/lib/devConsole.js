@@ -131,7 +131,7 @@ const listLogs = async (organizationCode, projectId, workspaceId, meshId, fileNa
 		headers: {
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
-			'x-api-key': apiKey,
+			'X-Api-Key': apiKey,
 		},
 	};
 
@@ -909,17 +909,15 @@ const getTenantFeatures = async organizationCode => {
 	const { accessToken, apiKey } = await getDevConsoleConfig();
 	const config = {
 		method: 'get',
-		url: `${SMS_BASE_URL}/organizations/${organizationCode}/features?API_KEY=${apiKey}`,
+		url: `${SMS_BASE_URL}/organizations/${organizationCode}/features`,
 		headers: {
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
+			'X-Api-Key': apiKey,
 		},
 	};
 
-	logger.info(
-		'Initiating GET %s',
-		`${SMS_BASE_URL}/organizations/${organizationCode}/features?API_KEY=${apiKey}`,
-	);
+	logger.info('Initiating GET %s', `${SMS_BASE_URL}/organizations/${organizationCode}/features`);
 
 	try {
 		const response = await axios(config);
@@ -966,16 +964,17 @@ const getMeshDeployments = async (organizationCode, projectId, workspaceId, mesh
 	const { accessToken, apiKey } = await getDevConsoleConfig();
 	const config = {
 		method: 'get',
-		url: `${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/deployments/latest?API_KEY=${apiKey}`,
+		url: `${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/deployments/latest`,
 		headers: {
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
+			'X-Api-Key': apiKey,
 		},
 	};
 
 	logger.info(
 		'Initiating GET %s',
-		`${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/deployments/latest?API_KEY=${apiKey}`,
+		`${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/deployments/latest`,
 	);
 
 	try {
@@ -1021,15 +1020,16 @@ const getPublicEncryptionKey = async organizationCode => {
 	const { accessToken, apiKey } = await getDevConsoleConfig();
 	const config = {
 		method: 'get',
-		url: `${SMS_BASE_URL}/organizations/${organizationCode}/getPublicKey?API_KEY=${apiKey}`,
+		url: `${SMS_BASE_URL}/organizations/${organizationCode}/getPublicKey`,
 		headers: {
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
+			'X-Api-Key': apiKey,
 		},
 	};
 	logger.info(
 		'Initiating GET %s',
-		`${SMS_BASE_URL}/organizations/${organizationCode}/getPublicKey?API_KEY=${apiKey}`,
+		`${SMS_BASE_URL}/organizations/${organizationCode}/getPublicKey`,
 	);
 	try {
 		const response = await axios(config);
@@ -1069,7 +1069,7 @@ const getPresignedUrls = async (
 		headers: {
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
-			'x-api-key': apiKey,
+			'X-Api-Key': apiKey,
 		},
 	};
 
@@ -1108,7 +1108,7 @@ const getLogsByRayId = async (organizationCode, projectId, workspaceId, meshId, 
 		headers: {
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
-			'x-api-key': apiKey,
+			'X-Api-Key': apiKey,
 		},
 	};
 
