@@ -44,7 +44,7 @@
 		"@adobe/aio-lib-env": "^3.0.0",
 		"@adobe/aio-lib-ims": "^7.0.1",
 		"@adobe/plugin-hooks": "0.3.2-beta",
-		"@adobe/plugin-on-fetch": "0.1.0",
+		"@adobe/plugin-on-fetch": "0.1.1-alpha",
 		"@graphql-mesh/cli": "0.82.30",
 		"@graphql-mesh/graphql": "0.34.13",
 		"@graphql-mesh/json-schema": "0.35.38",

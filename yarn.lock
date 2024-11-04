@@ -180,10 +180,10 @@
     make-cancellable-promise "^1.1.0"
     node-fetch "^2"
 
-"@adobe/plugin-on-fetch@0.1.0":
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/@adobe/plugin-on-fetch/-/plugin-on-fetch-0.1.0.tgz#78de3f38c2ee73bf051df6516622749e494b86d2"
-  integrity sha512-67OZ1O3AACwCfheTjSjTQ/UY0rDo3T5p6q1QnMGemAuD2PptCWzQPYIeC8M+bGJW/0XufncEaI6kZo3RcV2oHg==
+"@adobe/plugin-on-fetch@0.1.1-alpha":
+  version "0.1.1-alpha"
+  resolved "https://registry.yarnpkg.com/@adobe/plugin-on-fetch/-/plugin-on-fetch-0.1.1-alpha.tgz#69ce0feed03bc2015eb9de6dc48cfcfd377fce84"
+  integrity sha512-3eC/Hcjxnc9erbG2Rf9wosdr+fMvCHLwIzfC2Gu25bMXLGM/cfbKfdYWd8Q5CzaiQzn6Sb9BndT/pLC5qPxK0A==
 
 "@ampproject/remapping@^2.1.0", "@ampproject/remapping@^2.2.0":
   version "2.2.1"
