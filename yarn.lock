@@ -7,10 +7,10 @@
   resolved "https://registry.yarnpkg.com/@aashutoshrathi/word-wrap/-/word-wrap-1.2.6.tgz#bd9154aec9983f77b3a034ecaa015c2e4201f6cf"
   integrity sha512-1Yjs2SvM8TflER/OD3cOjhWWOZb58A2t7wpE2S9XfBYTiIl+XFhQG2bjy4Pu1I+EAlCNUzRDYDdFwFYUKvXcIA==
 
-"@adobe-apimesh/mesh-builder@1.6.2-alpha.3":
-  version "1.6.2-alpha.3"
-  resolved "https://registry.yarnpkg.com/@adobe-apimesh/mesh-builder/-/mesh-builder-1.6.2-alpha.3.tgz#556ea8c8172efe2e458de514eff537aa20c17089"
-  integrity sha512-U3h/wbQaI2CwOIRy7PRoESAySh4swizaHTqaD66JAuw6GO6Xze9EoxwOo6qEK9mPLZD6J3HTEdb37lNiDfmz+Q==
+"@adobe-apimesh/mesh-builder@1.7.1":
+  version "1.7.1"
+  resolved "https://registry.yarnpkg.com/@adobe-apimesh/mesh-builder/-/mesh-builder-1.7.1.tgz#b12db675d3058287576441c405c3a8b369e2a504"
+  integrity sha512-GNi2pQjbZZIJ0uSivdOq/FW6SfIcc496iJDw3B/6yfYr4I0LKMky9eQMCkSpkPdC4oZ7j/cuPE8ahBabXspf2g==
   dependencies:
     "@fastify/request-context" "^4.1.0"
     eslint "^8.39.0"
@@ -170,20 +170,20 @@
     joi "^17.4.2"
     lodash.clonedeep "^4.5.0"
 
-"@adobe/plugin-hooks@0.3.2-beta":
-  version "0.3.2-beta"
-  resolved "https://registry.yarnpkg.com/@adobe/plugin-hooks/-/plugin-hooks-0.3.2-beta.tgz#9ac4a7ec4d279507518e8b922de44d14c8524264"
-  integrity sha512-PbRZr25oaRvwHSieu3cWBzMAftGMFfQIv/ZSVZG56eIwfzbZbKUVOAu+h8IyUSs3HDXrlKbQrgYoCWeNN8tu4g==
+"@adobe/plugin-hooks@0.3.2":
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/@adobe/plugin-hooks/-/plugin-hooks-0.3.2.tgz#06ebbe2072c8c4c7f049706e00ebcb6c7bd8c668"
+  integrity sha512-hXo5dDiXXLoukOKQc/Aiw+pPEmlpQLMlbXwTrJGLETa/pMgPNwqT7jFCOODCuJVljffrYv0UfYafOPWOx0nfdA==
   dependencies:
     "@graphql-mesh/utils" "^0.43.4"
     await-timeout "^1.1.1"
     make-cancellable-promise "^1.1.0"
     node-fetch "^2"
 
-"@adobe/plugin-on-fetch@0.1.1-alpha":
-  version "0.1.1-alpha"
-  resolved "https://registry.yarnpkg.com/@adobe/plugin-on-fetch/-/plugin-on-fetch-0.1.1-alpha.tgz#69ce0feed03bc2015eb9de6dc48cfcfd377fce84"
-  integrity sha512-3eC/Hcjxnc9erbG2Rf9wosdr+fMvCHLwIzfC2Gu25bMXLGM/cfbKfdYWd8Q5CzaiQzn6Sb9BndT/pLC5qPxK0A==
+"@adobe/plugin-on-fetch@0.1.1":
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/@adobe/plugin-on-fetch/-/plugin-on-fetch-0.1.1.tgz#4c5a784c5bd754cfa1100528a88be02c005b72fb"
+  integrity sha512-DUpBLWKUW6EZQJcZ2IFvKS1+B2l/TFkI6SZQNtemSFnv4zOUpCRaKRcGSJS7zNShRBVlxiJsfG20jBIDuECVLg==
 
 "@ampproject/remapping@^2.1.0", "@ampproject/remapping@^2.2.0":
   version "2.2.1"
