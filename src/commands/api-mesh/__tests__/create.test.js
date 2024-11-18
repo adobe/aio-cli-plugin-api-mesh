@@ -413,20 +413,7 @@ describe('create command tests', () => {
 		    "dummy_api_key",
 		  ],
 		  [
-		    "
-		API Mesh now runs at the edge and legacy mesh URLs will be deprecated.
-		Use the following link to find more information on how to migrate your mesh:",
-		  ],
-		  [
-		    "https://developer.adobe.com/graphql-mesh-gateway/mesh/release/migration
-		",
-		  ],
-		  [
-		    "Legacy Mesh Endpoint: %s",
-		    "https://graph.adobe.io/api/dummy_mesh_id/graphql?api_key=dummy_api_key",
-		  ],
-		  [
-		    "Edge Mesh Endpoint: %s
+		    "Mesh Endpoint: %s
 		",
 		    "https://edge-sandbox-graph.adobe.io/api/dummy_mesh_id/graphql",
 		  ],
@@ -519,20 +506,7 @@ describe('create command tests', () => {
 		    "dummy_api_key",
 		  ],
 		  [
-		    "
-		API Mesh now runs at the edge and legacy mesh URLs will be deprecated.
-		Use the following link to find more information on how to migrate your mesh:",
-		  ],
-		  [
-		    "https://developer.adobe.com/graphql-mesh-gateway/mesh/release/migration
-		",
-		  ],
-		  [
-		    "Legacy Mesh Endpoint: %s",
-		    "https://tigraph.adobe.io/dummy_mesh_id/graphql",
-		  ],
-		  [
-		    "Edge Mesh Endpoint: %s
+		    "Mesh Endpoint: %s
 		",
 		    "https://edge-sandbox-graph.adobe.io/api/dummy_mesh_id/graphql",
 		  ],
@@ -723,20 +697,7 @@ describe('create command tests', () => {
 		    "dummy_api_key",
 		  ],
 		  [
-		    "
-		API Mesh now runs at the edge and legacy mesh URLs will be deprecated.
-		Use the following link to find more information on how to migrate your mesh:",
-		  ],
-		  [
-		    "https://developer.adobe.com/graphql-mesh-gateway/mesh/release/migration
-		",
-		  ],
-		  [
-		    "Legacy Mesh Endpoint: %s",
-		    "https://graph.adobe.io/api/dummy_mesh_id/graphql?api_key=dummy_api_key",
-		  ],
-		  [
-		    "Edge Mesh Endpoint: %s
+		    "Mesh Endpoint: %s
 		",
 		    "https://edge-sandbox-graph.adobe.io/api/dummy_mesh_id/graphql",
 		  ],
@@ -1891,12 +1852,7 @@ describe('create command tests', () => {
 		await CreateCommand.run();
 
 		expect(logSpy).toHaveBeenCalledWith(
-			expect.stringContaining('Legacy Mesh Endpoint:'),
-			'https://graph.adobe.io/api/dummy_mesh_id/graphql?api_key=dummy_api_key',
-		);
-
-		expect(logSpy).toHaveBeenCalledWith(
-			expect.stringContaining('Edge Mesh Endpoint:'),
+			expect.stringContaining('Mesh Endpoint:'),
 			'https://edge-graph.adobe.io/api/dummy_mesh_id/graphql',
 		);
 	});
@@ -1916,12 +1872,7 @@ describe('create command tests', () => {
 		await CreateCommand.run();
 
 		expect(logSpy).toHaveBeenCalledWith(
-			expect.stringContaining('Legacy Mesh Endpoint:'),
-			'https://graph.adobe.io/api/dummy_mesh_id/graphql?api_key=dummy_api_key',
-		);
-
-		expect(logSpy).toHaveBeenCalledWith(
-			expect.stringContaining('Edge Mesh Endpoint:'),
+			expect.stringContaining('Mesh Endpoint:'),
 			'https://edge-sandbox-graph.adobe.io/api/dummy_mesh_id/graphql',
 		);
 	});
