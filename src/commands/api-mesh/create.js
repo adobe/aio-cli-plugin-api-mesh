@@ -10,7 +10,6 @@ governing permissions and limitations under the License.
 */
 
 const { Command } = require('@oclif/core');
-const chalk = require('chalk');
 const { initSdk, initRequestId, promptConfirm, importFiles } = require('../../helpers');
 const logger = require('../../classes/logger');
 const {
@@ -28,7 +27,7 @@ const {
 	encryptSecrets,
 } = require('../../utils');
 const { createMesh, getPublicEncryptionKey } = require('../../lib/devConsole');
-const { buildEdgeMeshUrl, buildMeshUrl } = require('../../urlBuilder');
+const { buildMeshUrl } = require('../../urlBuilder');
 
 class CreateCommand extends Command {
 	static args = [{ name: 'file' }];
@@ -161,28 +160,8 @@ class CreateCommand extends Command {
 						if (sdkList) {
 							this.log('Successfully subscribed API Key %s to API Mesh service', apiKey);
 
-							const meshUrl = await buildMeshUrl(
-								imsOrgId,
-								projectId,
-								workspaceId,
-								workspaceName,
-								mesh.meshId,
-								apiKey,
-							);
-
-							const edgeMeshUrl = buildEdgeMeshUrl(mesh.meshId, workspaceName);
-							this.log(
-								chalk.bgYellow(
-									`\nAPI Mesh now runs at the edge and legacy mesh URLs will be deprecated.\nUse the following link to find more information on how to migrate your mesh:`,
-								),
-							);
-							this.log(
-								chalk.underline.blue(
-									'https://developer.adobe.com/graphql-mesh-gateway/mesh/release/migration\n',
-								),
-							);
-							this.log('Legacy Mesh Endpoint: %s', meshUrl);
-							this.log(chalk.bold('Edge Mesh Endpoint: %s\n'), edgeMeshUrl);
+							const meshUrl = buildMeshUrl(mesh.meshId, workspaceName);
+							this.log('Mesh Endpoint: %s\n', meshUrl);
 						} else {
 							this.log('Unable to subscribe API Key %s to API Mesh service', apiKey);
 						}
