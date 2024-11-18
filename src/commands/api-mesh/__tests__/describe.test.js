@@ -186,26 +186,8 @@ describe('describe command tests', () => {
 		    "dummy_meshId",
 		  ],
 		  [
-		    "
-		API Mesh now runs at the edge and legacy mesh URLs will be deprecated.
-		Use the following link to find more information on how to migrate your mesh:",
-		  ],
-		  [
-		    "https://developer.adobe.com/graphql-mesh-gateway/mesh/release/migration
-		",
-		  ],
-		  [
-		    "Legacy Mesh Endpoint: %s",
-		    "https://graph.adobe.io/api/dummy_meshId/graphql",
-		  ],
-		  [
-		    "Edge Mesh Endpoint: %s
-		",
+		    "Mesh Endpoint: %s",
 		    "https://edge-sandbox-graph.adobe.io/api/dummy_meshId/graphql",
-		  ],
-		  [
-		    "Update your mesh before using the edge mesh endpoint.
-		You can validate your edge mesh status using the aio api-mesh status command.",
 		  ],
 		]
 	`);
@@ -251,26 +233,8 @@ describe('describe command tests', () => {
 		    "dummy_meshId",
 		  ],
 		  [
-		    "
-		API Mesh now runs at the edge and legacy mesh URLs will be deprecated.
-		Use the following link to find more information on how to migrate your mesh:",
-		  ],
-		  [
-		    "https://developer.adobe.com/graphql-mesh-gateway/mesh/release/migration
-		",
-		  ],
-		  [
-		    "Legacy Mesh Endpoint: %s",
-		    "https://graph.adobe.io/api/dummy_meshId/graphql?api_key=dummy_apiKey",
-		  ],
-		  [
-		    "Edge Mesh Endpoint: %s
-		",
+		    "Mesh Endpoint: %s",
 		    "https://edge-sandbox-graph.adobe.io/api/dummy_meshId/graphql",
-		  ],
-		  [
-		    "Update your mesh before using the edge mesh endpoint.
-		You can validate your edge mesh status using the aio api-mesh status command.",
 		  ],
 		]
 	`);
@@ -320,26 +284,8 @@ describe('describe command tests', () => {
 		    "dummy_meshId",
 		  ],
 		  [
-		    "
-		API Mesh now runs at the edge and legacy mesh URLs will be deprecated.
-		Use the following link to find more information on how to migrate your mesh:",
-		  ],
-		  [
-		    "https://developer.adobe.com/graphql-mesh-gateway/mesh/release/migration
-		",
-		  ],
-		  [
-		    "Legacy Mesh Endpoint: %s",
-		    "https://tigraph.adobe.io/dummy_meshId/graphql",
-		  ],
-		  [
-		    "Edge Mesh Endpoint: %s
-		",
+		    "Mesh Endpoint: %s",
 		    "https://edge-sandbox-graph.adobe.io/api/dummy_meshId/graphql",
-		  ],
-		  [
-		    "Update your mesh before using the edge mesh endpoint.
-		You can validate your edge mesh status using the aio api-mesh status command.",
 		  ],
 		]
 	`);
@@ -361,12 +307,7 @@ describe('describe command tests', () => {
 		await DescribeCommand.run();
 
 		expect(logSpy).toHaveBeenCalledWith(
-			expect.stringContaining('Legacy Mesh Endpoint:'),
-			'https://graph.adobe.io/api/dummy_meshId/graphql?api_key=dummy_apiKey',
-		);
-
-		expect(logSpy).toHaveBeenCalledWith(
-			expect.stringContaining('Edge Mesh Endpoint:'),
+			expect.stringContaining('Mesh Endpoint:'),
 			'https://edge-graph.adobe.io/api/dummy_meshId/graphql',
 		);
 	});
@@ -386,12 +327,7 @@ describe('describe command tests', () => {
 		await DescribeCommand.run();
 
 		expect(logSpy).toHaveBeenCalledWith(
-			expect.stringContaining('Legacy Mesh Endpoint:'),
-			'https://graph.adobe.io/api/dummy_meshId/graphql?api_key=dummy_apiKey',
-		);
-
-		expect(logSpy).toHaveBeenCalledWith(
-			expect.stringContaining('Edge Mesh Endpoint:'),
+			expect.stringContaining('Mesh Endpoint:'),
 			'https://edge-sandbox-graph.adobe.io/api/dummy_meshId/graphql',
 		);
 	});
