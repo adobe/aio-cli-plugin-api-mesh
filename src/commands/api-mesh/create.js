@@ -154,20 +154,9 @@ class CreateCommand extends Command {
 						'******************************************************************************************************',
 					);
 
-					if (apiKey) {
-						this.log('Successfully created API Key %s', apiKey);
+					const meshUrl = buildMeshUrl(mesh.meshId, workspaceName);
+					this.log('Mesh Endpoint: %s\n', meshUrl);
 
-						if (sdkList) {
-							this.log('Successfully subscribed API Key %s to API Mesh service', apiKey);
-
-							const meshUrl = buildMeshUrl(mesh.meshId, workspaceName);
-							this.log('Mesh Endpoint: %s\n', meshUrl);
-						} else {
-							this.log('Unable to subscribe API Key %s to API Mesh service', apiKey);
-						}
-					} else {
-						this.log('Unable to create API Key');
-					}
 					// When renaming the return values, make sure to make necessary changes to
 					// template adobe/generator-app-api-mesh since it relies on "mesh" & "apiKey"
 					return {
