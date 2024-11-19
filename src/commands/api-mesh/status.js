@@ -49,7 +49,7 @@ class StatusCommand extends Command {
 		} catch (err) {
 			// Error occurred while fetching/displaying the mesh status
 			this.error(
-				`Unable to get the mesh status. If the error persists please contact support. RequestId: ${global.requestId}`,
+				`Unable to get mesh status. If this error persists, contact support. RequestId: ${global.requestId}`,
 			);
 		}
 	}
@@ -84,13 +84,13 @@ class StatusCommand extends Command {
 				this.log('Mesh is awaiting processing.');
 				break;
 			case 'building':
-				this.log('Mesh is currently building. Please wait a few minutes before checking again.');
+				this.log('Mesh is currently building. Wait a few minutes before checking again.');
 				break;
 			case 'error':
 				this.log('Mesh build has errors.', mesh.error);
 				break;
 			default:
-				this.log('Mesh status is not available. Please wait for a while and try again.');
+				this.log('Mesh status is not available. Wait a few minutes and try again.');
 				break;
 		}
 	}
@@ -116,23 +116,19 @@ class StatusCommand extends Command {
 
 		switch (meshDeploymentStatus) {
 			case 'provisioning':
-				this.log(
-					`Mesh is currently being provisioned. Please wait a few minutes before checking again.`,
-				);
+				this.log(`Currently provisioning your mesh. Wait a few minutes and try again.`);
 				break;
 			case 'de-provisioning':
-				this.log(
-					`Mesh is currently being de-provisioned. Please wait a few minutes before checking again.`,
-				);
+				this.log(`Currently de-provisioning your mesh. Wait a few minutes and try again.`);
 				break;
 			case 'success':
-				this.log(`Mesh has been successfully built.`);
+				this.log(`Mesh was built successfully.`);
 				break;
 			case 'error':
 				this.log('Mesh build has errors.', meshDeployments.error);
 				break;
 			default:
-				this.log('Mesh status is not available. Please wait for a while and try again.');
+				this.log('Mesh status is not available. Wait a few minutes and try again.');
 				break;
 		}
 	}
