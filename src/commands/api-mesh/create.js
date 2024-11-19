@@ -155,7 +155,7 @@ class CreateCommand extends Command {
 					);
 
 					const meshUrl = buildMeshUrl(mesh.meshId, workspaceName);
-					this.log('Mesh Endpoint: %s\n', meshUrl);
+					this.log('Mesh Endpoint: %s', meshUrl);
 
 					// When renaming the return values, make sure to make necessary changes to
 					// template adobe/generator-app-api-mesh since it relies on "mesh" & "apiKey"

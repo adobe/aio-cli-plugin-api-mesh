@@ -586,7 +586,7 @@ const getMeshId = async (organizationId, projectId, workspaceId, workspaceName) 
 		logger.info('Response from GET %s', response.status);
 
 		if (response && response.status === 200) {
-			logger.info(`Mesh Config : ${objToString(response, ['data'])}`);
+			logger.debug(`Mesh response data : ${objToString(response, ['data'])}`);
 
 			return response.data.meshId;
 		} else {
@@ -1000,9 +1000,9 @@ const getMeshDeployments = async (organizationCode, projectId, workspaceId, mesh
 		logger.error(`Error fetching deployments for mesh: ${meshId}`);
 
 		return {
-			status: 'ERROR',
+			status: null,
 			meshId: meshId,
-			error: 'Mesh status is not available.',
+			error: null,
 		};
 	}
 };
