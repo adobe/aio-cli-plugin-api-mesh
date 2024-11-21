@@ -94,9 +94,9 @@ const describeMesh = async (organizationId, projectId, workspaceId, workspaceNam
 			const credential = await getApiKeyCredential(organizationId, projectId, workspaceId);
 
 			if (credential) {
-				return { meshId, apiKey: credential.client_id };
+				return { meshId };
 			} else {
-				logger.error('API Key credential not found on workspace');
+				logger.error('credential not found on workspace');
 
 				return { meshId, apiKey: null };
 			}
@@ -270,42 +270,9 @@ const createMesh = async (
 		if (response && response.status === 201) {
 			logger.info(`Mesh Config : ${objToString(response, ['data'])}`);
 
-			let sdkList = [];
-			let credential;
-			let isApiKeyNew = false;
-
-			credential = await getApiKeyCredential(organizationId, projectId, workspaceId);
-			if (!credential) {
-				logger.info('API Key credential not found on workspace');
-
-				// try to create a new API key credential
-				credential = await createAPIMeshCredentials(organizationId, projectId, workspaceId);
-				isApiKeyNew = true;
-			}
-			// subscribe the credential to API mesh service
-			sdkList = await subscribeCredentialToMeshService(
-				organizationId,
-				projectId,
-				workspaceId,
-				isApiKeyNew ? credential.id : credential.id_integration,
-			);
-			const newlyCreatedOrExistingApiKey = isApiKeyNew ? credential.apiKey : credential.client_id;
-
-			if (sdkList) {
-				logger.info(
-					'Successfully subscribed API Key %s to API Mesh service',
-					isApiKeyNew ? credential.apiKey : credential.client_id,
-				);
-			} else {
-				logger.error(
-					'Unable to subscribe API Key %s to API Mesh service',
-					newlyCreatedOrExistingApiKey,
-				);
-			}
 			return {
-				mesh: response.data,
-				apiKey: newlyCreatedOrExistingApiKey,
-				sdkList,
+				mesh: response.data
+				
 			};
 		} else {
 			// Non 201 response received
