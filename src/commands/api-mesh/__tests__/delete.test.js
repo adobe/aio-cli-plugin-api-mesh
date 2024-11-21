@@ -280,7 +280,7 @@ describe('delete command tests', () => {
 		]
 	`);
 
-	expect(logSpy.mock.calls).toMatchInlineSnapshot(`
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
 		[
 		  [
 		    "Successfully deleted mesh %s",
