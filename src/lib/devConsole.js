@@ -94,9 +94,9 @@ const describeMesh = async (organizationId, projectId, workspaceId, workspaceNam
 			const credential = await getApiKeyCredential(organizationId, projectId, workspaceId);
 
 			if (credential) {
-				return { meshId };
+				return { meshId, apiKey: null };
 			} else {
-				logger.error('credential not found on workspace');
+				logger.error('credentials not found on workspace');
 
 				return { meshId, apiKey: null };
 			}
@@ -272,6 +272,8 @@ const createMesh = async (
 
 			return {
 				mesh: response.data,
+				apiKey: null,
+				sdkList: null,
 			};
 		} else {
 			// Non 201 response received

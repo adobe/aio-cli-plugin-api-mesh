@@ -130,7 +130,7 @@ class CreateCommand extends Command {
 
 		if (shouldContinue) {
 			try {
-				const { mesh } = await createMesh(
+				const { mesh, apiKey, sdkList } = await createMesh(
 					imsOrgId,
 					projectId,
 					workspaceId,
@@ -161,6 +161,8 @@ class CreateCommand extends Command {
 					// template adobe/generator-app-api-mesh since it relies on "mesh" & "apiKey"
 					return {
 						mesh,
+						apiKey,
+						sdkList,
 					};
 				} else {
 					this.error(`Unable to create a mesh. Please try again. RequestId: ${global.requestId}`, {
