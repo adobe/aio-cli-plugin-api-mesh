@@ -14,10 +14,7 @@ const { Command } = require('@oclif/command');
 const logger = require('../../classes/logger');
 const { initSdk, initRequestId, promptConfirm } = require('../../helpers');
 const { ignoreCacheFlag, autoConfirmActionFlag } = require('../../utils');
-const {
-	getMeshId,
-	deleteMesh,
-} = require('../../lib/devConsole');
+const { getMeshId, deleteMesh } = require('../../lib/devConsole');
 
 require('dotenv').config();
 

@@ -271,8 +271,7 @@ const createMesh = async (
 			logger.info(`Mesh Config : ${objToString(response, ['data'])}`);
 
 			return {
-				mesh: response.data
-				
+				mesh: response.data,
 			};
 		} else {
 			// Non 201 response received
