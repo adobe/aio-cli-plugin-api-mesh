@@ -87,7 +87,8 @@ class StatusCommand extends Command {
 				this.log('Mesh is currently building. Wait a few minutes before checking again.');
 				break;
 			case 'error':
-				this.log('Mesh build has errors.', mesh.error);
+				this.log('Mesh build has errors.');
+				this.log(mesh.error);
 				break;
 			default:
 				this.log('Mesh status is not available. Wait a few minutes and try again.');
@@ -116,16 +117,17 @@ class StatusCommand extends Command {
 
 		switch (meshDeploymentStatus) {
 			case 'provisioning':
-				this.log(`Currently provisioning your mesh. Wait a few minutes and try again.`);
+				this.log('Currently provisioning your mesh. Wait a few minutes and try again.');
 				break;
 			case 'de-provisioning':
-				this.log(`Currently de-provisioning your mesh. Wait a few minutes and try again.`);
+				this.log('Currently de-provisioning your mesh. Wait a few minutes and try again.');
 				break;
 			case 'success':
-				this.log(`Mesh was built successfully.`);
+				this.log('Mesh was built successfully.');
 				break;
 			case 'error':
-				this.log('Mesh build has errors.', meshDeployments.error);
+				this.log('Mesh build has errors.');
+				this.log(meshDeployments.error);
 				break;
 			default:
 				this.log('Mesh status is not available. Wait a few minutes and try again.');

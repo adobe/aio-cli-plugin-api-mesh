@@ -405,16 +405,7 @@ describe('create command tests', () => {
 		    "******************************************************************************************************",
 		  ],
 		  [
-		    "Successfully created API Key %s",
-		    "dummy_api_key",
-		  ],
-		  [
-		    "Successfully subscribed API Key %s to API Mesh service",
-		    "dummy_api_key",
-		  ],
-		  [
-		    "Mesh Endpoint: %s
-		",
+		    "Mesh Endpoint: %s",
 		    "https://edge-sandbox-graph.adobe.io/api/dummy_mesh_id/graphql",
 		  ],
 		]
@@ -498,16 +489,7 @@ describe('create command tests', () => {
 		    "******************************************************************************************************",
 		  ],
 		  [
-		    "Successfully created API Key %s",
-		    "dummy_api_key",
-		  ],
-		  [
-		    "Successfully subscribed API Key %s to API Mesh service",
-		    "dummy_api_key",
-		  ],
-		  [
-		    "Mesh Endpoint: %s
-		",
+		    "Mesh Endpoint: %s",
 		    "https://edge-sandbox-graph.adobe.io/api/dummy_mesh_id/graphql",
 		  ],
 		]
@@ -637,10 +619,6 @@ describe('create command tests', () => {
 		    "******************************************************************************************************",
 		  ],
 		  [
-		    "Successfully created API Key %s",
-		    "dummy_api_key",
-		  ],
-		  [
 		    "subscribe credential to mesh service api failed",
 		  ],
 		]
@@ -689,16 +667,7 @@ describe('create command tests', () => {
 		    "******************************************************************************************************",
 		  ],
 		  [
-		    "Successfully created API Key %s",
-		    "dummy_api_key",
-		  ],
-		  [
-		    "Successfully subscribed API Key %s to API Mesh service",
-		    "dummy_api_key",
-		  ],
-		  [
-		    "Mesh Endpoint: %s
-		",
+		    "Mesh Endpoint: %s",
 		    "https://edge-sandbox-graph.adobe.io/api/dummy_mesh_id/graphql",
 		  ],
 		]
