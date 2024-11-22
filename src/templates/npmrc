@@ -1,2 +1,7 @@
 @adobe:registry=https://registry.npmjs.org/
 @adobe-apimesh:registry=https://registry.npmjs.org/
+@astock:registry=https://artifactory.corp.adobe.com/artifactory/api/npm/npm-stock-engineering-release/
+@multitenant-graphql:registry=https://artifactory.corp.adobe.com/artifactory/api/npm/npm-multitenant-graphql-release/
+@cloudfare:registry=https://registry.npmjs.org/
+registry=https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/
+registry=https://registry.npmjs.org/
