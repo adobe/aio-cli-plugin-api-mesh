@@ -90,21 +90,7 @@ const describeMesh = async (organizationId, projectId, workspaceId, workspaceNam
 
 		logger.info('Response from getMeshId %s', meshId);
 
-		if (meshId) {
-			const credential = await getApiKeyCredential(organizationId, projectId, workspaceId);
-
-			if (credential) {
-				return { meshId, apiKey: null };
-			} else {
-				logger.error('credentials not found on workspace');
-
-				return { meshId, apiKey: null };
-			}
-		} else {
-			logger.error(`Unable to retrieve meshId.`);
-
-			throw new Error(`Unable to retrieve meshId.`);
-		}
+		return { meshId, apiKey: null };
 	} catch (error) {
 		logger.error(error);
 

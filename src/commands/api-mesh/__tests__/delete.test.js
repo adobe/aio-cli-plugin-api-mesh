@@ -260,7 +260,7 @@ describe('delete command tests', () => {
 	`);
 	});
 
-	test('should delete mesh  if correct args are provided', async () => {
+	test('should delete mesh if correct args are provided', async () => {
 		const runResult = await DeleteCommand.run();
 
 		expect(initRequestId).toHaveBeenCalled();
