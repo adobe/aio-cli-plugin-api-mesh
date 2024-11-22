@@ -163,11 +163,27 @@ class RunCommand extends Command {
 					}
 
 					//Generating unique mesh id
-					meshId = UUID.newUuid().toString();
+					meshId = 'testMesh'
 
 					await validateMesh(data.meshConfig);
 					await buildMesh(meshId, data.meshConfig);
 					await compileMesh(meshId);
+
+					// Remove mesh artifact directory if exists
+					if (fs.existsSync('.mesh')) {
+						fs.rmdirSync('.mesh', { recursive: true });
+					}
+					// Move built mesh artifact to expect directory
+					fs.renameSync(`mesh-artifact/${meshId}`, '.mesh');
+					// Remove tenant files directory if exists
+					if (fs.existsSync('tenantFiles')) {
+						fs.rmdirSync('tenantFiles', { recursive: true });
+					}
+					// Move built tenant files if exists
+					if (fs.existsSync('mesh-artifact/tenantFiles')) {
+						fs.cpSync('mesh-artifact/tenantFiles', '.mesh/tenantFiles', { recursive: true });
+						fs.renameSync('mesh-artifact/tenantFiles', 'tenantFiles');
+					}
 				}
 
 				let portNo;

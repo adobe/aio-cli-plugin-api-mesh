@@ -6,6 +6,7 @@ const yogaPath = require.resolve('graphql-yoga', { paths: [process.cwd()] });
 const fastify = require(fastifyPath);
 const { createYoga } = require(yogaPath);
 const logger = require('./classes/logger');
+const { exec } = require('child_process');
 
 //Load the functions from serverUtils.js
 const {
@@ -75,7 +76,7 @@ const getYogaServer = async () => {
 		return yogaServer;
 	} else {
 		const currentWorkingDirectory = process.cwd();
-		const meshArtifactsPath = `${currentWorkingDirectory}/mesh-artifact/${meshId}`;
+		const meshArtifactsPath = `${currentWorkingDirectory}/.mesh`;
 
 		const meshArtifacts = require(meshArtifactsPath);
 		const { getBuiltMesh } = meshArtifacts;
@@ -91,19 +92,32 @@ const getYogaServer = async () => {
 
 		meshConfig = readMeshConfig(meshId);
 
-		yogaServer = createYoga({
-			plugins: tenantMesh.plugins,
-			graphqlEndpoint: `/graphql`,
-			graphiql: true,
-			maskedErrors: false,
-			cors: corsOptions,
-			context: initialContext => ({
-				...initialContext,
-				secrets: secretsProxy,
-			}),
+		const serverPath = `${__dirname}/index.js`;
+		
+		const command = `./node_modules/.bin/wrangler dev ${serverPath} --port 8788 --inspector-port 9788 --var meshPath:${meshArtifactsPath}`;
+		const server = exec(command);
+
+		server.stdout.on('data', data => {
+			console.log(data);
+		});
+	
+		server.stderr.on('data', data => {
+			console.error(data);
+		});
+	
+		server.on('close', code => {
+			console.log(`Server closed with code ${code}`);
+		});
+	
+		server.on('exit', code => {
+			console.log(`Server exited with code ${code}`);
+		});
+	
+		server.on('error', err => {
+			console.error(`Server exited with error ${err}`);
 		});
 
-		return yogaServer;
+		return null;
 	}
 };
 
