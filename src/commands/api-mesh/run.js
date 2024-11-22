@@ -163,7 +163,7 @@ class RunCommand extends Command {
 					}
 
 					//Generating unique mesh id
-					meshId = 'testMesh'
+					meshId = 'testMesh';
 
 					await validateMesh(data.meshConfig);
 					await buildMesh(meshId, data.meshConfig);

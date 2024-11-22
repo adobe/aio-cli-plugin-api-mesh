@@ -1,6 +1,5 @@
 export default {
-
-	async runServer(meshPath){
+	async runServer(meshPath) {
 		const meshArtifacts = await import(meshPath);
 		const { getBuiltMesh } = meshArtifacts;
 
@@ -10,6 +9,6 @@ export default {
 	// TODO: Access mesh artifact and run yogaServer
 	async fetch(request, env, ctx) {
 		await this.runServer(env.meshPath);
-		return new Response("Hello World!");
+		return new Response('Hello World!');
 	},
-  };
+};

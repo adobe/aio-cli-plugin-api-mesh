@@ -93,26 +93,26 @@ const getYogaServer = async () => {
 		meshConfig = readMeshConfig(meshId);
 
 		const serverPath = `${__dirname}/index.js`;
-		
+
 		const command = `./node_modules/.bin/wrangler dev ${serverPath} --port 8788 --inspector-port 9788 --var meshPath:${meshArtifactsPath}`;
 		const server = exec(command);
 
 		server.stdout.on('data', data => {
 			console.log(data);
 		});
-	
+
 		server.stderr.on('data', data => {
 			console.error(data);
 		});
-	
+
 		server.on('close', code => {
 			console.log(`Server closed with code ${code}`);
 		});
-	
+
 		server.on('exit', code => {
 			console.log(`Server exited with code ${code}`);
 		});
-	
+
 		server.on('error', err => {
 			console.error(`Server exited with error ${err}`);
 		});
