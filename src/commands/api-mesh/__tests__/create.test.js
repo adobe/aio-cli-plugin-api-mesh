@@ -42,8 +42,6 @@ const {
 const {
 	getMesh,
 	createMesh,
-	createAPIMeshCredentials,
-	subscribeCredentialToMeshService,
 	getTenantFeatures,
 	getPublicEncryptionKey,
 } = require('../../../lib/devConsole');
@@ -122,16 +120,7 @@ describe('create command tests', () => {
 				meshId: 'dummy_mesh_id',
 				meshConfig: sampleCreateMeshConfig.meshConfig,
 			},
-			apiKey: 'dummy_api_key',
-			sdkList: ['dummy_service'],
 		});
-
-		createAPIMeshCredentials.mockResolvedValue({
-			apiKey: 'dummy_api_key',
-			id: 'dummy_id',
-		});
-
-		subscribeCredentialToMeshService.mockResolvedValue(['dummy_service']);
 
 		getMesh.mockResolvedValue({
 			meshId: 'dummy_id',
@@ -171,11 +160,7 @@ describe('create command tests', () => {
 		});
 		const output = await CreateCommand.run();
 		expect(output).toHaveProperty('mesh');
-		expect(output).toHaveProperty('apiKey');
-		expect(output).toHaveProperty('sdkList');
 		expect(output.mesh).toEqual(expect.objectContaining({ meshId: 'dummy_mesh_id' }));
-		expect(output.apiKey).toEqual('dummy_api_key');
-		expect(output.sdkList).toEqual(['dummy_service']);
 	});
 
 	test('snapshot create command description', () => {
@@ -244,8 +229,6 @@ describe('create command tests', () => {
 				meshId: 'dummy_mesh_id',
 				meshConfig: meshConfigWithComposerFiles.meshConfig,
 			},
-			apiKey: 'dummy_api_key',
-			sdkList: ['dummy_service'],
 		});
 
 		parseSpy.mockResolvedValueOnce({
@@ -259,7 +242,6 @@ describe('create command tests', () => {
 
 		expect(output).toMatchInlineSnapshot(`
 		{
-		  "apiKey": "dummy_api_key",
 		  "mesh": {
 		    "meshConfig": {
 		      "files": [
@@ -303,9 +285,6 @@ describe('create command tests', () => {
 		    },
 		    "meshId": "dummy_mesh_id",
 		  },
-		  "sdkList": [
-		    "dummy_service",
-		  ],
 		}
 	`);
 	});
@@ -365,7 +344,6 @@ describe('create command tests', () => {
 	`);
 		expect(runResult).toMatchInlineSnapshot(`
 		{
-		  "apiKey": "dummy_api_key",
 		  "mesh": {
 		    "meshConfig": {
 		      "sources": [
@@ -381,9 +359,6 @@ describe('create command tests', () => {
 		    },
 		    "meshId": "dummy_mesh_id",
 		  },
-		  "sdkList": [
-		    "dummy_service",
-		  ],
 		}
 	`);
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
@@ -449,7 +424,6 @@ describe('create command tests', () => {
 
 		expect(runResult).toMatchInlineSnapshot(`
 		{
-		  "apiKey": "dummy_api_key",
 		  "mesh": {
 		    "meshConfig": {
 		      "sources": [
@@ -465,9 +439,6 @@ describe('create command tests', () => {
 		    },
 		    "meshId": "dummy_mesh_id",
 		  },
-		  "sdkList": [
-		    "dummy_service",
-		  ],
 		}
 	`);
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
@@ -546,92 +517,6 @@ describe('create command tests', () => {
 	`);
 	});
 
-	test.skip('should fail if create api credential api has failed', async () => {
-		createAPIMeshCredentials.mockRejectedValue(new Error('create api credential api failed'));
-
-		const runResult = CreateCommand.run();
-
-		await expect(runResult).rejects.toEqual(
-			new Error(
-				'Unable to create a mesh. Please check the mesh configuration file and try again. If the error persists please contact support. RequestId: dummy_request_id',
-			),
-		);
-		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
-		[
-		  [
-		    "******************************************************************************************************",
-		  ],
-		  [
-		    "Your mesh is being provisioned. Wait a few minutes before checking the status of your mesh %s",
-		    "dummy_mesh_id",
-		  ],
-		  [
-		    "To check the status of your mesh, run:",
-		  ],
-		  [
-		    "aio api-mesh:status",
-		  ],
-		  [
-		    "******************************************************************************************************",
-		  ],
-		  [
-		    "create api credential api failed",
-		  ],
-		]
-	`);
-		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
-		[
-		  [
-		    "Unable to create a mesh. Please check the mesh configuration file and try again. If the error persists please contact support. RequestId: dummy_request_id",
-		  ],
-		]
-	`);
-	});
-
-	test.skip('should fail if subscribe credential to mesh service api has failed', async () => {
-		subscribeCredentialToMeshService.mockRejectedValueOnce(
-			new Error('subscribe credential to mesh service api failed'),
-		);
-
-		const runResult = CreateCommand.run();
-
-		await expect(runResult).rejects.toEqual(
-			new Error(
-				'Unable to create a mesh. Please check the mesh configuration file and try again. If the error persists please contact support. RequestId: dummy_request_id',
-			),
-		);
-		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
-		[
-		  [
-		    "******************************************************************************************************",
-		  ],
-		  [
-		    "Your mesh is being provisioned. Wait a few minutes before checking the status of your mesh %s",
-		    "dummy_mesh_id",
-		  ],
-		  [
-		    "To check the status of your mesh, run:",
-		  ],
-		  [
-		    "aio api-mesh:status",
-		  ],
-		  [
-		    "******************************************************************************************************",
-		  ],
-		  [
-		    "subscribe credential to mesh service api failed",
-		  ],
-		]
-	`);
-		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
-		[
-		  [
-		    "Unable to create a mesh. Please check the mesh configuration file and try again. If the error persists please contact support. RequestId: dummy_request_id",
-		  ],
-		]
-	`);
-	});
-
 	test('should not ask for confirmation if autoConfirmAction is provided', async () => {
 		parseSpy.mockResolvedValueOnce({
 			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
@@ -704,11 +589,7 @@ describe('create command tests', () => {
 		});
 		const output = await CreateCommand.run();
 		expect(output).toHaveProperty('mesh');
-		expect(output).toHaveProperty('apiKey');
-		expect(output).toHaveProperty('sdkList');
 		expect(output.mesh).toEqual(expect.objectContaining({ meshId: 'dummy_mesh_id' }));
-		expect(output.apiKey).toEqual('dummy_api_key');
-		expect(output.sdkList).toEqual(['dummy_service']);
 	});
 
 	test('should return error if the mesh has placeholders and env file provided using --env flag is not found', async () => {
@@ -876,7 +757,6 @@ describe('create command tests', () => {
 		expect(promptConfirm).toHaveBeenCalledWith('Are you sure you want to create a mesh?');
 		expect(runResult).toMatchInlineSnapshot(`
 		{
-		  "apiKey": "dummy_api_key",
 		  "mesh": {
 		    "meshConfig": {
 		      "sources": [
@@ -892,9 +772,6 @@ describe('create command tests', () => {
 		    },
 		    "meshId": "dummy_mesh_id",
 		  },
-		  "sdkList": [
-		    "dummy_service",
-		  ],
 		}
 	`);
 	});
@@ -956,8 +833,6 @@ describe('create command tests', () => {
 				meshId: 'dummy_mesh_id',
 				meshConfig: meshConfig,
 			},
-			apiKey: 'dummy_api_key',
-			sdkList: ['dummy_service'],
 		});
 
 		parseSpy.mockResolvedValueOnce({
@@ -1016,7 +891,6 @@ describe('create command tests', () => {
 
 		expect(output).toMatchInlineSnapshot(`
 		{
-		  "apiKey": "dummy_api_key",
 		  "mesh": {
 		    "meshConfig": {
 		      "files": [
@@ -1047,9 +921,6 @@ describe('create command tests', () => {
 		    },
 		    "meshId": "dummy_mesh_id",
 		  },
-		  "sdkList": [
-		    "dummy_service",
-		  ],
 		}
 	`);
 	});
@@ -1225,8 +1096,6 @@ describe('create command tests', () => {
 				meshId: 'dummy_mesh_id',
 				meshConfig: meshConfig,
 			},
-			apiKey: 'dummy_api_key',
-			sdkList: ['dummy_service'],
 		});
 
 		parseSpy.mockResolvedValueOnce({
@@ -1278,7 +1147,6 @@ describe('create command tests', () => {
 	`);
 		expect(output).toMatchInlineSnapshot(`
 		{
-		  "apiKey": "dummy_api_key",
 		  "mesh": {
 		    "meshConfig": {
 		      "files": [
@@ -1309,9 +1177,6 @@ describe('create command tests', () => {
 		    },
 		    "meshId": "dummy_mesh_id",
 		  },
-		  "sdkList": [
-		    "dummy_service",
-		  ],
 		}
 	`);
 	});
@@ -1364,8 +1229,6 @@ describe('create command tests', () => {
 				meshId: 'dummy_mesh_id',
 				meshConfig: meshConfig,
 			},
-			apiKey: 'dummy_api_key',
-			sdkList: ['dummy_service'],
 		});
 
 		const output = await CreateCommand.run();
@@ -1413,7 +1276,6 @@ describe('create command tests', () => {
 
 		expect(output).toMatchInlineSnapshot(`
 		{
-		  "apiKey": "dummy_api_key",
 		  "mesh": {
 		    "meshConfig": {
 		      "files": [
@@ -1444,9 +1306,6 @@ describe('create command tests', () => {
 		    },
 		    "meshId": "dummy_mesh_id",
 		  },
-		  "sdkList": [
-		    "dummy_service",
-		  ],
 		}
 	`);
 	});
@@ -1498,8 +1357,6 @@ describe('create command tests', () => {
 				meshId: 'dummy_mesh_id',
 				meshConfig: meshConfig,
 			},
-			apiKey: 'dummy_api_key',
-			sdkList: ['dummy_service'],
 		});
 
 		const output = await CreateCommand.run();
@@ -1546,7 +1403,6 @@ describe('create command tests', () => {
 	`);
 		expect(output).toMatchInlineSnapshot(`
 		{
-		  "apiKey": "dummy_api_key",
 		  "mesh": {
 		    "meshConfig": {
 		      "files": [
@@ -1577,9 +1433,6 @@ describe('create command tests', () => {
 		    },
 		    "meshId": "dummy_mesh_id",
 		  },
-		  "sdkList": [
-		    "dummy_service",
-		  ],
 		}
 	`);
 	});
@@ -1618,8 +1471,6 @@ describe('create command tests', () => {
 				meshId: 'dummy_mesh_id',
 				meshConfig: meshConfig,
 			},
-			apiKey: 'dummy_api_key',
-			sdkList: ['dummy_service'],
 		});
 
 		parseSpy.mockResolvedValueOnce({
@@ -1677,7 +1528,6 @@ describe('create command tests', () => {
 	`);
 		expect(output).toMatchInlineSnapshot(`
 		{
-		  "apiKey": "dummy_api_key",
 		  "mesh": {
 		    "meshConfig": {
 		      "files": [
@@ -1708,9 +1558,6 @@ describe('create command tests', () => {
 		    },
 		    "meshId": "dummy_mesh_id",
 		  },
-		  "sdkList": [
-		    "dummy_service",
-		  ],
 		}
 	`);
 	});
@@ -1921,7 +1768,6 @@ describe('create command tests', () => {
 		const runResult = await CreateCommand.run();
 		expect(runResult).toMatchInlineSnapshot(`
 		{
-		  "apiKey": "dummy_api_key",
 		  "mesh": {
 		    "meshConfig": {
 		      "sources": [
@@ -1937,9 +1783,6 @@ describe('create command tests', () => {
 		    },
 		    "meshId": "dummy_mesh_id",
 		  },
-		  "sdkList": [
-		    "dummy_service",
-		  ],
 		}
 	`);
 	});
@@ -1995,7 +1838,6 @@ describe('create command tests', () => {
 		const runResult = await CreateCommand.run();
 		expect(runResult).toMatchInlineSnapshot(`
 		{
-		  "apiKey": "dummy_api_key",
 		  "mesh": {
 		    "meshConfig": {
 		      "sources": [
@@ -2011,9 +1853,6 @@ describe('create command tests', () => {
 		    },
 		    "meshId": "dummy_mesh_id",
 		  },
-		  "sdkList": [
-		    "dummy_service",
-		  ],
 		}
 	`);
 	});
@@ -2036,7 +1875,6 @@ describe('create command tests', () => {
 		const runResult = await CreateCommand.run();
 		expect(runResult).toMatchInlineSnapshot(`
 		{
-		  "apiKey": "dummy_api_key",
 		  "mesh": {
 		    "meshConfig": {
 		      "sources": [
@@ -2052,9 +1890,6 @@ describe('create command tests', () => {
 		    },
 		    "meshId": "dummy_mesh_id",
 		  },
-		  "sdkList": [
-		    "dummy_service",
-		  ],
 		}
 	`);
 	});
