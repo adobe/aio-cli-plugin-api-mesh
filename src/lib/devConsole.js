@@ -90,7 +90,7 @@ const describeMesh = async (organizationId, projectId, workspaceId, workspaceNam
 
 		logger.info('Response from getMeshId %s', meshId);
 
-		return { meshId, apiKey: null };
+		return { meshId };
 	} catch (error) {
 		logger.error(error);
 
@@ -258,8 +258,6 @@ const createMesh = async (
 
 			return {
 				mesh: response.data,
-				apiKey: null,
-				sdkList: null,
 			};
 		} else {
 			// Non 201 response received
