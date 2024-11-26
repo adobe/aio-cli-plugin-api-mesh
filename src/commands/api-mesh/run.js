@@ -39,6 +39,8 @@ const {
 const logger = require('../../classes/logger');
 const { getMeshId, getMeshArtifact } = require('../../lib/devConsole');
 require('dotenv').config();
+const { runServer } = require('../../server');
+const { fixPlugins } = require('../../fixPlugins');
 
 const { validateMesh, buildMesh, compileMesh } = meshBuilder.default;
 
@@ -163,11 +165,34 @@ class RunCommand extends Command {
 					}
 
 					//Generating unique mesh id
-					meshId = UUID.newUuid().toString();
+					meshId = 'testMesh';
 
 					await validateMesh(data.meshConfig);
 					await buildMesh(meshId, data.meshConfig);
 					await compileMesh(meshId);
+
+					// Remove mesh artifact directory if exists
+					if (fs.existsSync('.mesh')) {
+						fs.rmdirSync('.mesh', { recursive: true });
+					}
+					// Move built mesh artifact to expect directory
+					fs.renameSync(`mesh-artifact/${meshId}`, '.mesh');
+					// Remove tenant files directory if exists
+					if (fs.existsSync('tenantFiles')) {
+						fs.rmdirSync('tenantFiles', { recursive: true });
+					}
+					// Move built tenant files if exists
+					if (fs.existsSync('mesh-artifact/tenantFiles')) {
+						fs.cpSync('mesh-artifact/tenantFiles', '.mesh/tenantFiles', { recursive: true });
+						fs.renameSync('mesh-artifact/tenantFiles', 'tenantFiles');
+					}
+
+					await fixPlugins('.mesh/index.js');
+
+					if (fs.existsSync(`${__dirname}/../../../.mesh`)) {
+						fs.rmdirSync(`${__dirname}/../../../.mesh`, { recursive: true });
+					}
+					fs.cpSync('.mesh', `${__dirname}/../../../.mesh`, { recursive: true });
 				}
 
 				let portNo;
@@ -201,9 +226,7 @@ class RunCommand extends Command {
 				if (!portNo) {
 					portNo = 5000;
 				}
-
-				this.log(`Starting server on port : ${portNo}`);
-				await startGraphqlServer(meshId, portNo, flags.debug);
+				runServer();
 			} else {
 				throw new Error(
 					'`aio api-mesh run` cannot be executed because there is no package.json file in the current directory. Use `aio api-mesh init` to set up a package.',

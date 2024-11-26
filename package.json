@@ -47,9 +47,10 @@
 		"@adobe/plugin-on-fetch": "0.1.1",
 		"@graphql-mesh/cli": "0.82.30",
 		"@graphql-mesh/graphql": "0.34.13",
+		"@graphql-mesh/http": "^0.96.9",
 		"@graphql-mesh/json-schema": "0.35.38",
 		"@graphql-mesh/openapi": "0.33.39",
-		"@graphql-mesh/plugin-http-details-extensions": "0.1.21",
+		"@graphql-mesh/plugin-http-details-extensions": "^0.103.4",
 		"@graphql-mesh/runtime": "0.46.21",
 		"@graphql-mesh/soap": "0.14.25",
 		"@graphql-mesh/store": "0.9.20",
@@ -88,7 +89,7 @@
 		"lru-cache": "^7.14.1",
 		"node-clipboardy": "^1.0.3",
 		"node-fetch": "2.6.1",
-		"pino": "^7.9.2",
+		"pino": "^9.5.0",
 		"pino-pretty": "^7.6.0",
 		"pupa": "^3.1.0",
 		"source-registry-storage-adapter": "github:devx-services/source-registry-storage-adapter#main",
@@ -98,6 +99,7 @@
 	},
 	"devDependencies": {
 		"@babel/eslint-parser": "^7.15.8",
+		"@graphql-mesh/plugin-http-details-extensions": "0.1.21",
 		"@oclif/dev-cli": "1.26.10",
 		"@oclif/plugin-help": "2.2.3",
 		"@trivago/prettier-plugin-sort-imports": "^3.1.1",
@@ -117,7 +119,8 @@
 		"jest": "^29.2.2",
 		"jest-junit": "^6.0.0",
 		"prettier": "2.2.1",
-		"stdout-stderr": "^0.1.9"
+		"stdout-stderr": "^0.1.9",
+		"wrangler": "^3.80.4"
 	},
 	"engines": {
 		"node": "^16.13 || >=18.0.0",
