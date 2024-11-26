@@ -169,10 +169,6 @@ describe('delete command tests', () => {
 		    "Successfully deleted mesh %s",
 		    "mesh_id",
 		  ],
-		  [
-		    "Successfully unsubscribed API Key %s",
-		    "dummy_client_id",
-		  ],
 		]
 	`);
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`[]`);
@@ -204,67 +200,7 @@ describe('delete command tests', () => {
 	`);
 	});
 
-	test('should delete mesh but fail to unsubscribe if unable to get api key', async () => {
-		getApiKeyCredential.mockRejectedValueOnce(new Error('unable to get api key'));
-
-		const runResult = DeleteCommand.run();
-
-		await expect(runResult).rejects.toEqual(
-			new Error(
-				'Unable to delete mesh. Please check the details and try again. If the error persists please contact support. RequestId: dummy_request_id',
-			),
-		);
-		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
-		[
-		  [
-		    "Successfully deleted mesh %s",
-		    "mesh_id",
-		  ],
-		  [
-		    "unable to get api key",
-		  ],
-		]
-	`);
-		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
-		[
-		  [
-		    "Unable to delete mesh. Please check the details and try again. If the error persists please contact support. RequestId: dummy_request_id",
-		  ],
-		]
-	`);
-	});
-
-	test('should delete mesh but fail to unsubscribe if unsubscribe api failed', async () => {
-		unsubscribeCredentialFromMeshService.mockRejectedValueOnce(new Error('unsubscribe api failed'));
-
-		const runResult = DeleteCommand.run();
-
-		await expect(runResult).rejects.toEqual(
-			new Error(
-				'Unable to delete mesh. Please check the details and try again. If the error persists please contact support. RequestId: dummy_request_id',
-			),
-		);
-		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
-		[
-		  [
-		    "Successfully deleted mesh %s",
-		    "mesh_id",
-		  ],
-		  [
-		    "unsubscribe api failed",
-		  ],
-		]
-	`);
-		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
-		[
-		  [
-		    "Unable to delete mesh. Please check the details and try again. If the error persists please contact support. RequestId: dummy_request_id",
-		  ],
-		]
-	`);
-	});
-
-	test('should delete mesh and unsubscribe if correct args are provided', async () => {
+	test('should delete mesh if correct args are provided', async () => {
 		const runResult = await DeleteCommand.run();
 
 		expect(initRequestId).toHaveBeenCalled();
@@ -283,34 +219,12 @@ describe('delete command tests', () => {
 		  ],
 		]
 	`);
-		expect(getApiKeyCredential.mock.calls).toMatchInlineSnapshot(`
-		[
-		  [
-		    "1234",
-		    "5678",
-		    "123456789",
-		  ],
-		]
-	`);
-		expect(unsubscribeCredentialFromMeshService.mock.calls).toMatchInlineSnapshot(`
-		[
-		  [
-		    "1234",
-		    "5678",
-		    "123456789",
-		    "dummy_integration_id",
-		  ],
-		]
-	`);
+
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
 		[
 		  [
 		    "Successfully deleted mesh %s",
 		    "mesh_id",
-		  ],
-		  [
-		    "Successfully unsubscribed API Key %s",
-		    "dummy_client_id",
 		  ],
 		]
 	`);

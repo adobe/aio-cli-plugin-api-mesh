@@ -14,12 +14,7 @@ const { Command } = require('@oclif/command');
 const logger = require('../../classes/logger');
 const { initSdk, initRequestId, promptConfirm } = require('../../helpers');
 const { ignoreCacheFlag, autoConfirmActionFlag } = require('../../utils');
-const {
-	getMeshId,
-	deleteMesh,
-	getApiKeyCredential,
-	unsubscribeCredentialFromMeshService,
-} = require('../../lib/devConsole');
+const { getMeshId, deleteMesh } = require('../../lib/devConsole');
 
 require('dotenv').config();
 
@@ -68,25 +63,6 @@ class DeleteCommand extends Command {
 
 					if (deleteMeshResponse) {
 						this.log('Successfully deleted mesh %s', meshId);
-
-						const credential = await getApiKeyCredential(imsOrgId, projectId, workspaceId);
-
-						if (credential) {
-							const newSDKList = await unsubscribeCredentialFromMeshService(
-								imsOrgId,
-								projectId,
-								workspaceId,
-								credential.id_integration,
-							);
-
-							if (newSDKList) {
-								this.log('Successfully unsubscribed API Key %s', credential.client_id);
-							} else {
-								this.log('Unable to unsubscribe API Key %s', credential.client_id);
-							}
-						} else {
-							this.log('No API Key found to unsubscribe');
-						}
 
 						return deleteMeshResponse;
 					} else {
