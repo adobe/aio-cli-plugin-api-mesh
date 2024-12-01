@@ -37,7 +37,7 @@
 		"version": "oclif-dev readme && git add README.md"
 	},
 	"dependencies": {
-		"@adobe-apimesh/mesh-builder": "1.7.1",
+		"@adobe-apimesh/mesh-builder": "2.0.0",
 		"@adobe/aio-cli-lib-console": "^5.0.0",
 		"@adobe/aio-lib-core-config": "^5.0.0",
 		"@adobe/aio-lib-core-logging": "^3.0.0",
