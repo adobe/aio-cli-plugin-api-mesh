@@ -8,8 +8,7 @@ const pinoLogger = level =>
 	pino({
 		level: level || 'info',
 		formatters: {
-			// eslint-disable-next-line @typescript-eslint/no-unused-vars
-			level(label, _number) {
+			level(label) {
 				return {
 					level: label,
 				};
