@@ -5,12 +5,24 @@ const { createYoga } = require('graphql-yoga');
 const { GraphQLError } = require('graphql/error');
 
 const { loadMeshSecrets, getSecretsHandler } = require('./secrets');
+const useComplianceHeaders = require('./plugins/complianceHeaders');
+const UseHttpDetailsExtensions = require('./plugins/httpDetailsExtensions');
+const useSourceHeaders = require('@api-mesh/plugin-source-headers');
 
 let meshInstance$;
 
-async function buildMeshInstance(meshArtifacts) {
+async function buildMeshInstance(meshArtifacts, meshConfig) {
 	const { getMeshOptions } = meshArtifacts;
 	const options = await getMeshOptions();
+
+	options.additionalEnvelopPlugins = (options.additionalEnvelopPlugins || []).concat(
+		useComplianceHeaders(),
+		UseHttpDetailsExtensions({
+			// Get the details of responseConfig.includeHTTPDetails and store in Cache
+			if: meshConfig.responseConfig?.includeHTTPDetails || false,
+		}),
+		useSourceHeaders(meshConfig),
+	);
 
 	return getMesh(options).then(mesh => {
 		const id = mesh.pubsub.subscribe('destroy', () => {
@@ -21,16 +33,16 @@ async function buildMeshInstance(meshArtifacts) {
 	});
 }
 
-async function getBuiltMesh(meshArtifacts) {
+async function getBuiltMesh(meshArtifacts, meshConfig) {
 	if (meshInstance$ == null) {
-		meshInstance$ = buildMeshInstance(meshArtifacts);
+		meshInstance$ = buildMeshInstance(meshArtifacts, meshConfig);
 	}
 	return meshInstance$;
 }
 
 const buildServer = async (loggerInstance, env, meshArtifacts, meshConfig) => {
 	const { MESH_ID: meshId, Secret: secret } = env;
-	const tenantMesh = await getBuiltMesh(meshArtifacts);
+	const tenantMesh = await getBuiltMesh(meshArtifacts, meshConfig);
 	const meshSecrets = loadMeshSecrets(loggerInstance, secret);
 	return await buildYogaServer(env, tenantMesh, meshId, meshConfig, meshSecrets);
 };

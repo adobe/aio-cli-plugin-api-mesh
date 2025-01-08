@@ -26,12 +26,10 @@ const {
 } = require('../../utils');
 const meshBuilder = require('@adobe-apimesh/mesh-builder');
 const fs = require('fs');
-const UUID = require('../../uuid');
 const path = require('path');
 const {
 	initSdk,
 	initRequestId,
-	startGraphqlServer,
 	importFiles,
 	setUpTenantFiles,
 	writeSecretsFile,

@@ -1,4 +1,5 @@
 import { bindedlogger as logger } from '../utils/logger';
+import { getRequestId } from '../utils/requestId';
 import { ServedTier, addServedHeader } from './served';
 import { buildServer } from './wranglerServer';
 
@@ -15,8 +16,7 @@ export default {
 	 * @param ctx Event context.
 	 */
 	async fetch(request, env, ctx) {
-		const requestId = 1;
-
+		const requestId = getRequestId(request);
 		// Retrieve environment variables
 		const { MESH_ID: meshId, LOG_LEVEL: logLevel } = env;
 		const loggerInstance = logger({ logLevel, meshId, requestId });
