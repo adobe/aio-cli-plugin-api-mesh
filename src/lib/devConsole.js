@@ -160,7 +160,7 @@ const getMesh = async (organizationId, projectId, workspaceId, workspaceName, me
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
 			'workspaceName': workspaceName,
-			'x-api-key': SMS_BASE_URL
+			'x-api-key': SMS_BASE_URL,
 		},
 	};
 
@@ -922,10 +922,7 @@ const getTenantFeatures = async organizationCode => {
 		},
 	};
 
-	logger.info(
-		'Initiating GET %s',
-		`${SMS_BASE_URL}/organizations/${organizationCode}/features`,
-	);
+	logger.info('Initiating GET %s', `${SMS_BASE_URL}/organizations/${organizationCode}/features`);
 
 	try {
 		const response = await axios(config);
