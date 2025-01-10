@@ -233,7 +233,7 @@ const createMesh = async (
 	projectName,
 	data,
 ) => {
-	const { baseUrl: devConsoleUrl, accessToken, apiKey } = await getDevConsoleConfig();
+	const { accessToken } = await getDevConsoleConfig();
 	const config = {
 		method: 'post',
 		url: `${SMS_API_KEY}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes`,
@@ -812,7 +812,7 @@ const getMeshArtifact = async (organizationId, projectId, workspaceId, workspace
 	const { accessToken } = await getDevConsoleConfig();
 	const config = {
 		method: 'get',
-		url: `${SMS_BASE_URL}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/artifact?API_KEY=${smsApiKey}`,
+		url: `${SMS_BASE_URL}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/artifact`,
 		headers: {
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
@@ -978,7 +978,7 @@ const getMeshDeployments = async (organizationCode, projectId, workspaceId, mesh
  * @returns string
  */
 const getPublicEncryptionKey = async organizationCode => {
-	const { accessToken, apiKey } = await getDevConsoleConfig();
+	const { accessToken } = await getDevConsoleConfig();
 	const config = {
 		method: 'get',
 		url: `${SMS_BASE_URL}/organizations/${organizationCode}/getPublicKey`,
