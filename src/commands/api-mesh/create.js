@@ -59,7 +59,6 @@ class CreateCommand extends Command {
 		const envFilePath = await flags.env;
 		const secretsFilePath = await flags.secrets;
 		const {
-			imsOrgId,
 			imsOrgCode,
 			projectId,
 			workspaceId,
@@ -131,7 +130,7 @@ class CreateCommand extends Command {
 		if (shouldContinue) {
 			try {
 				const { mesh } = await createMesh(
-					imsOrgId,
+					imsOrgCode,
 					projectId,
 					workspaceId,
 					workspaceName,

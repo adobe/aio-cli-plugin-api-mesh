@@ -320,7 +320,7 @@ describe('create command tests', () => {
 		expect(initRequestId).toHaveBeenCalled();
 		expect(createMesh.mock.calls[0]).toMatchInlineSnapshot(`
 		[
-		  "1234",
+		  "CODE1234@AdobeOrg",
 		  "5678",
 		  "123456789",
 		  "Workspace01",
@@ -399,7 +399,7 @@ describe('create command tests', () => {
 		expect(initRequestId).toHaveBeenCalled();
 		expect(createMesh.mock.calls[0]).toMatchInlineSnapshot(`
 		[
-		  "1234",
+		  "CODE1234@AdobeOrg",
 		  "5678",
 		  "123456789",
 		  "Workspace01",
@@ -851,7 +851,7 @@ describe('create command tests', () => {
 		expect(initRequestId).toHaveBeenCalled();
 		expect(createMesh.mock.calls[0]).toMatchInlineSnapshot(`
 		[
-		  "1234",
+		  "CODE1234@AdobeOrg",
 		  "5678",
 		  "123456789",
 		  "Workspace01",
@@ -1364,7 +1364,7 @@ describe('create command tests', () => {
 		expect(initRequestId).toHaveBeenCalled();
 		expect(createMesh.mock.calls[0]).toMatchInlineSnapshot(`
 		[
-		  "1234",
+		  "CODE1234@AdobeOrg",
 		  "5678",
 		  "123456789",
 		  "Workspace01",
@@ -1489,7 +1489,7 @@ describe('create command tests', () => {
 		expect(initRequestId).toHaveBeenCalled();
 		expect(createMesh.mock.calls[0]).toMatchInlineSnapshot(`
 		[
-		  "1234",
+		  "CODE1234@AdobeOrg",
 		  "5678",
 		  "123456789",
 		  "Workspace01",

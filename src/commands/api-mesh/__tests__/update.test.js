@@ -50,6 +50,7 @@ describe('update command tests', () => {
 	beforeEach(() => {
 		initSdk.mockResolvedValue({
 			imsOrgId: selectedOrg.id,
+			imsOrgCode: selectedOrg.code,
 			projectId: selectedProject.id,
 			workspaceId: selectedWorkspace.id,
 			workspaceName: selectedWorkspace.title,
@@ -554,7 +555,7 @@ describe('update command tests', () => {
 		expect(initRequestId).toHaveBeenCalled();
 		expect(updateMesh.mock.calls[0]).toMatchInlineSnapshot(`
 		[
-		  "1234",
+		  "CODE1234@AdobeOrg",
 		  "5678",
 		  "123456789",
 		  "Workspace01",

@@ -150,7 +150,7 @@ const getMesh = async (organizationId, projectId, workspaceId, workspaceName, me
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
 			'workspaceName': workspaceName,
-			'x-api-key': SMS_BASE_URL,
+			'x-api-key': SMS_API_KEY,
 		},
 	};
 
@@ -236,7 +236,7 @@ const createMesh = async (
 	const { accessToken } = await getDevConsoleConfig();
 	const config = {
 		method: 'post',
-		url: `${SMS_API_KEY}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes`,
+		url: `${SMS_BASE_URL}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes`,
 		headers: {
 			'Authorization': `Bearer ${accessToken}`,
 			'Content-Type': 'application/json',
@@ -251,7 +251,7 @@ const createMesh = async (
 
 	logger.info(
 		'Initiating POST %s',
-		`${SMS_API_KEY}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes`,
+		`${SMS_BASE_URL}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes`,
 	);
 
 	try {
@@ -363,7 +363,7 @@ const updateMesh = async (
 
 	logger.info(
 		'Initiating PUT %s',
-		`${SMS_BASE_URL}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}}`,
+		`${SMS_BASE_URL}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}`,
 	);
 
 	try {
@@ -439,7 +439,7 @@ const deleteMesh = async (organizationId, projectId, workspaceId, meshId) => {
 	const { accessToken } = await getDevConsoleConfig();
 	const config = {
 		method: 'delete',
-		url: `${SMS_BASE_URL}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}}`,
+		url: `${SMS_BASE_URL}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}`,
 		headers: {
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
@@ -522,22 +522,23 @@ const deleteMesh = async (organizationId, projectId, workspaceId, meshId) => {
 };
 
 const getMeshId = async (organizationId, projectId, workspaceId, workspaceName) => {
-	const { baseUrl: devConsoleUrl, accessToken, apiKey } = await getDevConsoleConfig();
+	const { accessToken } = await getDevConsoleConfig();
 	logger.info('Initiating Mesh ID request');
 
 	const config = {
 		method: 'get',
-		url: `${devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/describe?API_KEY=${apiKey}`,
+		url: `${SMS_BASE_URL}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/mesh`,
 		headers: {
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
 			'workspaceName': workspaceName,
+			'x-api-key': SMS_API_KEY,
 		},
 	};
 
 	logger.info(
 		'Initiating GET %s',
-		`${devConsoleUrl}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/describe?API_KEY=${apiKey}`,
+		`${SMS_BASE_URL}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/mesh`,
 	);
 
 	try {

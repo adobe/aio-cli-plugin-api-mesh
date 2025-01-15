@@ -141,7 +141,7 @@ class UpdateCommand extends Command {
 			if (shouldContinue) {
 				try {
 					const response = await updateMesh(
-						imsOrgId,
+						imsOrgCode,
 						projectId,
 						workspaceId,
 						workspaceName,

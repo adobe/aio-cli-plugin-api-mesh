@@ -42,7 +42,7 @@ class StatusCommand extends Command {
 		}
 
 		try {
-			const mesh = await getMesh(imsOrgId, projectId, workspaceId, workspaceName, meshId);
+			const mesh = await getMesh(imsOrgCode, projectId, workspaceId, workspaceName, meshId);
 			this.log(''.padEnd(102, '*'));
 			await this.displayMeshStatus(mesh, imsOrgCode, projectId, workspaceId);
 			this.log(''.padEnd(102, '*'));

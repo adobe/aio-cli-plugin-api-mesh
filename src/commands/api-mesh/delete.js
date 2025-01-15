@@ -34,14 +34,14 @@ class DeleteCommand extends Command {
 		const ignoreCache = await flags.ignoreCache;
 		const autoConfirmAction = await flags.autoConfirmAction;
 
-		const { imsOrgId, projectId, workspaceId } = await initSdk({
+		const { imsOrgCode, projectId, workspaceId } = await initSdk({
 			ignoreCache,
 		});
 
 		let meshId = null;
 
 		try {
-			meshId = await getMeshId(imsOrgId, projectId, workspaceId);
+			meshId = await getMeshId(imsOrgCode, projectId, workspaceId);
 		} catch (err) {
 			this.error(
 				`Unable to get mesh ID. Please check the details and try again. RequestId: ${global.requestId}`,
@@ -59,7 +59,7 @@ class DeleteCommand extends Command {
 
 			if (shouldContinue) {
 				try {
-					const deleteMeshResponse = await deleteMesh(imsOrgId, projectId, workspaceId, meshId);
+					const deleteMeshResponse = await deleteMesh(imsOrgCode, projectId, workspaceId, meshId);
 
 					if (deleteMeshResponse) {
 						this.log('Successfully deleted mesh %s', meshId);
@@ -82,7 +82,7 @@ class DeleteCommand extends Command {
 			}
 		} else {
 			this.error(
-				`Unable to delete. No mesh found for Org(${imsOrgId}) -> Project(${projectId}) -> Workspace(${workspaceId}). Please check the details and try again.`,
+				`Unable to delete. No mesh found for Org(${imsOrgCode}) -> Project(${projectId}) -> Workspace(${workspaceId}). Please check the details and try again.`,
 			);
 		}
 	}
