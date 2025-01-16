@@ -82,7 +82,7 @@ class CreateCommand extends Command {
 				data = JSON.parse(inputMeshData);
 			} catch (err) {
 				this.log(err.message);
-				this.error('Input mesh file is not a valid JSON. Please check the file provided.');
+				this.error('Input mesh file is not a valid JSON. Check the file provided.');
 			}
 		}
 
@@ -101,9 +101,7 @@ class CreateCommand extends Command {
 				data = await importFiles(data, filesList, args.file, flags.autoConfirmAction);
 			} catch (err) {
 				this.log(err.message);
-				this.error(
-					'Unable to import the files in the mesh config. Please check the file and try again.',
-				);
+				this.error('Unable to import the files in the mesh config. Check the file and try again.');
 			}
 		}
 
@@ -117,7 +115,7 @@ class CreateCommand extends Command {
 				data.secrets = encryptedSecrets;
 			} catch (err) {
 				this.log(err.message);
-				this.error('Unable to import secrets. Please check the file and try again.');
+				this.error('Unable to import secrets. Check the file and try again.');
 			}
 		}
 
@@ -168,7 +166,7 @@ class CreateCommand extends Command {
 				this.log(error.message);
 
 				this.error(
-					`Unable to create a mesh. Please check the mesh configuration file and try again. If the error persists please contact support. RequestId: ${global.requestId}`,
+					`Unable to create a mesh. Check the mesh configuration file and try again. If the error persists please contact support. RequestId: ${global.requestId}`,
 				);
 			}
 		} else {

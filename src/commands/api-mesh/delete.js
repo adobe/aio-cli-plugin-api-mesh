@@ -72,7 +72,7 @@ class DeleteCommand extends Command {
 					this.log(error.message);
 
 					this.error(
-						`Unable to delete mesh. Please check the details and try again. If the error persists please contact support. RequestId: ${global.requestId}`,
+						`Unable to delete mesh. Check the details and try again. If the error persists please contact support. RequestId: ${global.requestId}`,
 					);
 				}
 			} else {
@@ -82,7 +82,7 @@ class DeleteCommand extends Command {
 			}
 		} else {
 			this.error(
-				`Unable to delete. No mesh found for Org(${imsOrgCode}) -> Project(${projectId}) -> Workspace(${workspaceId}). Please check the details and try again.`,
+				`Unable to delete mesh. No mesh found for Org(${imsOrgCode}) -> Project(${projectId}) -> Workspace(${workspaceId}). Check the details and try again.`,
 			);
 		}
 	}

@@ -37,7 +37,7 @@ class StatusCommand extends Command {
 		// API Request succeeded, but mesh could not be found
 		if (!meshId) {
 			this.error(
-				`Unable to get mesh status. No mesh found for Org(${imsOrgCode}) -> Project(${projectId}) -> Workspace(${workspaceId}). Please check the details and try again.`,
+				`Unable to get mesh status. No mesh found for Org(${imsOrgCode}) -> Project(${projectId}) -> Workspace(${workspaceId}). Check the details and try again.`,
 			);
 		}
 

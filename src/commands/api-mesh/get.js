@@ -48,7 +48,7 @@ class GetCommand extends Command {
 			meshId = await getMeshId(imsOrgCode, projectId, workspaceId, workspaceName);
 		} catch (err) {
 			this.error(
-				`Unable to get mesh ID. Please check the details and try again. RequestId: ${global.requestId}`,
+				`Unable to get mesh ID. Check the details and try again. RequestId: ${global.requestId}`,
 			);
 		}
 
@@ -75,7 +75,7 @@ class GetCommand extends Command {
 					return mesh;
 				} else {
 					logger.error(
-						`Unable to get mesh with the ID ${meshId}. Please check the mesh ID and try again. RequestId: ${global.requestId}`,
+						`Unable to get mesh with the ID ${meshId}. Check the mesh ID and try again. RequestId: ${global.requestId}`,
 						{ exit: false },
 					);
 				}
@@ -83,7 +83,7 @@ class GetCommand extends Command {
 				this.log(error.message);
 
 				this.error(
-					`Unable to get mesh. Please check the details and try again. If the error persists please contact support. RequestId: ${global.requestId}`,
+					`Unable to get mesh. Check the details and try again. If the error persists please contact support. RequestId: ${global.requestId}`,
 				);
 			}
 		} else {
