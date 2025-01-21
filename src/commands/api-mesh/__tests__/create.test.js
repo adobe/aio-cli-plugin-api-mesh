@@ -295,7 +295,7 @@ describe('create command tests', () => {
 		const runResult = CreateCommand.run();
 		await expect(runResult).rejects.toEqual(
 			new Error(
-				'Unable to create a mesh. Please check the mesh configuration file and try again. If the error persists please contact support. RequestId: dummy_request_id',
+				'Unable to create a mesh. Check the mesh configuration file and try again. If the error persists please contact support. RequestId: dummy_request_id',
 			),
 		);
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
@@ -308,7 +308,7 @@ describe('create command tests', () => {
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
 		[
 		  [
-		    "Unable to create a mesh. Please check the mesh configuration file and try again. If the error persists please contact support. RequestId: dummy_request_id",
+		    "Unable to create a mesh. Check the mesh configuration file and try again. If the error persists please contact support. RequestId: dummy_request_id",
 		  ],
 		]
 	`);
@@ -320,7 +320,7 @@ describe('create command tests', () => {
 		expect(initRequestId).toHaveBeenCalled();
 		expect(createMesh.mock.calls[0]).toMatchInlineSnapshot(`
 		[
-		  "1234",
+		  "CODE1234@AdobeOrg",
 		  "5678",
 		  "123456789",
 		  "Workspace01",
@@ -399,7 +399,7 @@ describe('create command tests', () => {
 		expect(initRequestId).toHaveBeenCalled();
 		expect(createMesh.mock.calls[0]).toMatchInlineSnapshot(`
 		[
-		  "1234",
+		  "CODE1234@AdobeOrg",
 		  "5678",
 		  "123456789",
 		  "Workspace01",
@@ -787,13 +787,13 @@ describe('create command tests', () => {
 
 		const runResult = CreateCommand.run();
 		await expect(runResult).rejects.toEqual(
-			new Error('Input mesh file is not a valid JSON. Please check the file provided.'),
+			new Error('Input mesh file is not a valid JSON. Check the file provided.'),
 		);
 
 		await expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
 		[
 		  [
-		    "Input mesh file is not a valid JSON. Please check the file provided.",
+		    "Input mesh file is not a valid JSON. Check the file provided.",
 		  ],
 		]
 	`);
@@ -851,7 +851,7 @@ describe('create command tests', () => {
 		expect(initRequestId).toHaveBeenCalled();
 		expect(createMesh.mock.calls[0]).toMatchInlineSnapshot(`
 		[
-		  "1234",
+		  "CODE1234@AdobeOrg",
 		  "5678",
 		  "123456789",
 		  "Workspace01",
@@ -998,9 +998,7 @@ describe('create command tests', () => {
 
 		const output = CreateCommand.run();
 		await expect(output).rejects.toEqual(
-			new Error(
-				'Unable to import the files in the mesh config. Please check the file and try again.',
-			),
+			new Error('Unable to import the files in the mesh config. Check the file and try again.'),
 		);
 
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
@@ -1014,7 +1012,7 @@ describe('create command tests', () => {
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
 		[
 		  [
-		    "Unable to import the files in the mesh config. Please check the file and try again.",
+		    "Unable to import the files in the mesh config. Check the file and try again.",
 		  ],
 		]
 	`);
@@ -1035,9 +1033,7 @@ describe('create command tests', () => {
 		const output = CreateCommand.run();
 
 		await expect(output).rejects.toEqual(
-			new Error(
-				'Unable to import the files in the mesh config. Please check the file and try again.',
-			),
+			new Error('Unable to import the files in the mesh config. Check the file and try again.'),
 		);
 
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
@@ -1051,7 +1047,7 @@ describe('create command tests', () => {
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
 		[
 		  [
-		    "Unable to import the files in the mesh config. Please check the file and try again.",
+		    "Unable to import the files in the mesh config. Check the file and try again.",
 		  ],
 		]
 	`);
@@ -1364,7 +1360,7 @@ describe('create command tests', () => {
 		expect(initRequestId).toHaveBeenCalled();
 		expect(createMesh.mock.calls[0]).toMatchInlineSnapshot(`
 		[
-		  "1234",
+		  "CODE1234@AdobeOrg",
 		  "5678",
 		  "123456789",
 		  "Workspace01",
@@ -1489,7 +1485,7 @@ describe('create command tests', () => {
 		expect(initRequestId).toHaveBeenCalled();
 		expect(createMesh.mock.calls[0]).toMatchInlineSnapshot(`
 		[
-		  "1234",
+		  "CODE1234@AdobeOrg",
 		  "5678",
 		  "123456789",
 		  "Workspace01",
@@ -1604,9 +1600,7 @@ describe('create command tests', () => {
 		const output = CreateCommand.run();
 
 		await expect(output).rejects.toEqual(
-			new Error(
-				'Unable to import the files in the mesh config. Please check the file and try again.',
-			),
+			new Error('Unable to import the files in the mesh config. Check the file and try again.'),
 		);
 
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
@@ -1620,7 +1614,7 @@ describe('create command tests', () => {
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
 		[
 		  [
-		    "Unable to import the files in the mesh config. Please check the file and try again.",
+		    "Unable to import the files in the mesh config. Check the file and try again.",
 		  ],
 		]
 	`);
@@ -1706,13 +1700,13 @@ describe('create command tests', () => {
 		const runResult = CreateCommand.run();
 
 		await expect(runResult).rejects.toEqual(
-			new Error('Unable to import secrets. Please check the file and try again.'),
+			new Error('Unable to import secrets. Check the file and try again.'),
 		);
 
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
 		[
 		  [
-		    "Unable to import secrets. Please check the file and try again.",
+		    "Unable to import secrets. Check the file and try again.",
 		  ],
 		]
 	`);
@@ -1731,7 +1725,7 @@ describe('create command tests', () => {
 		const runResult = CreateCommand.run();
 
 		await expect(runResult).rejects.toEqual(
-			new Error('Unable to import secrets. Please check the file and try again.'),
+			new Error('Unable to import secrets. Check the file and try again.'),
 		);
 
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
@@ -1745,7 +1739,7 @@ describe('create command tests', () => {
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
 		[
 		  [
-		    "Unable to import secrets. Please check the file and try again.",
+		    "Unable to import secrets. Check the file and try again.",
 		  ],
 		]
 	`);
@@ -1801,7 +1795,7 @@ describe('create command tests', () => {
 		const runResult = CreateCommand.run();
 
 		await expect(runResult).rejects.toEqual(
-			new Error('Unable to import secrets. Please check the file and try again.'),
+			new Error('Unable to import secrets. Check the file and try again.'),
 		);
 
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
@@ -1814,7 +1808,7 @@ describe('create command tests', () => {
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
 		[
 		  [
-		    "Unable to import secrets. Please check the file and try again.",
+		    "Unable to import secrets. Check the file and try again.",
 		  ],
 		]
 	`);
@@ -1910,7 +1904,7 @@ describe('create command tests', () => {
 
 		const runResult = CreateCommand.run();
 		await expect(runResult).rejects.toEqual(
-			new Error('Unable to import secrets. Please check the file and try again.'),
+			new Error('Unable to import secrets. Check the file and try again.'),
 		);
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
 		[

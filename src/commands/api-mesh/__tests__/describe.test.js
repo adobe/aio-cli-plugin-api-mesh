@@ -199,7 +199,7 @@ describe('describe command tests', () => {
 
 		expect(initRequestId).toHaveBeenCalled();
 		expect(describeMesh).toHaveBeenCalledWith(
-			selectedOrg.id,
+			selectedOrg.code,
 			selectedProject.id,
 			selectedWorkspace.id,
 			selectedWorkspace.title,
@@ -250,7 +250,7 @@ describe('describe command tests', () => {
 
 		expect(initRequestId).toHaveBeenCalled();
 		expect(describeMesh).toHaveBeenCalledWith(
-			selectedOrg.id,
+			selectedOrg.code,
 			selectedProject.id,
 			selectedWorkspace.id,
 			selectedWorkspace.title,
