@@ -168,31 +168,7 @@ class RunCommand extends Command {
 					await validateMesh(data.meshConfig);
 					await buildMesh(meshId, data.meshConfig);
 					await compileMesh(meshId);
-
-					// Remove mesh artifact directory if exists
-					if (fs.existsSync('.mesh')) {
-						fs.rmdirSync('.mesh', { recursive: true });
-					}
-					// Move built mesh artifact to expect directory
-					fs.renameSync(`mesh-artifact/${meshId}`, '.mesh');
-					// Remove tenant files directory if exists
-					if (fs.existsSync('tenantFiles')) {
-						fs.rmdirSync('tenantFiles', { recursive: true });
-					}
-					// Move built tenant files if exists
-					if (fs.existsSync('mesh-artifact/tenantFiles')) {
-						fs.cpSync('mesh-artifact/tenantFiles', '.mesh/tenantFiles', { recursive: true });
-						fs.renameSync('mesh-artifact/tenantFiles', 'tenantFiles');
-					}
-
-					await fixPlugins('.mesh/index.js');
-
-					if (fs.existsSync(`${__dirname}/../../../.mesh`)) {
-						fs.rmdirSync(`${__dirname}/../../../.mesh`, { recursive: true });
-					}
-					fs.cpSync('.mesh', `${__dirname}/../../../.mesh`, { recursive: true });
 				}
-
 				let portNo;
 				//secrets management
 				if (secretsFilePath) {
@@ -205,6 +181,8 @@ class RunCommand extends Command {
 						this.error('Unable to import secrets. Please check the file and try again.');
 					}
 				}
+
+				await this.copyMeshContent(meshId);
 
 				//To set the port number using the environment file
 				if (process.env.PORT !== undefined) {
@@ -224,7 +202,8 @@ class RunCommand extends Command {
 				if (!portNo) {
 					portNo = 5000;
 				}
-				runServer();
+				meshId = '00000000-0000-0000-0000-000000000000';
+				runServer(meshId, portNo);
 			} else {
 				throw new Error(
 					'`aio api-mesh run` cannot be executed because there is no package.json file in the current directory. Use `aio api-mesh init` to set up a package.',
@@ -233,6 +212,31 @@ class RunCommand extends Command {
 		} catch (error) {
 			this.error(error.message);
 		}
+	}
+
+	async copyMeshContent(meshId) {
+		// Remove mesh artifact directory if exists
+		if (fs.existsSync('.mesh')) {
+			fs.rmdirSync('.mesh', { recursive: true });
+		}
+		// Move built mesh artifact to expect directory
+		fs.renameSync(`mesh-artifact/${meshId}`, '.mesh');
+		// Remove tenant files directory if exists
+		if (fs.existsSync('tenantFiles')) {
+			fs.rmdirSync('tenantFiles', { recursive: true });
+		}
+		// Move built tenant files if exists
+		if (fs.existsSync('mesh-artifact/tenantFiles')) {
+			fs.cpSync('mesh-artifact/tenantFiles', '.mesh/tenantFiles', { recursive: true });
+			fs.renameSync('mesh-artifact/tenantFiles', 'tenantFiles');
+		}
+
+		await fixPlugins('.mesh/index.js');
+
+		if (fs.existsSync(`${__dirname}/../../../.mesh`)) {
+			fs.rmdirSync(`${__dirname}/../../../.mesh`, { recursive: true });
+		}
+		fs.cpSync('.mesh', `${__dirname}/../../../.mesh`, { recursive: true });
 	}
 }
 
