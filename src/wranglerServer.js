@@ -7,7 +7,7 @@ const { GraphQLError } = require('graphql/error');
 const { loadMeshSecrets, getSecretsHandler } = require('./secrets');
 const useComplianceHeaders = require('./plugins/complianceHeaders');
 const UseHttpDetailsExtensions = require('./plugins/httpDetailsExtensions');
-const useSourceHeaders = require('@api-mesh/plugin-source-headers');
+const useSourceHeaders = require('@adobe/plugin-source-headers');
 
 let meshInstance$;
 
