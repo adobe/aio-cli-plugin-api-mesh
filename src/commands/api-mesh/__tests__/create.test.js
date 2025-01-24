@@ -159,8 +159,28 @@ describe('create command tests', () => {
 			},
 		});
 		const output = await CreateCommand.run();
-		expect(output).toHaveProperty('mesh');
-		expect(output.mesh).toEqual(expect.objectContaining({ meshId: 'dummy_mesh_id' }));
+		expect(output).toMatchInlineSnapshot(`
+		{
+		  "imsOrgId": "1234",
+		  "meshConfig": {
+		    "sources": [
+		      {
+		        "handler": {
+		          "graphql": {
+		            "endpoint": "<gql_endpoint>",
+		          },
+		        },
+		        "name": "<api_name>",
+		      },
+		    ],
+		  },
+		  "meshId": "dummy_mesh_id",
+		  "meshUrl": "https://edge-sandbox-graph.adobe.io/api/dummy_mesh_id/graphql",
+		  "projectId": "5678",
+		  "workspaceId": "123456789",
+		  "workspaceName": "Workspace01",
+		}
+	`);
 	});
 
 	test('snapshot create command description', () => {
@@ -597,8 +617,28 @@ describe('create command tests', () => {
 			},
 		});
 		const output = await CreateCommand.run();
-		expect(output).toHaveProperty('mesh');
-		expect(output.mesh).toEqual(expect.objectContaining({ meshId: 'dummy_mesh_id' }));
+		expect(output).toMatchInlineSnapshot(`
+		{
+		  "imsOrgId": "1234",
+		  "meshConfig": {
+		    "sources": [
+		      {
+		        "handler": {
+		          "graphql": {
+		            "endpoint": "<gql_endpoint>",
+		          },
+		        },
+		        "name": "<api_name>",
+		      },
+		    ],
+		  },
+		  "meshId": "dummy_mesh_id",
+		  "meshUrl": "https://edge-sandbox-graph.adobe.io/api/dummy_mesh_id/graphql",
+		  "projectId": "5678",
+		  "workspaceId": "123456789",
+		  "workspaceName": "Workspace01",
+		}
+	`);
 	});
 
 	test('should return error if the mesh has placeholders and env file provided using --env flag is not found', async () => {

@@ -75,7 +75,7 @@ class GetCommand extends Command {
 						}
 					}
 
-					return { mesh, meshUrl, imsOrgId, projectId, workspaceId, workspaceName };
+					return { ...mesh, meshUrl, imsOrgId, projectId, workspaceId, workspaceName };
 				} else {
 					logger.error(
 						`Unable to get mesh with the ID ${meshId}. Please check the mesh ID and try again. RequestId: ${global.requestId}`,
