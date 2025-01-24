@@ -49,7 +49,7 @@ class DescribeCommand extends Command {
 					this.log('Mesh ID: %s', meshId);
 					this.log('Mesh Endpoint: %s', meshUrl);
 
-					return meshDetails;
+					return { ...meshDetails, meshUrl, imsOrgId, projectId, workspaceId, workspaceName };
 				} else {
 					logger.error(
 						`Unable to get mesh details. Please check the details and try again. RequestId: ${global.requestId}`,
