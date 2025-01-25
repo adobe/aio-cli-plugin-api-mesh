@@ -202,7 +202,7 @@ class RunCommand extends Command {
 				if (!portNo) {
 					portNo = 5000;
 				}
-				meshId = 'testMesh';
+				meshId = '000000000000-0000-0000-0000-000000000000';
 				runServer(meshId, portNo);
 			} else {
 				throw new Error(
