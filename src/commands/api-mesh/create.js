@@ -159,7 +159,7 @@ class CreateCommand extends Command {
 
 					// When renaming the return values, make sure to make necessary changes to
 					// template adobe/generator-app-api-mesh since it relies on "mesh"
-					return { mesh };
+					return { ...mesh, meshUrl, imsOrgId, projectId, workspaceId, workspaceName };
 				} else {
 					this.error(`Unable to create a mesh. Please try again. RequestId: ${global.requestId}`, {
 						exit: false,

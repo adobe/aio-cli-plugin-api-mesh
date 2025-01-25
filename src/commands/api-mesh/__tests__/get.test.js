@@ -193,7 +193,30 @@ describe('get command tests', () => {
 			verbose: true,
 		});
 		expect(initRequestId).toHaveBeenCalled();
-		expect(runResult).toEqual({ meshId: 'dummy_meshId', mesh: mockGetMeshConfig });
+		expect(runResult).toMatchInlineSnapshot(`
+		{
+		  "imsOrgId": "1234",
+		  "mesh": {
+		    "meshConfig": {
+		      "sources": [
+		        {
+		          "handler": {
+		            "graphql": {
+		              "endpoint": "<gql_endpoint>",
+		            },
+		          },
+		          "name": "<api_name>",
+		        },
+		      ],
+		    },
+		  },
+		  "meshId": "dummy_meshId",
+		  "meshUrl": "https://edge-sandbox-graph.adobe.io/api/dummy_meshId/graphql",
+		  "projectId": "5678",
+		  "workspaceId": "123456789",
+		  "workspaceName": "Workspace01",
+		}
+	`);
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
 		[
 		  [
@@ -240,7 +263,30 @@ describe('get command tests', () => {
 
 		const runResult = await GetCommand.run();
 
-		expect(runResult).toEqual({ meshId: 'dummy_meshId', mesh: mockGetMeshConfig });
+		expect(runResult).toMatchInlineSnapshot(`
+		{
+		  "imsOrgId": "1234",
+		  "mesh": {
+		    "meshConfig": {
+		      "sources": [
+		        {
+		          "handler": {
+		            "graphql": {
+		              "endpoint": "<gql_endpoint>",
+		            },
+		          },
+		          "name": "<api_name>",
+		        },
+		      ],
+		    },
+		  },
+		  "meshId": "dummy_meshId",
+		  "meshUrl": "https://edge-sandbox-graph.adobe.io/api/dummy_meshId/graphql",
+		  "projectId": "5678",
+		  "workspaceId": "123456789",
+		  "workspaceName": "Workspace01",
+		}
+	`);
 		expect(writeFile.mock.calls).toMatchInlineSnapshot(`
 		[
 		  [
@@ -294,7 +340,30 @@ describe('get command tests', () => {
 		});
 		const runResult = await GetCommand.run();
 
-		expect(runResult).toEqual({ meshId: 'dummy_meshId', mesh: mockGetMeshConfig });
+		expect(runResult).toMatchInlineSnapshot(`
+		{
+		  "imsOrgId": "1234",
+		  "mesh": {
+		    "meshConfig": {
+		      "sources": [
+		        {
+		          "handler": {
+		            "graphql": {
+		              "endpoint": "<gql_endpoint>",
+		            },
+		          },
+		          "name": "<api_name>",
+		        },
+		      ],
+		    },
+		  },
+		  "meshId": "dummy_meshId",
+		  "meshUrl": "https://edge-sandbox-graph.adobe.io/api/dummy_meshId/graphql",
+		  "projectId": "5678",
+		  "workspaceId": "123456789",
+		  "workspaceName": "Workspace01",
+		}
+	`);
 		expect(writeFile.mock.calls).toMatchInlineSnapshot(`
 		[
 		  [
