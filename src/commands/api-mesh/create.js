@@ -10,7 +10,14 @@ governing permissions and limitations under the License.
 */
 
 const { Command } = require('@oclif/core');
-const { initSdk, initRequestId, promptConfirm, importFiles } = require('../../helpers');
+const {
+	initSdk,
+	initRequestId,
+	promptConfirm,
+	importFiles,
+	getPluginVersionDetails,
+	isCurrentVersionLatest,
+} = require('../../helpers');
 const logger = require('../../classes/logger');
 const {
 	ignoreCacheFlag,
@@ -42,6 +49,17 @@ class CreateCommand extends Command {
 	static enableJsonFlag = true;
 
 	async run() {
+		const installedPlugins = this.config.plugins;
+
+		const { currentVersion, latestVersion } = await getPluginVersionDetails(installedPlugins);
+
+		if (!isCurrentVersionLatest(currentVersion, latestVersion)) {
+			this.warn(
+				`@adobe/aio-cli-plugin-api-mesh update available from ${currentVersion} to ${latestVersion}`,
+			);
+			this.warn(`Run aio plugins:install @adobe/aio-cli-plugin-api-mesh to update to the latest`);
+		}
+
 		await initRequestId();
 
 		logger.info(`RequestId: ${global.requestId}`);

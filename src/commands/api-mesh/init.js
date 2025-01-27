@@ -13,7 +13,13 @@ const { Command, Flags } = require('@oclif/core');
 const path = require('path');
 const fs = require('fs/promises');
 
-const { promptConfirm, promptSelect, runCliCommand } = require('../../helpers');
+const {
+	promptConfirm,
+	promptSelect,
+	runCliCommand,
+	getPluginVersionDetails,
+	isCurrentVersionLatest,
+} = require('../../helpers');
 const { getAppRootDir } = require('../../utils');
 
 const { resolve } = path;
@@ -86,6 +92,17 @@ class InitCommand extends Command {
 	}
 
 	async run() {
+		const installedPlugins = this.config.plugins;
+
+		const { currentVersion, latestVersion } = await getPluginVersionDetails(installedPlugins);
+
+		if (!isCurrentVersionLatest(currentVersion, latestVersion)) {
+			this.warn(
+				`@adobe/aio-cli-plugin-api-mesh update available from ${currentVersion} to ${latestVersion}`,
+			);
+			this.warn(`Run aio plugins:install @adobe/aio-cli-plugin-api-mesh to update to the latest`);
+		}
+
 		const { args, flags } = await this.parse(InitCommand);
 		const gitFlagOptions = {
 			y: true,

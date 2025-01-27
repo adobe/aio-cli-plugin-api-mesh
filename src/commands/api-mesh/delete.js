@@ -12,7 +12,13 @@ governing permissions and limitations under the License.
 const { Command } = require('@oclif/command');
 
 const logger = require('../../classes/logger');
-const { initSdk, initRequestId, promptConfirm } = require('../../helpers');
+const {
+	initSdk,
+	initRequestId,
+	promptConfirm,
+	getPluginVersionDetails,
+	isCurrentVersionLatest,
+} = require('../../helpers');
 const { ignoreCacheFlag, autoConfirmActionFlag } = require('../../utils');
 const { getMeshId, deleteMesh } = require('../../lib/devConsole');
 
@@ -25,6 +31,17 @@ class DeleteCommand extends Command {
 	};
 
 	async run() {
+		const installedPlugins = this.config.plugins;
+
+		const { currentVersion, latestVersion } = await getPluginVersionDetails(installedPlugins);
+
+		if (!isCurrentVersionLatest(currentVersion, latestVersion)) {
+			this.warn(
+				`@adobe/aio-cli-plugin-api-mesh update available from ${currentVersion} to ${latestVersion}`,
+			);
+			this.warn(`Run aio plugins:install @adobe/aio-cli-plugin-api-mesh to update to the latest`);
+		}
+
 		await initRequestId();
 
 		logger.info(`RequestId: ${global.requestId}`);
