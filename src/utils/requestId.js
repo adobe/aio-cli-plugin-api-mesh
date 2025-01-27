@@ -1,4 +1,4 @@
-const UUID = require('../src/uuid');
+const UUID = require('../uuid');
 
 /**
  * Default request identifier header name.

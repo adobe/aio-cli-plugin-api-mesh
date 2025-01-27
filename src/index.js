@@ -1,6 +1,6 @@
-import { bindedlogger as logger } from '../utils/logger';
-import { getRequestId } from '../utils/requestId';
 import { ServedTier, addServedHeader } from './served';
+import { bindedlogger as logger } from './utils/logger';
+import { getRequestId } from './utils/requestId';
 import { buildServer } from './wranglerServer';
 
 let server;
