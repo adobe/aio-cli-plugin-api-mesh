@@ -882,6 +882,13 @@ async function writeSecretsFile(secretsData, meshId) {
 	}
 }
 
+/**
+ *
+ * This function fetches current installed version the system and the latest version from npm
+ *
+ * @param {*} installedPlugins
+ * @returns { currentVersion: string, latestVersion: string }
+ */
 async function getPluginVersionDetails(installedPlugins) {
 	try {
 		const meshPlugin = installedPlugins.find(
@@ -915,10 +922,27 @@ async function getPluginVersionDetails(installedPlugins) {
 	}
 }
 
+/**
+ *
+ * This function compares current installed version against the latest version from npm and
+ * returns true if current version is same as latest. Returns false if the current version
+ * is behind the latest version.
+ *
+ * @param {string} currentVersion
+ * @param {string} latestVersion
+ * @returns
+ */
 function isCurrentVersionLatest(currentVersion, latestVersion) {
-	logger.debug(`Comparing versions Current: ${currentVersion} against Latest: ${latestVersion}`);
+	try {
+		logger.debug(`Comparing versions Current: ${currentVersion} against Latest: ${latestVersion}`);
 
-	return compareVersions(currentVersion, latestVersion) >= 0;
+		return compareVersions(currentVersion, latestVersion) >= 0;
+	} catch (err) {
+		logger.error('Unable to compare versions');
+		logger.error(err.message);
+
+		return true;
+	}
 }
 
 module.exports = {
