@@ -43,7 +43,7 @@ const runServer = async portNo => {
 		experimental: { disableExperimentalWarning: true },
 		port: portNo,
 		vars: {
-			secrets: JSON.stringify(secrets),
+			Secret: JSON.stringify(secrets),
 		},
 		logLevel: 'info',
 	});
