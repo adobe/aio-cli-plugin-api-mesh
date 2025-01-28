@@ -51,7 +51,7 @@ async function buildYogaServer(env, tenantMesh, meshId, meshConfig, meshSecrets)
 	const secretsProxy = new Proxy(meshSecrets, getSecretsHandler);
 	return createYoga({
 		plugins: tenantMesh.plugins,
-		graphqlEndpoint: `/api/${meshId}/graphql`,
+		graphqlEndpoint: `/graphql`,
 		cors: getCorsOptions(env, meshConfig),
 		context: initialContext => ({
 			...initialContext,
