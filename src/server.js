@@ -45,6 +45,7 @@ const runServer = async portNo => {
 		vars: {
 			secrets: JSON.stringify(secrets),
 		},
+		logLevel: 'info',
 	});
 };
 //
