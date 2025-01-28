@@ -62,6 +62,8 @@ class StatusCommand extends Command {
 			this.log(''.padEnd(102, '*'));
 			await this.displayMeshStatus(mesh, imsOrgCode, projectId, workspaceId);
 			this.log(''.padEnd(102, '*'));
+
+			return mesh;
 		} catch (err) {
 			// Error occurred while fetching/displaying the mesh status
 			this.error(
