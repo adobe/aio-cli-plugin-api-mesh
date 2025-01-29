@@ -1,8 +1,10 @@
 const { spawn } = require('child_process');
 const { readSecretsFile } = require('./serverUtils');
+const packageData = require('../package.json');
 
 const runServer = portNo => {
-	const wranglerVersion = `wrangler@3.80.4`;
+	const wranglerPackageNumber = packageData.dependencies.wrangler;
+	const wranglerVersion = `wrangler@${wranglerPackageNumber.replace(/^[\^~]/, '')}`;
 	const indexFilePath = `${__dirname}/index.js`;
 	const filePath = '.mesh';
 	const secrets = readSecretsFile(filePath);
