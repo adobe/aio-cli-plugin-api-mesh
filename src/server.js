@@ -1,7 +1,7 @@
 const { spawn } = require('child_process');
 const { readSecretsFile } = require('./serverUtils');
 
-const runServer = (meshId, portNo) => {
+const runServer = portNo => {
 	const wranglerVersion = `wrangler@3.80.4`;
 	const indexFilePath = `${__dirname}/index.js`;
 	const filePath = '.mesh';
@@ -11,7 +11,6 @@ const runServer = (meshId, portNo) => {
 		'dev',
 		indexFilePath,
 		'--var',
-		`MESH_ID:${meshId}`,
 		`Secret:${JSON.stringify(secrets)}`,
 		'--port',
 		portNo,
