@@ -202,8 +202,9 @@ class RunCommand extends Command {
 				if (!portNo) {
 					portNo = 5000;
 				}
-				meshId = '000000000000-0000-0000-0000-000000000000';
-				runServer(meshId, portNo);
+				this.log(`Starting server on port : ${portNo}`);
+				await runServer(portNo);
+				this.log(`Server is running on http://localhost:${portNo}/graphql`);
 			} else {
 				throw new Error(
 					'`aio api-mesh run` cannot be executed because there is no package.json file in the current directory. Use `aio api-mesh init` to set up a package.',
@@ -217,13 +218,13 @@ class RunCommand extends Command {
 	async copyMeshContent(meshId) {
 		// Remove mesh artifact directory if exists
 		if (fs.existsSync('.mesh')) {
-			fs.rmdirSync('.mesh', { recursive: true });
+			fs.rmSync('.mesh', { recursive: true });
 		}
 		// Move built mesh artifact to expect directory
 		fs.renameSync(`mesh-artifact/${meshId}`, '.mesh');
 		// Remove tenant files directory if exists
 		if (fs.existsSync('tenantFiles')) {
-			fs.rmdirSync('tenantFiles', { recursive: true });
+			fs.rmSync('tenantFiles', { recursive: true });
 		}
 		// Move built tenant files if exists
 		if (fs.existsSync('mesh-artifact/tenantFiles')) {
@@ -234,7 +235,7 @@ class RunCommand extends Command {
 		await fixPlugins('.mesh/index.js');
 
 		if (fs.existsSync(`${__dirname}/../../../.mesh`)) {
-			fs.rmdirSync(`${__dirname}/../../../.mesh`, { recursive: true });
+			fs.rmSync(`${__dirname}/../../../.mesh`, { recursive: true });
 		}
 		fs.cpSync('.mesh', `${__dirname}/../../../.mesh`, { recursive: true });
 	}

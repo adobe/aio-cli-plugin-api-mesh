@@ -41,17 +41,17 @@ async function getBuiltMesh(meshArtifacts, meshConfig) {
 }
 
 const buildServer = async (loggerInstance, env, meshArtifacts, meshConfig) => {
-	const { MESH_ID: meshId, Secret: secret } = env;
+	const { Secret: secret } = env;
 	const tenantMesh = await getBuiltMesh(meshArtifacts, meshConfig);
 	const meshSecrets = loadMeshSecrets(loggerInstance, secret);
-	return await buildYogaServer(env, tenantMesh, meshId, meshConfig, meshSecrets);
+	return await buildYogaServer(env, tenantMesh, meshConfig, meshSecrets);
 };
 
-async function buildYogaServer(env, tenantMesh, meshId, meshConfig, meshSecrets) {
+async function buildYogaServer(env, tenantMesh, meshConfig, meshSecrets) {
 	const secretsProxy = new Proxy(meshSecrets, getSecretsHandler);
 	return createYoga({
 		plugins: tenantMesh.plugins,
-		graphqlEndpoint: `/api/${meshId}/graphql`,
+		graphqlEndpoint: `/graphql`,
 		cors: getCorsOptions(env, meshConfig),
 		context: initialContext => ({
 			...initialContext,

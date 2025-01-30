@@ -1,22 +1,24 @@
 const { spawn } = require('child_process');
 const { readSecretsFile } = require('./serverUtils');
+const packageData = require('../package.json');
 
-const runServer = (meshId, portNo) => {
-	const wranglerPath = `${__dirname}/../node_modules/.bin/wrangler`;
+const runServer = portNo => {
+	const wranglerPackageNumber = packageData.dependencies.wrangler;
+	const wranglerVersion = `wrangler@${wranglerPackageNumber.replace(/^[\^~]/, '')}`;
 	const indexFilePath = `${__dirname}/index.js`;
 	const filePath = '.mesh';
 	const secrets = readSecretsFile(filePath);
 	const commandArgs = [
+		wranglerVersion,
 		'dev',
 		indexFilePath,
 		'--var',
-		`MESH_ID:${meshId}`,
 		`Secret:${JSON.stringify(secrets)}`,
 		'--port',
 		portNo,
 	];
 
-	const wrangler = spawn(wranglerPath, commandArgs, {
+	const wrangler = spawn('npx', commandArgs, {
 		stdio: 'inherit',
 	});
 
