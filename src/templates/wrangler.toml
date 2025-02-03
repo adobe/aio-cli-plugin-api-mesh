@@ -1,0 +1,14 @@
+# Tenant worker core definition. For platform workers metadata configs are used to set bindings.
+name = "tenant-worker-core"
+compatibility_date = "2024-06-03"
+node_compat = false
+
+find_additional_modules = true
+base_dir = ".mesh"
+rules = [
+  { type = "CommonJS", globs = ["tenantFiles/**/*.js"] }
+]
+
+
+[[migrations]]
+tag = "v1"

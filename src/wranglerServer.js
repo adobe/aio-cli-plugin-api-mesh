@@ -8,6 +8,7 @@ const { loadMeshSecrets, getSecretsHandler } = require('./secrets');
 const useComplianceHeaders = require('./plugins/complianceHeaders');
 const UseHttpDetailsExtensions = require('./plugins/httpDetailsExtensions');
 const useSourceHeaders = require('@adobe/plugin-source-headers');
+const { useDisableIntrospection } = require('@envelop/disable-introspection');
 
 let meshInstance$;
 
@@ -23,6 +24,10 @@ async function buildMeshInstance(meshArtifacts, meshConfig) {
 		}),
 		useSourceHeaders(meshConfig),
 	);
+
+	if (meshConfig.disableIntrospection) {
+		options.additionalEnvelopPlugins.push(useDisableIntrospection());
+	}
 
 	return getMesh(options).then(mesh => {
 		const id = mesh.pubsub.subscribe('destroy', () => {
