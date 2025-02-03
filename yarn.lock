@@ -1069,6 +1069,13 @@
     "@envelop/types" "5.0.0"
     tslib "^2.5.0"
 
+"@envelop/disable-introspection@^6.0.0":
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/@envelop/disable-introspection/-/disable-introspection-6.0.0.tgz#f611514ba7505f6e38fb171b3c765d837d687d4d"
+  integrity sha512-+DxCvKdzsHat/aWr6dqDsebbGk6ZGiM7VZlnpwKS8g4+PDHg7AfMBnDP8CtUODgifU+kgZME4TFzU288MNpNDg==
+  dependencies:
+    tslib "^2.5.0"
+
 "@envelop/extended-validation@2.0.6":
   version "2.0.6"
   resolved "https://registry.yarnpkg.com/@envelop/extended-validation/-/extended-validation-2.0.6.tgz#0dd156d3cbabb5659af6dcd868cc0d1a090f4935"
