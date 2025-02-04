@@ -102,7 +102,6 @@
 	},
 	"devDependencies": {
 		"@babel/eslint-parser": "^7.15.8",
-		"@graphql-mesh/plugin-http-details-extensions": "0.1.21",
 		"@oclif/dev-cli": "1.26.10",
 		"@oclif/plugin-help": "2.2.3",
 		"@trivago/prettier-plugin-sort-imports": "^3.1.1",
