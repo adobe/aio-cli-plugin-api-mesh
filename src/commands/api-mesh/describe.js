@@ -11,12 +11,7 @@ governing permissions and limitations under the License.
 
 const { Command } = require('@oclif/command');
 const logger = require('../../classes/logger');
-const {
-	initSdk,
-	initRequestId,
-	getPluginVersionDetails,
-	isCurrentVersionLatest,
-} = require('../../helpers');
+const { initSdk, initRequestId } = require('../../helpers');
 const { ignoreCacheFlag } = require('../../utils');
 const { describeMesh } = require('../../lib/devConsole');
 const { buildMeshUrl } = require('../../urlBuilder');
@@ -29,17 +24,6 @@ class DescribeCommand extends Command {
 	};
 
 	async run() {
-		const installedPlugins = this.config.plugins;
-
-		const { currentVersion, latestVersion } = await getPluginVersionDetails(installedPlugins);
-
-		if (!isCurrentVersionLatest(currentVersion, latestVersion)) {
-			this.warn(
-				`@adobe/aio-cli-plugin-api-mesh update available from ${currentVersion} to ${latestVersion}`,
-			);
-			this.warn(`Run aio plugins:install @adobe/aio-cli-plugin-api-mesh to update to the latest`);
-		}
-
 		await initRequestId();
 
 		logger.info(`RequestId: ${global.requestId}`);

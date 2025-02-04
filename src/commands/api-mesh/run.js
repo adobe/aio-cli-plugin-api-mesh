@@ -33,8 +33,6 @@ const {
 	importFiles,
 	setUpTenantFiles,
 	writeSecretsFile,
-	getPluginVersionDetails,
-	isCurrentVersionLatest,
 } = require('../../helpers');
 const logger = require('../../classes/logger');
 const { getMeshId, getMeshArtifact } = require('../../lib/devConsole');
@@ -69,17 +67,6 @@ class RunCommand extends Command {
 	static examples = [];
 
 	async run() {
-		const installedPlugins = this.config.plugins;
-
-		const { currentVersion, latestVersion } = await getPluginVersionDetails(installedPlugins);
-
-		if (!isCurrentVersionLatest(currentVersion, latestVersion)) {
-			this.warn(
-				`@adobe/aio-cli-plugin-api-mesh update available from ${currentVersion} to ${latestVersion}`,
-			);
-			this.warn(`Run aio plugins:install @adobe/aio-cli-plugin-api-mesh to update to the latest`);
-		}
-
 		await initRequestId();
 
 		logger.info(`RequestId: ${global.requestId}`);

@@ -1,13 +1,7 @@
 const { Command } = require('@oclif/core');
 const path = require('path');
 const fs = require('fs');
-const {
-	initRequestId,
-	initSdk,
-	promptConfirm,
-	getPluginVersionDetails,
-	isCurrentVersionLatest,
-} = require('../../helpers');
+const { initRequestId, initSdk, promptConfirm } = require('../../helpers');
 const { getMeshId, getPresignedUrls } = require('../../lib/devConsole');
 const logger = require('../../classes/logger');
 const axios = require('axios');
@@ -30,17 +24,6 @@ class GetBulkLogCommand extends Command {
 	};
 
 	async run() {
-		const installedPlugins = this.config.plugins;
-
-		const { currentVersion, latestVersion } = await getPluginVersionDetails(installedPlugins);
-
-		if (!isCurrentVersionLatest(currentVersion, latestVersion)) {
-			this.warn(
-				`@adobe/aio-cli-plugin-api-mesh update available from ${currentVersion} to ${latestVersion}`,
-			);
-			this.warn(`Run aio plugins:install @adobe/aio-cli-plugin-api-mesh to update to the latest`);
-		}
-
 		// Column headers to be written as the first row in the output file
 		const columnHeaders =
 			'EventTimestampMs,Exceptions,Logs,Outcome,MeshId,RayID,URL,Request Method,Response Status,Level';

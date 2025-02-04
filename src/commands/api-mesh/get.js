@@ -13,12 +13,7 @@ const { Command } = require('@oclif/core');
 const { writeFile } = require('fs/promises');
 
 const logger = require('../../classes/logger');
-const {
-	initSdk,
-	initRequestId,
-	getPluginVersionDetails,
-	isCurrentVersionLatest,
-} = require('../../helpers');
+const { initSdk, initRequestId } = require('../../helpers');
 const { ignoreCacheFlag, jsonFlag } = require('../../utils');
 const { getMeshId, getMesh } = require('../../lib/devConsole');
 const { buildMeshUrl } = require('../../urlBuilder');
@@ -34,17 +29,6 @@ class GetCommand extends Command {
 	static enableJsonFlag = true;
 
 	async run() {
-		const installedPlugins = this.config.plugins;
-
-		const { currentVersion, latestVersion } = await getPluginVersionDetails(installedPlugins);
-
-		if (!isCurrentVersionLatest(currentVersion, latestVersion)) {
-			this.warn(
-				`@adobe/aio-cli-plugin-api-mesh update available from ${currentVersion} to ${latestVersion}`,
-			);
-			this.warn(`Run aio plugins:install @adobe/aio-cli-plugin-api-mesh to update to the latest`);
-		}
-
 		await initRequestId();
 
 		logger.info(`RequestId: ${global.requestId}`);
