@@ -318,13 +318,13 @@ function ccDirectivesToString(directives) {
 
 /**
  * Returns secrets content from artifacts
- * @param meshId
+ * @param meshPath
  * @returns
  */
-function readSecretsFile(meshId) {
+function readSecretsFile(meshPath) {
 	let secrets = {};
 	try {
-		const filePath = path.resolve(process.cwd(), 'mesh-artifact', `${meshId}`, 'secrets.yaml');
+		const filePath = path.resolve(process.cwd(), `${meshPath}`, 'secrets.yaml');
 		if (fs.existsSync(filePath)) {
 			secrets = YAML.parse(fs.readFileSync(filePath, 'utf8'));
 		}

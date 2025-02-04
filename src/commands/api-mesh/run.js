@@ -26,12 +26,10 @@ const {
 } = require('../../utils');
 const meshBuilder = require('@adobe-apimesh/mesh-builder');
 const fs = require('fs');
-const UUID = require('../../uuid');
 const path = require('path');
 const {
 	initSdk,
 	initRequestId,
-	startGraphqlServer,
 	importFiles,
 	setUpTenantFiles,
 	writeSecretsFile,
@@ -39,6 +37,8 @@ const {
 const logger = require('../../classes/logger');
 const { getMeshId, getMeshArtifact } = require('../../lib/devConsole');
 require('dotenv').config();
+const { runServer } = require('../../server');
+const { fixPlugins } = require('../../fixPlugins');
 
 const { validateMesh, buildMesh, compileMesh } = meshBuilder.default;
 
@@ -185,7 +185,6 @@ class RunCommand extends Command {
 						fs.renameSync('mesh-artifact/tenantFiles', 'tenantFiles');
 					}
 				}
-
 				let portNo;
 				//secrets management
 				if (secretsFilePath) {
@@ -198,6 +197,8 @@ class RunCommand extends Command {
 						this.error('Unable to import secrets. Please check the file and try again.');
 					}
 				}
+
+				await this.copyMeshContent(meshId);
 
 				//To set the port number using the environment file
 				if (process.env.PORT !== undefined) {
@@ -217,9 +218,9 @@ class RunCommand extends Command {
 				if (!portNo) {
 					portNo = 5000;
 				}
-
 				this.log(`Starting server on port : ${portNo}`);
-				await startGraphqlServer(meshId, portNo, flags.debug);
+				await runServer(portNo);
+				this.log(`Server is running on http://localhost:${portNo}/graphql`);
 			} else {
 				throw new Error(
 					'`aio api-mesh run` cannot be executed because there is no package.json file in the current directory. Use `aio api-mesh init` to set up a package.',
@@ -228,6 +229,31 @@ class RunCommand extends Command {
 		} catch (error) {
 			this.error(error.message);
 		}
+	}
+
+	async copyMeshContent(meshId) {
+		// Remove mesh artifact directory if exists
+		if (fs.existsSync('.mesh')) {
+			fs.rmSync('.mesh', { recursive: true });
+		}
+		// Move built mesh artifact to expect directory
+		fs.renameSync(`mesh-artifact/${meshId}`, '.mesh');
+		// Remove tenant files directory if exists
+		if (fs.existsSync('tenantFiles')) {
+			fs.rmSync('tenantFiles', { recursive: true });
+		}
+		// Move built tenant files if exists
+		if (fs.existsSync('mesh-artifact/tenantFiles')) {
+			fs.cpSync('mesh-artifact/tenantFiles', '.mesh/tenantFiles', { recursive: true });
+			fs.renameSync('mesh-artifact/tenantFiles', 'tenantFiles');
+		}
+
+		await fixPlugins('.mesh/index.js');
+
+		if (fs.existsSync(`${__dirname}/../../../.mesh`)) {
+			fs.rmSync(`${__dirname}/../../../.mesh`, { recursive: true });
+		}
+		fs.cpSync('.mesh', `${__dirname}/../../../.mesh`, { recursive: true });
 	}
 }
 

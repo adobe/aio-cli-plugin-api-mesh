@@ -108,7 +108,7 @@ class InitCommand extends Command {
 		const readmePath = `${getAppRootDir()}/src/templates/readme.md`;
 		const sampleMeshConfigPath = `${getAppRootDir()}/src/templates/mesh.json`;
 		const newRelicConfigPath = `${getAppRootDir()}/src/templates/newrelic.cjs`;
-		const wranglerConfigPath = `${getAppRootDir()}/src/templates/wrangler.toml`;
+		const wranglerTomlTemplate = `${getAppRootDir()}/src/templates/wrangler.toml`;
 		const shouldCreateWorkspace = await promptConfirm(
 			`Do you want to create the workspace in ${absolutePath}`,
 		);
@@ -181,7 +181,7 @@ class InitCommand extends Command {
 			await this.cloneFile(readmePath, `${absolutePath}/README.md`);
 			await this.cloneFile(sampleMeshConfigPath, `${absolutePath}/mesh.json`);
 			await this.cloneFile(newRelicConfigPath, `${absolutePath}/newrelic.cjs`);
-			await this.cloneFile(wranglerConfigPath, `${absolutePath}/wrangler.toml`);
+			await this.cloneFile(wranglerTomlTemplate, `${absolutePath}/wrangler.toml`);
 
 			this.log(`Installing dependencies`);
 

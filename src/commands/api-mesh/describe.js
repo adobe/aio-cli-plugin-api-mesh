@@ -10,13 +10,11 @@ governing permissions and limitations under the License.
 */
 
 const { Command } = require('@oclif/command');
-const chalk = require('chalk');
-
 const logger = require('../../classes/logger');
 const { initSdk, initRequestId } = require('../../helpers');
 const { ignoreCacheFlag } = require('../../utils');
 const { describeMesh } = require('../../lib/devConsole');
-const { buildMeshUrl, buildEdgeMeshUrl } = require('../../urlBuilder');
+const { buildMeshUrl } = require('../../urlBuilder');
 
 require('dotenv').config();
 
@@ -40,43 +38,18 @@ class DescribeCommand extends Command {
 			const meshDetails = await describeMesh(imsOrgId, projectId, workspaceId, workspaceName);
 
 			if (meshDetails) {
-				const { meshId, apiKey } = meshDetails;
+				const { meshId } = meshDetails;
 
 				if (meshId) {
-					const meshUrl = await buildMeshUrl(
-						imsOrgId,
-						projectId,
-						workspaceId,
-						workspaceName,
-						meshId,
-						apiKey,
-					);
-
+					const meshUrl = buildMeshUrl(meshId, workspaceName);
 					this.log('Successfully retrieved mesh details \n');
 					this.log('Org ID: %s', imsOrgId);
 					this.log('Project ID: %s', projectId);
 					this.log('Workspace ID: %s', workspaceId);
 					this.log('Mesh ID: %s', meshId);
+					this.log('Mesh Endpoint: %s', meshUrl);
 
-					const edgeMeshUrl = buildEdgeMeshUrl(meshId, workspaceName);
-					this.log(
-						chalk.bgYellow(
-							`\nAPI Mesh now runs at the edge and legacy mesh URLs will be deprecated.\nUse the following link to find more information on how to migrate your mesh:`,
-						),
-					);
-					this.log(
-						chalk.underline.blue(
-							'https://developer.adobe.com/graphql-mesh-gateway/mesh/release/migration\n',
-						),
-					);
-					this.log('Legacy Mesh Endpoint: %s', meshUrl);
-					this.log(chalk.bold('Edge Mesh Endpoint: %s\n'), edgeMeshUrl);
-					this.log(
-						chalk.bgYellow(
-							'Update your mesh before using the edge mesh endpoint.\nYou can validate your edge mesh status using the aio api-mesh status command.',
-						),
-					);
-					return meshDetails;
+					return { ...meshDetails, meshUrl, imsOrgId, projectId, workspaceId, workspaceName };
 				} else {
 					logger.error(
 						`Unable to get mesh details. Please check the details and try again. RequestId: ${global.requestId}`,

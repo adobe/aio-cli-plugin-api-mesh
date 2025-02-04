@@ -1,6 +1,6 @@
 {
 	"name": "@adobe/aio-cli-plugin-api-mesh",
-	"version": "3.9.4",
+	"version": "4.1.0-beta.5",
 	"description": "Adobe I/O CLI plugin to develop and manage API mesh sources",
 	"keywords": [
 		"oclif-plugin"
@@ -37,7 +37,7 @@
 		"version": "oclif-dev readme && git add README.md"
 	},
 	"dependencies": {
-		"@adobe-apimesh/mesh-builder": "1.7.1",
+		"@adobe-apimesh/mesh-builder": "2.0.0",
 		"@adobe/aio-cli-lib-console": "^5.0.0",
 		"@adobe/aio-lib-core-config": "^5.0.0",
 		"@adobe/aio-lib-core-logging": "^3.0.0",
@@ -45,11 +45,14 @@
 		"@adobe/aio-lib-ims": "^7.0.1",
 		"@adobe/plugin-hooks": "0.3.2",
 		"@adobe/plugin-on-fetch": "0.1.1",
+		"@adobe/plugin-source-headers": "^0.0.1",
+		"@envelop/disable-introspection": "^6.0.0",
 		"@graphql-mesh/cli": "0.82.30",
 		"@graphql-mesh/graphql": "0.34.13",
+		"@graphql-mesh/http": "^0.96.9",
 		"@graphql-mesh/json-schema": "0.35.38",
 		"@graphql-mesh/openapi": "0.33.39",
-		"@graphql-mesh/plugin-http-details-extensions": "0.1.21",
+		"@graphql-mesh/plugin-http-details-extensions": "^0.103.4",
 		"@graphql-mesh/runtime": "0.46.21",
 		"@graphql-mesh/soap": "0.14.25",
 		"@graphql-mesh/store": "0.9.20",
@@ -88,16 +91,18 @@
 		"lru-cache": "^7.14.1",
 		"node-clipboardy": "^1.0.3",
 		"node-fetch": "2.6.1",
-		"pino": "^7.9.2",
+		"pino": "^9.5.0",
 		"pino-pretty": "^7.6.0",
 		"pupa": "^3.1.0",
 		"source-registry-storage-adapter": "github:devx-services/source-registry-storage-adapter#main",
 		"util": "^0.12.5",
 		"uuid": "^8.3.2",
+		"wrangler": "3.80.4",
 		"yaml": "^2.4.2"
 	},
 	"devDependencies": {
 		"@babel/eslint-parser": "^7.15.8",
+		"@graphql-mesh/plugin-http-details-extensions": "0.1.21",
 		"@oclif/dev-cli": "1.26.10",
 		"@oclif/plugin-help": "2.2.3",
 		"@trivago/prettier-plugin-sort-imports": "^3.1.1",
