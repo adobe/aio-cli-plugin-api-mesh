@@ -12,10 +12,14 @@ const runServer = portNo => {
 		wranglerVersion,
 		'dev',
 		indexFilePath,
+		'--show-interactive-dev-session',
+		'false',
 		'--var',
 		`Secret:${JSON.stringify(secrets)}`,
 		'--port',
 		portNo,
+		'--inspector-port',
+		'9229',
 	];
 
 	const wrangler = spawn('npx', commandArgs, {
