@@ -8,6 +8,7 @@ const { loadMeshSecrets, getSecretsHandler } = require('./secrets');
 const useComplianceHeaders = require('./plugins/complianceHeaders');
 const UseHttpDetailsExtensions = require('./plugins/httpDetailsExtensions');
 const useSourceHeaders = require('@adobe/plugin-source-headers');
+const { useDisableIntrospection } = require('@envelop/disable-introspection');
 
 let meshInstance$;
 
@@ -23,6 +24,10 @@ async function buildMeshInstance(meshArtifacts, meshConfig) {
 		}),
 		useSourceHeaders(meshConfig),
 	);
+
+	if (meshConfig.disableIntrospection) {
+		options.additionalEnvelopPlugins.push(useDisableIntrospection());
+	}
 
 	return getMesh(options).then(mesh => {
 		const id = mesh.pubsub.subscribe('destroy', () => {
@@ -41,17 +46,17 @@ async function getBuiltMesh(meshArtifacts, meshConfig) {
 }
 
 const buildServer = async (loggerInstance, env, meshArtifacts, meshConfig) => {
-	const { MESH_ID: meshId, Secret: secret } = env;
+	const { Secret: secret } = env;
 	const tenantMesh = await getBuiltMesh(meshArtifacts, meshConfig);
 	const meshSecrets = loadMeshSecrets(loggerInstance, secret);
-	return await buildYogaServer(env, tenantMesh, meshId, meshConfig, meshSecrets);
+	return await buildYogaServer(env, tenantMesh, meshConfig, meshSecrets);
 };
 
-async function buildYogaServer(env, tenantMesh, meshId, meshConfig, meshSecrets) {
+async function buildYogaServer(env, tenantMesh, meshConfig, meshSecrets) {
 	const secretsProxy = new Proxy(meshSecrets, getSecretsHandler);
 	return createYoga({
 		plugins: tenantMesh.plugins,
-		graphqlEndpoint: `/api/${meshId}/graphql`,
+		graphqlEndpoint: `/graphql`,
 		cors: getCorsOptions(env, meshConfig),
 		context: initialContext => ({
 			...initialContext,

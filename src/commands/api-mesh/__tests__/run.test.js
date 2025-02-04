@@ -196,7 +196,7 @@ describe('run command tests', () => {
 		parseSpy.mockResolvedValue(parseOutput);
 
 		await RunCommand.run();
-		expect(runServer).toHaveBeenCalledWith(expect.anything(), parseOutput.flags.port);
+		expect(runServer).toHaveBeenCalledWith(parseOutput.flags.port);
 	});
 
 	test('should use the port number provided in the .env file if there is no port', async () => {
@@ -213,7 +213,7 @@ describe('run command tests', () => {
 		parseSpy.mockResolvedValue(parseOutput);
 
 		await RunCommand.run();
-		expect(runServer).toHaveBeenCalledWith(expect.anything(), process.env.PORT);
+		expect(runServer).toHaveBeenCalledWith(process.env.PORT);
 	});
 
 	test('should use the default port if port number is not provided explicitly', async () => {
@@ -229,7 +229,7 @@ describe('run command tests', () => {
 		parseSpy.mockResolvedValue(parseOutput);
 
 		await RunCommand.run();
-		expect(runServer).toHaveBeenCalledWith(expect.anything(), defaultPort);
+		expect(runServer).toHaveBeenCalledWith(defaultPort);
 	});
 
 	test('should return error for run command if the mesh has placeholders and env file provided using --env flag is not found', async () => {
@@ -396,7 +396,7 @@ describe('run command tests', () => {
 		});
 
 		await RunCommand.run();
-		expect(runServer).toHaveBeenCalledWith(expect.anything(), defaultPort);
+		expect(runServer).toHaveBeenCalledWith(defaultPort);
 	});
 
 	// file import tests
@@ -442,7 +442,7 @@ describe('run command tests', () => {
 		});
 
 		await RunCommand.run();
-		expect(runServer).toHaveBeenCalledWith(expect.anything(), defaultPort);
+		expect(runServer).toHaveBeenCalledWith(defaultPort);
 	});
 
 	test('should fail if the file name is more than 25 characters', async () => {
@@ -618,7 +618,7 @@ describe('run command tests', () => {
 		});
 
 		await RunCommand.run();
-		expect(runServer).toHaveBeenCalledWith(expect.anything(), defaultPort);
+		expect(runServer).toHaveBeenCalledWith(defaultPort);
 	});
 
 	test('should override if prompt returns Yes, if there is files array', async () => {
@@ -665,7 +665,7 @@ describe('run command tests', () => {
 
 		await RunCommand.run();
 
-		expect(runServer).toHaveBeenCalledWith(expect.anything(), defaultPort);
+		expect(runServer).toHaveBeenCalledWith(defaultPort);
 	});
 
 	test('should pass for a fully-qualified meshConfig even if the file does not exist in fileSystem', async () => {
@@ -712,7 +712,7 @@ describe('run command tests', () => {
 		});
 
 		await RunCommand.run();
-		expect(runServer).toHaveBeenCalledWith(expect.anything(), defaultPort);
+		expect(runServer).toHaveBeenCalledWith(defaultPort);
 	});
 
 	test('should pass if the file is located in subdirectory of mesh directory', async () => {
@@ -758,7 +758,7 @@ describe('run command tests', () => {
 
 		await RunCommand.run();
 
-		expect(runServer).toHaveBeenCalledWith(expect.anything(), defaultPort);
+		expect(runServer).toHaveBeenCalledWith(defaultPort);
 	});
 
 	test('should fail if the file is outside the workspace directory', async () => {
@@ -929,7 +929,7 @@ describe('run command tests', () => {
 
 		await RunCommand.run();
 		expect(writeSecretsFile).toHaveBeenCalled();
-		expect(runServer).toHaveBeenCalledWith(expect.anything(), defaultPort);
+		expect(runServer).toHaveBeenCalledWith(defaultPort);
 	});
 
 	test('should return error if ran with secrets against windows platform with batch variables', async () => {
@@ -967,7 +967,7 @@ describe('run command tests', () => {
 
 		await RunCommand.run();
 		expect(writeSecretsFile).toHaveBeenCalled();
-		expect(runServer).toHaveBeenCalledWith(expect.anything(), defaultPort);
+		expect(runServer).toHaveBeenCalledWith(defaultPort);
 	});
 
 	test('should pass if ran with secrets against darwin(macOS) platform with batch variables', async () => {
@@ -982,7 +982,7 @@ describe('run command tests', () => {
 
 		await RunCommand.run();
 		expect(writeSecretsFile).toHaveBeenCalled();
-		expect(runServer).toHaveBeenCalledWith(expect.anything(), defaultPort);
+		expect(runServer).toHaveBeenCalledWith(defaultPort);
 	});
 
 	test('should escape variables that are preceded by backslash symbol', async () => {
@@ -999,6 +999,6 @@ describe('run command tests', () => {
 			'Home: rootPath\nHomeString: $HOME\nHomeWithSlash: \\rootPath\nHomeStringWithSlash: \\$HOME\n',
 			expect.anything(),
 		);
-		expect(runServer).toHaveBeenCalledWith(expect.anything(), defaultPort);
+		expect(runServer).toHaveBeenCalledWith(defaultPort);
 	});
 });
