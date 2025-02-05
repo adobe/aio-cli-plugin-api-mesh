@@ -1,6 +1,6 @@
 {
 	"name": "@adobe/aio-cli-plugin-api-mesh",
-	"version": "4.1.0-beta.5",
+	"version": "4.1.0-beta.6",
 	"description": "Adobe I/O CLI plugin to develop and manage API mesh sources",
 	"keywords": [
 		"oclif-plugin"
@@ -102,7 +102,6 @@
 	},
 	"devDependencies": {
 		"@babel/eslint-parser": "^7.15.8",
-		"@graphql-mesh/plugin-http-details-extensions": "0.1.21",
 		"@oclif/dev-cli": "1.26.10",
 		"@oclif/plugin-help": "2.2.3",
 		"@trivago/prettier-plugin-sort-imports": "^3.1.1",
