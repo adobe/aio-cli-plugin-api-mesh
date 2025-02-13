@@ -16,6 +16,7 @@ const logger = require('../../classes/logger');
 const { initSdk, initRequestId } = require('../../helpers');
 const { ignoreCacheFlag, jsonFlag } = require('../../utils');
 const { getMeshId, getMesh } = require('../../lib/devConsole');
+const { buildMeshUrl } = require('../../urlBuilder');
 
 require('dotenv').config();
 class GetCommand extends Command {
@@ -59,6 +60,8 @@ class GetCommand extends Command {
 				if (mesh) {
 					this.log('Successfully retrieved mesh %s', JSON.stringify(mesh, null, 2));
 
+					const meshUrl = buildMeshUrl(meshId, workspaceName);
+
 					if (args.file) {
 						try {
 							const { meshConfig } = mesh;
@@ -72,7 +75,7 @@ class GetCommand extends Command {
 						}
 					}
 
-					return mesh;
+					return { ...mesh, meshUrl, imsOrgId, projectId, workspaceId, workspaceName };
 				} else {
 					logger.error(
 						`Unable to get mesh with the ID ${meshId}. Check the mesh ID and try again. RequestId: ${global.requestId}`,

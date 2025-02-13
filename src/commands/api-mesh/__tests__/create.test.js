@@ -159,8 +159,28 @@ describe('create command tests', () => {
 			},
 		});
 		const output = await CreateCommand.run();
-		expect(output).toHaveProperty('mesh');
-		expect(output.mesh).toEqual(expect.objectContaining({ meshId: 'dummy_mesh_id' }));
+		expect(output).toMatchInlineSnapshot(`
+		{
+		  "imsOrgId": "1234",
+		  "meshConfig": {
+		    "sources": [
+		      {
+		        "handler": {
+		          "graphql": {
+		            "endpoint": "<gql_endpoint>",
+		          },
+		        },
+		        "name": "<api_name>",
+		      },
+		    ],
+		  },
+		  "meshId": "dummy_mesh_id",
+		  "meshUrl": "https://edge-sandbox-graph.adobe.io/api/dummy_mesh_id/graphql",
+		  "projectId": "5678",
+		  "workspaceId": "123456789",
+		  "workspaceName": "Workspace01",
+		}
+	`);
 	});
 
 	test('snapshot create command description', () => {
@@ -242,49 +262,52 @@ describe('create command tests', () => {
 
 		expect(output).toMatchInlineSnapshot(`
 		{
-		  "mesh": {
-		    "meshConfig": {
-		      "files": [
-		        {
-		          "content": "{"type":"dummyContent"}",
-		          "path": "./requestParams.json",
-		        },
-		        {
-		          "content": "module.exports.functionName = () => { console.log('beforeAll hook'); }",
-		          "path": "./hooks.js",
-		        },
-		      ],
-		      "plugins": [
-		        {
-		          "hooks": {
-		            "beforeAll": {
-		              "composer": "./hooks.js#functionName",
-		            },
+		  "imsOrgId": "1234",
+		  "meshConfig": {
+		    "files": [
+		      {
+		        "content": "{"type":"dummyContent"}",
+		        "path": "./requestParams.json",
+		      },
+		      {
+		        "content": "module.exports.functionName = () => { console.log('beforeAll hook'); }",
+		        "path": "./hooks.js",
+		      },
+		    ],
+		    "plugins": [
+		      {
+		        "hooks": {
+		          "beforeAll": {
+		            "composer": "./hooks.js#functionName",
 		          },
 		        },
-		      ],
-		      "sources": [
-		        {
-		          "handler": {
-		            "JsonSchema": {
-		              "baseUrl": "<json_source__baseurl>",
-		              "operations": [
-		                {
-		                  "field": "<query>",
-		                  "method": "POST",
-		                  "path": "<query_path>",
-		                  "requestSchema": "./requestParams.json",
-		                  "type": "Query",
-		                },
-		              ],
-		            },
+		      },
+		    ],
+		    "sources": [
+		      {
+		        "handler": {
+		          "JsonSchema": {
+		            "baseUrl": "<json_source__baseurl>",
+		            "operations": [
+		              {
+		                "field": "<query>",
+		                "method": "POST",
+		                "path": "<query_path>",
+		                "requestSchema": "./requestParams.json",
+		                "type": "Query",
+		              },
+		            ],
 		          },
-		          "name": "<json_source_name>",
 		        },
-		      ],
-		    },
-		    "meshId": "dummy_mesh_id",
+		        "name": "<json_source_name>",
+		      },
+		    ],
 		  },
+		  "meshId": "dummy_mesh_id",
+		  "meshUrl": "https://edge-sandbox-graph.adobe.io/api/dummy_mesh_id/graphql",
+		  "projectId": "5678",
+		  "workspaceId": "123456789",
+		  "workspaceName": "Workspace01",
 		}
 	`);
 	});
@@ -344,21 +367,24 @@ describe('create command tests', () => {
 	`);
 		expect(runResult).toMatchInlineSnapshot(`
 		{
-		  "mesh": {
-		    "meshConfig": {
-		      "sources": [
-		        {
-		          "handler": {
-		            "graphql": {
-		              "endpoint": "<gql_endpoint>",
-		            },
+		  "imsOrgId": "1234",
+		  "meshConfig": {
+		    "sources": [
+		      {
+		        "handler": {
+		          "graphql": {
+		            "endpoint": "<gql_endpoint>",
 		          },
-		          "name": "<api_name>",
 		        },
-		      ],
-		    },
-		    "meshId": "dummy_mesh_id",
+		        "name": "<api_name>",
+		      },
+		    ],
 		  },
+		  "meshId": "dummy_mesh_id",
+		  "meshUrl": "https://edge-sandbox-graph.adobe.io/api/dummy_mesh_id/graphql",
+		  "projectId": "5678",
+		  "workspaceId": "123456789",
+		  "workspaceName": "Workspace01",
 		}
 	`);
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
@@ -424,21 +450,24 @@ describe('create command tests', () => {
 
 		expect(runResult).toMatchInlineSnapshot(`
 		{
-		  "mesh": {
-		    "meshConfig": {
-		      "sources": [
-		        {
-		          "handler": {
-		            "graphql": {
-		              "endpoint": "<gql_endpoint>",
-		            },
+		  "imsOrgId": "1234",
+		  "meshConfig": {
+		    "sources": [
+		      {
+		        "handler": {
+		          "graphql": {
+		            "endpoint": "<gql_endpoint>",
 		          },
-		          "name": "<api_name>",
 		        },
-		      ],
-		    },
-		    "meshId": "dummy_mesh_id",
+		        "name": "<api_name>",
+		      },
+		    ],
 		  },
+		  "meshId": "dummy_mesh_id",
+		  "meshUrl": "https://edge-sandbox-graph.adobe.io/api/dummy_mesh_id/graphql",
+		  "projectId": "5678",
+		  "workspaceId": "123456789",
+		  "workspaceName": "Workspace01",
 		}
 	`);
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
@@ -588,8 +617,28 @@ describe('create command tests', () => {
 			},
 		});
 		const output = await CreateCommand.run();
-		expect(output).toHaveProperty('mesh');
-		expect(output.mesh).toEqual(expect.objectContaining({ meshId: 'dummy_mesh_id' }));
+		expect(output).toMatchInlineSnapshot(`
+		{
+		  "imsOrgId": "1234",
+		  "meshConfig": {
+		    "sources": [
+		      {
+		        "handler": {
+		          "graphql": {
+		            "endpoint": "<gql_endpoint>",
+		          },
+		        },
+		        "name": "<api_name>",
+		      },
+		    ],
+		  },
+		  "meshId": "dummy_mesh_id",
+		  "meshUrl": "https://edge-sandbox-graph.adobe.io/api/dummy_mesh_id/graphql",
+		  "projectId": "5678",
+		  "workspaceId": "123456789",
+		  "workspaceName": "Workspace01",
+		}
+	`);
 	});
 
 	test('should return error if the mesh has placeholders and env file provided using --env flag is not found', async () => {
@@ -757,21 +806,24 @@ describe('create command tests', () => {
 		expect(promptConfirm).toHaveBeenCalledWith('Are you sure you want to create a mesh?');
 		expect(runResult).toMatchInlineSnapshot(`
 		{
-		  "mesh": {
-		    "meshConfig": {
-		      "sources": [
-		        {
-		          "handler": {
-		            "graphql": {
-		              "endpoint": "<gql_endpoint>",
-		            },
+		  "imsOrgId": "1234",
+		  "meshConfig": {
+		    "sources": [
+		      {
+		        "handler": {
+		          "graphql": {
+		            "endpoint": "<gql_endpoint>",
 		          },
-		          "name": "<api_name>",
 		        },
-		      ],
-		    },
-		    "meshId": "dummy_mesh_id",
+		        "name": "<api_name>",
+		      },
+		    ],
 		  },
+		  "meshId": "dummy_mesh_id",
+		  "meshUrl": "https://edge-sandbox-graph.adobe.io/api/dummy_mesh_id/graphql",
+		  "projectId": "5678",
+		  "workspaceId": "123456789",
+		  "workspaceName": "Workspace01",
 		}
 	`);
 	});
@@ -891,36 +943,39 @@ describe('create command tests', () => {
 
 		expect(output).toMatchInlineSnapshot(`
 		{
-		  "mesh": {
-		    "meshConfig": {
-		      "files": [
-		        {
-		          "content": "{"type":"updatedContent"}",
-		          "path": "./requestParams.json",
-		        },
-		      ],
-		      "sources": [
-		        {
-		          "handler": {
-		            "JsonSchema": {
-		              "baseUrl": "<json_source__baseurl>",
-		              "operations": [
-		                {
-		                  "field": "<query>",
-		                  "method": "POST",
-		                  "path": "<query_path>",
-		                  "requestSchema": "./requestParams.json",
-		                  "type": "Query",
-		                },
-		              ],
-		            },
+		  "imsOrgId": "1234",
+		  "meshConfig": {
+		    "files": [
+		      {
+		        "content": "{"type":"updatedContent"}",
+		        "path": "./requestParams.json",
+		      },
+		    ],
+		    "sources": [
+		      {
+		        "handler": {
+		          "JsonSchema": {
+		            "baseUrl": "<json_source__baseurl>",
+		            "operations": [
+		              {
+		                "field": "<query>",
+		                "method": "POST",
+		                "path": "<query_path>",
+		                "requestSchema": "./requestParams.json",
+		                "type": "Query",
+		              },
+		            ],
 		          },
-		          "name": "<json_source_name>",
 		        },
-		      ],
-		    },
-		    "meshId": "dummy_mesh_id",
+		        "name": "<json_source_name>",
+		      },
+		    ],
 		  },
+		  "meshId": "dummy_mesh_id",
+		  "meshUrl": "https://edge-sandbox-graph.adobe.io/api/dummy_mesh_id/graphql",
+		  "projectId": "5678",
+		  "workspaceId": "123456789",
+		  "workspaceName": "Workspace01",
 		}
 	`);
 	});
@@ -1399,36 +1454,39 @@ describe('create command tests', () => {
 	`);
 		expect(output).toMatchInlineSnapshot(`
 		{
-		  "mesh": {
-		    "meshConfig": {
-		      "files": [
-		        {
-		          "content": "{"type":"dummyContent"}",
-		          "path": "./schemaBody.json",
-		        },
-		      ],
-		      "sources": [
-		        {
-		          "handler": {
-		            "JsonSchema": {
-		              "baseUrl": "<json_source__baseurl>",
-		              "operations": [
-		                {
-		                  "field": "<query>",
-		                  "method": "POST",
-		                  "path": "<query_path>",
-		                  "requestSchema": "./schemaBody.json",
-		                  "type": "Query",
-		                },
-		              ],
-		            },
+		  "imsOrgId": "1234",
+		  "meshConfig": {
+		    "files": [
+		      {
+		        "content": "{"type":"dummyContent"}",
+		        "path": "./schemaBody.json",
+		      },
+		    ],
+		    "sources": [
+		      {
+		        "handler": {
+		          "JsonSchema": {
+		            "baseUrl": "<json_source__baseurl>",
+		            "operations": [
+		              {
+		                "field": "<query>",
+		                "method": "POST",
+		                "path": "<query_path>",
+		                "requestSchema": "./schemaBody.json",
+		                "type": "Query",
+		              },
+		            ],
 		          },
-		          "name": "<json_source_name>",
 		        },
-		      ],
-		    },
-		    "meshId": "dummy_mesh_id",
+		        "name": "<json_source_name>",
+		      },
+		    ],
 		  },
+		  "meshId": "dummy_mesh_id",
+		  "meshUrl": "https://edge-sandbox-graph.adobe.io/api/dummy_mesh_id/graphql",
+		  "projectId": "5678",
+		  "workspaceId": "123456789",
+		  "workspaceName": "Workspace01",
 		}
 	`);
 	});
@@ -1524,36 +1582,39 @@ describe('create command tests', () => {
 	`);
 		expect(output).toMatchInlineSnapshot(`
 		{
-		  "mesh": {
-		    "meshConfig": {
-		      "files": [
-		        {
-		          "content": "{"type":"updatedContent"}",
-		          "path": "./files/requestParams.json",
-		        },
-		      ],
-		      "sources": [
-		        {
-		          "handler": {
-		            "JsonSchema": {
-		              "baseUrl": "<json_source__baseurl>",
-		              "operations": [
-		                {
-		                  "field": "<query>",
-		                  "method": "POST",
-		                  "path": "<query_path>",
-		                  "requestSchema": "./files/requestParams.json",
-		                  "type": "Query",
-		                },
-		              ],
-		            },
+		  "imsOrgId": "1234",
+		  "meshConfig": {
+		    "files": [
+		      {
+		        "content": "{"type":"updatedContent"}",
+		        "path": "./files/requestParams.json",
+		      },
+		    ],
+		    "sources": [
+		      {
+		        "handler": {
+		          "JsonSchema": {
+		            "baseUrl": "<json_source__baseurl>",
+		            "operations": [
+		              {
+		                "field": "<query>",
+		                "method": "POST",
+		                "path": "<query_path>",
+		                "requestSchema": "./files/requestParams.json",
+		                "type": "Query",
+		              },
+		            ],
 		          },
-		          "name": "<json_source_name>",
 		        },
-		      ],
-		    },
-		    "meshId": "dummy_mesh_id",
+		        "name": "<json_source_name>",
+		      },
+		    ],
 		  },
+		  "meshId": "dummy_mesh_id",
+		  "meshUrl": "https://edge-sandbox-graph.adobe.io/api/dummy_mesh_id/graphql",
+		  "projectId": "5678",
+		  "workspaceId": "123456789",
+		  "workspaceName": "Workspace01",
 		}
 	`);
 	});
@@ -1762,21 +1823,24 @@ describe('create command tests', () => {
 		const runResult = await CreateCommand.run();
 		expect(runResult).toMatchInlineSnapshot(`
 		{
-		  "mesh": {
-		    "meshConfig": {
-		      "sources": [
-		        {
-		          "handler": {
-		            "graphql": {
-		              "endpoint": "<gql_endpoint>",
-		            },
+		  "imsOrgId": "1234",
+		  "meshConfig": {
+		    "sources": [
+		      {
+		        "handler": {
+		          "graphql": {
+		            "endpoint": "<gql_endpoint>",
 		          },
-		          "name": "<api_name>",
 		        },
-		      ],
-		    },
-		    "meshId": "dummy_mesh_id",
+		        "name": "<api_name>",
+		      },
+		    ],
 		  },
+		  "meshId": "dummy_mesh_id",
+		  "meshUrl": "https://edge-sandbox-graph.adobe.io/api/dummy_mesh_id/graphql",
+		  "projectId": "5678",
+		  "workspaceId": "123456789",
+		  "workspaceName": "Workspace01",
 		}
 	`);
 	});
@@ -1832,21 +1896,24 @@ describe('create command tests', () => {
 		const runResult = await CreateCommand.run();
 		expect(runResult).toMatchInlineSnapshot(`
 		{
-		  "mesh": {
-		    "meshConfig": {
-		      "sources": [
-		        {
-		          "handler": {
-		            "graphql": {
-		              "endpoint": "<gql_endpoint>",
-		            },
+		  "imsOrgId": "1234",
+		  "meshConfig": {
+		    "sources": [
+		      {
+		        "handler": {
+		          "graphql": {
+		            "endpoint": "<gql_endpoint>",
 		          },
-		          "name": "<api_name>",
 		        },
-		      ],
-		    },
-		    "meshId": "dummy_mesh_id",
+		        "name": "<api_name>",
+		      },
+		    ],
 		  },
+		  "meshId": "dummy_mesh_id",
+		  "meshUrl": "https://edge-sandbox-graph.adobe.io/api/dummy_mesh_id/graphql",
+		  "projectId": "5678",
+		  "workspaceId": "123456789",
+		  "workspaceName": "Workspace01",
 		}
 	`);
 	});
@@ -1869,21 +1936,24 @@ describe('create command tests', () => {
 		const runResult = await CreateCommand.run();
 		expect(runResult).toMatchInlineSnapshot(`
 		{
-		  "mesh": {
-		    "meshConfig": {
-		      "sources": [
-		        {
-		          "handler": {
-		            "graphql": {
-		              "endpoint": "<gql_endpoint>",
-		            },
+		  "imsOrgId": "1234",
+		  "meshConfig": {
+		    "sources": [
+		      {
+		        "handler": {
+		          "graphql": {
+		            "endpoint": "<gql_endpoint>",
 		          },
-		          "name": "<api_name>",
 		        },
-		      ],
-		    },
-		    "meshId": "dummy_mesh_id",
+		        "name": "<api_name>",
+		      },
+		    ],
 		  },
+		  "meshId": "dummy_mesh_id",
+		  "meshUrl": "https://edge-sandbox-graph.adobe.io/api/dummy_mesh_id/graphql",
+		  "projectId": "5678",
+		  "workspaceId": "123456789",
+		  "workspaceName": "Workspace01",
 		}
 	`);
 	});

@@ -160,7 +160,12 @@ describe('describe command tests', () => {
 
 		expect(runResult).toMatchInlineSnapshot(`
 		{
+		  "imsOrgId": "1234",
 		  "meshId": "dummy_meshId",
+		  "meshUrl": "https://edge-sandbox-graph.adobe.io/api/dummy_meshId/graphql",
+		  "projectId": "5678",
+		  "workspaceId": "123456789",
+		  "workspaceName": "Workspace01",
 		}
 	`);
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
@@ -207,7 +212,12 @@ describe('describe command tests', () => {
 		expect(runResult).toMatchInlineSnapshot(`
 		{
 		  "apiKey": "dummy_apiKey",
+		  "imsOrgId": "1234",
 		  "meshId": "dummy_meshId",
+		  "meshUrl": "https://edge-sandbox-graph.adobe.io/api/dummy_meshId/graphql",
+		  "projectId": "5678",
+		  "workspaceId": "123456789",
+		  "workspaceName": "Workspace01",
 		}
 	`);
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
@@ -258,7 +268,12 @@ describe('describe command tests', () => {
 		expect(runResult).toMatchInlineSnapshot(`
 		{
 		  "apiKey": "dummy_apiKey",
+		  "imsOrgId": "1234",
 		  "meshId": "dummy_meshId",
+		  "meshUrl": "https://edge-sandbox-graph.adobe.io/api/dummy_meshId/graphql",
+		  "projectId": "5678",
+		  "workspaceId": "123456789",
+		  "workspaceName": "Workspace01",
 		}
 	`);
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
