@@ -38,7 +38,7 @@ class GetCommand extends Command {
 		const ignoreCache = await flags.ignoreCache;
 		const json = await flags.json;
 
-		const { imsOrgCode, projectId, workspaceId, workspaceName } = await initSdk({
+		const { imsOrgId, imsOrgCode, projectId, workspaceId, workspaceName } = await initSdk({
 			ignoreCache,
 			verbose: !json,
 		});

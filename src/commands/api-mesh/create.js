@@ -59,6 +59,7 @@ class CreateCommand extends Command {
 		const envFilePath = await flags.env;
 		const secretsFilePath = await flags.secrets;
 		const {
+			imsOrgId,
 			imsOrgCode,
 			projectId,
 			workspaceId,
