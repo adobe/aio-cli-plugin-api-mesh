@@ -17,15 +17,17 @@ const { getToken, context } = require('@adobe/aio-lib-ims');
 const { CLI } = require('@adobe/aio-lib-ims/src/context');
 const libConsoleCLI = require('@adobe/aio-cli-lib-console');
 const { getCliEnv } = require('@adobe/aio-lib-env');
-
-const logger = require('../src/classes/logger');
-const { UUID } = require('./classes/UUID');
-const CONSTANTS = require('./constants');
+const axios = require('axios');
 const path = require('path');
 const { exec } = require('child_process');
 const { stdout, stderr } = require('process');
 const jsmin = require('jsmin').jsmin;
 const { resolve: resolveAbsolutePath } = require('path');
+const { compareVersions } = require('compare-versions');
+
+const logger = require('../src/classes/logger');
+const { UUID } = require('./classes/UUID');
+const CONSTANTS = require('./constants');
 
 const { DEV_CONSOLE_BASE_URL, DEV_CONSOLE_API_KEY, AIO_CLI_API_KEY } = CONSTANTS;
 
@@ -880,6 +882,69 @@ async function writeSecretsFile(secretsData, meshId) {
 	}
 }
 
+/**
+ *
+ * This function fetches current installed version the system and the latest version from npm
+ *
+ * @param {*} installedPlugins
+ * @returns { currentVersion: string, latestVersion: string }
+ */
+async function getPluginVersionDetails(installedPlugins) {
+	try {
+		const meshPlugin = installedPlugins.find(
+			({ name }) => name === '@adobe/aio-cli-plugin-api-mesh',
+		);
+		const currentVersion = meshPlugin.version;
+
+		let config = {
+			method: 'get',
+			url: 'https://registry.npmjs.org/@adobe/aio-cli-plugin-api-mesh/latest',
+		};
+
+		const response = await axios.request(config);
+		const latestVersion = response.data.version;
+
+		logger.debug(`Latest mesh plugin version: ${latestVersion}`);
+		logger.debug(`Installed mesh plugin version: ${currentVersion}`);
+
+		return {
+			currentVersion,
+			latestVersion,
+		};
+	} catch (err) {
+		logger.error('Unable to get package version to compare');
+		logger.error(err.message);
+
+		return {
+			currentVersion: null,
+			latestVersion: null,
+		};
+	}
+}
+
+/**
+ *
+ * This function compares current installed version against the latest version from npm and
+ * returns true if current version is same as latest. Returns false if the current version
+ * is behind the latest version.
+ *
+ * @param {string} currentVersion
+ * @param {string} latestVersion
+ * @returns
+ */
+function isCurrentVersionLatest(currentVersion, latestVersion) {
+	try {
+		logger.debug(`Comparing versions Current: ${currentVersion} against Latest: ${latestVersion}`);
+
+		return compareVersions(currentVersion, latestVersion) >= 0;
+	} catch (err) {
+		logger.error('Unable to compare versions');
+		logger.error(err.message);
+
+		return true;
+	}
+}
+
 module.exports = {
 	objToString,
 	promptInput,
@@ -897,4 +962,6 @@ module.exports = {
 	startGraphqlServer,
 	setUpTenantFiles,
 	writeSecretsFile,
+	getPluginVersionDetails,
+	isCurrentVersionLatest,
 };
