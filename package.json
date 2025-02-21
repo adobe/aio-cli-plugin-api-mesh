@@ -1,6 +1,6 @@
 {
 	"name": "@adobe/aio-cli-plugin-api-mesh",
-	"version": "4.1.2-beta",
+	"version": "5.1.0-beta",
 	"description": "Adobe I/O CLI plugin to develop and manage API mesh sources",
 	"keywords": [
 		"oclif-plugin"
@@ -75,6 +75,7 @@
 		"axios": "^1.2.0",
 		"chalk": "^4.1.0",
 		"child_process": "^1.0.2",
+		"compare-versions": "^6.1.1",
 		"content-disposition": "^0.5.4",
 		"dotenv": "^16.0.3",
 		"envsub": "^4.1.0",
@@ -139,6 +140,11 @@
 		"devPlugins": [
 			"@oclif/plugin-help"
 		],
+		"hooks": {
+			"prerun": [
+				"./src/hooks/versionCompare.js"
+			]
+		},
 		"repositoryPrefix": "<%- repo %>/blob/<%- version %>/<%- commandPath %>"
 	}
 }
