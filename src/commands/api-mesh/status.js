@@ -125,7 +125,7 @@ class StatusCommand extends Command {
 				this.log('Currently de-provisioning your mesh. Wait a few minutes and try again.');
 				break;
 			case 'success':
-				this.log('Mesh was provisioned successfully.');
+				this.log('Mesh provisioned successfully.');
 				break;
 			case 'error':
 				this.log('Mesh encountered errors during provisioning.');
