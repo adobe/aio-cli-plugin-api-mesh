@@ -128,8 +128,8 @@ class StatusCommand extends Command {
 				this.log('Mesh was provisioned successfully.');
 				break;
 			case 'error':
-				this.log('Mesh provisioning has errors.');
-				this.log(`If the error persists please contact support. RequestId: ${global.requestId}`);
+				this.log('Mesh encountered errors during provisioning.');
+				this.log(`If the error persists, contact support. RequestId: ${global.requestId}`);
 				break;
 			default:
 				this.log('Mesh status is not available. Wait a few minutes and try again.');
