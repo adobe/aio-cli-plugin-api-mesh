@@ -67,8 +67,8 @@ describe('status command tests', () => {
 		test.each([
 			['provisioning', 'Currently provisioning your mesh. Wait a few minutes and try again.'],
 			['de-provisioning', 'Currently de-provisioning your mesh. Wait a few minutes and try again.'],
-			['success', 'Mesh was provisioned successfully.'],
-			['error', 'Mesh provisioning has errors.'],
+			['success', 'Mesh provisioned successfully.'],
+			['error', 'Mesh encountered errors during provisioning.'],
 			['not-a-real-status', 'Mesh status is not available. Wait a few minutes and try again.'],
 			[null, 'Mesh status is not available. Wait a few minutes and try again.'],
 		])(
