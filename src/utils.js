@@ -35,6 +35,14 @@ const autoConfirmActionFlag = Flags.boolean({
 	default: false,
 });
 
+const cachePurgeActionFlag = Flags.boolean({
+	char: 'a',
+	description:
+		'Auto confirm action prompt for cache purge.',
+	default: false,
+	required: true,
+});
+
 const jsonFlag = Flags.boolean({
 	description: 'Output JSON',
 	default: false,
@@ -621,4 +629,5 @@ module.exports = {
 	endTimeFlag,
 	logFilenameFlag,
 	suggestCorrectedDateFormat,
+	cachePurgeActionFlag,
 };
