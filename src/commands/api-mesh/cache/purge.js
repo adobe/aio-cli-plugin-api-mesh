@@ -22,7 +22,7 @@ class CachePurgeCommand extends Command {
 	static flags = {
 		ignoreCache: ignoreCacheFlag,
 		autoConfirmAction: autoConfirmActionFlag,
-        cachePurgeAction: cachePurgeActionFlag,
+		cachePurgeAction: cachePurgeActionFlag,
 	};
 
 	async run() {
@@ -34,11 +34,11 @@ class CachePurgeCommand extends Command {
 
 		const ignoreCache = await flags.ignoreCache;
 		const autoConfirmAction = await flags.autoConfirmAction;
-        const cachePurgeAction = await flags.cachePurgeAction;
+		const cachePurgeAction = await flags.cachePurgeAction;
 
-		if(!cachePurgeAction) {
+		if (!cachePurgeAction) {
 			this.error('Missing required args. Run aio api-mesh cache:purge --help for more info.');
-		} 
+		}
 
 		const { imsOrgCode, projectId, workspaceId } = await initSdk({
 			ignoreCache,
@@ -56,12 +56,10 @@ class CachePurgeCommand extends Command {
 
 		if (meshId) {
 			let shouldContinue = true;
-            console.log(cachePurgeAction);
-            if(cachePurgeAction && !autoConfirmAction) {
-                shouldContinue = await promptConfirm(
-                    `Cache will purge ALL data. Do you wish to continue?`,
-                );
-            } 
+			console.log(cachePurgeAction);
+			if (cachePurgeAction && !autoConfirmAction) {
+				shouldContinue = await promptConfirm(`Cache will purge ALL data. Do you wish to continue?`);
+			}
 
 			if (shouldContinue) {
 				try {
@@ -72,7 +70,9 @@ class CachePurgeCommand extends Command {
 
 						return cachePurgeResponse;
 					} else {
-						throw new Error(`Unable to purge cache. If the error persists please contact support. RequestId: ${global.requestId}`);
+						throw new Error(
+							`Unable to purge cache. If the error persists please contact support. RequestId: ${global.requestId}`,
+						);
 					}
 				} catch (error) {
 					this.log(error.message);

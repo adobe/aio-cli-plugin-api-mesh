@@ -37,8 +37,7 @@ const autoConfirmActionFlag = Flags.boolean({
 
 const cachePurgeActionFlag = Flags.boolean({
 	char: 'a',
-	description:
-		'Auto confirm action prompt for cache purge.',
+	description: 'Auto confirm action prompt for cache purge.',
 	default: false,
 	required: true,
 });
