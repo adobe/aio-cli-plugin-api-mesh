@@ -36,10 +36,6 @@ class CachePurgeCommand extends Command {
 		const autoConfirmAction = await flags.autoConfirmAction;
 		const cachePurgeAction = await flags.cachePurgeAction;
 
-		if (!cachePurgeAction) {
-			this.error('Missing required args. Run aio api-mesh cache:purge --help for more info.');
-		}
-
 		const { imsOrgCode, projectId, workspaceId } = await initSdk({
 			ignoreCache,
 		});
@@ -56,7 +52,9 @@ class CachePurgeCommand extends Command {
 
 		if (meshId) {
 			let shouldContinue = true;
-			console.log(cachePurgeAction);
+			if (!cachePurgeAction) {
+				this.error('Missing required args. Run aio api-mesh:cache:purge --help for more info.');
+			}
 			if (cachePurgeAction && !autoConfirmAction) {
 				shouldContinue = await promptConfirm(`Cache will purge ALL data. Do you wish to continue?`);
 			}
