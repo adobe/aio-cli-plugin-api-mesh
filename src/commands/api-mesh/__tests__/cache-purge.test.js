@@ -24,15 +24,16 @@ jest.mock('../../../helpers', () => ({
 	promptConfirm: jest.fn().mockResolvedValue(true),
 }));
 jest.mock('../../../lib/devConsole');
-
+jest.mock('chalk', () => ({
+	red: jest.fn(text => text),
+	underline: {
+		blue: jest.fn(text => text),
+	},
+}));
 const mockConsoleCLIInstance = {};
-
 const selectedOrg = { id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' };
-
 const selectedProject = { id: '5678', title: 'Project01' };
-
 const selectedWorkspace = { id: '123456789', title: 'Workspace01' };
-
 const CachePurgeCommand = require('../cache/purge');
 const { initSdk, initRequestId, promptConfirm } = require('../../../helpers');
 const {
@@ -42,25 +43,25 @@ const {
 	unsubscribeCredentialFromMeshService,
 	cachePurge,
 } = require('../../../lib/devConsole');
-
 let logSpy = null;
 let errorLogSpy = null;
-
+let commandInstance;
 let parseSpy = null;
-
 const mockIgnoreCacheFlag = Promise.resolve(true);
 const mockAutoApproveAction = Promise.resolve(false);
 
 describe('cache purge command tests', () => {
 	beforeEach(() => {
+		commandInstance = new CachePurgeCommand([], {});
+		commandInstance.config = commandInstance.config || {};
+		commandInstance.config.runCommand = jest.fn(() => Promise.resolve());
+
 		initSdk.mockResolvedValue({
 			imsOrgCode: selectedOrg.code,
 			projectId: selectedProject.id,
 			workspaceId: selectedWorkspace.id,
 		});
-
 		global.requestId = 'dummy_request_id';
-
 		logSpy = jest.spyOn(CachePurgeCommand.prototype, 'log');
 		errorLogSpy = jest.spyOn(CachePurgeCommand.prototype, 'error');
 
@@ -82,38 +83,46 @@ describe('cache purge command tests', () => {
 		});
 	});
 
-	// afterEach(() => {
-	// 	jest.restoreAllMocks();
-	// });
+	afterEach(() => {
+		jest.restoreAllMocks();
+	});
 
-	test('should fail if cachePurgeAction is missing', async () => {
+	test('should fail if purgeAllAction is missing', async () => {
 		parseSpy.mockResolvedValueOnce({
 			args: {},
 			flags: {
 				ignoreCache: mockIgnoreCacheFlag,
 				autoConfirmAction: mockAutoApproveAction,
-				cachePurgeAction: Promise.resolve(false),
+				purgeAllAction: Promise.resolve(false),
 			},
 		});
+		await commandInstance.run();
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
+		[
+		  [
+		    "Missing required args.",
+		  ],
+		  [
+		    "Showing help:",
+		  ],
+		]
+	`);
+		expect(commandInstance.config.runCommand).toHaveBeenCalledWith('help', [
+			'api-mesh:cache:purge',
+		]);
 
-		const runResult = CachePurgeCommand.run();
-
-		return runResult.catch(err => {
-			expect(err.message).toMatchInlineSnapshot(
-				`"Missing required args. Run aio api-mesh:cache:purge --help for more info."`,
-			);
-			expect(logSpy.mock.calls).toMatchInlineSnapshot(`[]`);
-			expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
-			[
-			  [
-			    "Missing required args. Run aio api-mesh:cache:purge --help for more info.",
-			  ],
-			]
-		`);
-		});
+		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`[]`);
 	});
 
 	test('should fail if unable to get mesh ID', async () => {
+		parseSpy.mockResolvedValueOnce({
+			args: {},
+			flags: {
+				ignoreCache: mockIgnoreCacheFlag,
+				autoConfirmAction: mockAutoApproveAction,
+				purgeAllAction: Promise.resolve(true),
+			},
+		});
 		getMeshId.mockResolvedValueOnce(null);
 
 		const runResult = CachePurgeCommand.run();
@@ -139,7 +148,7 @@ describe('cache purge command tests', () => {
 			flags: {
 				ignoreCache: mockIgnoreCacheFlag,
 				autoConfirmAction: mockAutoApproveAction,
-				cachePurgeAction: Promise.resolve(true),
+				purgeAllAction: Promise.resolve(true),
 			},
 		});
 		promptConfirm.mockResolvedValueOnce(false);
@@ -163,7 +172,7 @@ describe('cache purge command tests', () => {
 			flags: {
 				ignoreCache: mockIgnoreCacheFlag,
 				autoConfirmAction: Promise.resolve(true),
-				cachePurgeAction: Promise.resolve(true),
+				purgeAllAction: Promise.resolve(true),
 			},
 		});
 		cachePurge.mockResolvedValueOnce({ success: true });
@@ -192,7 +201,7 @@ describe('cache purge command tests', () => {
 			flags: {
 				ignoreCache: mockIgnoreCacheFlag,
 				autoConfirmAction: Promise.resolve(false),
-				cachePurgeAction: Promise.resolve(true),
+				purgeAllAction: Promise.resolve(true),
 			},
 		});
 		cachePurge.mockRejectedValueOnce(new Error('cache purge failed'));
@@ -226,7 +235,7 @@ describe('cache purge command tests', () => {
 			flags: {
 				ignoreCache: mockIgnoreCacheFlag,
 				autoConfirmAction: Promise.resolve(true),
-				cachePurgeAction: Promise.resolve(true),
+				purgeAllAction: Promise.resolve(true),
 			},
 		});
 		cachePurge.mockResolvedValueOnce({ success: true });

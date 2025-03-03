@@ -35,9 +35,10 @@ const autoConfirmActionFlag = Flags.boolean({
 	default: false,
 });
 
-const cachePurgeActionFlag = Flags.boolean({
+const cachePurgeAllActionFlag = Flags.boolean({
 	char: 'a',
-	description: 'Auto confirm action prompt for cache purge. Cache will purge ALL data',
+	description: 'Purge all cache. CLI will purge all cache data.',
+	helpLabel: '-a, --all',
 	default: false,
 	required: true,
 });
@@ -628,5 +629,5 @@ module.exports = {
 	endTimeFlag,
 	logFilenameFlag,
 	suggestCorrectedDateFormat,
-	cachePurgeActionFlag,
+	cachePurgeAllActionFlag,
 };

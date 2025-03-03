@@ -13,8 +13,13 @@ const { Command } = require('@oclif/command');
 
 const logger = require('../../../classes/logger');
 const { initSdk, initRequestId, promptConfirm } = require('../../../helpers');
-const { ignoreCacheFlag, autoConfirmActionFlag, cachePurgeActionFlag } = require('../../../utils');
+const {
+	ignoreCacheFlag,
+	autoConfirmActionFlag,
+	cachePurgeAllActionFlag,
+} = require('../../../utils');
 const { getMeshId, cachePurge } = require('../../../lib/devConsole');
+const chalk = require('chalk');
 
 require('dotenv').config();
 
@@ -22,7 +27,7 @@ class CachePurgeCommand extends Command {
 	static flags = {
 		ignoreCache: ignoreCacheFlag,
 		autoConfirmAction: autoConfirmActionFlag,
-		cachePurgeAction: cachePurgeActionFlag,
+		purgeAllAction: cachePurgeAllActionFlag,
 	};
 
 	async run() {
@@ -34,7 +39,7 @@ class CachePurgeCommand extends Command {
 
 		const ignoreCache = await flags.ignoreCache;
 		const autoConfirmAction = await flags.autoConfirmAction;
-		const cachePurgeAction = await flags.cachePurgeAction;
+		const purgeAllAction = await flags.purgeAllAction;
 
 		const { imsOrgCode, projectId, workspaceId } = await initSdk({
 			ignoreCache,
@@ -52,10 +57,13 @@ class CachePurgeCommand extends Command {
 
 		if (meshId) {
 			let shouldContinue = true;
-			if (!cachePurgeAction) {
-				this.error('Missing required args. Run aio api-mesh:cache:purge --help for more info.');
+			if (!purgeAllAction) {
+				this.log(chalk.red('Missing required args.'));
+				this.log(chalk.underline.blue('Showing help:'));
+				this.config.runCommand('help', ['api-mesh:cache:purge']);
+				return;
 			}
-			if (cachePurgeAction && !autoConfirmAction) {
+			if (purgeAllAction && !autoConfirmAction) {
 				shouldContinue = await promptConfirm(`Cache will purge ALL data. Do you wish to continue?`);
 			}
 
