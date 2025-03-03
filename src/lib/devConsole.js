@@ -547,13 +547,13 @@ const cachePurge = async (organizationId, projectId, workspaceId, meshId) => {
 		if (response && response.status === 200) {
 			return response;
 		} else {
-			// Non 204 response received
+			// Non 200 response received
 			logger.error(
 				`Something went wrong: ${objToString(
 					response,
 					['data'],
 					'Unable to purge cache',
-				)}. Received ${response.status} response instead of 204`,
+				)}. Received ${response.status} response instead of 200`,
 			);
 
 			throw new Error(
