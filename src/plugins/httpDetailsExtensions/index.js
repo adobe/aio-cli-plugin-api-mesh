@@ -34,7 +34,7 @@ function useIncludeHttpDetailsInExtensions(opts) {
 					const responseTime = responseTimestamp - requestTimestamp;
 					const httpDetailsList = getHttpDetailsByContext(context);
 					const httpDetails = {
-						sourceName: (info)?.sourceName,
+						sourceName: info?.sourceName,
 						path: info?.path,
 						request: {
 							timestamp: requestTimestamp,
