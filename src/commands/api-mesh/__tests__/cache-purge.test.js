@@ -39,17 +39,12 @@ const {
 } = require('../../../lib/devConsole');
 let logSpy = null;
 let errorLogSpy = null;
-let commandInstance;
 let parseSpy = null;
 const mockIgnoreCacheFlag = Promise.resolve(true);
 const mockAutoApproveAction = Promise.resolve(false);
 
 describe('cache purge command tests', () => {
 	beforeEach(() => {
-		commandInstance = new CachePurgeCommand([], {});
-		commandInstance.config = commandInstance.config || {};
-		commandInstance.config.runCommand = jest.fn(() => Promise.resolve());
-
 		initSdk.mockResolvedValue({
 			imsOrgCode: selectedOrg.code,
 			projectId: selectedProject.id,
@@ -68,13 +63,6 @@ describe('cache purge command tests', () => {
 		unsubscribeCredentialFromMeshService.mockResolvedValue(['dummy_service']);
 
 		parseSpy = jest.spyOn(CachePurgeCommand.prototype, 'parse');
-		parseSpy.mockResolvedValue({
-			args: {},
-			flags: {
-				ignoreCache: mockIgnoreCacheFlag,
-				autoConfirmAction: mockAutoApproveAction,
-			},
-		});
 	});
 
 	afterEach(() => {
