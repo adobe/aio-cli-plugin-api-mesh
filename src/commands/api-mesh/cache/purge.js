@@ -58,7 +58,7 @@ class CachePurgeCommand extends Command {
 				`Unable to purge cache. No mesh found for Org(${imsOrgCode}) -> Project(${projectId}) -> Workspace(${workspaceId}). Check the details and try again.`,
 			);
 		}
-		let shouldContinue = autoConfirmAction ? true : false;
+		let shouldContinue = !!autoConfirmAction;
 		if (!autoConfirmAction) {
 			shouldContinue = await promptConfirm(`Cache will purge ALL data. Do you wish to continue?`);
 		}
