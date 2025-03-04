@@ -38,8 +38,6 @@ const autoConfirmActionFlag = Flags.boolean({
 const cachePurgeAllActionFlag = Flags.boolean({
 	char: 'a',
 	description: 'Purge all cache. CLI will purge all cache data.',
-	helpLabel: '-a, --all',
-	default: false,
 	required: true,
 });
 

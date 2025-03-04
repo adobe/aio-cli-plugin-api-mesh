@@ -19,7 +19,6 @@ const {
 	cachePurgeAllActionFlag,
 } = require('../../../utils');
 const { getMeshId, cachePurge } = require('../../../lib/devConsole');
-const chalk = require('chalk');
 
 require('dotenv').config();
 
@@ -27,7 +26,7 @@ class CachePurgeCommand extends Command {
 	static flags = {
 		ignoreCache: ignoreCacheFlag,
 		autoConfirmAction: autoConfirmActionFlag,
-		purgeAllAction: cachePurgeAllActionFlag,
+		all: cachePurgeAllActionFlag,
 	};
 
 	async run() {
@@ -39,7 +38,6 @@ class CachePurgeCommand extends Command {
 
 		const ignoreCache = await flags.ignoreCache;
 		const autoConfirmAction = await flags.autoConfirmAction;
-		const purgeAllAction = await flags.purgeAllAction;
 
 		const { imsOrgCode, projectId, workspaceId } = await initSdk({
 			ignoreCache,
@@ -55,46 +53,37 @@ class CachePurgeCommand extends Command {
 			);
 		}
 
-		if (meshId) {
-			let shouldContinue = true;
-			if (!purgeAllAction) {
-				this.log(chalk.red('Missing required args.'));
-				this.log(chalk.underline.blue('Showing help:'));
-				this.config.runCommand('help', ['api-mesh:cache:purge']);
-				return;
-			}
-			if (purgeAllAction && !autoConfirmAction) {
-				shouldContinue = await promptConfirm(`Cache will purge ALL data. Do you wish to continue?`);
-			}
-
-			if (shouldContinue) {
-				try {
-					const cachePurgeResponse = await cachePurge(imsOrgCode, projectId, workspaceId, meshId);
-
-					if (cachePurgeResponse) {
-						this.log('Successfully purged cache for mesh %s', meshId);
-
-						return cachePurgeResponse;
-					} else {
-						throw new Error(
-							`Unable to purge cache. If the error persists please contact support. RequestId: ${global.requestId}`,
-						);
-					}
-				} catch (error) {
-					this.log(error.message);
-
-					this.error(
-						`Unable to purge cache. If the error persists please contact support. RequestId: ${global.requestId}`,
-					);
-				}
-			} else {
-				this.log('Cache purge cancelled');
-
-				return 'Cache purge cancelled';
-			}
-		} else {
+		if (!meshId) {
 			this.error(
 				`Unable to purge cache. No mesh found for Org(${imsOrgCode}) -> Project(${projectId}) -> Workspace(${workspaceId}). Check the details and try again.`,
+			);
+		}
+		let shouldContinue = autoConfirmAction ? true : false;
+		if (!autoConfirmAction) {
+			shouldContinue = await promptConfirm(`Cache will purge ALL data. Do you wish to continue?`);
+		}
+		if (!shouldContinue) {
+			this.log('Cache purge cancelled');
+
+			return 'Cache purge cancelled';
+		}
+		try {
+			const cachePurgeResponse = await cachePurge(imsOrgCode, projectId, workspaceId, meshId);
+
+			if (cachePurgeResponse) {
+				this.log('Successfully purged cache for mesh %s', meshId);
+
+				return cachePurgeResponse;
+			} else {
+				throw new Error(
+					`Unable to purge cache. If the error persists please contact support. RequestId: ${global.requestId}`,
+				);
+			}
+		} catch (error) {
+			this.log(error.message);
+
+			this.error(
+				`Unable to purge cache. If the error persists please contact support. RequestId: ${global.requestId}`,
 			);
 		}
 	}
