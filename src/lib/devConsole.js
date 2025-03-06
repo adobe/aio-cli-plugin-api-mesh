@@ -532,6 +532,7 @@ const cachePurge = async (organizationId, projectId, workspaceId, meshId) => {
 			'x-request-id': global.requestId,
 			'x-api-key': SMS_API_KEY,
 		},
+		data: {},
 	};
 
 	logger.info(
