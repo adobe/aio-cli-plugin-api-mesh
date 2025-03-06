@@ -35,6 +35,12 @@ const autoConfirmActionFlag = Flags.boolean({
 	default: false,
 });
 
+const cachePurgeAllActionFlag = Flags.boolean({
+	char: 'a',
+	description: 'Purge all cache. CLI will purge all cache data.',
+	required: true,
+});
+
 const jsonFlag = Flags.boolean({
 	description: 'Output JSON',
 	default: false,
@@ -621,4 +627,5 @@ module.exports = {
 	endTimeFlag,
 	logFilenameFlag,
 	suggestCorrectedDateFormat,
+	cachePurgeAllActionFlag,
 };
