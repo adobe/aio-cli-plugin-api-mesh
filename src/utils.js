@@ -85,7 +85,8 @@ const pastFlag = Flags.string({
 });
 
 const fromFlag = Flags.string({
-	description: 'From time in DD-MM-YYYY:HH:MM:SS format to fetch logs from the past. Used as the starting time for the past time duration.',
+	description:
+		'From time in DD-MM-YYYY:HH:MM:SS format to fetch logs from the past. Used as the starting time for the past time duration.',
 });
 
 const logFilenameFlag = Flags.string({
@@ -606,7 +607,6 @@ function suggestCorrectedDateFormat(inputDate) {
 	return correctedDate;
 }
 
-
 /**
  * Parses a duration string representing a past time window and converts it to milliseconds.
  *
@@ -619,21 +619,23 @@ function parsePastDuration(pastTimeWindow) {
 	const match = pastTimeWindow.match(pastDurationRegex);
 
 	if (!match) {
-		throw new Error('Invalid format. Past time window should be in minutes, e.g., "20 mins", "15 minutes".');
+		throw new Error(
+			'Invalid format. Past time window should be in minutes, e.g., "20 mins", "15 minutes".',
+		);
 	}
 
-	// Convert the matched duration to milliseconds 
+	// Convert the matched duration to milliseconds
 	const durationInMs = ms(pastTimeWindow);
 
 	return durationInMs;
 }
 
 /**
-	 * Validates the provided startTime and endTime flags.
-	 *
-	 * @param {string} startTime - The start time in the format YYYY-MM-DDTHH:MM:SSZ
-	 * @param {string} endTime - The end time in the format YYYY-MM-DDTHH:MM:SSZ
-	 */
+ * Validates the provided startTime and endTime flags.
+ *
+ * @param {string} startTime - The start time in the format YYYY-MM-DDTHH:MM:SSZ
+ * @param {string} endTime - The end time in the format YYYY-MM-DDTHH:MM:SSZ
+ */
 function validateDateTimeRange(startTime, endTime) {
 	// Convert formatted times to Date objects for comparison
 	const start = new Date(startTime);
@@ -648,7 +650,6 @@ function validateDateTimeRange(startTime, endTime) {
 	// Validate that logs from beyond 30 days from today are not available
 	if (start < thirtyDaysAgo || end < thirtyDaysAgo) {
 		throw new Error('Cannot get logs more than 30 days old. Adjust your time range.');
-		return;
 	}
 
 	// Truncate milliseconds to ensure comparison is only done up to seconds
@@ -658,18 +659,15 @@ function validateDateTimeRange(startTime, endTime) {
 	// Validate startTime < endTime
 	if (start > end) {
 		throw new Error('endTime must be greater than startTime');
-		return;
 	}
 
 	// Validate that endTime is not greater than the current time (now)
 	if (end > now) {
 		throw new Error('endTime cannot be in the future. Provide a valid endTime.');
-		return;
 	}
 
 	if (start.getTime() === end.getTime()) {
 		throw new Error('Minimum duration should be 1 minutes. Current duration is 0 minutes.');
-		return;
 	}
 
 	// Check if the duration between start and end times is greater than 30 minutes (1800 seconds)
@@ -681,14 +679,14 @@ function validateDateTimeRange(startTime, endTime) {
 		const seconds = timeDifferenceInSeconds % 60; // Seconds calculation
 
 		throw new Error(
-			`Max duration between startTime and endTime should be 30 minutes. Current duration is ${hours} hour${hours !== 1 ? 's' : ''
-			} ${minutes} minute${minutes !== 1 ? 's' : ''} and ${seconds} second${seconds !== 1 ? 's' : ''
+			`Max duration between startTime and endTime should be 30 minutes. Current duration is ${hours} hour${
+				hours !== 1 ? 's' : ''
+			} ${minutes} minute${minutes !== 1 ? 's' : ''} and ${seconds} second${
+				seconds !== 1 ? 's' : ''
 			}.`,
 		);
-		return;
 	}
 }
-
 
 /**
  * Format and validate a given date string
@@ -696,7 +694,6 @@ function validateDateTimeRange(startTime, endTime) {
  * @returns {string|null} The formatted and validated date string or null if invalid
  */
 function validateDateTimeFormat(time) {
-
 	// Regular expression to validate the input date format YYYY-MM-DDTHH:MM:SSZ
 	const dateTimeRegex = /^(?:(\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])T(0[0-9]|1[0-9]|2[0-3]):([0-5]\d):([0-5]\d)Z)$/;
 
@@ -718,25 +715,26 @@ function validateDateTimeFormat(time) {
 /**
  * Convert a given local time string to UTC time string
  * @param {string} timeString - The time string in the format YYYY-MM-DD:Period:HH:MM:SS
- * @returns {string|null} The UTC time in the format YYYY-MM-DDTHH:mm:ss[Z] 
+ * @returns {string|null} The UTC time in the format YYYY-MM-DDTHH:mm:ss[Z]
  */
 async function localToUTCTime(timeString) {
-	// Split the input time string into components 
+	// Split the input time string into components
 	let [date, hour, minute, second] = timeString.split(':');
-	// Create a properly formatted date-time string 
+	// Create a properly formatted date-time string
 	const formattedTimeString = `${date}T${hour}:${minute}:${second}`;
 	try {
-		//Get the local timezone 
+		//Get the local timezone
 		const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-		console.log(`Local timezone: ${timeZone}`);
-		// Create a Date object from the formatted time string 
+
+		// Create a Date object from the formatted time string
 		const localTime = new Date(formattedTimeString);
-		// Convert to UTC 
+
+		// Convert to UTC
 		const utcTime = new Date(localTime.toUTCString('en-US', { timeZone: timeZone }));
+
 		// Return the UTC time in ISO format without milliseconds
 		return utcTime.toISOString().replace(/\.\d{3}Z$/, 'Z');
-	}
-	catch (error) {
+	} catch (error) {
 		logger.error(`Error: ${error.message}`);
 		throw error;
 	}

@@ -21,7 +21,6 @@ const {
 
 require('dotenv').config();
 
-
 class GetBulkLogCommand extends Command {
 	static flags = {
 		ignoreCache: ignoreCacheFlag,
@@ -67,7 +66,6 @@ class GetBulkLogCommand extends Command {
 					);
 				}
 				return;
-
 			}
 
 			// Validate user provided endTime format
@@ -97,12 +95,10 @@ class GetBulkLogCommand extends Command {
 				const dateTimeRegex = /^\d{4}-\d{2}-\d{2}:\d{2}:\d{2}:\d{2}$/;
 				if (!dateTimeRegex.test(flags.from)) {
 					this.error('Found invalid date components passed in --from. Check and correct the date.');
-
 				} else {
 					convertedTime = await localToUTCTime(flags.from.toString());
 					if (!convertedTime) {
 						this.error('Invalid format. Use the format YYYY-MM-DD:HH:MM:SS for --from.');
-
 					}
 				}
 				// add the past window to the converted time to get the end time to fetch logs from the past
@@ -119,12 +115,13 @@ class GetBulkLogCommand extends Command {
 			// Properly format startTime and endTime strings before handing it over to SMS i.e remove the milliseconds
 			formattedStartTime = validateDateTimeFormat(calculatedStartTime);
 			formattedEndTime = validateDateTimeFormat(calculatedEndTime);
-		} else if (flags.startTime && !flags.endTime || !flags.startTime && flags.endTime) {
-
+		} else if ((flags.startTime && !flags.endTime) || (!flags.startTime && flags.endTime)) {
 			this.error('Provide both startTime and endTime.');
 			return;
 		} else {
-			this.error('Missing required flags. Provide at least one flag --startTime, --endTime, or --past --from or  type `mesh log:get-bulk --help` for more information.');
+			this.error(
+				'Missing required flags. Provide at least one flag --startTime, --endTime, or --past --from or  type `mesh log:get-bulk --help` for more information.',
+			);
 			return;
 		}
 
