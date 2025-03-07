@@ -7,10 +7,10 @@
   resolved "https://registry.yarnpkg.com/@aashutoshrathi/word-wrap/-/word-wrap-1.2.6.tgz#bd9154aec9983f77b3a034ecaa015c2e4201f6cf"
   integrity sha512-1Yjs2SvM8TflER/OD3cOjhWWOZb58A2t7wpE2S9XfBYTiIl+XFhQG2bjy4Pu1I+EAlCNUzRDYDdFwFYUKvXcIA==
 
-"@adobe-apimesh/mesh-builder@2.0.0":
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/@adobe-apimesh/mesh-builder/-/mesh-builder-2.0.0.tgz#faabdc200de1891f78c63c5812363fb1df7105b1"
-  integrity sha512-APS8j/Qr65hQiQNscpoXhlh7Ta2c+i/voN24nXslRDwOT+Jg2sUHlLaLrXu7y0oc+F4qtZuQM55YZTMENs/qtA==
+"@adobe-apimesh/mesh-builder@2.1.4":
+  version "2.1.4"
+  resolved "https://registry.yarnpkg.com/@adobe-apimesh/mesh-builder/-/mesh-builder-2.1.4.tgz#cd58968f313566a9fb018a7d45aaefd2ef08d165"
+  integrity sha512-GVpUnt3oIbPRlagbcfmAw89M45g0Yhq242vkAEO+0KzOj//NhWlDEMi+ya9OMD2+sop2bZU+IrcDYbLKzORK/g==
   dependencies:
     "@fastify/request-context" "^4.1.0"
     eslint "^8.39.0"
@@ -170,10 +170,10 @@
     joi "^17.4.2"
     lodash.clonedeep "^4.5.0"
 
-"@adobe/plugin-hooks@0.3.2":
-  version "0.3.2"
-  resolved "https://registry.yarnpkg.com/@adobe/plugin-hooks/-/plugin-hooks-0.3.2.tgz#06ebbe2072c8c4c7f049706e00ebcb6c7bd8c668"
-  integrity sha512-hXo5dDiXXLoukOKQc/Aiw+pPEmlpQLMlbXwTrJGLETa/pMgPNwqT7jFCOODCuJVljffrYv0UfYafOPWOx0nfdA==
+"@adobe/plugin-hooks@0.3.3":
+  version "0.3.3"
+  resolved "https://registry.yarnpkg.com/@adobe/plugin-hooks/-/plugin-hooks-0.3.3.tgz#7a963d0d82e12d27a277ee1997184c4bb3a05875"
+  integrity sha512-Cz3JFB/WdWq2C0hifMCIv8mjl+2DRDqsdz4C9r9H1VXXBOG3k4NM6cjjiaLMTfxjNuHiHDnnLXeIec3SsOV81Q==
   dependencies:
     "@graphql-mesh/utils" "^0.43.4"
     await-timeout "^1.1.1"
