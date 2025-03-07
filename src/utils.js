@@ -6,6 +6,7 @@ const { readFile } = require('fs/promises');
 const { interpolateMesh } = require('./helpers');
 const dotenv = require('dotenv');
 const YAML = require('yaml');
+const ms = require('ms');
 const parseEnv = require('envsub/js/envsub-parser');
 const os = require('os');
 const chalk = require('chalk');
@@ -73,12 +74,18 @@ const fileNameFlag = Flags.string({
 
 const startTimeFlag = Flags.string({
 	description: 'Start time for the logs in UTC',
-	required: true,
 });
 
 const endTimeFlag = Flags.string({
 	description: 'End time for the logs in UTC',
-	required: true,
+});
+
+const pastFlag = Flags.string({
+	description: 'Past time window in mins',
+});
+
+const fromFlag = Flags.string({
+	description: 'From time in DD-MM-YYYY:HH:MM:SS format to fetch logs from the past. Used as the starting time for the past time duration.',
 });
 
 const logFilenameFlag = Flags.string({
@@ -599,6 +606,142 @@ function suggestCorrectedDateFormat(inputDate) {
 	return correctedDate;
 }
 
+
+/**
+ * Parses a duration string representing a past time window and converts it to milliseconds.
+ *
+ * @param {string} pastTimeWindow - The past time duration to parse, e.g., "20 mins", "15 minutes".
+ * @returns {number} The duration in milliseconds.
+ */
+function parsePastDuration(pastTimeWindow) {
+	// Regular expression to match various formats of minute abbreviations
+	const pastDurationRegex = /^(\d+)\s*(m|mins?|minutes?)$/i;
+	const match = pastTimeWindow.match(pastDurationRegex);
+
+	if (!match) {
+		throw new Error('Invalid format. Past time window should be in minutes, e.g., "20 mins", "15 minutes".');
+	}
+
+	// Convert the matched duration to milliseconds 
+	const durationInMs = ms(pastTimeWindow);
+
+	return durationInMs;
+}
+
+/**
+	 * Validates the provided startTime and endTime flags.
+	 *
+	 * @param {string} startTime - The start time in the format YYYY-MM-DDTHH:MM:SSZ
+	 * @param {string} endTime - The end time in the format YYYY-MM-DDTHH:MM:SSZ
+	 */
+function validateDateTimeRange(startTime, endTime) {
+	// Convert formatted times to Date objects for comparison
+	const start = new Date(startTime);
+	const end = new Date(endTime);
+	const now = new Date(); // Current time
+
+	// Get the current date and calculate the date 30 days ago, both in UTC
+	const today = new Date();
+	const thirtyDaysAgo = new Date(today);
+	thirtyDaysAgo.setUTCDate(today.getUTCDate() - 30);
+
+	// Validate that logs from beyond 30 days from today are not available
+	if (start < thirtyDaysAgo || end < thirtyDaysAgo) {
+		throw new Error('Cannot get logs more than 30 days old. Adjust your time range.');
+		return;
+	}
+
+	// Truncate milliseconds to ensure comparison is only done up to seconds
+	start.setMilliseconds(0);
+	end.setMilliseconds(0);
+
+	// Validate startTime < endTime
+	if (start > end) {
+		throw new Error('endTime must be greater than startTime');
+		return;
+	}
+
+	// Validate that endTime is not greater than the current time (now)
+	if (end > now) {
+		throw new Error('endTime cannot be in the future. Provide a valid endTime.');
+		return;
+	}
+
+	if (start.getTime() === end.getTime()) {
+		throw new Error('Minimum duration should be 1 minutes. Current duration is 0 minutes.');
+		return;
+	}
+
+	// Check if the duration between start and end times is greater than 30 minutes (1800 seconds)
+	const timeDifferenceInSeconds = (end.getTime() - start.getTime()) / 1000;
+
+	if (timeDifferenceInSeconds > 1800) {
+		const hours = Math.floor(timeDifferenceInSeconds / 3600); // Hours calculation
+		const minutes = Math.floor((timeDifferenceInSeconds % 3600) / 60); // Minutes calculation
+		const seconds = timeDifferenceInSeconds % 60; // Seconds calculation
+
+		throw new Error(
+			`Max duration between startTime and endTime should be 30 minutes. Current duration is ${hours} hour${hours !== 1 ? 's' : ''
+			} ${minutes} minute${minutes !== 1 ? 's' : ''} and ${seconds} second${seconds !== 1 ? 's' : ''
+			}.`,
+		);
+		return;
+	}
+}
+
+
+/**
+ * Format and validate a given date string
+ * @param {string} time - The time string in the format YYYY-MM-DDTHH:MM:SSZ
+ * @returns {string|null} The formatted and validated date string or null if invalid
+ */
+function validateDateTimeFormat(time) {
+
+	// Regular expression to validate the input date format YYYY-MM-DDTHH:MM:SSZ
+	const dateTimeRegex = /^(?:(\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])T(0[0-9]|1[0-9]|2[0-3]):([0-5]\d):([0-5]\d)Z)$/;
+
+	// Convert the Date object to ISO string and remove milliseconds
+	let timeString = time.toISOString().replace(/\.\d{3}Z$/, 'Z');
+
+	// Validate the formatted time string against the regex
+	if (!dateTimeRegex.test(timeString)) {
+		const correctedDate = suggestCorrectedDateFormat(timeString);
+		if (!correctedDate) {
+			throw Error(`Found invalid date components for ${timeString}. Check and correct the date.`);
+		}
+	}
+
+	// Return the formatted time string without dashes, colons, and 'Z'
+	return timeString.replace(/-|:|Z/g, '').replace('T', 'T');
+}
+
+/**
+ * Convert a given local time string to UTC time string
+ * @param {string} timeString - The time string in the format YYYY-MM-DD:Period:HH:MM:SS
+ * @returns {string|null} The UTC time in the format YYYY-MM-DDTHH:mm:ss[Z] 
+ */
+async function localToUTCTime(timeString) {
+	// Split the input time string into components 
+	let [date, hour, minute, second] = timeString.split(':');
+	// Create a properly formatted date-time string 
+	const formattedTimeString = `${date}T${hour}:${minute}:${second}`;
+	try {
+		//Get the local timezone 
+		const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+		console.log(`Local timezone: ${timeZone}`);
+		// Create a Date object from the formatted time string 
+		const localTime = new Date(formattedTimeString);
+		// Convert to UTC 
+		const utcTime = new Date(localTime.toUTCString('en-US', { timeZone: timeZone }));
+		// Return the UTC time in ISO format without milliseconds
+		return utcTime.toISOString().replace(/\.\d{3}Z$/, 'Z');
+	}
+	catch (error) {
+		logger.error(`Error: ${error.message}`);
+		throw error;
+	}
+}
+
 module.exports = {
 	ignoreCacheFlag,
 	autoConfirmActionFlag,
@@ -620,5 +763,11 @@ module.exports = {
 	startTimeFlag,
 	endTimeFlag,
 	logFilenameFlag,
+	pastFlag,
+	fromFlag,
 	suggestCorrectedDateFormat,
+	parsePastDuration,
+	validateDateTimeRange,
+	validateDateTimeFormat,
+	localToUTCTime,
 };

@@ -10,10 +10,17 @@ const {
 	startTimeFlag,
 	endTimeFlag,
 	logFilenameFlag,
+	pastFlag,
+	fromFlag,
 	suggestCorrectedDateFormat,
+	parsePastDuration,
+	validateDateTimeRange,
+	validateDateTimeFormat,
+	localToUTCTime,
 } = require('../../utils');
 
 require('dotenv').config();
+
 
 class GetBulkLogCommand extends Command {
 	static flags = {
@@ -21,6 +28,8 @@ class GetBulkLogCommand extends Command {
 		startTime: startTimeFlag,
 		endTime: endTimeFlag,
 		filename: logFilenameFlag,
+		past: pastFlag,
+		from: fromFlag,
 	};
 
 	async run() {
@@ -35,64 +44,87 @@ class GetBulkLogCommand extends Command {
 
 		const filename = await flags.filename;
 
+		let calculatedStartTime, calculatedEndTime, formattedStartTime, formattedEndTime;
+
 		// Only supports files that end with .csv
 		if (!filename || path.extname(filename).toLowerCase() !== '.csv') {
 			this.error('Invalid file type. Provide a filename with a .csv extension.');
 			return;
 		}
-		// Regular expression to validate the input date format YYYY-MM-DDTHH:MM:SSZ
-		const dateTimeRegex = /^(?:(\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])T(0[0-9]|1[0-9]|2[0-3]):([0-5]\d):([0-5]\d)Z)$/;
 
-		// Validate user provided startTime format
-		if (!dateTimeRegex.test(flags.startTime)) {
-			const correctedStartTime = suggestCorrectedDateFormat(flags.startTime);
-			if (!correctedStartTime) {
-				this.error('Found invalid date components for startTime. Check and correct the date.');
-			} else {
-				this.error(
-					`Use the format YYYY-MM-DDTHH:MM:SSZ for startTime. Did you mean ${correctedStartTime}?`,
-				);
+		if (flags.startTime && flags.endTime) {
+			// Regular expression to validate the input date format YYYY-MM-DDTHH:MM:SSZ
+			const dateTimeRegex = /^(?:(\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])T(0[0-9]|1[0-9]|2[0-3]):([0-5]\d):([0-5]\d)Z)$/;
+
+			// Validate user provided startTime format
+			if (!dateTimeRegex.test(flags.startTime)) {
+				const correctedStartTime = suggestCorrectedDateFormat(flags.startTime);
+				if (!correctedStartTime) {
+					this.error('Found invalid date components for startTime. Check and correct the date.');
+				} else {
+					this.error(
+						`Use the format YYYY-MM-DDTHH:MM:SSZ for startTime. Did you mean ${correctedStartTime}?`,
+					);
+				}
+				return;
+
 			}
 
-			return;
-		}
-
-		// Validate user provided endTime format
-		if (!dateTimeRegex.test(flags.endTime)) {
-			const correctedEndTime = suggestCorrectedDateFormat(flags.endTime);
-			//check for incorrect date components
-			if (!correctedEndTime) {
-				this.error('Found invalid date components for endTime. Check and correct the date.');
-			} else {
-				this.error(
-					`Use the format YYYY-MM-DDTHH:MM:SSZ for endTime. Did you mean ${correctedEndTime}?`,
-				);
+			// Validate user provided endTime format
+			if (!dateTimeRegex.test(flags.endTime)) {
+				const correctedEndTime = suggestCorrectedDateFormat(flags.endTime);
+				// Check for incorrect date components
+				if (!correctedEndTime) {
+					this.error('Found invalid date components for endTime. Check and correct the date.');
+				} else {
+					this.error(
+						`Use the format YYYY-MM-DDTHH:MM:SSZ for endTime. Did you mean ${correctedEndTime}?`,
+					);
+				}
+				return;
 			}
-			return;
-		}
 
-		// Properly format startTime and endTime strings before handing it over to SMS
-		const formattedStartTime = flags.startTime.replace(/-|:|Z/g, '').replace('T', 'T');
-		const formattedEndTime = flags.endTime.replace(/-|:|Z/g, '').replace('T', 'T');
+			// Validate the date-time range
+			validateDateTimeRange(flags.startTime, flags.endTime);
 
-		// Convert formatted times to Date objects for comparison
-		const startTime = new Date(flags.startTime);
-		const endTime = new Date(flags.endTime);
-		const now = new Date(); // Current time
+			// Properly format startTime and endTime strings before handing it over to SMS
+			formattedStartTime = flags.startTime.replace(/-|:|Z/g, '').replace('T', 'T');
+			formattedEndTime = flags.endTime.replace(/-|:|Z/g, '').replace('T', 'T');
+		} else if (flags.past) {
+			const pastTimeWindow = parsePastDuration(flags.past);
+			if (flags.from) {
+				let convertedTime;
+				const dateTimeRegex = /^\d{4}-\d{2}-\d{2}:\d{2}:\d{2}:\d{2}$/;
+				if (!dateTimeRegex.test(flags.from)) {
+					this.error('Found invalid date components passed in --from. Check and correct the date.');
 
-		// Require both startTime and endTime
-		if (!startTime || !endTime) {
+				} else {
+					convertedTime = await localToUTCTime(flags.from.toString());
+					if (!convertedTime) {
+						this.error('Invalid format. Use the format YYYY-MM-DD:HH:MM:SS for --from.');
+
+					}
+				}
+				// add the past window to the converted time to get the end time to fetch logs from the past
+				calculatedStartTime = new Date(convertedTime);
+				calculatedEndTime = new Date(calculatedStartTime.getTime() + pastTimeWindow);
+			} else {
+				// subtract the past window from the current time to get the start time to fetch recent logs from now
+				calculatedEndTime = new Date();
+				calculatedStartTime = new Date(calculatedEndTime.getTime() - pastTimeWindow);
+			}
+
+			// Validate the calculated start and end times range
+			validateDateTimeRange(calculatedStartTime, calculatedEndTime);
+			// Properly format startTime and endTime strings before handing it over to SMS i.e remove the milliseconds
+			formattedStartTime = validateDateTimeFormat(calculatedStartTime);
+			formattedEndTime = validateDateTimeFormat(calculatedEndTime);
+		} else if (flags.startTime && !flags.endTime || !flags.startTime && flags.endTime) {
+
 			this.error('Provide both startTime and endTime.');
 			return;
-		}
-
-		// Get the current date and calculate the date 30 days ago, both in UTC
-		const today = new Date();
-		const thirtyDaysAgo = new Date(today);
-		thirtyDaysAgo.setUTCDate(today.getUTCDate() - 30);
-		// Validate that logs from beyond 30 days from today are not available
-		if (startTime < thirtyDaysAgo || endTime < thirtyDaysAgo) {
-			this.error('Cannot get logs more than 30 days old. Adjust your time range.');
+		} else {
+			this.error('Missing required flags. Provide at least one flag --startTime, --endTime, or --past --from or  type `mesh log:get-bulk --help` for more information.');
 			return;
 		}
 
@@ -115,37 +147,7 @@ class GetBulkLogCommand extends Command {
 		if (stats.size > 0) {
 			throw new Error(`Make sure the file: ${filename} is empty`);
 		}
-		// truncate milliseconds to ensure comparison is only done up to seconds
-		startTime.setMilliseconds(0);
-		endTime.setMilliseconds(0);
 
-		// Validate startTime < endTime
-		if (startTime > endTime) {
-			this.error('endTime must be greater than startTime');
-		}
-		// Validate that endTime is not greater than the current time (now)
-		if (endTime > now) {
-			this.error('endTime cannot be in the future. Provide a valid endTime.');
-			return;
-		}
-
-		// 4. Check if the duration between start and end times is greater than 30 minutes (1800 seconds)
-		const timeDifferenceInSeconds = (endTime.getTime() - startTime.getTime()) / 1000;
-
-		if (timeDifferenceInSeconds > 1800) {
-			const hours = Math.floor(timeDifferenceInSeconds / 3600); //hours calculation
-			const minutes = Math.floor((timeDifferenceInSeconds % 3600) / 60); //minutes calculation
-			const seconds = timeDifferenceInSeconds % 60; //seconds calculation
-
-			this.error(
-				`Max duration between startTime and endTime should be 30 minutes. Current duration is ${hours} hour${
-					hours !== 1 ? 's' : ''
-				} ${minutes} minute${minutes !== 1 ? 's' : ''} and ${seconds} second${
-					seconds !== 1 ? 's' : ''
-				}.`,
-			);
-			return;
-		}
 		logger.info('Calling initSdk...');
 		const { imsOrgCode, projectId, workspaceId, workspaceName } = await initSdk({
 			ignoreCache,
