@@ -720,7 +720,7 @@ function validateDateTimeFormat(time) {
 
 /**
  * Convert a given local time string to UTC time string
- * @param {string} timeString - The time string in the format YYYY-MM-DD:Period:HH:MM:SS
+ * @param {string} timeString - The time string in the format YYYY-MM-DD:HH:MM:SS
  * @returns {string|null} The UTC time in the format YYYY-MM-DDTHH:mm:ss[Z]
  */
 async function localToUTCTime(timeString) {
@@ -730,6 +730,8 @@ async function localToUTCTime(timeString) {
 	const formattedTimeString = `${date}T${hour}:${minute}:${second}`;
 	try {
 		//Get the local timezone
+		// takes the timezone where the javascript runtime is running
+		// reference https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/resolvedOptions#browser_compatibility:~:text=The%20value%20provided%20for%20this%20property%20in%20the%20options%20argument%2C%20with%20default%20filled%20in%20as%20needed.%20It%20is%20an%20IANA%20time%20zone%20name.%20The%20default%20is%20the%20runtime%27s%20default%20time%20zone.
 		const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 		// Create a Date object from the formatted time string

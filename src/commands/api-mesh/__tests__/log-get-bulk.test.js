@@ -3,7 +3,11 @@ const path = require('path');
 const GetBulkLogCommand = require('../log-get-bulk');
 const { initRequestId, initSdk, promptConfirm } = require('../../../helpers');
 const { getMeshId, getPresignedUrls } = require('../../../lib/devConsole');
-const { suggestCorrectedDateFormat } = require('../../../utils');
+const {
+	suggestCorrectedDateFormat,
+	validateDateTimeRange,
+	parsePastDuration,
+} = require('../../../utils');
 
 jest.mock('fs');
 jest.mock('axios');
@@ -288,6 +292,252 @@ describe('GetBulkLogCommand startTime and endTime validation', () => {
 		(inputDate, expectedOutput) => {
 			const correctedDate = suggestCorrectedDateFormat(inputDate);
 			expect(correctedDate).toBe(expectedOutput);
+		},
+	);
+});
+
+describe('GetBulkLogCommand with --past and --from flags', () => {
+	let parseSpy;
+
+	beforeEach(() => {
+		parseSpy = jest.spyOn(GetBulkLogCommand.prototype, 'parse').mockResolvedValue({
+			flags: {
+				past: '20mins',
+				from: '2025-03-10:12:00:00',
+				filename: 'test.csv',
+				ignoreCache: false,
+			},
+		});
+
+		initSdk.mockResolvedValue({
+			imsOrgId: 'orgId',
+			imsOrgCode: 'orgCode',
+			projectId: 'projectId',
+			workspaceId: 'workspaceId',
+			workspaceName: 'workspaceName',
+		});
+		getMeshId.mockResolvedValue('meshId');
+		getPresignedUrls.mockResolvedValue({
+			presignedUrls: [{ key: 'log1.csv', url: 'http://example.com/someHash' }],
+			totalSize: 2048,
+		});
+		promptConfirm.mockResolvedValue(true);
+		global.requestId = 'dummy_request_id';
+	});
+
+	afterEach(() => {
+		jest.clearAllMocks();
+	});
+
+	test('runs with valid --past and --from flags', async () => {
+		fs.existsSync.mockReturnValue(true);
+		fs.statSync.mockReturnValue({ size: 0 });
+
+		const mockWriteStream = {
+			write: jest.fn(),
+			end: jest.fn(),
+			on: jest.fn((event, callback) => {
+				if (event === 'finish') {
+					callback();
+				}
+			}),
+		};
+		fs.createWriteStream.mockReturnValue(mockWriteStream);
+
+		const command = new GetBulkLogCommand([], {});
+		await command.run();
+
+		expect(initRequestId).toHaveBeenCalled();
+		expect(initSdk).toHaveBeenCalled();
+		expect(getMeshId).toHaveBeenCalledWith('orgCode', 'projectId', 'workspaceId', 'workspaceName');
+		expect(getPresignedUrls).toHaveBeenCalledWith(
+			'orgCode',
+			'projectId',
+			'workspaceId',
+			'meshId',
+			expect.any(String),
+			expect.any(String),
+		);
+		expect(fs.createWriteStream).toHaveBeenCalledWith(path.resolve(process.cwd(), 'test.csv'), {
+			flags: 'a',
+		});
+		expect(mockWriteStream.write).toHaveBeenCalled();
+		expect(mockWriteStream.end).toHaveBeenCalled();
+	});
+
+	test('throws an error with invalid --from date components', async () => {
+		parseSpy.mockResolvedValueOnce({
+			flags: {
+				past: '20mins',
+				from: '2025-13-01:25:61:61',
+				filename: 'test.csv',
+				ignoreCache: false,
+			},
+		});
+
+		const command = new GetBulkLogCommand([], {});
+		await expect(command.run()).rejects.toThrow(
+			'Found invalid date components passed in --from. Check and correct the date.',
+		);
+	});
+
+	test('throws an error with invalid --from date format', async () => {
+		parseSpy.mockResolvedValueOnce({
+			flags: {
+				past: '15mins',
+				from: '2025:03:01:15:00:00',
+				filename: 'test.csv',
+				ignoreCache: false,
+			},
+		});
+
+		const command = new GetBulkLogCommand([], {});
+		await expect(command.run()).rejects.toThrow(
+			'Invalid format. Use the format YYYY-MM-DD:HH:MM:SS for --from.',
+		);
+	});
+
+	test('runs with valid --past flag without --from', async () => {
+		parseSpy.mockResolvedValueOnce({
+			flags: {
+				past: '15mins',
+				filename: 'test.csv',
+				ignoreCache: false,
+			},
+		});
+
+		fs.existsSync.mockReturnValue(true);
+		fs.statSync.mockReturnValue({ size: 0 });
+
+		const command = new GetBulkLogCommand([], {});
+		await command.run();
+
+		expect(initRequestId).toHaveBeenCalled();
+		expect(initSdk).toHaveBeenCalled();
+		expect(getMeshId).toHaveBeenCalledWith('orgCode', 'projectId', 'workspaceId', 'workspaceName');
+		expect(getPresignedUrls).toHaveBeenCalledWith(
+			'orgCode',
+			'projectId',
+			'workspaceId',
+			'meshId',
+			expect.any(String),
+			expect.any(String),
+		);
+	});
+
+	test('throws an error with edge case for --past duration', async () => {
+		parseSpy.mockResolvedValueOnce({
+			flags: {
+				past: '0s',
+				from: '2025-03-10:12:00:00',
+				filename: 'test.csv',
+				ignoreCache: false,
+			},
+		});
+
+		const command = new GetBulkLogCommand([], {});
+		await expect(command.run()).rejects.toThrow(
+			'Invalid format. Past time window should be in minutes, e.g., "20 mins", "15 minutes".',
+		);
+	});
+
+	test('runs with edge case for --from date', async () => {
+		parseSpy.mockResolvedValueOnce({
+			flags: {
+				past: '15mins',
+				from: '2025-01-01:00:00:00',
+				filename: 'test.csv',
+				ignoreCache: false,
+			},
+		});
+
+		fs.existsSync.mockReturnValue(true);
+		fs.statSync.mockReturnValue({ size: 0 });
+
+		const command = new GetBulkLogCommand([], {});
+		await expect(command.run()).rejects.toThrow(
+			'Cannot get logs more than 30 days old. Adjust your time range.',
+		);
+	});
+});
+
+describe('validateDateTimeRange', () => {
+	const testCases = [
+		{
+			startTime: '2025-03-09T12:00:00Z',
+			endTime: '2025-03-09T12:45:00Z',
+			error:
+				'Max duration between startTime and endTime should be 30 minutes. Current duration is 0 hours 45 minutes and 0 seconds.',
+		},
+		{
+			startTime: new Date().toISOString(),
+			endTime: new Date(new Date().getTime() + 45 * 60 * 1000).toISOString(),
+			error: 'endTime cannot be in the future. Provide a valid endTime.',
+		},
+		{
+			startTime: new Date(new Date().setUTCDate(new Date().getUTCDate() - 31)).toISOString(),
+			endTime: '2025-03-10T12:00:00Z',
+			error: 'Cannot get logs more than 30 days old. Adjust your time range.',
+		},
+		{
+			startTime: '2025-03-09T12:00:00Z',
+			endTime: '2025-03-09T12:00:00Z',
+			error: 'Minimum duration should be 1 minutes. Current duration is 0 minutes.',
+		},
+		{
+			startTime: '2025-03-09T12:30:00Z',
+			endTime: '2025-03-09T12:00:00Z',
+			error: 'endTime must be greater than startTime',
+		},
+		{
+			startTime: '2025-03-09T12:00:00Z',
+			endTime: '2025-03-09T12:20:00Z',
+			error: null,
+		},
+	];
+
+	test.each(testCases)(
+		'validates time range for startTime: $startTime and endTime: $endTime',
+		({ startTime, endTime, error }) => {
+			if (error) {
+				expect(() => validateDateTimeRange(startTime, endTime)).toThrow(error);
+			} else {
+				expect(() => validateDateTimeRange(startTime, endTime)).not.toThrow();
+			}
+		},
+	);
+});
+
+describe('parsePastDuration', () => {
+	const validDurations = [
+		['20m', 20 * 60 * 1000],
+		['20 m', 20 * 60 * 1000],
+		['20min', 20 * 60 * 1000],
+		['20 min', 20 * 60 * 1000],
+		['20mins', 20 * 60 * 1000],
+		['20 mins', 20 * 60 * 1000],
+		['20minute', 20 * 60 * 1000],
+		['20 minute', 20 * 60 * 1000],
+		['20minutes', 20 * 60 * 1000],
+		['20 minutes', 20 * 60 * 1000],
+	];
+
+	test.each(validDurations)(
+		'parses valid past duration "%s" correctly',
+		(pastDuration, expectedDurationInMs) => {
+			const durationInMs = parsePastDuration(pastDuration);
+			expect(durationInMs).toBe(expectedDurationInMs);
+		},
+	);
+
+	const invalidDurations = ['20h', '20 hours', '20s', '20 seconds'];
+
+	test.each(invalidDurations)(
+		'throws an error for invalid past duration format "%s"',
+		invalidPastDuration => {
+			expect(() => parsePastDuration(invalidPastDuration)).toThrow(
+				'Invalid format. Past time window should be in minutes, e.g., "20 mins", "15 minutes".',
+			);
 		},
 	);
 });

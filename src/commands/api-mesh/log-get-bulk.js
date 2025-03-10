@@ -94,11 +94,14 @@ class GetBulkLogCommand extends Command {
 				let convertedTime;
 				const dateTimeRegex = /^\d{4}-\d{2}-\d{2}:\d{2}:\d{2}:\d{2}$/;
 				if (!dateTimeRegex.test(flags.from)) {
-					this.error('Found invalid date components passed in --from. Check and correct the date.');
+					this.error('Invalid format. Use the format YYYY-MM-DD:HH:MM:SS for --from.');
 				} else {
-					convertedTime = await localToUTCTime(flags.from.toString());
-					if (!convertedTime) {
-						this.error('Invalid format. Use the format YYYY-MM-DD:HH:MM:SS for --from.');
+					try {
+						convertedTime = await localToUTCTime(flags.from.toString());
+					} catch (error) {
+						this.error(
+							`Found invalid date components passed in --from. Check and correct the date.`,
+						);
 					}
 				}
 				// add the past window to the converted time to get the end time to fetch logs from the past
