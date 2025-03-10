@@ -303,7 +303,7 @@ describe('GetBulkLogCommand with --past and --from flags', () => {
 		parseSpy = jest.spyOn(GetBulkLogCommand.prototype, 'parse').mockResolvedValue({
 			flags: {
 				past: '20mins',
-				from: '2025-03-10:12:00:00',
+				from: '2025-03-09:12:00:00',
 				filename: 'test.csv',
 				ignoreCache: false,
 			},
