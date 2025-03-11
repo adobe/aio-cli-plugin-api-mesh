@@ -299,11 +299,15 @@ describe('GetBulkLogCommand startTime and endTime validation', () => {
 describe('GetBulkLogCommand with --past and --from flags', () => {
 	let parseSpy;
 
+	let now;
+	let fromDate;
 	beforeEach(() => {
+		now = new Date();
+		fromDate = new Date(now);
 		parseSpy = jest.spyOn(GetBulkLogCommand.prototype, 'parse').mockResolvedValue({
 			flags: {
 				past: '20mins',
-				from: '2025-03-09:12:00:00',
+				from: fromDate.toISOString().slice(0, 10) + ':12:00:00',
 				filename: 'test.csv',
 				ignoreCache: false,
 			},
@@ -327,6 +331,9 @@ describe('GetBulkLogCommand with --past and --from flags', () => {
 
 	afterEach(() => {
 		jest.clearAllMocks();
+		// clear the date objects
+		now = null;
+		fromDate = null;
 	});
 
 	test('runs with valid --past and --from flags', async () => {
@@ -369,7 +376,7 @@ describe('GetBulkLogCommand with --past and --from flags', () => {
 		parseSpy.mockResolvedValueOnce({
 			flags: {
 				past: '20mins',
-				from: '2025-13-01:25:61:61',
+				from: fromDate.toISOString().slice(0, 10) + ':25:61:61',
 				filename: 'test.csv',
 				ignoreCache: false,
 			},
@@ -385,7 +392,7 @@ describe('GetBulkLogCommand with --past and --from flags', () => {
 		parseSpy.mockResolvedValueOnce({
 			flags: {
 				past: '15mins',
-				from: '2025:03:01:15:00:00',
+				from: fromDate.toISOString().slice(0, 10).replace(/-/g, ':') + ':15:00:00',
 				filename: 'test.csv',
 				ignoreCache: false,
 			},
@@ -429,7 +436,7 @@ describe('GetBulkLogCommand with --past and --from flags', () => {
 		parseSpy.mockResolvedValueOnce({
 			flags: {
 				past: '0s',
-				from: '2025-03-10:12:00:00',
+				from: fromDate.toISOString().slice(0, 10) + ':12:00:00',
 				filename: 'test.csv',
 				ignoreCache: false,
 			},
@@ -445,7 +452,7 @@ describe('GetBulkLogCommand with --past and --from flags', () => {
 		parseSpy.mockResolvedValueOnce({
 			flags: {
 				past: '15mins',
-				from: '2025-01-01:00:00:00',
+				from: fromDate.toISOString().slice(0, 10) + ':00:00:00',
 				filename: 'test.csv',
 				ignoreCache: false,
 			},
@@ -455,8 +462,18 @@ describe('GetBulkLogCommand with --past and --from flags', () => {
 		fs.statSync.mockReturnValue({ size: 0 });
 
 		const command = new GetBulkLogCommand([], {});
-		await expect(command.run()).rejects.toThrow(
-			'Cannot get logs more than 30 days old. Adjust your time range.',
+		await command.run();
+
+		expect(initRequestId).toHaveBeenCalled();
+		expect(initSdk).toHaveBeenCalled();
+		expect(getMeshId).toHaveBeenCalledWith('orgCode', 'projectId', 'workspaceId', 'workspaceName');
+		expect(getPresignedUrls).toHaveBeenCalledWith(
+			'orgCode',
+			'projectId',
+			'workspaceId',
+			'meshId',
+			expect.any(String),
+			expect.any(String),
 		);
 	});
 });
