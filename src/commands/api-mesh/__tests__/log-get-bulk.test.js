@@ -304,6 +304,7 @@ describe('GetBulkLogCommand with --past and --from flags', () => {
 	beforeEach(() => {
 		now = new Date();
 		fromDate = new Date(now);
+		fromDate.setDate(fromDate.getDate() - 29); // Set fromDate to 29 days ago
 		parseSpy = jest.spyOn(GetBulkLogCommand.prototype, 'parse').mockResolvedValue({
 			flags: {
 				past: '20mins',
