@@ -99,9 +99,7 @@ class GetBulkLogCommand extends Command {
 					try {
 						convertedTime = await localToUTCTime(flags.from.toString());
 					} catch (error) {
-						this.error(
-							`Invalid date components passed in --from. Correct the date.`,
-						);
+						this.error(`Invalid date components passed in --from. Correct the date.`);
 					}
 				}
 				// add the past window to the converted time to get the end time to fetch logs from the past

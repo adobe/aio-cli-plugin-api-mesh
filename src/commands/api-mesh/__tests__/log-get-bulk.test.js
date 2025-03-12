@@ -90,7 +90,7 @@ describe('GetBulkLogCommand', () => {
 
 		const command = new GetBulkLogCommand([], {});
 		await expect(command.run()).rejects.toThrow(
-			'Max duration between startTime and endTime should be 30 minutes. Current duration is 0 hours 45 minutes and 0 seconds.',
+			'The maximum duration between startTime and endTime is 30 minutes. The current duration is 0 hours 45 minutes and 0 seconds.',
 		);
 	});
 
@@ -445,7 +445,7 @@ describe('GetBulkLogCommand with --past and --from flags', () => {
 
 		const command = new GetBulkLogCommand([], {});
 		await expect(command.run()).rejects.toThrow(
-			'Invalid format. Past time window should be in minutes, e.g., "20 mins", "15 minutes".',
+			'Invalid format. The past time window should be in minutes, for example, "20 mins", "15 minutes".',
 		);
 	});
 
@@ -500,7 +500,7 @@ describe('validateDateTimeRange', () => {
 		{
 			startTime: '2025-03-09T12:00:00Z',
 			endTime: '2025-03-09T12:00:00Z',
-			error: 'The minimum duration is minutes. Current duration is 0 minutes.',
+			error: 'The minimum duration is 1 minutes. The current duration is 0 minutes.',
 		},
 		{
 			startTime: '2025-03-09T12:30:00Z',

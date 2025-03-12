@@ -91,8 +91,7 @@ const pastFlag = Flags.string({
 });
 
 const fromFlag = Flags.string({
-	description:
-		'The from time in DD-MM-YYYY:HH:MM:SS format based on your system's time zone. It is used to fetch logs from the past and is the starting time for the past time duration.',
+	description: `The from time in DD-MM-YYYY:HH:MM:SS format based on your system's time zone. It is used to fetch logs from the past and is the starting time for the past time duration.`,
 });
 
 const logFilenameFlag = Flags.string({
@@ -710,7 +709,9 @@ function validateDateTimeFormat(time) {
 	if (!dateTimeRegex.test(timeString)) {
 		const correctedDate = suggestCorrectedDateFormat(timeString);
 		if (!correctedDate) {
-			throw Error(`Invalid date components in ${timeString}. Confirm the date information is correct.`);
+			throw Error(
+				`Invalid date components in ${timeString}. Confirm the date information is correct.`,
+			);
 		}
 	}
 
