@@ -59,7 +59,7 @@ class GetBulkLogCommand extends Command {
 			if (!dateTimeRegex.test(flags.startTime)) {
 				const correctedStartTime = suggestCorrectedDateFormat(flags.startTime);
 				if (!correctedStartTime) {
-					this.error('Found invalid date components for startTime. Check and correct the date.');
+					this.error('Invalid date components in startTime. Correct the date.');
 				} else {
 					this.error(
 						`Use the format YYYY-MM-DDTHH:MM:SSZ for startTime. Did you mean ${correctedStartTime}?`,
@@ -100,7 +100,7 @@ class GetBulkLogCommand extends Command {
 						convertedTime = await localToUTCTime(flags.from.toString());
 					} catch (error) {
 						this.error(
-							`Found invalid date components passed in --from. Check and correct the date.`,
+							`Invalid date components passed in --from. Correct the date.`,
 						);
 					}
 				}

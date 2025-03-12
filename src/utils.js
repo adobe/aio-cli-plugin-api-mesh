@@ -92,7 +92,7 @@ const pastFlag = Flags.string({
 
 const fromFlag = Flags.string({
 	description:
-		'From time in DD-MM-YYYY:HH:MM:SS format to fetch logs from the past. Used as the starting time for the past time duration.',
+		'The from time in DD-MM-YYYY:HH:MM:SS format based on your system's time zone. It is used to fetch logs from the past and is the starting time for the past time duration.',
 });
 
 const logFilenameFlag = Flags.string({
@@ -626,7 +626,7 @@ function parsePastDuration(pastTimeWindow) {
 
 	if (!match) {
 		throw new Error(
-			'Invalid format. Past time window should be in minutes, e.g., "20 mins", "15 minutes".',
+			'Invalid format. The past time window should be in minutes, for example, "20 mins", "15 minutes".',
 		);
 	}
 
@@ -673,7 +673,7 @@ function validateDateTimeRange(startTime, endTime) {
 	}
 
 	if (start.getTime() === end.getTime()) {
-		throw new Error('Minimum duration should be 1 minutes. Current duration is 0 minutes.');
+		throw new Error('The minimum duration is 1 minutes. The current duration is 0 minutes.');
 	}
 
 	// Check if the duration between start and end times is greater than 30 minutes (1800 seconds)
@@ -685,7 +685,7 @@ function validateDateTimeRange(startTime, endTime) {
 		const seconds = timeDifferenceInSeconds % 60; // Seconds calculation
 
 		throw new Error(
-			`Max duration between startTime and endTime should be 30 minutes. Current duration is ${hours} hour${
+			`The maximum duration between startTime and endTime is 30 minutes. The current duration is ${hours} hour${
 				hours !== 1 ? 's' : ''
 			} ${minutes} minute${minutes !== 1 ? 's' : ''} and ${seconds} second${
 				seconds !== 1 ? 's' : ''
@@ -710,7 +710,7 @@ function validateDateTimeFormat(time) {
 	if (!dateTimeRegex.test(timeString)) {
 		const correctedDate = suggestCorrectedDateFormat(timeString);
 		if (!correctedDate) {
-			throw Error(`Found invalid date components for ${timeString}. Check and correct the date.`);
+			throw Error(`Invalid date components in ${timeString}. Confirm the date information is correct.`);
 		}
 	}
 
