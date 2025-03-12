@@ -91,7 +91,7 @@ const pastFlag = Flags.string({
 });
 
 const fromFlag = Flags.string({
-	description: `The from time in DD-MM-YYYY:HH:MM:SS format based on your system's time zone. It is used to fetch logs from the past and is the starting time for the past time duration.`,
+	description: `The from time in YYYY-MM-DD:HH:MM:SS format based on your system's time zone. It is used to fetch logs from the past and is the starting time for the past time duration.`,
 });
 
 const logFilenameFlag = Flags.string({
