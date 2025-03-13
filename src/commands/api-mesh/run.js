@@ -228,7 +228,7 @@ class RunCommand extends Command {
 		}
 		// Move built tenant files if exists
 		if (fs.existsSync('mesh-artifact/tenantFiles')) {
-			// Tenant files included alongside the bundle for dynamic references
+			// Tenant files included in the bundle for runtime/dynamic imports
 			fs.cpSync('mesh-artifact/tenantFiles', '.mesh/tenantFiles', { recursive: true });
 			fs.renameSync('mesh-artifact/tenantFiles', 'tenantFiles');
 		}
@@ -238,8 +238,9 @@ class RunCommand extends Command {
 		if (fs.existsSync(`${__dirname}/../../../.mesh`)) {
 			fs.rmSync(`${__dirname}/../../../.mesh`, { recursive: true });
 		}
+		// At this time the bundle and build files must be copied out to the plugin directory
 		fs.cpSync('.mesh', `${__dirname}/../../../.mesh`, { recursive: true });
-		// Tenant files included in the bundle for static imports
+		// Tenant files used at build time
 		fs.cpSync('tenantFiles', `${__dirname}/../../../tenantFiles`, { recursive: true });
 	}
 }
