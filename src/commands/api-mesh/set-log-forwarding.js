@@ -19,14 +19,7 @@ const {
 	promptInputSecret,
 } = require('../../helpers');
 const logger = require('../../classes/logger');
-const {
-	ignoreCacheFlag,
-	autoConfirmActionFlag,
-	jsonFlag,
-	logForwardingDestinationFlag,
-	logForwardingBaseUriFlag,
-	logForwardingLicenseKeyFlag,
-} = require('../../utils');
+const { ignoreCacheFlag, autoConfirmActionFlag, jsonFlag } = require('../../utils');
 const { setLogForwarding, getMeshId } = require('../../lib/devConsole');
 
 class SetLogForwardingCommand extends Command {
@@ -34,9 +27,6 @@ class SetLogForwardingCommand extends Command {
 		ignoreCache: ignoreCacheFlag,
 		autoConfirmAction: autoConfirmActionFlag,
 		json: jsonFlag,
-		destination: logForwardingDestinationFlag,
-		baseUri: logForwardingBaseUriFlag,
-		licenseKey: logForwardingLicenseKeyFlag,
 	};
 
 	static enableJsonFlag = true;
@@ -69,39 +59,31 @@ class SetLogForwardingCommand extends Command {
 			);
 		}
 
-		let destination = flags.destination;
+		// Prompt for destination
+		let destination = await promptSelect('Select log forwarding destination:', destinations);
 		if (!destination) {
-			destination = await promptSelect('Select log forwarding destination:', destinations);
-			if (!destination) {
-				this.error('Destination is required');
-				return;
-			}
+			this.error('Destination is required');
+			return;
 		}
 
-		// Get base URI from flag or prompt
-		let baseUri = flags.baseUri;
+		// Prompt for base URI
+		let baseUri = await promptInput('Enter base URI:');
 		if (!baseUri) {
-			baseUri = await promptInput('Enter base URI:', baseUri);
-			if (!baseUri) {
-				this.error('Base URI is required');
-				return;
-			}
+			this.error('Base URI is required');
+			return;
 		}
 
-		// Validate base URI from flag
+		// Validate base URI
 		if (!baseUri.startsWith('https://')) {
 			this.error('The URI value must include the protocol (https://)');
 			return;
 		}
 
-		// Get license key from flag or prompt
-		let licenseKey = flags.licenseKey;
+		// Prompt for license key
+		let licenseKey = await promptInputSecret('Enter New Relic license key:');
 		if (!licenseKey) {
-			licenseKey = await promptInputSecret('Enter New Relic license key:', licenseKey);
-			if (!licenseKey) {
-				this.error('License key is required');
-				return;
-			}
+			this.error('License key is required');
+			return;
 		}
 
 		if (licenseKey.length !== 40) {
@@ -121,7 +103,6 @@ class SetLogForwardingCommand extends Command {
 
 		if (shouldContinue) {
 			try {
-				// This function would need to be implemented in the devConsole lib
 				await setLogForwarding(imsOrgCode, projectId, workspaceId, {
 					destination: 'newrelic',
 					config: {

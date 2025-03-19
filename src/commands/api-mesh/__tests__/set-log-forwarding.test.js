@@ -39,13 +39,11 @@ describe('SetLogForwardingCommand', () => {
 		// Setup spies and mock functions
 		parseSpy = jest.spyOn(SetLogForwardingCommand.prototype, 'parse').mockResolvedValue({
 			flags: {
-				destination: 'newrelic',
-				baseUri: 'https://log-api.newrelic.com/log/v1',
-				licenseKey: 'abcdef0123456789abcdef0123456789abcdef01',
 				ignoreCache: false,
 				autoConfirmAction: false,
 				json: false,
 			},
+			args: [], // Empty args since we'll use prompts
 		});
 
 		logSpy = jest.spyOn(SetLogForwardingCommand.prototype, 'log');
@@ -66,10 +64,14 @@ describe('SetLogForwardingCommand', () => {
 		jest.clearAllMocks();
 	});
 
+	/** Success Case */
 	test('sets log forwarding with valid parameters', async () => {
 		const command = new SetLogForwardingCommand([], {});
 		const result = await command.run();
 
+		expect(promptSelect).toHaveBeenCalledWith('Select log forwarding destination:', ['newrelic']);
+		expect(promptInput).toHaveBeenCalledWith('Enter base URI:');
+		expect(promptInputSecret).toHaveBeenCalledWith('Enter New Relic license key:');
 		expect(setLogForwarding).toHaveBeenCalledWith('orgCode', 'projectId', 'workspaceId', {
 			destination: 'newrelic',
 			config: {
@@ -88,6 +90,7 @@ describe('SetLogForwardingCommand', () => {
 		});
 	});
 
+	/** Error Cases */
 	test('throws an error if mesh ID is not found', async () => {
 		getMeshId.mockResolvedValueOnce(null);
 
@@ -106,17 +109,9 @@ describe('SetLogForwardingCommand', () => {
 		);
 	});
 
+	/** Input Validation */
 	test('throws an error if base URI does not include protocol', async () => {
-		parseSpy.mockResolvedValueOnce({
-			flags: {
-				destination: 'newrelic',
-				baseUri: 'log-api.newrelic.com/log/v1', // Missing https://
-				licenseKey: 'abcdef0123456789abcdef0123456789abcdef01',
-				ignoreCache: false,
-				autoConfirmAction: false,
-				json: false,
-			},
-		});
+		promptInput.mockResolvedValueOnce('log-api.newrelic.com/log/v1'); // Missing https://
 
 		const command = new SetLogForwardingCommand([], {});
 		await expect(command.run()).rejects.toThrow(
@@ -125,16 +120,7 @@ describe('SetLogForwardingCommand', () => {
 	});
 
 	test('throws an error if license key has wrong format', async () => {
-		parseSpy.mockResolvedValueOnce({
-			flags: {
-				destination: 'newrelic',
-				baseUri: 'https://log-api.newrelic.com/log/v1',
-				licenseKey: 'wrongformat', // Too short
-				ignoreCache: false,
-				autoConfirmAction: false,
-				json: false,
-			},
-		});
+		promptInputSecret.mockResolvedValueOnce('wrongformat'); // Too short
 
 		const command = new SetLogForwardingCommand([], {});
 		await expect(command.run()).rejects.toThrow(
@@ -142,35 +128,16 @@ describe('SetLogForwardingCommand', () => {
 		);
 	});
 
-	test('skips confirmation when autoConfirmAction flag is set', async () => {
-		parseSpy.mockResolvedValueOnce({
-			flags: {
-				destination: 'newrelic',
-				baseUri: 'https://log-api.newrelic.com/log/v1',
-				licenseKey: 'abcdef0123456789abcdef0123456789abcdef01',
-				ignoreCache: false,
-				autoConfirmAction: true, // Auto-confirm enabled
-				json: false,
-			},
-		});
-
-		const command = new SetLogForwardingCommand([], {});
-		await command.run();
-
-		expect(promptConfirm).not.toHaveBeenCalled();
-		expect(setLogForwarding).toHaveBeenCalled();
-	});
-
+	/** User Interaction */
 	test('prompts for missing destination', async () => {
 		parseSpy.mockResolvedValueOnce({
 			flags: {
 				// No destination provided
-				baseUri: 'https://log-api.newrelic.com/log/v1',
-				licenseKey: 'abcdef0123456789abcdef0123456789abcdef01',
 				ignoreCache: false,
 				autoConfirmAction: false,
 				json: false,
 			},
+			args: [],
 		});
 
 		const command = new SetLogForwardingCommand([], {});
@@ -183,12 +150,11 @@ describe('SetLogForwardingCommand', () => {
 		parseSpy.mockResolvedValueOnce({
 			flags: {
 				// No destination provided
-				baseUri: 'https://log-api.newrelic.com/log/v1',
-				licenseKey: 'abcdef0123456789abcdef0123456789abcdef01',
 				ignoreCache: false,
 				autoConfirmAction: false,
 				json: false,
 			},
+			args: [],
 		});
 
 		promptSelect.mockResolvedValueOnce(null); // User cancels selection
@@ -200,36 +166,85 @@ describe('SetLogForwardingCommand', () => {
 	test('prompts for missing base URI', async () => {
 		parseSpy.mockResolvedValueOnce({
 			flags: {
-				destination: 'newrelic',
-				// No baseUri provided
-				licenseKey: 'abcdef0123456789abcdef0123456789abcdef01',
 				ignoreCache: false,
 				autoConfirmAction: false,
 				json: false,
 			},
+			args: [],
 		});
 
 		const command = new SetLogForwardingCommand([], {});
 		await command.run();
 
-		expect(promptInput).toHaveBeenCalledWith('Enter base URI:', undefined);
+		expect(promptInput).toHaveBeenCalledWith('Enter base URI:');
 	});
 
 	test('prompts for missing license key', async () => {
 		parseSpy.mockResolvedValueOnce({
 			flags: {
-				destination: 'newrelic',
-				baseUri: 'https://log-api.newrelic.com/log/v1',
-				// No licenseKey provided
 				ignoreCache: false,
 				autoConfirmAction: false,
 				json: false,
 			},
+			args: [],
 		});
 
 		const command = new SetLogForwardingCommand([], {});
 		await command.run();
 
-		expect(promptInputSecret).toHaveBeenCalledWith('Enter New Relic license key:', undefined);
+		expect(promptInputSecret).toHaveBeenCalledWith('Enter New Relic license key:');
+	});
+
+	test('throws an error if base URI is empty', async () => {
+		promptInput.mockResolvedValueOnce(''); // Empty base URI
+
+		const command = new SetLogForwardingCommand([], {});
+		await expect(command.run()).rejects.toThrow('Base URI is required');
+	});
+
+	test('throws an error if license key is empty', async () => {
+		promptInputSecret.mockResolvedValueOnce(''); // Empty license key
+
+		const command = new SetLogForwardingCommand([], {});
+		await expect(command.run()).rejects.toThrow('License key is required');
+	});
+
+	test('returns cancellation message when user declines confirmation', async () => {
+		promptConfirm.mockResolvedValueOnce(false); // User declines
+
+		const command = new SetLogForwardingCommand([], {});
+		const result = await command.run();
+
+		expect(result).toBe('set-log-forwarding cancelled');
+		expect(setLogForwarding).not.toHaveBeenCalled();
+	});
+
+	test('logs error message when setLogForwarding fails', async () => {
+		const errorMessage = 'API call failed';
+		setLogForwarding.mockRejectedValueOnce(new Error(errorMessage));
+
+		const command = new SetLogForwardingCommand([], {});
+		await expect(command.run()).rejects.toThrow(
+			'Failed to set log forwarding details. Please try again. RequestId: dummy_request_id',
+		);
+		expect(logSpy).toHaveBeenCalledWith(errorMessage);
+	});
+
+	/** Flag Handling */
+	test('skips confirmation when autoConfirmAction flag is set', async () => {
+		parseSpy.mockResolvedValueOnce({
+			flags: {
+				ignoreCache: false,
+				autoConfirmAction: true, // Auto-confirm enabled
+				json: false,
+			},
+			args: [],
+		});
+
+		const command = new SetLogForwardingCommand([], {});
+		await command.run();
+
+		expect(promptConfirm).not.toHaveBeenCalled();
+		expect(setLogForwarding).toHaveBeenCalled();
 	});
 });

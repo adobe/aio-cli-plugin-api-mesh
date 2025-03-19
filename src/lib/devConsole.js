@@ -1212,7 +1212,7 @@ const getLogsByRayId = async (organizationCode, projectId, workspaceId, meshId, 
 const setLogForwarding = async (organizationCode, projectId, workspaceId, logConfig) => {
 	const { accessToken } = await getDevConsoleConfig();
 	const config = {
-		method: 'put',
+		method: 'POST',
 		url: `${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/mesh/log/forwarding`,
 		headers: {
 			'Authorization': `Bearer ${accessToken}`,
@@ -1230,7 +1230,6 @@ const setLogForwarding = async (organizationCode, projectId, workspaceId, logCon
 
 	try {
 		const response = await axios(config);
-
 		logger.info('Response from PUT %s', response.status);
 
 		if (response && response.status === 200) {
