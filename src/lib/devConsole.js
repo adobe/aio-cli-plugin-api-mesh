@@ -1224,7 +1224,7 @@ const setLogForwarding = async (organizationCode, projectId, workspaceId, logCon
 	};
 
 	logger.info(
-		'Initiating PUT %s',
+		'Initiating POST %s',
 		`${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/mesh/log/forwarding`,
 	);
 
