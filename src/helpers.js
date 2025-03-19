@@ -521,9 +521,10 @@ async function promptInput(message) {
 }
 
 /**
- * Function to run the CLI selectable list
+ * Function to prompt for a secret/password input that masks the characters
  *
  * @param {string} message - prompt message
+ * @returns {Promise<string>} - the entered secret value
  */
 async function promptInputSecret(message) {
 	const selected = await inquirer.prompt([

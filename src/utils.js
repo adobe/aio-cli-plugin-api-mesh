@@ -101,7 +101,7 @@ const logFilenameFlag = Flags.string({
 
 const logForwardingDestinationFlag = Flags.string({
 	char: 'd',
-	description: 'Log forwarding destination (currently only supports "newrelic")',
+	description: 'Log forwarding destination',
 });
 
 const logForwardingBaseUriFlag = Flags.string({
