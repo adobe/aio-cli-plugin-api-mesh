@@ -521,6 +521,23 @@ async function promptInput(message) {
 }
 
 /**
+ * Function to run the CLI selectable list
+ *
+ * @param {string} message - prompt message
+ */
+async function promptInputSecret(message) {
+	const selected = await inquirer.prompt([
+		{
+			name: 'item',
+			message,
+			type: 'password',
+		},
+	]);
+
+	return selected.item;
+}
+
+/**
  * Import the files in the files array in meshConfig
  *
  * @param data MeshConfig
@@ -949,6 +966,7 @@ module.exports = {
 	objToString,
 	promptInput,
 	promptConfirm,
+	promptInputSecret,
 	getLibConsoleCLI,
 	getDevConsoleConfig,
 	initSdk,

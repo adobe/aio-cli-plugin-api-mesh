@@ -1201,6 +1201,68 @@ const getLogsByRayId = async (organizationCode, projectId, workspaceId, meshId, 
 	}
 };
 
+/**
+ * Sets log forwarding configuration for a mesh
+ * @param {string} organizationCode - The IMS org code
+ * @param {string} projectId - The project ID
+ * @param {string} workspaceId - The workspace ID
+ * @param {Object} logConfig - The log forwarding configuration
+ * @returns {Promise<Object>} - The response from the API
+ */
+const setLogForwarding = async (organizationCode, projectId, workspaceId, logConfig) => {
+	const { accessToken } = await getDevConsoleConfig();
+	const config = {
+		method: 'put',
+		url: `${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/mesh/log/forwarding`,
+		headers: {
+			'Authorization': `Bearer ${accessToken}`,
+			'Content-Type': 'application/json',
+			'x-request-id': global.requestId,
+			'x-api-key': SMS_API_KEY,
+		},
+		data: JSON.stringify(logConfig),
+	};
+
+	logger.info(
+		'Initiating PUT %s',
+		`${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/mesh/log/forwarding`,
+	);
+
+	try {
+		const response = await axios(config);
+
+		logger.info('Response from PUT %s', response.status);
+
+		if (response && response.status === 200) {
+			logger.info(`Log forwarding configuration: ${objToString(response, ['data'])}`);
+			return response.data;
+		} else {
+			// Non 200 response received
+			logger.error(
+				`Something went wrong: ${objToString(
+					response,
+					['data'],
+					'Unable to set log forwarding',
+				)}. Received ${response.status} response instead of 200`,
+			);
+
+			throw new Error(
+				`Something went wrong: ${objToString(response, ['data'], 'Unable to set log forwarding')}`,
+			);
+		}
+	} catch (error) {
+		if (error.response && error.response.status === 404) {
+			// The request was made and the server responded with a 404 status code
+			logger.error('Mesh not found');
+			throw new Error('Mesh not found');
+		} else {
+			// The request was made and the server responded with a different status code
+			logger.error('Error while setting log forwarding');
+			return null;
+		}
+	}
+};
+
 module.exports = {
 	getApiKeyCredential,
 	describeMesh,
@@ -1222,4 +1284,5 @@ module.exports = {
 	getPresignedUrls,
 	getLogsByRayId,
 	cachePurge,
+	setLogForwarding,
 };

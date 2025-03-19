@@ -99,6 +99,19 @@ const logFilenameFlag = Flags.string({
 	required: true,
 });
 
+const logForwardingDestinationFlag = Flags.string({
+	char: 'd',
+	description: 'Log forwarding destination (currently only supports "newrelic")',
+});
+
+const logForwardingBaseUriFlag = Flags.string({
+	description: 'Base URI for the log forwarding destination',
+});
+
+const logForwardingLicenseKeyFlag = Flags.string({
+	description: 'License key for the log forwarding destination',
+});
+
 /**
  * Parse the meshConfig and get the list of (local) files to be imported
  *
@@ -778,4 +791,7 @@ module.exports = {
 	validateDateTimeFormat,
 	localToUTCTime,
 	cachePurgeAllActionFlag,
+	logForwardingDestinationFlag,
+	logForwardingBaseUriFlag,
+	logForwardingLicenseKeyFlag,
 };
