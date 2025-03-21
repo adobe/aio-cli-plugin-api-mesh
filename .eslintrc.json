@@ -20,5 +20,6 @@
 		"prettier/prettier": "error",
 		"no-useless-escape": "warn",
 		"no-path-concat": ["warn"]
-	}
+	},
+    "ignorePatterns": ["node_modules/", "dist/", "tenantFiles/"]
 }
