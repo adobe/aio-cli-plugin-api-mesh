@@ -1202,18 +1202,17 @@ const getLogsByRayId = async (organizationCode, projectId, workspaceId, meshId, 
 };
 
 /**
- * Sets log forwarding configuration for a mesh
  * @param {string} organizationCode - The IMS org code
  * @param {string} projectId - The project ID
  * @param {string} workspaceId - The workspace ID
+ * @param {string} meshId - The mesh ID
  * @param {Object} logConfig - The log forwarding configuration
- * @returns {Promise<Object>} - The response from the API
  */
-const setLogForwarding = async (organizationCode, projectId, workspaceId, logConfig) => {
+const setLogForwarding = async (organizationCode, projectId, workspaceId, meshId, logConfig) => {
 	const { accessToken } = await getDevConsoleConfig();
 	const config = {
 		method: 'POST',
-		url: `${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/mesh/log/forwarding`,
+		url: `${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/log/forwarding`,
 		headers: {
 			'Authorization': `Bearer ${accessToken}`,
 			'Content-Type': 'application/json',
@@ -1225,39 +1224,69 @@ const setLogForwarding = async (organizationCode, projectId, workspaceId, logCon
 
 	logger.info(
 		'Initiating POST %s',
-		`${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/mesh/log/forwarding`,
+		`${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/log/forwarding`,
 	);
 
 	try {
 		const response = await axios(config);
-		logger.info('Response from PUT %s', response.status);
 
-		if (response && response.status === 200) {
+		logger.info('Response from POST %s', response.status);
+
+		if (response?.status === 200) {
 			logger.info(`Log forwarding configuration: ${objToString(response, ['data'])}`);
-			return response.data;
+			return {
+				result: response.data.result,
+				message: response.data.message,
+			};
 		} else {
-			// Non 200 response received
+			// not 200 response
 			logger.error(
 				`Something went wrong: ${objToString(
 					response,
 					['data'],
-					'Unable to set log forwarding',
-				)}. Received ${response.status} response instead of 200`,
+					'Unable to set log forwarding details.',
+				)}. Received ${response.status}, expected 200`,
 			);
-
-			throw new Error(
-				`Something went wrong: ${objToString(response, ['data'], 'Unable to set log forwarding')}`,
-			);
+			throw new Error(response.data.message);
 		}
 	} catch (error) {
-		if (error.response && error.response.status === 404) {
-			// The request was made and the server responded with a 404 status code
-			logger.error('Mesh not found');
-			throw new Error('Mesh not found');
+		if (error.response && error.response.status === 400) {
+			// The request was made and the server responded with a 400 status code
+			logger.error('Error setting log forwarding configuration: %j', error.response.data);
+
+			throw new Error('Invalid input parameters.');
+		}
+		// request made but no response received
+		else if (error.request && !error.response) {
+			logger.error('No response received from server when setting log forwarding configuration');
+			throw new Error('Unable to set log forwarding details. Check the details and try again.');
+		}
+		// response received with error
+		else if (error.response && error.response.data) {
+			logger.error(
+				'Error setting log forwarding configuration: %s',
+				objToString(error, ['response', 'data'], 'Unable to set log forwarding'),
+			);
+
+			// response a message or messages field
+
+			if (error.response.data.message || error.response.data.messages) {
+				const message = objToString(
+					error,
+					['response', 'data', 'message' || 'messages'],
+					'Unable to set log forwarding',
+				);
+				throw new Error(message);
+			}
+			// response contains error but no specific message field
+			else {
+				const message = objToString(error, ['response', 'data'], 'Unable to set log forwarding');
+				throw new Error(message);
+			}
 		} else {
-			// The request was made and the server responded with a different status code
-			logger.error('Error while setting log forwarding');
-			return null;
+			// Something else happened while setting up the request
+			logger.error('Error setting log forwarding configuration: %s', error.message);
+			throw new Error(`Something went wrong while setting log forwarding. ${error.message}`);
 		}
 	}
 };

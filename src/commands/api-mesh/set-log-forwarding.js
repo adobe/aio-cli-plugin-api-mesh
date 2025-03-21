@@ -19,7 +19,7 @@ const {
 	promptInputSecret,
 } = require('../../helpers');
 const logger = require('../../classes/logger');
-const { ignoreCacheFlag, autoConfirmActionFlag, jsonFlag } = require('../../utils');
+const { ignoreCacheFlag, autoConfirmActionFlag, jsonFlag, destinations } = require('../../utils');
 const { setLogForwarding, getMeshId } = require('../../lib/devConsole');
 
 class SetLogForwardingCommand extends Command {
@@ -40,103 +40,112 @@ class SetLogForwardingCommand extends Command {
 
 		const ignoreCache = await flags.ignoreCache;
 		const autoConfirmAction = await flags.autoConfirmAction;
-		const { imsOrgId, imsOrgCode, projectId, workspaceId, workspaceName } = await initSdk({
+
+		let destinationConfig;
+		try {
+			destinationConfig = await this.inputAndValidateConfigs(destinations);
+		} catch (error) {
+			this.error(error.message);
+			return;
+		}
+		const { imsOrgCode, projectId, workspaceId, workspaceName } = await initSdk({
 			ignoreCache,
 		});
 
-		// For MVP, only New Relic is supported
-		const destinations = ['newrelic'];
-
 		let meshId = null;
+
 		try {
-			meshId = await getMeshId(imsOrgCode, projectId, workspaceId, meshId);
-			if (!meshId) {
-				throw new Error('MeshIdNotFound');
-			}
-		} catch (error) {
+			meshId = await getMeshId(imsOrgCode, projectId, workspaceId, workspaceName);
+		} catch (err) {
+			this.log(err.message);
 			this.error(
 				`Unable to get mesh ID. Please check the details and try again. RequestId: ${global.requestId}`,
 			);
 		}
 
-		// Prompt for destination
-		let destination = await promptSelect('Select log forwarding destination:', destinations);
-		if (!destination) {
-			this.error('Destination is required');
-			return;
-		}
-
-		// Prompt for base URI
-		let baseUri = await promptInput('Enter base URI:');
-		if (!baseUri) {
-			this.error('Base URI is required');
-			return;
-		}
-
-		// Validate base URI
-		if (!baseUri.startsWith('https://')) {
-			this.error('The URI value must include the protocol (https://)');
-			return;
-		}
-
-		// Prompt for license key
-		let licenseKey = await promptInputSecret('Enter New Relic license key:');
-		if (!licenseKey) {
-			this.error('License key is required');
-			return;
-		}
-
-		if (licenseKey.length !== 40) {
+		// mesh could not be found
+		if (!meshId) {
 			this.error(
-				`License key has wrong format. Expected: 40 characters (received: ${licenseKey.length})`,
+				`Unable to get meshId. No mesh found for Org(${imsOrgCode}) -> Project(${projectId}) -> Workspace(${workspaceId}). Check the details and try again.`,
 			);
-			return;
 		}
 
 		let shouldContinue = true;
 
 		if (!autoConfirmAction) {
 			shouldContinue = await promptConfirm(
-				`Are you sure you want to set log forwarding to New Relic?`,
+				`Are you sure you want to set log forwarding to ${destinationConfig.destination}?`,
 			);
 		}
 
 		if (shouldContinue) {
 			try {
-				await setLogForwarding(imsOrgCode, projectId, workspaceId, {
-					destination: 'newrelic',
-					config: {
-						baseUri,
-						licenseKey,
-					},
-				});
-
-				this.log('Log forwarding details set successfully.');
-
-				return {
-					success: true,
-					destination: 'newrelic',
-					imsOrgId,
+				const response = await setLogForwarding(
+					imsOrgCode,
 					projectId,
 					workspaceId,
-					workspaceName,
-				};
+					meshId,
+					destinationConfig,
+				);
+				if (response && response.result) {
+					this.log('Log forwarding successfully.');
+					return { destinationConfig, imsOrgCode, projectId, workspaceId, workspaceName };
+				} else {
+					this.error(
+						`Unable to set log forwarding details. Please try again. RequestId: ${global.requestId}`,
+					);
+					return;
+				}
 			} catch (error) {
 				this.log(error.message);
 				this.error(
-					`Failed to set log forwarding details. Please try again. RequestId: ${global.requestId}`,
+					`Failed to set log forwarding details. Try again. RequestId: ${global.requestId}`,
 				);
 			}
 		} else {
-			this.log('set-log-forwarding cancelled');
+			this.log('log-forwarding cancelled');
 			return 'set-log-forwarding cancelled';
 		}
 	}
+
+	async inputAndValidateConfigs(destinations) {
+		// Prompt for destination
+		const destinationKey = await promptSelect(
+			'Select log forwarding destination:',
+			Object.keys(destinations),
+		);
+		if (!destinationKey) {
+			throw new Error('Destination is required');
+		}
+
+		const destinationConfig = destinations[destinationKey];
+		const inputs = {};
+
+		// For each input defined in the destination config, prompt and validate
+		for (const inputConfig of destinationConfig.inputs) {
+			// Prompt for input value (regular or secret based on config)
+			const promptFn = inputConfig.isSecret ? promptInputSecret : promptInput;
+			const value = await promptFn(inputConfig.promptMessage);
+
+			// Validate the input
+			if (inputConfig.validate) {
+				inputConfig.validate(value);
+			}
+
+			// Store the validated input
+			inputs[inputConfig.name] = value;
+		}
+
+		return {
+			destination: destinationConfig.name,
+			config: inputs,
+		};
+	}
 }
 
-SetLogForwardingCommand.description = `Set log forwarding destination for API mesh. 
+SetLogForwardingCommand.description = `Sets the log forwarding destination for API mesh. 
 - Select a log forwarding destination: Choose from available options ( example : newrelic).
-- Enter the base URI: Provide the URI for the log forwarding service. Ensure it includes the protocol ( example : \`https://\`).
+- Enter the base URI: Provide the URI for the log forwarding service. Ensure it includes the protocol ( example : \`https://www.adobe.com\`).
 - Enter the license key: Provide the license key for authentication with the log forwarding service. The key must be 40 characters long.`;
 
 module.exports = SetLogForwardingCommand;

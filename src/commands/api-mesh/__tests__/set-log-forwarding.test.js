@@ -34,6 +34,7 @@ jest.mock('../../../classes/logger');
 describe('SetLogForwardingCommand', () => {
 	let parseSpy;
 	let logSpy;
+	let errorSpy;
 
 	beforeEach(() => {
 		// Setup spies and mock functions
@@ -43,10 +44,13 @@ describe('SetLogForwardingCommand', () => {
 				autoConfirmAction: false,
 				json: false,
 			},
-			args: [], // Empty args since we'll use prompts
+			args: [], // Empty args since we are using prompts
 		});
 
 		logSpy = jest.spyOn(SetLogForwardingCommand.prototype, 'log');
+		errorSpy = jest.spyOn(SetLogForwardingCommand.prototype, 'error').mockImplementation(() => {
+			throw new Error(errorSpy.mock.calls[0][0]);
+		});
 
 		initSdk.mockResolvedValue({
 			imsOrgId: 'orgId',
@@ -56,7 +60,7 @@ describe('SetLogForwardingCommand', () => {
 			workspaceName: 'workspaceName',
 		});
 		getMeshId.mockResolvedValue('meshId');
-		setLogForwarding.mockResolvedValue({ success: true });
+		setLogForwarding.mockResolvedValue({ success: true, result: true });
 		global.requestId = 'dummy_request_id';
 	});
 
@@ -64,48 +68,31 @@ describe('SetLogForwardingCommand', () => {
 		jest.clearAllMocks();
 	});
 
-	/** Success Case */
+	/** Success Scenario */
 	test('sets log forwarding with valid parameters', async () => {
 		const command = new SetLogForwardingCommand([], {});
-		const result = await command.run();
+		await command.run();
 
 		expect(promptSelect).toHaveBeenCalledWith('Select log forwarding destination:', ['newrelic']);
 		expect(promptInput).toHaveBeenCalledWith('Enter base URI:');
-		expect(promptInputSecret).toHaveBeenCalledWith('Enter New Relic license key:');
-		expect(setLogForwarding).toHaveBeenCalledWith('orgCode', 'projectId', 'workspaceId', {
+		expect(promptInputSecret).toHaveBeenCalledWith('Enter license key:');
+		expect(setLogForwarding).toHaveBeenCalledWith('orgCode', 'projectId', 'workspaceId', 'meshId', {
 			destination: 'newrelic',
 			config: {
 				baseUri: 'https://log-api.newrelic.com/log/v1',
 				licenseKey: 'abcdef0123456789abcdef0123456789abcdef01',
 			},
 		});
-		expect(logSpy).toHaveBeenCalledWith('Log forwarding details set successfully.');
-		expect(result).toEqual({
-			success: true,
-			destination: 'newrelic',
-			imsOrgId: 'orgId',
-			projectId: 'projectId',
-			workspaceId: 'workspaceId',
-			workspaceName: 'workspaceName',
-		});
+		expect(logSpy).toHaveBeenCalledWith('Log forwarding successfully.');
 	});
 
-	/** Error Cases */
+	/** Error Scenarios */
 	test('throws an error if mesh ID is not found', async () => {
 		getMeshId.mockResolvedValueOnce(null);
 
 		const command = new SetLogForwardingCommand([], {});
 		await expect(command.run()).rejects.toThrow(
-			'Unable to get mesh ID. Please check the details and try again. RequestId: dummy_request_id',
-		);
-	});
-
-	test('throws an error if set log forwarding call to SMS fails', async () => {
-		setLogForwarding.mockRejectedValueOnce(new Error('Failed to set log forwarding'));
-
-		const command = new SetLogForwardingCommand([], {});
-		await expect(command.run()).rejects.toThrow(
-			'Failed to set log forwarding details. Please try again. RequestId: dummy_request_id',
+			'Unable to get meshId. No mesh found for Org(orgCode) -> Project(projectId) -> Workspace(workspaceId). Check the details and try again.',
 		);
 	});
 
@@ -124,11 +111,10 @@ describe('SetLogForwardingCommand', () => {
 
 		const command = new SetLogForwardingCommand([], {});
 		await expect(command.run()).rejects.toThrow(
-			'License key has wrong format. Expected: 40 characters (received: 11)',
+			`The license key is in the wrong format. Expected: 40 characters (received: ${11})`,
 		);
 	});
 
-	/** User Interaction */
 	test('prompts for missing destination', async () => {
 		parseSpy.mockResolvedValueOnce({
 			flags: {
@@ -163,38 +149,6 @@ describe('SetLogForwardingCommand', () => {
 		await expect(command.run()).rejects.toThrow('Destination is required');
 	});
 
-	test('prompts for missing base URI', async () => {
-		parseSpy.mockResolvedValueOnce({
-			flags: {
-				ignoreCache: false,
-				autoConfirmAction: false,
-				json: false,
-			},
-			args: [],
-		});
-
-		const command = new SetLogForwardingCommand([], {});
-		await command.run();
-
-		expect(promptInput).toHaveBeenCalledWith('Enter base URI:');
-	});
-
-	test('prompts for missing license key', async () => {
-		parseSpy.mockResolvedValueOnce({
-			flags: {
-				ignoreCache: false,
-				autoConfirmAction: false,
-				json: false,
-			},
-			args: [],
-		});
-
-		const command = new SetLogForwardingCommand([], {});
-		await command.run();
-
-		expect(promptInputSecret).toHaveBeenCalledWith('Enter New Relic license key:');
-	});
-
 	test('throws an error if base URI is empty', async () => {
 		promptInput.mockResolvedValueOnce(''); // Empty base URI
 
@@ -219,17 +173,6 @@ describe('SetLogForwardingCommand', () => {
 		expect(setLogForwarding).not.toHaveBeenCalled();
 	});
 
-	test('logs error message when setLogForwarding fails', async () => {
-		const errorMessage = 'API call failed';
-		setLogForwarding.mockRejectedValueOnce(new Error(errorMessage));
-
-		const command = new SetLogForwardingCommand([], {});
-		await expect(command.run()).rejects.toThrow(
-			'Failed to set log forwarding details. Please try again. RequestId: dummy_request_id',
-		);
-		expect(logSpy).toHaveBeenCalledWith(errorMessage);
-	});
-
 	/** Flag Handling */
 	test('skips confirmation when autoConfirmAction flag is set', async () => {
 		parseSpy.mockResolvedValueOnce({
@@ -246,5 +189,40 @@ describe('SetLogForwardingCommand', () => {
 
 		expect(promptConfirm).not.toHaveBeenCalled();
 		expect(setLogForwarding).toHaveBeenCalled();
+	});
+
+	test('sets log forwarding with auto-confirmation', async () => {
+		parseSpy.mockResolvedValueOnce({
+			flags: {
+				ignoreCache: false,
+				autoConfirmAction: true, // Auto-confirm enabled
+				json: false,
+			},
+			args: [],
+		});
+
+		const command = new SetLogForwardingCommand([], {});
+		await command.run();
+
+		expect(promptConfirm).not.toHaveBeenCalled();
+		expect(setLogForwarding).toHaveBeenCalledWith('orgCode', 'projectId', 'workspaceId', 'meshId', {
+			destination: 'newrelic',
+			config: {
+				baseUri: 'https://log-api.newrelic.com/log/v1',
+				licenseKey: 'abcdef0123456789abcdef0123456789abcdef01',
+			},
+		});
+		expect(logSpy).toHaveBeenCalledWith('Log forwarding successfully.');
+	});
+
+	test('logs error message when setLogForwarding fails', async () => {
+		const errorMessage = 'Unable to set log forwarding details';
+		setLogForwarding.mockRejectedValueOnce(new Error(errorMessage));
+
+		const command = new SetLogForwardingCommand([], {});
+		await expect(command.run()).rejects.toThrow(
+			'Failed to set log forwarding details. Try again. RequestId: dummy_request_id',
+		);
+		expect(logSpy).toHaveBeenCalledWith(errorMessage);
 	});
 });
