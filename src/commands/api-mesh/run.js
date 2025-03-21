@@ -38,7 +38,7 @@ const {
 const logger = require('../../classes/logger');
 const { getMeshId, getMeshArtifact } = require('../../lib/devConsole');
 require('dotenv').config();
-const { runServer } = require('../../server2');
+const { runServer } = require('../../server');
 const { fixPlugins } = require('../../fixPlugins');
 
 const { validateMesh, buildMesh, compileMesh } = meshBuilder.default;
