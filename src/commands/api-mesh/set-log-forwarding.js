@@ -59,7 +59,7 @@ class SetLogForwardingCommand extends Command {
 		} catch (err) {
 			this.log(err.message);
 			this.error(
-				`Unable to get mesh ID. Please check the details and try again. RequestId: ${global.requestId}`,
+				`Unable to get mesh ID. Check the details and try again. RequestId: ${global.requestId}`,
 			);
 		}
 
