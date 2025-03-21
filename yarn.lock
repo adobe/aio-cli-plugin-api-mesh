@@ -9,7 +9,7 @@
 
 "@adobe-apimesh/mesh-builder@2.1.5":
   version "2.1.5"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@adobe-apimesh/mesh-builder/-/mesh-builder-2.1.5.tgz#6e392c23226bd661d206753efcb0ee834e3f7e2f"
+  resolved "https://registry.yarnpkg.com/@adobe-apimesh/mesh-builder/-/mesh-builder-2.1.5.tgz#6e392c23226bd661d206753efcb0ee834e3f7e2f"
   integrity sha512-jztlEcfeRPkZAE+AKgP2AAw/aIGJ3WvMeDlhA9cw2RZYmQN/jBSy6sG8D7J9G2fsQUAepeuj9dX4cYlVDCS9xA==
   dependencies:
     "@fastify/request-context" "^4.1.0"
@@ -187,7 +187,7 @@
 
 "@adobe/plugin-source-headers@^0.0.2":
   version "0.0.2"
-  resolved "https://artifactory.corp.adobe.com/artifactory/api/npm/npm-adobe-release/@adobe/plugin-source-headers/-/plugin-source-headers-0.0.2.tgz#4ab2423548e474e42fd32bf1067bc8ab6857f760"
+  resolved "https://registry.yarnpkg.com/@adobe/plugin-source-headers/-/plugin-source-headers-0.0.2.tgz#4ab2423548e474e42fd32bf1067bc8ab6857f760"
   integrity sha512-AdRC8ZtXJ8Cyr3rd8qxVuY7/PnddTZFM1Jt3CaJ6VoNQodEy4+b7mK0XGnn0mEJCjE3jtORt/ztl7z28ImGGlg==
   dependencies:
     "@rollup/plugin-commonjs" "^28.0.1"
