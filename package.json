@@ -99,10 +99,11 @@
 		"source-registry-storage-adapter": "github:devx-services/source-registry-storage-adapter#main",
 		"util": "^0.12.5",
 		"uuid": "^8.3.2",
-		"wrangler": "3.80.4",
+		"wrangler": "4.3.0",
 		"yaml": "^2.4.2"
 	},
 	"devDependencies": {
+        "@cloudflare/workers-types": "^4.20250320.0",
 		"@babel/eslint-parser": "^7.15.8",
 		"@oclif/dev-cli": "1.26.10",
 		"@oclif/plugin-help": "2.2.3",
