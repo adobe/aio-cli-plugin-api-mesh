@@ -64,6 +64,11 @@ const portNoFlag = Flags.integer({
 	description: 'Port number for the local dev server',
 });
 
+const inspectPortNoFlag = Flags.integer({
+	char: 'i',
+	description: 'Port number for the local dev server inspector',
+});
+
 const debugFlag = Flags.boolean({
 	description: 'Enable debugging mode',
 	default: false,
@@ -760,6 +765,7 @@ module.exports = {
 	validateAndInterpolateMesh,
 	getAppRootDir,
 	portNoFlag,
+	inspectPortNoFlag,
 	debugFlag,
 	selectFlag,
 	secretsFlag,
