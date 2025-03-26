@@ -1,0 +1,1 @@
+{"sources":[{"name":"AdobeCommerceAPI","handler":{"graphql":{"endpoint":"https://venia.magento.com/graphql"}}}],"plugins":[{"httpDetailsExtensions":{}}],"additionalResolvers":[]}

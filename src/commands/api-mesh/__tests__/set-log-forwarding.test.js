@@ -24,7 +24,7 @@ jest.mock('../../../helpers', () => ({
 	initSdk: jest.fn().mockResolvedValue({}),
 	initRequestId: jest.fn().mockResolvedValue({}),
 	promptConfirm: jest.fn().mockResolvedValue(true),
-	promptSelect: jest.fn().mockResolvedValue('newrelic'),
+	promptSelect: jest.fn().mockResolvedValue('New Relic'),
 	promptInput: jest.fn().mockResolvedValue('https://log-api.newrelic.com/log/v1'),
 	promptInputSecret: jest.fn().mockResolvedValue('abcdef0123456789abcdef0123456789abcdef01'),
 }));
@@ -68,13 +68,15 @@ describe('SetLogForwardingCommand', () => {
 		jest.clearAllMocks();
 	});
 
-	describe('Test newrelic destination', () => {
+	describe('Test New Relic destination', () => {
 		/** Success Scenario */
 		test('sets log forwarding with valid parameters', async () => {
 			const command = new SetLogForwardingCommand([], {});
 			await command.run();
 
-			expect(promptSelect).toHaveBeenCalledWith('Select log forwarding destination:', ['newrelic']);
+			expect(promptSelect).toHaveBeenCalledWith('Select log forwarding destination:', [
+				'New Relic',
+			]);
 			expect(promptInput).toHaveBeenCalledWith('Enter base URI:');
 			expect(promptInputSecret).toHaveBeenCalledWith('Enter license key:');
 			expect(setLogForwarding).toHaveBeenCalledWith(
@@ -90,7 +92,7 @@ describe('SetLogForwardingCommand', () => {
 					},
 				},
 			);
-			expect(logSpy).toHaveBeenCalledWith('Log forwarding successfully.');
+			expect(logSpy).toHaveBeenCalledWith('Log forwarding set successfully for meshId');
 		});
 
 		/** Error Scenarios */
@@ -136,7 +138,9 @@ describe('SetLogForwardingCommand', () => {
 			const command = new SetLogForwardingCommand([], {});
 			await command.run();
 
-			expect(promptSelect).toHaveBeenCalledWith('Select log forwarding destination:', ['newrelic']);
+			expect(promptSelect).toHaveBeenCalledWith('Select log forwarding destination:', [
+				'New Relic',
+			]);
 		});
 
 		test('throws an error if destination selection is cancelled', async () => {
@@ -225,7 +229,7 @@ describe('SetLogForwardingCommand', () => {
 					},
 				},
 			);
-			expect(logSpy).toHaveBeenCalledWith('Log forwarding successfully.');
+			expect(logSpy).toHaveBeenCalledWith('Log forwarding set successfully for meshId');
 		});
 
 		test('logs error message when setLogForwarding fails', async () => {

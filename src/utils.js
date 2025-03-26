@@ -104,10 +104,10 @@ const logFilenameFlag = Flags.string({
 // Each destination can have different key/value pairs of configuration credentials.
 // and applies the validation logic accordingly.
 const destinations = {
-	// Configuration for the 'newrelic' destination
-	newrelic: {
-		name: 'newrelic',
-		// Required inputs for the 'newrelic' destination
+	// Configuration for the 'New Relic' destination
+	'New Relic': {
+		name: 'newrelic', // internal value that will be used
+		// Required inputs for the 'New Relic' destination
 		inputs: [
 			{
 				name: 'baseUri',

@@ -88,7 +88,7 @@ class SetLogForwardingCommand extends Command {
 					destinationConfig,
 				);
 				if (response && response.result) {
-					this.log('Log forwarding successfully.');
+					this.log(`Log forwarding set successfully for ${meshId}`);
 					return { destinationConfig, imsOrgCode, projectId, workspaceId, workspaceName };
 				} else {
 					this.error(
@@ -145,7 +145,7 @@ class SetLogForwardingCommand extends Command {
 
 SetLogForwardingCommand.description = `Sets the log forwarding destination for API mesh. 
 - Select a log forwarding destination: Choose from available options ( example : newrelic).
-- Enter the base URI: Provide the URI for the log forwarding service. Ensure it includes the protocol ( example : \`https://www.adobe.com\`).
-- Enter the license key: Provide the license key for authentication with the log forwarding service. The key must be 40 characters long.`;
+- Enter the base URI: Provide the URI for the log forwarding service. Ensure it includes the protocol ( example : If the hosted region of New Relic account is U.S, the base URI can be 'https://log-api.newrelic.com/log/v1').
+- Enter the license key: Provide the INGEST-LICENSE API key type.`;
 
 module.exports = SetLogForwardingCommand;
