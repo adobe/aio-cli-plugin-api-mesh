@@ -144,7 +144,7 @@ class SetLogForwardingCommand extends Command {
 }
 
 SetLogForwardingCommand.description = `Sets the log forwarding destination for API mesh. 
-- Select a log forwarding destination: Choose from available options ( example : newrelic).
+- Select a log forwarding destination - Choose from available options (for example, New Relic).
 - Enter the base URI - Provide the URI for the log forwarding service. Ensure it includes the protocol (for example, if the hosted region of the New Relic account is the U.S, the base URI could be 'https://log-api.newrelic.com/log/v1').
 - Enter the license key - Provide the INGEST-LICENSE API key type.`;
 
