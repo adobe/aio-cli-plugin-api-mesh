@@ -92,7 +92,7 @@ class SetLogForwardingCommand extends Command {
 					return { destinationConfig, imsOrgCode, projectId, workspaceId, workspaceName };
 				} else {
 					this.error(
-						`Unable to set log forwarding details. Please try again. RequestId: ${global.requestId}`,
+						`Unable to set log forwarding details. Try again. RequestId: ${global.requestId}`,
 					);
 					return;
 				}
