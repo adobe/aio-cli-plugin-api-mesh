@@ -231,8 +231,8 @@ class RunCommand extends Command {
 			// Tenant files included in the bundle for runtime/dynamic imports
 			fs.cpSync('mesh-artifact/tenantFiles', '.mesh/tenantFiles', { recursive: true });
 			fs.renameSync('mesh-artifact/tenantFiles', 'tenantFiles');
-    		// Tenant files used at worker build time
-    		fs.cpSync('tenantFiles', `${__dirname}/../../../tenantFiles`, { recursive: true });
+			// Tenant files used at worker build time
+			fs.cpSync('tenantFiles', `${__dirname}/../../../tenantFiles`, { recursive: true });
 		}
 
 		await fixPlugins('.mesh/index.js');
