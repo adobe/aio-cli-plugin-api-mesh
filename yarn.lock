@@ -7,10 +7,10 @@
   resolved "https://registry.yarnpkg.com/@aashutoshrathi/word-wrap/-/word-wrap-1.2.6.tgz#bd9154aec9983f77b3a034ecaa015c2e4201f6cf"
   integrity sha512-1Yjs2SvM8TflER/OD3cOjhWWOZb58A2t7wpE2S9XfBYTiIl+XFhQG2bjy4Pu1I+EAlCNUzRDYDdFwFYUKvXcIA==
 
-"@adobe-apimesh/mesh-builder@2.1.4":
-  version "2.1.4"
-  resolved "https://registry.yarnpkg.com/@adobe-apimesh/mesh-builder/-/mesh-builder-2.1.4.tgz#cd58968f313566a9fb018a7d45aaefd2ef08d165"
-  integrity sha512-GVpUnt3oIbPRlagbcfmAw89M45g0Yhq242vkAEO+0KzOj//NhWlDEMi+ya9OMD2+sop2bZU+IrcDYbLKzORK/g==
+"@adobe-apimesh/mesh-builder@2.1.5":
+  version "2.1.5"
+  resolved "https://registry.yarnpkg.com/@adobe-apimesh/mesh-builder/-/mesh-builder-2.1.5.tgz#6e392c23226bd661d206753efcb0ee834e3f7e2f"
+  integrity sha512-jztlEcfeRPkZAE+AKgP2AAw/aIGJ3WvMeDlhA9cw2RZYmQN/jBSy6sG8D7J9G2fsQUAepeuj9dX4cYlVDCS9xA==
   dependencies:
     "@fastify/request-context" "^4.1.0"
     eslint "^8.39.0"
@@ -185,10 +185,10 @@
   resolved "https://registry.yarnpkg.com/@adobe/plugin-on-fetch/-/plugin-on-fetch-0.1.1.tgz#4c5a784c5bd754cfa1100528a88be02c005b72fb"
   integrity sha512-DUpBLWKUW6EZQJcZ2IFvKS1+B2l/TFkI6SZQNtemSFnv4zOUpCRaKRcGSJS7zNShRBVlxiJsfG20jBIDuECVLg==
 
-"@adobe/plugin-source-headers@^0.0.1":
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/@adobe/plugin-source-headers/-/plugin-source-headers-0.0.1.tgz#427f5c8aba4dfb21f10ebd1fd7b76363fe414c2e"
-  integrity sha512-KTKBGTPaNrb7kA9zNjxEhBbr3a03Vg2bgXxgBvBcpR2BfgT3UTf1HkMoUP2OQnYYIg6e/il2WRZM8Bi2SK0cdg==
+"@adobe/plugin-source-headers@^0.0.2":
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/@adobe/plugin-source-headers/-/plugin-source-headers-0.0.2.tgz#4ab2423548e474e42fd32bf1067bc8ab6857f760"
+  integrity sha512-AdRC8ZtXJ8Cyr3rd8qxVuY7/PnddTZFM1Jt3CaJ6VoNQodEy4+b7mK0XGnn0mEJCjE3jtORt/ztl7z28ImGGlg==
   dependencies:
     "@rollup/plugin-commonjs" "^28.0.1"
     "@rollup/plugin-node-resolve" "^15.3.0"
