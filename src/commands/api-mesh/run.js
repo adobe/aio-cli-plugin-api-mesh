@@ -231,6 +231,8 @@ class RunCommand extends Command {
 			// Tenant files included in the bundle for runtime/dynamic imports
 			fs.cpSync('mesh-artifact/tenantFiles', '.mesh/tenantFiles', { recursive: true });
 			fs.renameSync('mesh-artifact/tenantFiles', 'tenantFiles');
+			// Tenant files used at worker build time
+			fs.cpSync('tenantFiles', `${__dirname}/../../../tenantFiles`, { recursive: true });
 		}
 
 		await fixPlugins('.mesh/index.js');
@@ -240,8 +242,6 @@ class RunCommand extends Command {
 		}
 		// At this time the bundle and build files must be copied out to the plugin directory
 		fs.cpSync('.mesh', `${__dirname}/../../../.mesh`, { recursive: true });
-		// Tenant files used at build time
-		fs.cpSync('tenantFiles', `${__dirname}/../../../tenantFiles`, { recursive: true });
 	}
 }
 
