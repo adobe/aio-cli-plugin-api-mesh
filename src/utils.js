@@ -282,7 +282,7 @@ function checkPlaceholders(mesh) {
  * @param {string} file
  * @param {object} command
  * @param {string} filetype
- * @returns {string}
+ * @returns {Promise<string>}
  */
 async function readFileContents(file, command, filetype) {
 	try {
@@ -350,7 +350,7 @@ function validateFileName(filesList) {
  * @param {string} inputMeshData
  * @param {string} envFilePath
  * @param {object} command
- * @returns {string}
+ * @returns {Promise<string>}
  */
 async function validateAndInterpolateMesh(inputMeshData, envFilePath, command) {
 	//Read the environment file
