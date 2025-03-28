@@ -38,8 +38,9 @@ const {
 const logger = require('../../classes/logger');
 const { getMeshId, getMeshArtifact } = require('../../lib/devConsole');
 require('dotenv').config();
-const { runServer } = require('../../server');
+const { start } = require('../../wranglerCli');
 const { fixPlugins } = require('../../fixPlugins');
+const { resolveComposerAsStaticImport } = require('../../meshArtifact');
 
 const { validateMesh, buildMesh, compileMesh } = meshBuilder.default;
 
@@ -172,10 +173,14 @@ class RunCommand extends Command {
 				);
 			}
 		}
+		// Empty mesh-artifact directory
+		const artifactDir = 'mesh-artifact';
+		if (fs.existsSync(artifactDir)) {
+			fs.rmSync(artifactDir, { recursive: true });
+		}
 
 		//Generating unique mesh id
 		const meshId = 'testMesh';
-
 		await validateMesh(data.meshConfig);
 		await buildMesh(meshId, data.meshConfig);
 		await compileMesh(meshId);
@@ -183,30 +188,19 @@ class RunCommand extends Command {
 		return meshId;
 	}
 
-	getPort(env, flags) {
-		let value;
-		const envVar = env.PORT;
-		if (envVar) {
-			value = this.parseInt(envVar, 'PORT value in the .env file is not a valid integer');
+	updateFlagsFromEnv(flags) {
+		if (process.env.PORT !== undefined) {
+			flags.port = this.parseInt(
+				process.env.PORT,
+				'PORT value in the .env file is not a valid integer',
+			);
 		}
-		//To set the port number as the provided value in the command
-		if (flags.port) {
-			value = flags.port;
+		if (process.env.INSPECT_PORT !== undefined) {
+			flags.inspectPort = this.parseInt(
+				process.env.INSPECT_PORT,
+				'INSPECT_PORT value in the .env file is not a valid integer',
+			);
 		}
-		return value;
-	}
-
-	getInspectPort(env, flags) {
-		let value;
-		const envVar = env.INSPECT_PORT;
-		if (envVar) {
-			value = this.parseInt(envVar, 'INSPECT_PORT value in the .env file is not a valid integer');
-		}
-		//To set the port number as the provided value in the command
-		if (flags.inspectPort) {
-			value = flags.inspectPort;
-		}
-		return value;
 	}
 
 	/**
@@ -251,8 +245,7 @@ class RunCommand extends Command {
 			const { args, flags } = await this.parse(RunCommand);
 			await this.validateCwd();
 
-			const port = this.getPort(process.env, flags);
-			const inspectPort = this.getInspectPort(process.env, flags);
+			this.updateFlagsFromEnv(flags);
 
 			// Use remote or local mesh artifact
 			let meshId;
@@ -268,19 +261,58 @@ class RunCommand extends Command {
 				await this.handleSecretsFeature(secretsFilePath, meshId);
 			}
 
-			// TODO: Review copy to ensure files can be debugged
 			await this.copyMeshContent(meshId);
 
-			const worker = await runServer(this, port, flags.debug, inspectPort);
+			start(this, flags.port, flags.debug, flags.inspectPort);
 			if (flags.debug) {
-				this.log(`Debugging enabled on inspect port: ${worker.inspectPort}`);
+				this.log(`Debugging enabled on inspect port: ${flags.inspectPort}`);
 			}
 		} catch (error) {
 			this.error(error.message);
 		}
 	}
 
+	// TODO: Refactor to clean up shuffled files
 	async copyMeshContent(meshId) {
+		const artifactDir = 'mesh-artifact';
+		const meshDir = path.join(artifactDir, meshId);
+		// Handle both new and old file extensions for compatibility
+		const meshArtifactPath = fs.existsSync(path.join(meshDir, 'index.ts'))
+			? path.join(meshDir, 'index.ts')
+			: path.join(meshDir, 'index.js');
+
+		const tenantFilesDir = path.join(artifactDir, 'tenantFiles');
+
+		// Throw if something went wrong with mesh build, but we ended up here
+		if (!fs.existsSync(artifactDir)) {
+			throw new Error('Build artifact not found');
+		}
+
+		// Fix relative paths in built mesh for original source debugging
+		const filesPath = path.join(meshDir, 'files.json');
+		if (fs.existsSync(filesPath)) {
+			// read file and parse as json
+			const files = JSON.parse(fs.readFileSync(filesPath).toString());
+			let mesh = fs.readFileSync(meshArtifactPath).toString();
+			files.files.forEach(file => {
+				if (fs.existsSync(path.resolve(file.path))) {
+					const parentDirRegex = new RegExp(
+						'../tenantFiles'.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
+						'g',
+					);
+					mesh = mesh.replace(parentDirRegex, './tenantFiles');
+					const regex = new RegExp(
+						file.materializedPath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
+						'g',
+					);
+					const resolvedPath = path.resolve(file.path).replace(/^\.\//, '../');
+					mesh = mesh.replace(regex, resolvedPath);
+					mesh = resolveComposerAsStaticImport(meshArtifactPath, mesh);
+				}
+			});
+			fs.writeFileSync(meshArtifactPath, mesh, 'utf8');
+		}
+
 		// Remove mesh artifact directory if exists
 		if (fs.existsSync('.mesh')) {
 			fs.rmSync('.mesh', { recursive: true });
@@ -290,16 +322,17 @@ class RunCommand extends Command {
 			fs.rmSync('tenantFiles', { recursive: true });
 		}
 		// Move built mesh artifact to expect directory
-		fs.renameSync(`mesh-artifact/${meshId}`, '.mesh');
+		fs.renameSync(meshDir, '.mesh');
 
 		// Move built tenant files if exists
-		if (fs.existsSync('mesh-artifact/tenantFiles')) {
+		if (fs.existsSync(tenantFilesDir)) {
 			// Tenant files included in the bundle for runtime/dynamic imports
-			fs.cpSync('mesh-artifact/tenantFiles', '.mesh/tenantFiles', { recursive: true });
-			fs.renameSync('mesh-artifact/tenantFiles', 'tenantFiles');
+			fs.cpSync(tenantFilesDir, '.mesh/tenantFiles', { recursive: true });
+			//fs.renameSync('mesh-artifact/tenantFiles', 'tenantFiles');
 		}
 
-		await fixPlugins('.mesh/index.js');
+		const meshArtifact = fs.existsSync('.mesh/index.ts') ? '.mesh/index.ts' : '.mesh/index.js';
+		await fixPlugins(meshArtifact);
 
 		if (fs.existsSync(`${__dirname}/../../../.mesh`)) {
 			fs.rmSync(`${__dirname}/../../../.mesh`, { recursive: true });

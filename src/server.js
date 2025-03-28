@@ -1,76 +1,80 @@
-// eslint-disable-next-line no-unused-vars
-const { unstable_dev, Unstable_DevWorker, Unstable_DevOptions } = require('wrangler');
-const { readSecretsFile } = require('./serverUtils');
-const { join } = require('node:path');
+import { getMesh } from '@graphql-mesh/runtime';
 
-/**
- * @type {Unstable_DevWorker}
- */
-let worker;
+const { getCorsOptions } = require('./cors');
+const { createYoga } = require('graphql-yoga');
+const { GraphQLError } = require('graphql/error');
 
-/**
- * Handle shutdown of the Worker.
- * @returns {Promise<void>}
- */
-const handleShutdown = async () => {
-	if (worker) {
-		await worker.stop();
+const { loadMeshSecrets, getSecretsHandler } = require('./secrets');
+const useComplianceHeaders = require('./plugins/complianceHeaders');
+const UseHttpDetailsExtensions = require('./plugins/httpDetailsExtensions');
+const useSourceHeaders = require('@adobe/plugin-source-headers');
+const { useDisableIntrospection } = require('@envelop/disable-introspection');
+
+let meshInstance$;
+
+async function buildMeshInstance(meshArtifacts, meshConfig) {
+	const { getMeshOptions } = meshArtifacts;
+	const options = await getMeshOptions();
+
+	options.additionalEnvelopPlugins = (options.additionalEnvelopPlugins || []).concat(
+		useComplianceHeaders(),
+		UseHttpDetailsExtensions({
+			// Get the details of responseConfig.includeHTTPDetails and store in Cache
+			if: meshConfig.responseConfig?.includeHTTPDetails || false,
+		}),
+		useSourceHeaders(meshConfig),
+	);
+
+	if (meshConfig.disableIntrospection) {
+		options.additionalEnvelopPlugins.push(useDisableIntrospection());
 	}
+
+	return getMesh(options).then(mesh => {
+		const id = mesh.pubsub.subscribe('destroy', () => {
+			meshInstance$ = undefined;
+			mesh.pubsub.unsubscribe(id);
+		});
+		return mesh;
+	});
+}
+
+async function getBuiltMesh(meshArtifacts, meshConfig) {
+	if (meshInstance$ == null) {
+		meshInstance$ = buildMeshInstance(meshArtifacts, meshConfig);
+	}
+	return meshInstance$;
+}
+
+const buildServer = async (loggerInstance, env, meshArtifacts, meshConfig) => {
+	const { Secret: secret } = env;
+	const tenantMesh = await getBuiltMesh(meshArtifacts, meshConfig);
+	const meshSecrets = loadMeshSecrets(loggerInstance, secret);
+	return await buildYogaServer(env, tenantMesh, meshConfig, meshSecrets);
 };
 
-/**
- * Listen for process signals and handle shutdown.
- */
-process.on('exit', handleShutdown);
-process.on('SIGINT', handleShutdown);
-process.on('SIGTERM', handleShutdown);
-process.on('uncaughtException', async err => {
-	console.error(`\nUncaught exception: ${err.message}`);
-	await handleShutdown();
-});
-
-/**
- * Run the local server
- * @param command {Command} CLI command
- * @param port {number} Port number
- * @param debug {boolean} Whether to enable debugging
- * @param inspectPort {number?} Inspector port number
- * @returns {Promise<{address: string, inspectPort: number, port: number}>}
- */
-const runServer = async (command, port, debug, inspectPort) => {
-	const indexFilePath = `${__dirname}/index.js`;
-	const index2 = join(process.cwd(), 'index.ts');
-	const filePath = '.mesh';
-	const secrets = readSecretsFile(filePath);
-
-	/**
-	 * Dev options.
-	 * @type {Unstable_DevOptions}
-	 */
-	const options = {
-		config: join(__dirname, '../wrangler.toml'),
-		experimental: { disableExperimentalWarning: true },
-		port: port || 5000,
-		vars: {
-			Secret: JSON.stringify(secrets),
+async function buildYogaServer(env, tenantMesh, meshConfig, meshSecrets) {
+	const secretsProxy = new Proxy(meshSecrets, getSecretsHandler);
+	return createYoga({
+		plugins: tenantMesh.plugins,
+		graphqlEndpoint: `/graphql`,
+		cors: getCorsOptions(env, meshConfig),
+		context: initialContext => ({
+			...initialContext,
+			secrets: secretsProxy,
+		}),
+		maskedErrors: {
+			maskError: maskError,
 		},
-		compatibilityDate: '2024-06-03',
-		logLevel: process.env.ENABLE_LOGGER
-			? process.env.LOG_LEVEL
-				? process.env.LOG_LEVEL
-				: 'info'
-			: 'info',
-	};
-	if (debug) {
-		options.inspect = true;
-		options.inspectorPort = inspectPort || 9229;
+		logging: 'debug',
+	});
+}
+
+const maskError = error => {
+	if (error instanceof GraphQLError && error.extensions?.http?.headers) {
+		delete error.extensions.http.headers;
 	}
-	worker = await unstable_dev(index2, options);
-	return {
-		address: worker.address,
-		inspectPort: options.inspectorPort,
-		port: worker.port,
-	};
+
+	return error;
 };
 
-module.exports = { runServer };
+module.exports = { buildServer };

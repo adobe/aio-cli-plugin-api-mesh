@@ -62,11 +62,13 @@ const secretsFlag = Flags.string({
 const portNoFlag = Flags.integer({
 	char: 'p',
 	description: 'Port number for the local dev server',
+	default: 5000,
 });
 
 const inspectPortNoFlag = Flags.integer({
 	char: 'i',
 	description: 'Port number for the local dev server inspector',
+	default: 9229,
 });
 
 const debugFlag = Flags.boolean({
