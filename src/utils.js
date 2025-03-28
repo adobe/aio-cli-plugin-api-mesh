@@ -99,6 +99,49 @@ const logFilenameFlag = Flags.string({
 	required: true,
 });
 
+// The `destinations` object to hold the configuration for log forwarding destinations.
+// It prompts for the required inputs for the destination.
+// Each destination can have different key/value pairs of configuration credentials.
+// and applies the validation logic accordingly.
+const destinations = {
+	// Configuration for the 'New Relic' destination
+	'New Relic': {
+		name: 'newrelic', // internal value that will be used
+		// Required inputs for the 'New Relic' destination
+		inputs: [
+			{
+				name: 'baseUri',
+				promptMessage: 'Enter base URI:',
+				isSecret: false,
+				validate: value => {
+					if (!value) {
+						throw new Error('Base URI is required');
+					}
+					if (!value.startsWith('https://')) {
+						throw new Error('The URI value must include the protocol (https://)');
+					}
+				},
+			},
+			{
+				name: 'licenseKey',
+				promptMessage: 'Enter license key:',
+				isSecret: true,
+				validate: value => {
+					if (!value) {
+						throw new Error('License key is required');
+					}
+					if (value.length !== 40) {
+						throw new Error(
+							`The license key is in the wrong format. Expected: 40 characters (received: ${value.length})`,
+						);
+					}
+				},
+			},
+		],
+	},
+	// Additional destinations can be added here
+};
+
 /**
  * Parse the meshConfig and get the list of (local) files to be imported
  *
@@ -778,4 +821,5 @@ module.exports = {
 	validateDateTimeFormat,
 	localToUTCTime,
 	cachePurgeAllActionFlag,
+	destinations,
 };
