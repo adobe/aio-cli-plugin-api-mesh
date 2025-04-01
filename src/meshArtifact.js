@@ -1,7 +1,7 @@
 const path = require('path');
 const fs = require('fs');
 const { fixPlugins } = require('./fixPlugins');
-const logger = require('../src/logger');
+const logger = require('../src/classes/logger');
 
 /**
  * Whether file is TypeScript
