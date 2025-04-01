@@ -32,12 +32,9 @@ const start = (command, port, debug, inspectPort) => {
 		`Secret:${JSON.stringify(secrets)}`,
 		'--port',
 		port,
+		'--inspector-port',
+		debug ? inspectPort : 0,
 	];
-
-	// Activate inspector for debugging when debug flag
-	if (debug) {
-		commandArgs.push('--inspector-port', inspectPort);
-	}
 
 	const wrangler = spawn('npx', commandArgs, {
 		stdio: 'inherit',

@@ -1,4 +1,7 @@
 const path = require('path');
+const fs = require('fs');
+const { fixPlugins } = require('./fixPlugins');
+const logger = require('../src/logger');
 
 /**
  * Whether file is TypeScript
@@ -7,6 +10,18 @@ const path = require('path');
 function isTypeScriptFile(filePath) {
 	const ext = path.extname(filePath);
 	return ext === '.ts' || ext === '.tsx';
+}
+
+/**
+ * Gets
+ * @param builtMeshTenantDir
+ * @returns {string}
+ */
+function getBuiltMeshEntrypoint(builtMeshTenantDir) {
+	let builtMeshIndexPath = path.join(builtMeshTenantDir, 'index');
+	return fs.existsSync(`${builtMeshIndexPath}.ts`)
+		? `${builtMeshIndexPath}.ts`
+		: `${builtMeshIndexPath}.js`;
 }
 
 /**
@@ -76,9 +91,75 @@ function resolveComposerAsStaticImport(meshArtifactPath, data) {
 		: resolveComposerAsJavaScriptModule(data);
 }
 
+const resolveRelativeSources = async builtMeshTenantDir => {
+	let builtMeshPath = getBuiltMeshEntrypoint(builtMeshTenantDir);
+
+	// Fix http details extensions plugin for edge compatibility
+	await fixPlugins(builtMeshPath);
+
+	// Read tenant files inventory
+	const artifactFilesPath = path.join(builtMeshTenantDir, 'files.json');
+	if (fs.existsSync(artifactFilesPath)) {
+		// Read mesh artifact
+		let builtMeshData = fs.readFileSync(builtMeshPath).toString();
+
+		const parentDirRegex = new RegExp('../tenantFiles'.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
+		builtMeshData = builtMeshData.replace(parentDirRegex, './tenantFiles');
+
+		// Write the modified mesh artifact
+		fs.writeFileSync(builtMeshPath, builtMeshData, 'utf8');
+	}
+};
+
+/**
+ * Resolve original sources to materialized files in mesh artifact for local development and debugging
+ * @param builtMeshTenantDir Built mesh tenant directory
+ * @param localFileOverrides Local file overrides
+ */
+const resolveOriginalSources = async (builtMeshTenantDir, localFileOverrides) => {
+	let builtMeshPath = getBuiltMeshEntrypoint(builtMeshTenantDir);
+
+	// Fix http details extensions plugin for edge compatibility
+	await fixPlugins(builtMeshPath);
+
+	// Read tenant files inventory
+	const artifactFilesPath = path.join(builtMeshTenantDir, 'files.json');
+	if (fs.existsSync(artifactFilesPath)) {
+		let files = {};
+		try {
+			files = JSON.parse(fs.readFileSync(artifactFilesPath).toString());
+		} catch (err) {
+			logger.error('Malformed "files.json" file. Skipping original source resolution.');
+		}
+
+		// Read mesh artifact
+		let builtMeshData = fs.readFileSync(builtMeshPath).toString();
+		files.files.forEach(file => {
+			if (localFileOverrides[file.path]) {
+				// Skip files that are conflicting
+				return;
+			}
+
+			// When the source exists in project use it instead of the materialized file
+			const absoluteFilePath = path.resolve(file.path);
+			if (fs.existsSync(absoluteFilePath)) {
+				// Replace all occurrences of the materialized path with the fully qualified original path
+				const regex = new RegExp(file.materializedPath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
+				builtMeshData = builtMeshData.replace(regex, absoluteFilePath);
+				builtMeshData = resolveComposerAsStaticImport(builtMeshPath, builtMeshData);
+			}
+		});
+
+		// Write the modified mesh artifact
+		fs.writeFileSync(builtMeshPath, builtMeshData, 'utf8');
+	}
+};
+
 module.exports = {
 	isTypeScriptFile,
 	resolveComposerAsTypeScriptModule,
 	resolveComposerAsJavaScriptModule,
 	resolveComposerAsStaticImport,
+	resolveRelativeSources,
+	resolveOriginalSources,
 };

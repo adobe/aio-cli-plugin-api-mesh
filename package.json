@@ -103,8 +103,8 @@
 		"yaml": "^2.4.2"
 	},
 	"devDependencies": {
-        "@cloudflare/workers-types": "^4.20250320.0",
 		"@babel/eslint-parser": "^7.15.8",
+		"@cloudflare/workers-types": "^4.20250320.0",
 		"@oclif/dev-cli": "1.26.10",
 		"@oclif/plugin-help": "2.2.3",
 		"@trivago/prettier-plugin-sort-imports": "^3.1.1",
