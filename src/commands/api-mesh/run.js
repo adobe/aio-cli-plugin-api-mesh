@@ -289,6 +289,35 @@ class RunCommand extends Command {
 			this.error(error.message);
 		}
 	}
+
+	async copyMeshContent(meshId) {
+		// Remove mesh artifact directory if exists
+		if (fs.existsSync('.mesh')) {
+			fs.rmSync('.mesh', { recursive: true });
+		}
+		// Move built mesh artifact to expect directory
+		fs.renameSync(`mesh-artifact/${meshId}`, '.mesh');
+		// Remove tenant files directory if exists
+		if (fs.existsSync('tenantFiles')) {
+			fs.rmSync('tenantFiles', { recursive: true });
+		}
+		// Move built tenant files if exists
+		if (fs.existsSync('mesh-artifact/tenantFiles')) {
+			// Tenant files included in the bundle for runtime/dynamic imports
+			fs.cpSync('mesh-artifact/tenantFiles', '.mesh/tenantFiles', { recursive: true });
+			fs.renameSync('mesh-artifact/tenantFiles', 'tenantFiles');
+			// Tenant files used at worker build time
+			fs.cpSync('tenantFiles', `${__dirname}/../../../tenantFiles`, { recursive: true });
+		}
+
+		await fixPlugins('.mesh/index.js');
+
+		if (fs.existsSync(`${__dirname}/../../../.mesh`)) {
+			fs.rmSync(`${__dirname}/../../../.mesh`, { recursive: true });
+		}
+		// At this time the bundle and build files must be copied out to the plugin directory
+		fs.cpSync('.mesh', `${__dirname}/../../../.mesh`, { recursive: true });
+	}
 }
 
 module.exports = RunCommand;

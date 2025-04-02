@@ -53,5 +53,8 @@ Thumbs.db
 # Ignore built ts files
 dist/**/*
 dist
+tenantFiles
+.wrangler
+.mesh
 
 CHANGELOG.md
