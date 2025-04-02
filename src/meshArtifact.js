@@ -193,15 +193,20 @@ const resolveOriginalSources = async (builtMeshTenantDir, localFileOverrides) =>
 		// Read mesh artifact
 		let builtMeshData = fs.readFileSync(builtMeshPath).toString();
 		files.files.forEach(file => {
-			if (localFileOverrides[file.path]) {
-				// Skip files that are conflicting
+			// Skip replacement of files for local development when the user was prompted
+			// to override and answered no
+			if (
+				Object.keys(localFileOverrides).includes(file.path) &&
+				localFileOverrides[file.path] === false
+			) {
 				return;
 			}
 
 			// When the source exists in project use it instead of the materialized file
 			const absoluteFilePath = path.resolve(file.path);
+
+			// Replace all occurrences of the materialized path with the fully qualified original path when it exists
 			if (fs.existsSync(absoluteFilePath)) {
-				// Replace all occurrences of the materialized path with the fully qualified original path
 				const regex = new RegExp(file.materializedPath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
 				builtMeshData = builtMeshData.replace(regex, absoluteFilePath);
 				builtMeshData = resolveComposerAsStaticImport(builtMeshPath, builtMeshData);
