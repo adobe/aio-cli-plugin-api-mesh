@@ -10,6 +10,7 @@ governing permissions and limitations under the License.
 */
 
 const { Command } = require('@oclif/command');
+const chalk = require('chalk');
 
 const logger = require('../../classes/logger');
 const { initSdk, initRequestId, promptConfirm, importFiles } = require('../../helpers');
@@ -129,6 +130,21 @@ class UpdateCommand extends Command {
 
 		if (meshId) {
 			let shouldContinue = true;
+
+			if (
+				data?.meshConfig?.responseConfig?.includeHTTPDetails &&
+				workspaceName.toLowerCase() === 'production'
+			) {
+				this.warn(
+					`The mesh config has ${chalk.yellowBright('includeHTTPDetails')} set to ${chalk.redBright(
+						'true',
+					)}. This is a security risk and should not be used in a production workspace.\n` +
+						'Setting it to true will expose the HTTP request and response details in the mesh logs. This can lead to sensitive information being exposed.\n' +
+						`Please consider setting ${chalk.yellowBright(
+							'includeHTTPDetails',
+						)} to ${chalk.greenBright('false')} in the meshConfig.`,
+				);
+			}
 
 			if (!autoConfirmAction) {
 				shouldContinue = await promptConfirm(
