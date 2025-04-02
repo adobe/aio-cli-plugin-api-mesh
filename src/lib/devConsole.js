@@ -257,8 +257,6 @@ const createMesh = async (
 		`${SMS_BASE_URL}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes`,
 	);
 
-	console.log(JSON.stringify(config, null, 2));
-
 	try {
 		const response = await axios(config);
 
