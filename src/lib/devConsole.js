@@ -119,6 +119,7 @@ const listLogs = async (organizationCode, projectId, workspaceId, meshId, fileNa
 		method: 'get',
 		url: fileName ? url + `?filename=${fileName}` : url,
 		headers: {
+			...global?.metadataHeaders,
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
 			'x-api-key': SMS_API_KEY,
@@ -147,6 +148,7 @@ const getMesh = async (organizationId, projectId, workspaceId, workspaceName, me
 		method: 'get',
 		url: `${SMS_BASE_URL}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}`,
 		headers: {
+			...global?.metadataHeaders,
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
 			'workspaceName': workspaceName,
@@ -238,6 +240,7 @@ const createMesh = async (
 		method: 'post',
 		url: `${SMS_BASE_URL}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes`,
 		headers: {
+			...global?.metadataHeaders,
 			'Authorization': `Bearer ${accessToken}`,
 			'Content-Type': 'application/json',
 			'x-request-id': global.requestId,
@@ -253,6 +256,8 @@ const createMesh = async (
 		'Initiating POST %s',
 		`${SMS_BASE_URL}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes`,
 	);
+
+	console.log(JSON.stringify(config, null, 2));
 
 	try {
 		const response = await axios(config);
@@ -350,6 +355,7 @@ const updateMesh = async (
 		method: 'put',
 		url: `${SMS_BASE_URL}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}`,
 		headers: {
+			...global?.metadataHeaders,
 			'Authorization': `Bearer ${accessToken}`,
 			'Content-Type': 'application/json',
 			'x-request-id': global.requestId,
@@ -441,6 +447,7 @@ const deleteMesh = async (organizationId, projectId, workspaceId, meshId) => {
 		method: 'delete',
 		url: `${SMS_BASE_URL}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}`,
 		headers: {
+			...global?.metadataHeaders,
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
 			'x-api-key': SMS_API_KEY,
@@ -527,6 +534,7 @@ const cachePurge = async (organizationId, projectId, workspaceId, meshId) => {
 		method: 'post',
 		url: `${SMS_BASE_URL}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/cache/purge`,
 		headers: {
+			...global?.metadataHeaders,
 			'Authorization': `Bearer ${accessToken}`,
 			'Content-Type': 'application/json',
 			'x-request-id': global.requestId,
@@ -617,6 +625,7 @@ const getMeshId = async (organizationCode, projectId, workspaceId, workspaceName
 		method: 'get',
 		url: `${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/mesh`,
 		headers: {
+			...global?.metadataHeaders,
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
 			'workspaceName': workspaceName,
@@ -903,6 +912,7 @@ const getMeshArtifact = async (organizationId, projectId, workspaceId, workspace
 		method: 'get',
 		url: `${SMS_BASE_URL}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/artifact`,
 		headers: {
+			...global?.metadataHeaders,
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
 			'workspaceName': workspaceName,
@@ -961,6 +971,7 @@ const getTenantFeatures = async organizationCode => {
 		method: 'get',
 		url: `${SMS_BASE_URL}/organizations/${organizationCode}/features`,
 		headers: {
+			...global?.metadataHeaders,
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
 			'x-api-key': SMS_API_KEY,
@@ -1016,6 +1027,7 @@ const getMeshDeployments = async (organizationCode, projectId, workspaceId, mesh
 		method: 'get',
 		url: `${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/deployments/latest`,
 		headers: {
+			...global?.metadataHeaders,
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
 			'x-api-key': SMS_API_KEY,
@@ -1072,6 +1084,7 @@ const getPublicEncryptionKey = async organizationCode => {
 		method: 'get',
 		url: `${SMS_BASE_URL}/organizations/${organizationCode}/getPublicKey`,
 		headers: {
+			...global?.metadataHeaders,
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
 			'x-api-key': SMS_API_KEY,
@@ -1117,6 +1130,7 @@ const getPresignedUrls = async (
 		method: 'get',
 		url: `${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/logs?startDateTime=${startTime}&endDateTime=${endTime}`,
 		headers: {
+			...global?.metadataHeaders,
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
 			'x-api-key': SMS_API_KEY,
@@ -1156,6 +1170,7 @@ const getLogsByRayId = async (organizationCode, projectId, workspaceId, meshId, 
 		method: 'get',
 		url: `${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/logs/${rayId}`,
 		headers: {
+			...global?.metadataHeaders,
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
 			'x-api-key': SMS_API_KEY,

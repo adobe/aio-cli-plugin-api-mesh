@@ -27,13 +27,7 @@ const {
 const meshBuilder = require('@adobe-apimesh/mesh-builder');
 const fs = require('fs');
 const path = require('path');
-const {
-	initSdk,
-	initRequestId,
-	importFiles,
-	setUpTenantFiles,
-	writeSecretsFile,
-} = require('../../helpers');
+const { initSdk, importFiles, setUpTenantFiles, writeSecretsFile } = require('../../helpers');
 const logger = require('../../classes/logger');
 const { getMeshId, getMeshArtifact } = require('../../lib/devConsole');
 require('dotenv').config();
@@ -67,8 +61,6 @@ class RunCommand extends Command {
 	static examples = [];
 
 	async run() {
-		await initRequestId();
-
 		logger.info(`RequestId: ${global.requestId}`);
 
 		const { args, flags } = await this.parse(RunCommand);
