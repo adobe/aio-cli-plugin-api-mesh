@@ -91,6 +91,67 @@ function resolveComposerAsStaticImport(meshArtifactPath, data) {
 		: resolveComposerAsJavaScriptModule(data);
 }
 
+/**
+ * Converts handler string to static imports compatible with bundling
+ * @param data {string} Data read from the built mesh
+ * @returns {string} Updated data
+ * @example Converts composer string
+ * ```
+ * "beforeAll": {
+ *     "composer": "/Users/user/project/fetch.js",
+ *     "blocking": true
+ * }
+ * ```
+ * To:
+ * ```
+ * "beforeAll": {
+ *     "module": await import("/Users/user/project/fetch.js"),
+ *         "blocking": true
+ * }
+ * ```
+ */
+function resolveHandlerAsTypeScriptModule(data) {
+	return data.replace(/"handler":\s*"([^"]+)"/, `"handler": await import("$1")`);
+}
+
+/**
+ * Converts handler string to static imports compatible with bundling
+ * @param data {string} Data read from the built mesh
+ * @returns {string} Updated data
+ * @example Converts composer string
+ * ```
+ * "beforeAll": {
+ *     "handler": "/Users/user/project/fetch.js",
+ *     "blocking": true
+ * }
+ * ```
+ * To:
+ * ```
+ * "beforeAll": {
+ *     "module": __importStar(require("/Users/user/project/fetch.js")),
+ *         "blocking": true
+ * }
+ * ```
+ */
+function resolveHandlerAsJavaScriptModule(data) {
+	return data.replace(/"handler":\s*"([^"]+)"/, `"handler": __importStar(require("$1"))`);
+}
+
+/**
+ * Takes a mesh artifact and converts handler configuration to static imports
+ * compatible with bundling
+ * @param meshArtifactPath Path to the mesh artifact used to determine extension
+ * @param data {string} Data read from the built mesh
+ * @returns {string} Updated data
+ * @see {@link resolveHandlerAsJavaScriptModule}
+ * @see {@link resolveHandlerAsTypeScriptModule}
+ */
+function resolveHandlerAsStaticImport(meshArtifactPath, data) {
+	return isTypeScriptFile(meshArtifactPath)
+		? resolveHandlerAsTypeScriptModule(data)
+		: resolveHandlerAsJavaScriptModule(data);
+}
+
 const resolveRelativeSources = async builtMeshTenantDir => {
 	let builtMeshPath = getBuiltMeshEntrypoint(builtMeshTenantDir);
 
@@ -119,9 +180,6 @@ const resolveRelativeSources = async builtMeshTenantDir => {
 const resolveOriginalSources = async (builtMeshTenantDir, localFileOverrides) => {
 	let builtMeshPath = getBuiltMeshEntrypoint(builtMeshTenantDir);
 
-	// Fix http details extensions plugin for edge compatibility
-	await fixPlugins(builtMeshPath);
-
 	// Read tenant files inventory
 	const artifactFilesPath = path.join(builtMeshTenantDir, 'files.json');
 	if (fs.existsSync(artifactFilesPath)) {
@@ -147,6 +205,8 @@ const resolveOriginalSources = async (builtMeshTenantDir, localFileOverrides) =>
 				const regex = new RegExp(file.materializedPath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
 				builtMeshData = builtMeshData.replace(regex, absoluteFilePath);
 				builtMeshData = resolveComposerAsStaticImport(builtMeshPath, builtMeshData);
+				// TODO: Support onfetch
+				// builtMeshData = resolveHandlerAsStaticImport(builtMeshPath, builtMeshData);
 			}
 		});
 

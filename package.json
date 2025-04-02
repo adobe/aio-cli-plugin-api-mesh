@@ -43,7 +43,7 @@
 		"@adobe/aio-lib-core-logging": "^3.0.0",
 		"@adobe/aio-lib-env": "^3.0.0",
 		"@adobe/aio-lib-ims": "^7.0.1",
-		"@adobe/plugin-hooks": "0.3.3",
+		"@adobe/plugin-hooks": "0.3.4",
 		"@adobe/plugin-on-fetch": "0.1.1",
 		"@adobe/plugin-source-headers": "^0.0.1",
 		"@envelop/disable-introspection": "^6.0.0",
@@ -137,6 +137,9 @@
 		"access": "public"
 	},
 	"oclif": {
+		"topics": {
+			"api-mesh": { "description": "Create, run, test, and deploy API Mesh"}
+		},
 		"commands": "./src/commands",
 		"bin": "aio",
 		"devPlugins": [

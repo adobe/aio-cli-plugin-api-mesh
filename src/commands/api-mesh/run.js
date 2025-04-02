@@ -175,7 +175,7 @@ class RunCommand extends Command {
 		if (filesList.length) {
 			try {
 				// minification of js will not be done for run command if debugging is enabled
-				({ resultData: data, localFileOverrides } = await importFiles(
+				({ data, localFileOverrides } = await importFiles(
 					data,
 					filesList,
 					args.file,
@@ -272,16 +272,13 @@ class RunCommand extends Command {
 				meshId = await this.handleLocalMeshConfig(args, flags);
 			}
 
-			// Resolve relative sources in built mesh for local development
-			const builtMeshTenantDir = getBuiltMeshTenantDirectory(meshId);
-			await resolveRelativeSources(builtMeshTenantDir);
-
 			//secrets management
 			const secretsFilePath = await flags.secrets;
 			if (secretsFilePath) {
 				await this.handleSecretsFeature(secretsFilePath, meshId);
 			}
 
+			const builtMeshTenantDir = getBuiltMeshTenantDirectory(meshId);
 			await copyBuiltMeshToPackage(builtMeshTenantDir);
 
 			start(this, flags.port, flags.debug, flags.inspectPort);

@@ -99,12 +99,7 @@ class CreateCommand extends Command {
 		// if local files are present, import them in files array in meshConfig
 		if (filesList.length) {
 			try {
-				({ resultData: data } = await importFiles(
-					data,
-					filesList,
-					args.file,
-					flags.autoConfirmAction,
-				));
+				({ data } = await importFiles(data, filesList, args.file, flags.autoConfirmAction));
 			} catch (err) {
 				this.log(err.message);
 				this.error('Unable to import the files in the mesh config. Check the file and try again.');

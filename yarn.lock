@@ -170,10 +170,10 @@
     joi "^17.4.2"
     lodash.clonedeep "^4.5.0"
 
-"@adobe/plugin-hooks@0.3.3":
-  version "0.3.3"
-  resolved "https://registry.yarnpkg.com/@adobe/plugin-hooks/-/plugin-hooks-0.3.3.tgz#7a963d0d82e12d27a277ee1997184c4bb3a05875"
-  integrity sha512-Cz3JFB/WdWq2C0hifMCIv8mjl+2DRDqsdz4C9r9H1VXXBOG3k4NM6cjjiaLMTfxjNuHiHDnnLXeIec3SsOV81Q==
+"@adobe/plugin-hooks@0.3.4":
+  version "0.3.4"
+  resolved "https://registry.yarnpkg.com/@adobe/plugin-hooks/-/plugin-hooks-0.3.4.tgz#e1a743c496c87833dd3b0a73e9d3287fcc3f26d9"
+  integrity sha512-YjGWJeuU04FLpl6BsWzuM6K1/LxCL1ZfleUt9OhC+NDgNhLJx+BMr6SGmoDWbNSl9MZT1JvBLZQ6KWjuhJWZUw==
   dependencies:
     "@graphql-mesh/utils" "^0.43.4"
     await-timeout "^1.1.1"

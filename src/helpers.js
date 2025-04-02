@@ -527,7 +527,7 @@ async function promptInput(message) {
  * @param meshConfigName MeshConfigName
  * @param autoConfirmActionFlag The user won't be prompted any questions, if this flag is set
  * @param shouldMinifyJS
- * @returns Promise<{{ resultData, conflicts: string[] }}>
+ * @returns Promise<{{ data, localFileOverrides: string[] }}>
  */
 async function importFiles(
 	data,
@@ -590,8 +590,8 @@ async function importFiles(
 		);
 	}
 
-	// Result of conflict resolution
-	const conflicts = {};
+	// Result of override resolution
+	const localFileOverrides = {};
 	for (let i = 0; i < overrideArr.length; i++) {
 		const fileName = overrideArr[i].fileName;
 		shouldOverride = await promptConfirm(
@@ -606,15 +606,15 @@ async function importFiles(
 				overrideArr[i].index,
 				shouldMinifyJS,
 			);
-			conflicts[fileName] = true;
+			localFileOverrides[fileName] = true;
 		} else {
-			conflicts[fileName] = false;
+			localFileOverrides[fileName] = false;
 		}
 	}
 
 	return {
-		resultData,
-		conflicts,
+		data: resultData,
+		localFileOverrides,
 	};
 }
 

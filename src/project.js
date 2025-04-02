@@ -1,6 +1,5 @@
 const { cpSync, existsSync, renameSync, rmSync } = require('node:fs');
 const { join } = require('node:path');
-const fs = require('fs');
 const { resolveOriginalSources } = require('./meshArtifact');
 
 const BUILT_MESH_ARTIFACT_DIRECTORY = 'mesh-artifact';
@@ -12,18 +11,11 @@ const TEMP_FILES_DIRECTORY = 'tempfiles';
 const getBuiltMeshTenantDirectory = meshId => join(BUILT_MESH_ARTIFACT_DIRECTORY, meshId);
 
 /**
- * Whether the mesh build artifact exists
- * @returns {boolean}
+ * Copy built mesh artifact to packaged directory that runs local development.
+ * @param builtMeshTenantDir Built mesh directory path
+ * @returns {Promise<void>}
  */
-const isMeshBuilt = () => {
-	return fs.existsSync(BUILT_MESH_ARTIFACT_DIRECTORY);
-};
-
 const copyBuiltMeshToPackage = async builtMeshTenantDir => {
-	if (!isMeshBuilt()) {
-		throw new Error('Mesh build artifact "mesh-artifact" not found.');
-	}
-
 	// Reset packaged directories
 	safeDelete(PACKAGED_MESH_DIR);
 	safeDelete(PACKAGED_MESH_CLI_MIRROR_DIR);
