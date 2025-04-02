@@ -457,7 +457,7 @@ function initMetadata(config) {
 			'x-aio-cli-user-agent': userAgent,
 			'x-aio-cli-platform': platform,
 			'x-aio-cli-arch': arch,
-			'x-aio-cli-plugin-api-mesh-installed-version': currentIntalledVersion,
+			'x-aio-cli-plugin-api-mesh-version': currentIntalledVersion,
 		};
 
 		global.metadataHeaders = metadataHeaders;
