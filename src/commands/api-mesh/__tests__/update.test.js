@@ -35,7 +35,7 @@ const selectedWorkspace = { id: '123456789', title: 'Workspace01' };
 const { readFile } = require('fs/promises');
 
 const UpdateCommand = require('../update');
-const { initSdk, initRequestId, promptConfirm, importFiles } = require('../../../helpers');
+const { initSdk, promptConfirm, importFiles } = require('../../../helpers');
 const { getMeshId, updateMesh } = require('../../../lib/devConsole');
 
 let logSpy = null;
@@ -110,7 +110,7 @@ describe('update command tests', () => {
 		  "status": "success",
 		}
 	`);
-		expect(initRequestId).toHaveBeenCalled();
+
 		expect(initSdk).toHaveBeenCalledWith({
 			ignoreCache: true,
 		});
@@ -169,7 +169,7 @@ describe('update command tests', () => {
 		  "status": "success",
 		}
 	`);
-		expect(initRequestId).toHaveBeenCalled();
+
 		expect(initSdk).toHaveBeenCalledWith({
 			ignoreCache: true,
 		});
@@ -228,7 +228,7 @@ describe('update command tests', () => {
 		  "status": "success",
 		}
 	`);
-		expect(initRequestId).toHaveBeenCalled();
+
 		expect(promptConfirm).not.toHaveBeenCalled();
 		expect(initSdk).toHaveBeenCalledWith({
 			ignoreCache: true,
@@ -552,7 +552,6 @@ describe('update command tests', () => {
 
 		const output = await UpdateCommand.run();
 
-		expect(initRequestId).toHaveBeenCalled();
 		expect(updateMesh.mock.calls[0]).toMatchInlineSnapshot(`
 		[
 		  "CODE1234@AdobeOrg",

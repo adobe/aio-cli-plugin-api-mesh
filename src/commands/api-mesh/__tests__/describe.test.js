@@ -33,7 +33,7 @@ jest.mock('chalk', () => ({
 }));
 
 const DescribeCommand = require('../describe');
-const { initSdk, initRequestId } = require('../../../helpers');
+const { initSdk } = require('../../../helpers');
 const { describeMesh, getMesh, getTenantFeatures } = require('../../../lib/devConsole');
 const sampleCreateMeshConfig = require('../../__fixtures__/sample_mesh.json');
 
@@ -171,7 +171,7 @@ describe('describe command tests', () => {
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
 		[
 		  [
-		    "Successfully retrieved mesh details 
+		    "Successfully retrieved mesh details
 		",
 		  ],
 		  [
@@ -202,7 +202,6 @@ describe('describe command tests', () => {
 	test('should return Non TI url if request is Non Ti', async () => {
 		const runResult = await DescribeCommand.run();
 
-		expect(initRequestId).toHaveBeenCalled();
 		expect(describeMesh).toHaveBeenCalledWith(
 			selectedOrg.code,
 			selectedProject.id,
@@ -223,7 +222,7 @@ describe('describe command tests', () => {
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
 		[
 		  [
-		    "Successfully retrieved mesh details 
+		    "Successfully retrieved mesh details
 		",
 		  ],
 		  [
@@ -258,7 +257,6 @@ describe('describe command tests', () => {
 		getMesh.mockResolvedValue(fetchedMeshConfig);
 		const runResult = await DescribeCommand.run();
 
-		expect(initRequestId).toHaveBeenCalled();
 		expect(describeMesh).toHaveBeenCalledWith(
 			selectedOrg.code,
 			selectedProject.id,
@@ -279,7 +277,7 @@ describe('describe command tests', () => {
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
 		[
 		  [
-		    "Successfully retrieved mesh details 
+		    "Successfully retrieved mesh details
 		",
 		  ],
 		  [

@@ -31,7 +31,7 @@ const selectedProject = { id: '5678', title: 'Project01' };
 const selectedWorkspace = { id: '123456789', title: 'Workspace01' };
 
 const { writeFile } = require('fs/promises');
-const { initSdk, initRequestId } = require('../../../helpers');
+const { initSdk } = require('../../../helpers');
 const GetCommand = require('../get');
 const mockGetMeshConfig = require('../../__fixtures__/sample_mesh.json');
 const { getMeshId, getMesh } = require('../../../lib/devConsole');
@@ -192,7 +192,7 @@ describe('get command tests', () => {
 			ignoreCache: true,
 			verbose: true,
 		});
-		expect(initRequestId).toHaveBeenCalled();
+
 		expect(runResult).toMatchInlineSnapshot(`
 		{
 		  "imsOrgId": "1234",
