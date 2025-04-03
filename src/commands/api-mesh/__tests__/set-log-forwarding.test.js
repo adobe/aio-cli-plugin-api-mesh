@@ -10,7 +10,7 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const SetLogForwardingCommand = require('../set-log-forwarding');
+const SetLogForwardingCommand = require('../config/set/log-forwarding');
 const {
 	initSdk,
 	promptConfirm,
