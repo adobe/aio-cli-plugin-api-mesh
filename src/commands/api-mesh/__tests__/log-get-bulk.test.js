@@ -307,7 +307,7 @@ describe('GetBulkLogCommand with --past and --from flags', () => {
 		fromDate.setDate(fromDate.getDate() - 29); // Set fromDate to 29 days ago
 		parseSpy = jest.spyOn(GetBulkLogCommand.prototype, 'parse').mockResolvedValue({
 			flags: {
-				past: '20mins',
+				past: '20',
 				from: fromDate.toISOString().slice(0, 10) + ':12:00:00',
 				filename: 'test.csv',
 				ignoreCache: false,
@@ -376,7 +376,7 @@ describe('GetBulkLogCommand with --past and --from flags', () => {
 	test('throws an error with invalid --from date components', async () => {
 		parseSpy.mockResolvedValueOnce({
 			flags: {
-				past: '20mins',
+				past: '20',
 				from: fromDate.toISOString().slice(0, 10) + ':25:61:61',
 				filename: 'test.csv',
 				ignoreCache: false,
@@ -392,7 +392,7 @@ describe('GetBulkLogCommand with --past and --from flags', () => {
 	test('throws an error with invalid --from date format', async () => {
 		parseSpy.mockResolvedValueOnce({
 			flags: {
-				past: '15mins',
+				past: '15',
 				from: fromDate.toISOString().slice(0, 10).replace(/-/g, ':') + ':15:00:00',
 				filename: 'test.csv',
 				ignoreCache: false,
@@ -408,7 +408,7 @@ describe('GetBulkLogCommand with --past and --from flags', () => {
 	test('runs with valid --past flag without --from', async () => {
 		parseSpy.mockResolvedValueOnce({
 			flags: {
-				past: '15mins',
+				past: '15',
 				filename: 'test.csv',
 				ignoreCache: false,
 			},
@@ -436,7 +436,7 @@ describe('GetBulkLogCommand with --past and --from flags', () => {
 	test('throws an error with edge case for --past duration', async () => {
 		parseSpy.mockResolvedValueOnce({
 			flags: {
-				past: '0s',
+				past: '0',
 				from: fromDate.toISOString().slice(0, 10) + ':12:00:00',
 				filename: 'test.csv',
 				ignoreCache: false,
@@ -445,14 +445,14 @@ describe('GetBulkLogCommand with --past and --from flags', () => {
 
 		const command = new GetBulkLogCommand([], {});
 		await expect(command.run()).rejects.toThrow(
-			'Invalid format. The past time window should be in minutes, for example, "20 mins", "15 minutes".',
+			'The minimum duration is 1 minutes. The current duration is 0 minutes.',
 		);
 	});
 
 	test('runs with edge case for --from date', async () => {
 		parseSpy.mockResolvedValueOnce({
 			flags: {
-				past: '15mins',
+				past: '15',
 				from: fromDate.toISOString().slice(0, 10) + ':00:00:00',
 				filename: 'test.csv',
 				ignoreCache: false,
@@ -528,16 +528,9 @@ describe('validateDateTimeRange', () => {
 
 describe('parsePastDuration', () => {
 	const validDurations = [
-		['20m', 20 * 60 * 1000],
-		['20 m', 20 * 60 * 1000],
-		['20min', 20 * 60 * 1000],
-		['20 min', 20 * 60 * 1000],
-		['20mins', 20 * 60 * 1000],
-		['20 mins', 20 * 60 * 1000],
-		['20minute', 20 * 60 * 1000],
-		['20 minute', 20 * 60 * 1000],
-		['20minutes', 20 * 60 * 1000],
-		['20 minutes', 20 * 60 * 1000],
+		['20', 20 * 60 * 1000],
+		['30', 30 * 60 * 1000],
+		['15', 15 * 60 * 1000],
 	];
 
 	test.each(validDurations)(
@@ -548,14 +541,11 @@ describe('parsePastDuration', () => {
 		},
 	);
 
-	const invalidDurations = ['20h', '20 hours', '20s', '20 seconds'];
+	const invalidDurations = ['minutes', 'NaN', 'abc', ''];
 
-	test.each(invalidDurations)(
-		'throws an error for invalid past duration format "%s"',
-		invalidPastDuration => {
-			expect(() => parsePastDuration(invalidPastDuration)).toThrow(
-				'Invalid format. The past time window should be in minutes, for example, "20 mins", "15 minutes".',
-			);
-		},
-	);
+	test.each(invalidDurations)('throws an error for non-numeric input "%s"', invalidPastDuration => {
+		expect(() => parsePastDuration(invalidPastDuration)).toThrow(
+			'Invalid format. The past time window should be integer, for example, "20", "15".',
+		);
+	});
 });

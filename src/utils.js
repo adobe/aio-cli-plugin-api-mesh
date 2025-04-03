@@ -6,7 +6,6 @@ const { readFile } = require('fs/promises');
 const { interpolateMesh } = require('./helpers');
 const dotenv = require('dotenv');
 const YAML = require('yaml');
-const ms = require('ms');
 const parseEnv = require('envsub/js/envsub-parser');
 const os = require('os');
 const chalk = require('chalk');
@@ -658,22 +657,17 @@ function suggestCorrectedDateFormat(inputDate) {
 /**
  * Parses a duration string representing a past time window and converts it to milliseconds.
  *
- * @param {string} pastTimeWindow - The past time duration to parse, e.g., "20 mins", "15 minutes".
+ * @param {string} pastTimeWindow - The past time duration to parse, e.g., "20", "15".
  * @returns {number} The duration in milliseconds.
  */
 function parsePastDuration(pastTimeWindow) {
-	// Regular expression to match various formats of minute abbreviations
-	const pastDurationRegex = /^(\d+)\s*(m|mins?|minutes?)$/i;
-	const match = pastTimeWindow.match(pastDurationRegex);
+	const durationInMs = parseInt(pastTimeWindow) * 60 * 1000;
 
-	if (!match) {
+	if (isNaN(durationInMs)) {
 		throw new Error(
-			'Invalid format. The past time window should be in minutes, for example, "20 mins", "15 minutes".',
+			'Invalid format. The past time window should be integer, for example, "20", "15".',
 		);
 	}
-
-	// Convert the matched duration to milliseconds
-	const durationInMs = ms(pastTimeWindow);
 
 	return durationInMs;
 }
