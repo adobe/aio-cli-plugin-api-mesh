@@ -91,67 +91,66 @@ function resolveComposerAsStaticImport(meshArtifactPath, data) {
 		: resolveComposerAsJavaScriptModule(data);
 }
 
-// /**
-//  * Converts handler string to static imports compatible with bundling
-//  * @param data {string} Data read from the built mesh
-//  * @returns {string} Updated data
-//  * @example Converts composer string
-//  * ```
-//  * "onFetch": {
-//  *     "handler": "/Users/user/project/fetch.js",
-//  *     "blocking": true
-//  * }
-//  * ```
-//  * To:
-//  * ```
-//  * "onFetch": {
-//  *     "handler": await import("/Users/user/project/fetch.js"),
-//  *         "blocking": true
-//  * }
-//  * ```
-//  */
-// function resolveHandlerAsTypeScriptModule(data) {
-// 	return data.replace(/"handler":\s*"([^"]+)"/, `"handler": await import("$1")`);
-// }
+/**
+ * Converts handler string to static imports compatible with bundling
+ * @param data {string} Data read from the built mesh
+ * @returns {string} Updated data
+ * @example Converts composer string
+ * ```
+ * "onFetch": {
+ *     "handler": "/Users/user/project/fetch.js",
+ *     "blocking": true
+ * }
+ * ```
+ * To:
+ * ```
+ * "onFetch": {
+ *     "handler": await import("/Users/user/project/fetch.js"),
+ *         "blocking": true
+ * }
+ * ```
+ */
+function resolveHandlerAsTypeScriptModule(data) {
+	return data.replace(/"handler":\s*"([^"]+)"/, `"module": await import("$1")`);
+}
 
-// /**
-//  * Converts handler string to static imports compatible with bundling
-//  * @param data {string} Data read from the built mesh
-//  * @returns {string} Updated data
-//  * @example Converts composer string
-//  * ```
-//  * "onFetch": {
-//  *     "handler": "/Users/user/project/fetch.js",
-//  *     "blocking": true
-//  * }
-//  * ```
-//  * To:
-//  * ```
-//  * "onFetch": {
-//  *     "module": __importStar(require("/Users/user/project/fetch.js")),
-//  *         "blocking": true
-//  * }
-//  * ```
-//  */
-// function resolveHandlerAsJavaScriptModule(data) {
-// 	return data.replace(/"handler":\s*"([^"]+)"/, `"handler": __importStar(require("$1"))`);
-// }
+/**
+ * Converts handler string to static imports compatible with bundling
+ * @param data {string} Data read from the built mesh
+ * @returns {string} Updated data
+ * @example Converts composer string
+ * ```
+ * "onFetch": {
+ *     "handler": "/Users/user/project/fetch.js",
+ *     "blocking": true
+ * }
+ * ```
+ * To:
+ * ```
+ * "onFetch": {
+ *     "module": __importStar(require("/Users/user/project/fetch.js")),
+ *         "blocking": true
+ * }
+ * ```
+ */
+function resolveHandlerAsJavaScriptModule(data) {
+	return data.replace(/"handler":\s*"([^"]+)"/, `"module": __importStar(require("$1"))`);
+}
 
-// /**
-//  * Takes a mesh artifact and converts handler configuration to static imports
-//  * compatible with bundling
-//  * @param meshArtifactPath Path to the mesh artifact used to determine extension
-//  * @param data {string} Data read from the built mesh
-//  * @returns {string} Updated data
-//  * @see {@link resolveHandlerAsJavaScriptModule}
-//  * @see {@link resolveHandlerAsTypeScriptModule}
-//  */
-// TODO: onFetch support - requires plugin changes
-// function resolveHandlerAsStaticImport(meshArtifactPath, data) {
-// 	return isTypeScriptFile(meshArtifactPath)
-// 		? resolveHandlerAsTypeScriptModule(data)
-// 		: resolveHandlerAsJavaScriptModule(data);
-// }
+/**
+ * Takes a mesh artifact and converts handler configuration to static imports
+ * compatible with bundling
+ * @param meshArtifactPath Path to the mesh artifact used to determine extension
+ * @param data {string} Data read from the built mesh
+ * @returns {string} Updated data
+ * @see {@link resolveHandlerAsJavaScriptModule}
+ * @see {@link resolveHandlerAsTypeScriptModule}
+ */
+function resolveHandlerAsStaticImport(meshArtifactPath, data) {
+	return isTypeScriptFile(meshArtifactPath)
+		? resolveHandlerAsTypeScriptModule(data)
+		: resolveHandlerAsJavaScriptModule(data);
+}
 
 const resolveRelativeSources = async builtMeshTenantDir => {
 	let builtMeshPath = getBuiltMeshEntrypoint(builtMeshTenantDir);
@@ -211,8 +210,7 @@ const resolveOriginalSources = async (builtMeshTenantDir, localFileOverrides) =>
 				const regex = new RegExp(file.materializedPath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
 				builtMeshData = builtMeshData.replace(regex, absoluteFilePath);
 				builtMeshData = resolveComposerAsStaticImport(builtMeshPath, builtMeshData);
-				// TODO: onFetch support - requires plugin changes
-				// builtMeshData = resolveHandlerAsStaticImport(builtMeshPath, builtMeshData);
+				builtMeshData = resolveHandlerAsStaticImport(builtMeshPath, builtMeshData);
 			}
 		});
 
