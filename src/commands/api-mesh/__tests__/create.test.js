@@ -67,7 +67,7 @@ jest.mock('../../../helpers', () => ({
 	initRequestId: jest.fn().mockResolvedValue({}),
 	promptConfirm: jest.fn().mockResolvedValue(true),
 	interpolateMesh: jest.fn().mockResolvedValue({}),
-	importFiles: jest.fn().mockResolvedValue(),
+	importFiles: jest.fn().mockResolvedValue({}),
 }));
 jest.mock('../../../lib/devConsole');
 jest.mock('chalk', () => ({
@@ -895,7 +895,9 @@ describe('create command tests', () => {
 		});
 
 		importFiles.mockResolvedValueOnce({
-			meshConfig,
+			data: {
+				meshConfig,
+			},
 		});
 
 		const output = await CreateCommand.run();
@@ -1140,7 +1142,11 @@ describe('create command tests', () => {
 
 		promptConfirm.mockResolvedValueOnce(false).mockResolvedValueOnce(true);
 
-		importFiles.mockResolvedValueOnce(meshConfig);
+		importFiles.mockResolvedValueOnce({
+			data: {
+				meshConfig,
+			},
+		});
 
 		createMesh.mockResolvedValueOnce({
 			mesh: {
@@ -1272,7 +1278,9 @@ describe('create command tests', () => {
 		});
 
 		importFiles.mockResolvedValueOnce({
-			meshConfig,
+			data: {
+				meshConfig,
+			},
 		});
 
 		createMesh.mockResolvedValueOnce({
@@ -1400,7 +1408,9 @@ describe('create command tests', () => {
 		promptConfirm.mockResolvedValueOnce(true);
 
 		importFiles.mockResolvedValueOnce({
-			meshConfig,
+			data: {
+				meshConfig,
+			},
 		});
 
 		createMesh.mockResolvedValueOnce({
@@ -1535,7 +1545,9 @@ describe('create command tests', () => {
 		});
 
 		importFiles.mockResolvedValueOnce({
-			meshConfig,
+			data: {
+				meshConfig,
+			},
 		});
 
 		const output = await CreateCommand.run();
