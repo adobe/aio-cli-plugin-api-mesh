@@ -1,7 +1,7 @@
 const { Command } = require('@oclif/core');
 
 const logger = require('../../classes/logger');
-const { initRequestId, initSdk } = require('../../helpers');
+const { initSdk } = require('../../helpers');
 const { getMeshId, getMesh, getMeshDeployments } = require('../../lib/devConsole');
 const { ignoreCacheFlag } = require('../../utils');
 
@@ -13,7 +13,6 @@ class StatusCommand extends Command {
 	};
 
 	async run() {
-		await initRequestId();
 		logger.info(`RequestId: ${global.requestId}`);
 
 		const { flags } = await this.parse(StatusCommand);

@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const GetBulkLogCommand = require('../log-get-bulk');
-const { initRequestId, initSdk, promptConfirm } = require('../../../helpers');
+const { initSdk, promptConfirm } = require('../../../helpers');
 const { getMeshId, getPresignedUrls } = require('../../../lib/devConsole');
 const {
 	suggestCorrectedDateFormat,
@@ -251,7 +251,6 @@ describe('GetBulkLogCommand', () => {
 		const command = new GetBulkLogCommand([], {});
 		await command.run();
 
-		expect(initRequestId).toHaveBeenCalled();
 		expect(initSdk).toHaveBeenCalled();
 		expect(getMeshId).toHaveBeenCalledWith('orgCode', 'projectId', 'workspaceId', 'workspaceName');
 		expect(getPresignedUrls).toHaveBeenCalledWith(
@@ -355,7 +354,6 @@ describe('GetBulkLogCommand with --past and --from flags', () => {
 		const command = new GetBulkLogCommand([], {});
 		await command.run();
 
-		expect(initRequestId).toHaveBeenCalled();
 		expect(initSdk).toHaveBeenCalled();
 		expect(getMeshId).toHaveBeenCalledWith('orgCode', 'projectId', 'workspaceId', 'workspaceName');
 		expect(getPresignedUrls).toHaveBeenCalledWith(
@@ -420,7 +418,6 @@ describe('GetBulkLogCommand with --past and --from flags', () => {
 		const command = new GetBulkLogCommand([], {});
 		await command.run();
 
-		expect(initRequestId).toHaveBeenCalled();
 		expect(initSdk).toHaveBeenCalled();
 		expect(getMeshId).toHaveBeenCalledWith('orgCode', 'projectId', 'workspaceId', 'workspaceName');
 		expect(getPresignedUrls).toHaveBeenCalledWith(
@@ -465,7 +462,6 @@ describe('GetBulkLogCommand with --past and --from flags', () => {
 		const command = new GetBulkLogCommand([], {});
 		await command.run();
 
-		expect(initRequestId).toHaveBeenCalled();
 		expect(initSdk).toHaveBeenCalled();
 		expect(getMeshId).toHaveBeenCalledWith('orgCode', 'projectId', 'workspaceId', 'workspaceName');
 		expect(getPresignedUrls).toHaveBeenCalledWith(

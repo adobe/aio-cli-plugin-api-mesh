@@ -12,7 +12,7 @@ governing permissions and limitations under the License.
 const { Command } = require('@oclif/command');
 
 const logger = require('../../classes/logger');
-const { initSdk, initRequestId, promptConfirm, importFiles } = require('../../helpers');
+const { initSdk, promptConfirm, importFiles } = require('../../helpers');
 const {
 	ignoreCacheFlag,
 	autoConfirmActionFlag,
@@ -38,8 +38,6 @@ class UpdateCommand extends Command {
 	};
 
 	async run() {
-		await initRequestId();
-
 		logger.info(`RequestId: ${global.requestId}`);
 
 		const { args, flags } = await this.parse(UpdateCommand);

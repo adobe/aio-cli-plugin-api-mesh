@@ -29,7 +29,7 @@ const selectedOrg = { id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type
 const selectedProject = { id: '5678', title: 'Project01' };
 const selectedWorkspace = { id: '123456789', title: 'Workspace01' };
 const CachePurgeCommand = require('../cache/purge');
-const { initSdk, initRequestId, promptConfirm } = require('../../../helpers');
+const { initSdk, promptConfirm } = require('../../../helpers');
 const {
 	getMeshId,
 	deleteMesh,
@@ -229,7 +229,6 @@ describe('cache purge command tests', () => {
 		cachePurge.mockResolvedValueOnce({ success: true });
 		const runResult = await CachePurgeCommand.run();
 
-		expect(initRequestId).toHaveBeenCalled();
 		expect(runResult).toMatchInlineSnapshot(`
 		{
 		  "success": true,
