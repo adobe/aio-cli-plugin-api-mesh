@@ -21,6 +21,7 @@
 	},
 	"files": [
 		"/oclif.manifest.json",
+		"wrangler.toml",
 		"/src"
 	],
 	"scripts": {
