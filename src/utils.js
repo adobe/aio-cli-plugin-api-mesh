@@ -661,9 +661,12 @@ function suggestCorrectedDateFormat(inputDate) {
  * @returns {number} The duration in milliseconds.
  */
 function parsePastDuration(pastTimeWindow) {
+	// Check if pastTimeWindow contains non-numeric characters
+	const match = pastTimeWindow.match(/^(\d+)$/);
+
 	const durationInMs = parseInt(pastTimeWindow) * 60 * 1000;
 
-	if (isNaN(durationInMs)) {
+	if (isNaN(durationInMs) || !match) {
 		throw new Error(
 			'Invalid format. The past time window should be integer, for example, "20", "15".',
 		);
