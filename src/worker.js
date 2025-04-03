@@ -1,7 +1,7 @@
 import { ServedTier, addServedHeader } from './served';
+import { buildServer } from './server';
 import { bindedlogger as logger } from './utils/logger';
 import { getRequestId } from './utils/requestId';
-import { buildServer } from './wranglerServer';
 
 let server;
 
@@ -21,10 +21,10 @@ export default {
 		const { MESH_ID: meshId, LOG_LEVEL: logLevel } = env;
 		const loggerInstance = logger({ logLevel, meshId, requestId });
 		const meshArtifacts = await import('../.mesh');
-		const rawMesh = await import('../.mesh/.meshrc.json');
+		const meshConfig = await import('../.mesh/.meshrc.json');
 
 		if (!server) {
-			server = await this.buildAndCacheServer(env, loggerInstance, meshArtifacts, rawMesh);
+			server = await this.buildAndCacheServer(env, loggerInstance, meshArtifacts, meshConfig);
 		}
 
 		loggerInstance.debug('WORKER HOT: Fetching via worker');
@@ -34,11 +34,13 @@ export default {
 	},
 	/**
 	 * Build and cache mesh instance/server in global variable.
-	 * @param env
-	 * @param loggerInstance
+	 * @param env Environment
+	 * @param logger Logger
+	 * @param meshArtifacts Mesh artifact
+	 * @param meshConfig Mesh config
 	 */
-	async buildAndCacheServer(env, loggerInstance, meshArtifacts, meshConfig) {
-		server = await buildServer(loggerInstance, env, meshArtifacts, meshConfig);
+	async buildAndCacheServer(env, logger, meshArtifacts, meshConfig) {
+		server = await buildServer(logger, env, meshArtifacts, meshConfig);
 		return server;
 	},
 };

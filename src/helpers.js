@@ -445,7 +445,7 @@ async function initRequestId() {
  * Function to run the CLI Y/N prompt to confirm the user's action
  *
  * @param {string} message
- * @returns boolean
+ * @returns Promise<boolean>
  */
 async function promptConfirm(message) {
 	const prompt = inquirer.createPromptModule({ output: process.stderr });
@@ -505,7 +505,6 @@ async function promptSelect(message, choices) {
  * Function to run the CLI selectable list
  *
  * @param {string} message - prompt message
- * @param {object[]} choices - list of options
  * @returns {object[]} - selected options
  */
 async function promptInput(message) {
@@ -524,9 +523,11 @@ async function promptInput(message) {
  * Import the files in the files array in meshConfig
  *
  * @param data MeshConfig
- * @param filesList List of files in meshConfig
+ * @param filesListArray List of files in meshConfig
  * @param meshConfigName MeshConfigName
  * @param autoConfirmActionFlag The user won't be prompted any questions, if this flag is set
+ * @param shouldMinifyJS
+ * @returns Promise<{{ data, localFileOverrides: string[] }}>
  */
 async function importFiles(
 	data,
@@ -589,29 +590,38 @@ async function importFiles(
 		);
 	}
 
+	// Result of override resolution
+	const localFileOverrides = {};
 	for (let i = 0; i < overrideArr.length; i++) {
+		const fileName = overrideArr[i].fileName;
 		shouldOverride = await promptConfirm(
-			`Do you want to override the ${path.basename(overrideArr[i].fileName)} file?`,
+			`Do you want to override the ${path.basename(fileName)} file?`,
 		);
 
 		if (shouldOverride) {
 			resultData = updateFilesArray(
 				resultData,
-				overrideArr[i].fileName,
+				fileName,
 				meshConfigName,
 				overrideArr[i].index,
 				shouldMinifyJS,
 			);
+			localFileOverrides[fileName] = true;
+		} else {
+			localFileOverrides[fileName] = false;
 		}
 	}
 
-	return resultData;
+	return {
+		data: resultData,
+		localFileOverrides,
+	};
 }
 
 /**loads the pupa module dynamically and then interpolates the raw data from mesh file with object data
- * @param {data}
- * @param {obj}
- * @returns {object} having interpolationStatus, missingKeys and interpolatedMesh
+ * @param data
+ * @param obj
+ * @returns {object}
  */
 
 async function interpolateMesh(data, obj) {
@@ -845,7 +855,7 @@ async function processFileConfig(config) {
  * This function sets up the tenantFiles used in a particular mesh config
  * into the tenantFiles folder
  *
- * @param config
+ * @param meshId
  */
 async function setUpTenantFiles(meshId) {
 	if (fs.existsSync(path.resolve(process.cwd(), 'mesh-artifact', meshId, 'files.json'))) {

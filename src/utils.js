@@ -62,6 +62,13 @@ const secretsFlag = Flags.string({
 const portNoFlag = Flags.integer({
 	char: 'p',
 	description: 'Port number for the local dev server',
+	default: 5000,
+});
+
+const inspectPortNoFlag = Flags.integer({
+	char: 'i',
+	description: 'Port number for the local dev server inspector',
+	default: 9229,
 });
 
 const debugFlag = Flags.boolean({
@@ -277,7 +284,7 @@ function checkPlaceholders(mesh) {
  * @param {string} file
  * @param {object} command
  * @param {string} filetype
- * @returns {string}
+ * @returns {Promise<string>}
  */
 async function readFileContents(file, command, filetype) {
 	try {
@@ -345,7 +352,7 @@ function validateFileName(filesList) {
  * @param {string} inputMeshData
  * @param {string} envFilePath
  * @param {object} command
- * @returns {string}
+ * @returns {Promise<string>}
  */
 async function validateAndInterpolateMesh(inputMeshData, envFilePath, command) {
 	//Read the environment file
@@ -760,6 +767,7 @@ module.exports = {
 	validateAndInterpolateMesh,
 	getAppRootDir,
 	portNoFlag,
+	inspectPortNoFlag,
 	debugFlag,
 	selectFlag,
 	secretsFlag,
