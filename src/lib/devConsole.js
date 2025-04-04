@@ -1331,7 +1331,7 @@ const getLogForwarding = async (organizationCode, projectId, workspaceId, meshId
 				`Something went wrong: ${objToString(
 					response,
 					['data'],
-					'Unable to set log forwarding details.',
+					'Unable to get log forwarding details.',
 				)}. Received ${response.status}, expected 200`,
 			);
 			throw new Error(response.data.message);
@@ -1339,20 +1339,25 @@ const getLogForwarding = async (organizationCode, projectId, workspaceId, meshId
 	} catch (error) {
 		if (error.response && error.response.status === 400) {
 			// The request was made and the server responded with a 400 status code
-			logger.error('Error setting log forwarding configuration: %j', error.response.data);
+			logger.error('Error getting log forwarding configuration: %j', error.response.data);
 
 			throw new Error('Invalid input parameters.');
 		}
+		else if (error.response && error.response.status === 404) {
+			logger.error('Log forwarding details not found');
+
+			return null;
+		}
 		// request made but no response received
 		else if (error.request && !error.response) {
-			logger.error('No response received from server when setting log forwarding configuration');
-			throw new Error('Unable to set log forwarding details. Check the details and try again.');
+			logger.error('No response received from server when getting log forwarding configuration');
+			throw new Error('Unable to get log forwarding details. Check the details and try again.');
 		}
 		// response received with error
 		else if (error.response && error.response.data) {
 			logger.error(
-				'Error setting log forwarding configuration: %s',
-				objToString(error, ['response', 'data'], 'Unable to set log forwarding'),
+				'Error getting log forwarding configuration: %s',
+				objToString(error, ['response', 'data'], 'Unable to get log forwarding'),
 			);
 
 			// response a message or messages field
@@ -1361,19 +1366,19 @@ const getLogForwarding = async (organizationCode, projectId, workspaceId, meshId
 				const message = objToString(
 					error,
 					['response', 'data', 'message' || 'messages'],
-					'Unable to set log forwarding',
+					'Unable to get log forwarding',
 				);
 				throw new Error(message);
 			}
 			// response contains error but no specific message field
 			else {
-				const message = objToString(error, ['response', 'data'], 'Unable to set log forwarding');
+				const message = objToString(error, ['response', 'data'], 'Unable to get log forwarding');
 				throw new Error(message);
 			}
 		} else {
 			// Something else happened while setting up the request
-			logger.error('Error setting log forwarding configuration: %s', error.message);
-			throw new Error(`Something went wrong while setting log forwarding. ${error.message}`);
+			logger.error('Error getting log forwarding configuration: %s', error.message);
+			throw new Error(`Something went wrong while getting log forwarding. ${error.message}`);
 		}
 	}
 };
