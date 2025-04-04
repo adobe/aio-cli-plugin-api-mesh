@@ -1342,8 +1342,7 @@ const getLogForwarding = async (organizationCode, projectId, workspaceId, meshId
 			logger.error('Error getting log forwarding configuration: %j', error.response.data);
 
 			throw new Error('Invalid input parameters.');
-		}
-		else if (error.response && error.response.status === 404) {
+		} else if (error.response && error.response.status === 404) {
 			logger.error('Log forwarding details not found');
 
 			return null;
