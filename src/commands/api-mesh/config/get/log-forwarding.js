@@ -13,7 +13,7 @@ const { Command } = require('@oclif/core');
 const { initSdk, initRequestId } = require('../../../../helpers');
 const logger = require('../../../../classes/logger');
 const { ignoreCacheFlag, jsonFlag } = require('../../../../utils');
-const { getLogForwarding, getMeshId } = require('../../../../lib/devConsole');
+const { getLogForwarding, getMeshId } = require('../../../../lib/smsClient');
 
 class GetLogForwardingCommand extends Command {
 	static flags = {

@@ -12,13 +12,13 @@ governing permissions and limitations under the License.
 
 const GetLogForwardingCommand = require('../config/get/log-forwarding');
 const { initSdk, initRequestId } = require('../../../helpers');
-const { getLogForwarding, getMeshId } = require('../../../lib/devConsole');
+const { getLogForwarding, getMeshId } = require('../../../lib/smsClient');
 
 jest.mock('../../../helpers', () => ({
 	initSdk: jest.fn().mockResolvedValue({}),
 	initRequestId: jest.fn().mockResolvedValue({}),
 }));
-jest.mock('../../../lib/devConsole');
+jest.mock('../../../lib/smsClient');
 jest.mock('../../../classes/logger');
 
 describe('GetLogForwardingCommand', () => {

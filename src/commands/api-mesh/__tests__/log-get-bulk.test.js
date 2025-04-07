@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const GetBulkLogCommand = require('../log-get-bulk');
 const { initRequestId, initSdk, promptConfirm } = require('../../../helpers');
-const { getMeshId, getPresignedUrls } = require('../../../lib/devConsole');
+const { getMeshId, getPresignedUrls } = require('../../../lib/smsClient');
 const {
 	suggestCorrectedDateFormat,
 	validateDateTimeRange,
@@ -16,7 +16,7 @@ jest.mock('../../../helpers', () => ({
 	initRequestId: jest.fn().mockResolvedValue({}),
 	promptConfirm: jest.fn().mockResolvedValue(true),
 }));
-jest.mock('../../../lib/devConsole');
+jest.mock('../../../lib/smsClient');
 jest.mock('../../../classes/logger');
 
 describe('GetBulkLogCommand', () => {

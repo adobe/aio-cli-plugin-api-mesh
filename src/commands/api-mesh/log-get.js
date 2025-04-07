@@ -12,7 +12,7 @@ const { Command } = require('@oclif/core');
 const logger = require('../../classes/logger');
 const { initSdk, initRequestId } = require('../../helpers');
 const { ignoreCacheFlag } = require('../../utils');
-const { getMeshId, getLogsByRayId } = require('../../lib/devConsole');
+const { getMeshId, getLogsByRayId } = require('../../lib/smsClient');
 require('dotenv').config();
 
 class FetchLogsCommand extends Command {

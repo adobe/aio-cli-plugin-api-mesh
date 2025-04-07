@@ -13,7 +13,7 @@ const { Command } = require('@oclif/command');
 const logger = require('../../classes/logger');
 const { initSdk, initRequestId } = require('../../helpers');
 const { ignoreCacheFlag } = require('../../utils');
-const { describeMesh } = require('../../lib/devConsole');
+const { describeMesh } = require('../../lib/smsClient');
 const { buildMeshUrl } = require('../../urlBuilder');
 
 require('dotenv').config();

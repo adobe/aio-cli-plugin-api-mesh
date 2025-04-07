@@ -23,7 +23,7 @@ jest.mock('../../../helpers', () => ({
 	initRequestId: jest.fn().mockResolvedValue({}),
 	promptConfirm: jest.fn().mockResolvedValue(true),
 }));
-jest.mock('../../../lib/devConsole');
+jest.mock('../../../lib/smsClient');
 const mockConsoleCLIInstance = {};
 const selectedOrg = { id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' };
 const selectedProject = { id: '5678', title: 'Project01' };
@@ -36,7 +36,7 @@ const {
 	getApiKeyCredential,
 	unsubscribeCredentialFromMeshService,
 	cachePurge,
-} = require('../../../lib/devConsole');
+} = require('../../../lib/smsClient');
 let logSpy = null;
 let errorLogSpy = null;
 let parseSpy = null;

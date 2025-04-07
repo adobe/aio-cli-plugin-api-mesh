@@ -2,7 +2,7 @@ const { Command } = require('@oclif/core');
 
 const logger = require('../../classes/logger');
 const { initRequestId, initSdk } = require('../../helpers');
-const { getMeshId, getMesh, getMeshDeployments } = require('../../lib/devConsole');
+const { getMeshId, getMesh, getMeshDeployments } = require('../../lib/smsClient');
 const { ignoreCacheFlag } = require('../../utils');
 
 require('dotenv').config();

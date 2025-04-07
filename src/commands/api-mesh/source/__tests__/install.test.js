@@ -20,13 +20,13 @@ const mockSources = { '0.0.1-test-03': mockSourceTest03v1Fixture };
 jest.mock('source-registry-storage-adapter');
 jest.mock('../../../../helpers');
 const InstallCommand = require('../install');
-const { getMeshId, getMesh, updateMesh } = require('../../../../lib/devConsole');
+const { getMeshId, getMesh, updateMesh } = require('../../../../lib/smsClient');
 const mockGetMeshConfig = require('../../../__fixtures__/sample_mesh.json');
 const selectedOrg = { id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' };
 const selectedProject = { id: '5678', title: 'Project01' };
 const selectedWorkspace = { id: '123456789', title: 'Workspace01' };
 global.requestId = 'dummy_request_id';
-jest.mock('../../../../lib/devConsole');
+jest.mock('../../../../lib/smsClient');
 mockAdapter.mockImplementation(() => ({
 	get: jest.fn().mockResolvedValue(mockSources[`0.0.1-test-03`]),
 	getList: jest.fn().mockImplementation(() => mockMetadataFixture),
