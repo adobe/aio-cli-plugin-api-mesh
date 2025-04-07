@@ -1377,7 +1377,9 @@ const getLogForwarding = async (organizationCode, projectId, workspaceId, meshId
 		} else {
 			// Something else happened while setting up the request
 			logger.error('Error getting the log forwarding configuration: %s', error.message);
-			throw new Error(`Something went wrong while getting the log forwarding configuration. ${error.message}`);
+			throw new Error(
+				`Something went wrong while getting the log forwarding configuration. ${error.message}`,
+			);
 		}
 	}
 };
