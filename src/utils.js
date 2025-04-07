@@ -89,10 +89,6 @@ const pastFlag = Flags.string({
 	description: 'Past time window in mins',
 });
 
-const fromFlag = Flags.string({
-	description: `The from time in YYYY-MM-DD:HH:MM:SS format based on your system's time zone. It is used to fetch logs from the past and is the starting time for the past time duration.`,
-});
-
 const logFilenameFlag = Flags.string({
 	description: 'Path to the output file for logs',
 	required: true,
@@ -759,6 +755,7 @@ function validateDateTimeFormat(time) {
 	return timeString.replace(/-|:|Z/g, '').replace('T', 'T');
 }
 
+// can be used later if we want to take --startTime and --endTime in local time
 /**
  * Convert a given local time string to UTC time string
  * @param {string} timeString - The time string in the format YYYY-MM-DD:HH:MM:SS
@@ -811,7 +808,6 @@ module.exports = {
 	endTimeFlag,
 	logFilenameFlag,
 	pastFlag,
-	fromFlag,
 	suggestCorrectedDateFormat,
 	parsePastDuration,
 	validateDateTimeRange,
