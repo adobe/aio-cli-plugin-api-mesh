@@ -1349,13 +1349,13 @@ const getLogForwarding = async (organizationCode, projectId, workspaceId, meshId
 		}
 		// request made but no response received
 		else if (error.request && !error.response) {
-			logger.error('No response received from server when getting log forwarding configuration');
+			logger.error('No response from server when getting the log forwarding configuration');
 			throw new Error('Unable to get log forwarding details. Check the details and try again.');
 		}
 		// response received with error
 		else if (error.response && error.response.data) {
 			logger.error(
-				'Error getting log forwarding configuration: %s',
+				'Error getting the log forwarding configuration: %s',
 				objToString(error, ['response', 'data'], 'Unable to get log forwarding'),
 			);
 
@@ -1376,7 +1376,7 @@ const getLogForwarding = async (organizationCode, projectId, workspaceId, meshId
 			}
 		} else {
 			// Something else happened while setting up the request
-			logger.error('Error getting log forwarding configuration: %s', error.message);
+			logger.error('Error getting the log forwarding configuration: %s', error.message);
 			throw new Error(`Something went wrong while getting log forwarding. ${error.message}`);
 		}
 	}
