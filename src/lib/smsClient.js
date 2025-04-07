@@ -1339,7 +1339,7 @@ const getLogForwarding = async (organizationCode, projectId, workspaceId, meshId
 	} catch (error) {
 		if (error.response && error.response.status === 400) {
 			// The request was made and the server responded with a 400 status code
-			logger.error('Error getting log forwarding configuration: %j', error.response.data);
+			logger.error('Error getting the log forwarding configuration: %j', error.response.data);
 
 			throw new Error('Invalid input parameters.');
 		} else if (error.response && error.response.status === 404) {
@@ -1377,7 +1377,7 @@ const getLogForwarding = async (organizationCode, projectId, workspaceId, meshId
 		} else {
 			// Something else happened while setting up the request
 			logger.error('Error getting the log forwarding configuration: %s', error.message);
-			throw new Error(`Something went wrong while getting log forwarding. ${error.message}`);
+			throw new Error(`Something went wrong while getting the log forwarding configuration. ${error.message}`);
 		}
 	}
 };
