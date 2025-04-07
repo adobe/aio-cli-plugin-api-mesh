@@ -119,4 +119,31 @@ describe('GetLogForwardingCommand', () => {
 
 		expect(logSpy).toHaveBeenCalledWith(errorMessage);
 	});
+
+	test('handles 404 error when getLogForwarding returns null', async () => {
+		// Mock getLogForwarding to simulate a 404 error
+		getLogForwarding.mockImplementation(() => {
+			const error = new Error('Not Found');
+			error.response = { status: 404 };
+			throw error;
+		});
+
+		const command = new GetLogForwardingCommand([], {});
+
+		await expect(command.run()).rejects.toThrow(
+			'Failed to get log forwarding details. Try again. RequestId: dummy_request_id',
+		);
+		expect(logSpy).toHaveBeenCalledWith('Not Found');
+	});
+
+	test('when getLogForwarding returns null', async () => {
+		// Mock getLogForwarding to return null
+		getLogForwarding.mockResolvedValue(null);
+
+		const command = new GetLogForwardingCommand([], {});
+
+		await expect(command.run()).rejects.toThrow(
+			'Unable to get log forwarding details. Try again. RequestId: dummy_request_id',
+		);
+	});
 });
