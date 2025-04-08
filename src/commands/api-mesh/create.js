@@ -136,7 +136,7 @@ class CreateCommand extends Command {
 					'true' it exposes HTTP request and response details in the mesh logs, which can cause sensitive information to be exposed.\n' +
 					`Please consider setting ${chalk.yellowBright(
 						'includeHTTPDetails',
-					)} to ${chalk.greenBright('false')} in the meshConfig.`,
+					)} to ${chalk.greenBright('false')} in your mesh configuration file.`,
 			);
 		}
 
