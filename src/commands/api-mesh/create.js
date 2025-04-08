@@ -129,10 +129,11 @@ class CreateCommand extends Command {
 			workspaceName.toLowerCase() === 'production'
 		) {
 			this.warn(
-				`The mesh config has ${chalk.yellowBright('includeHTTPDetails')} set to ${chalk.redBright(
+				`Your mesh has ${chalk.yellowBright('includeHTTPDetails')} set to ${chalk.redBright(
 					'true',
-				)}. This is a security risk and should not be used in a production workspace.\n` +
-					'Setting it to true will expose the HTTP request and response details in the mesh logs. This can lead to sensitive information being exposed.\n' +
+				)}. This is a security risk and should not be used in production.\n` +
+					'When ${chalk.yellowBright('includeHTTPDetails')} is set to ${chalk.redBright(
+					'true' it exposes HTTP request and response details in the mesh logs, which can cause sensitive information to be exposed.\n' +
 					`Please consider setting ${chalk.yellowBright(
 						'includeHTTPDetails',
 					)} to ${chalk.greenBright('false')} in the meshConfig.`,
