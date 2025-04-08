@@ -134,7 +134,7 @@ class CreateCommand extends Command {
 				)}. This is a security risk and should not be used in production.\n` +
 					'When ${chalk.yellowBright('includeHTTPDetails')} is set to ${chalk.redBright(
 					'true' it exposes HTTP request and response details in the mesh logs, which can cause sensitive information to be exposed.\n' +
-					`Please consider setting ${chalk.yellowBright(
+					`Consider setting ${chalk.yellowBright(
 						'includeHTTPDetails',
 					)} to ${chalk.greenBright('false')} in your mesh configuration file.`,
 			);
