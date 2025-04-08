@@ -1,7 +1,7 @@
 const { Command } = require('@oclif/core');
 const path = require('path');
 const fs = require('fs');
-const { initRequestId, initSdk, promptConfirm } = require('../../helpers');
+const { initSdk, promptConfirm } = require('../../helpers');
 const { getMeshId, getPresignedUrls } = require('../../lib/devConsole');
 const logger = require('../../classes/logger');
 const axios = require('axios');
@@ -36,7 +36,6 @@ class GetBulkLogCommand extends Command {
 		const columnHeaders =
 			'EventTimestampMs,Exceptions,Logs,Outcome,MeshId,RayID,URL,Request Method,Response Status,Level';
 
-		await initRequestId();
 		logger.info(`RequestId: ${global.requestId}`);
 		const { flags } = await this.parse(GetBulkLogCommand);
 		const ignoreCache = await flags.ignoreCache;

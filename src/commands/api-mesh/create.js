@@ -10,7 +10,7 @@ governing permissions and limitations under the License.
 */
 
 const { Command } = require('@oclif/core');
-const { initSdk, initRequestId, promptConfirm, importFiles } = require('../../helpers');
+const { initSdk, promptConfirm, importFiles } = require('../../helpers');
 const logger = require('../../classes/logger');
 const {
 	ignoreCacheFlag,
@@ -42,8 +42,6 @@ class CreateCommand extends Command {
 	static enableJsonFlag = true;
 
 	async run() {
-		await initRequestId();
-
 		logger.info(`RequestId: ${global.requestId}`);
 
 		const { args, flags } = await this.parse(CreateCommand);

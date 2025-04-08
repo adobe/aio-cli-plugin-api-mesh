@@ -678,14 +678,15 @@ function validateDateTimeRange(startTime, endTime) {
 		throw new Error('endTime cannot be in the future. Provide a valid endTime.');
 	}
 
-	if (start.getTime() === end.getTime()) {
-		throw new Error('The minimum duration is 1 minutes. The current duration is 0 minutes.');
-	}
-
-	// Check if the duration between start and end times is greater than 30 minutes (1800 seconds)
 	const timeDifferenceInSeconds = (end.getTime() - start.getTime()) / 1000;
 
-	if (timeDifferenceInSeconds > 1800) {
+	if (timeDifferenceInSeconds < 60) {
+		// Check if the duration between start and end times is less than 1 minute (60 seconds)
+		throw new Error(
+			`The minimum duration is 1 minute. The current duration is ${timeDifferenceInSeconds} seconds.`,
+		);
+	} else if (timeDifferenceInSeconds > 1800) {
+		// Check if the duration between start and end times is greater than 30 minutes (1800 seconds)
 		const hours = Math.floor(timeDifferenceInSeconds / 3600); // Hours calculation
 		const minutes = Math.floor((timeDifferenceInSeconds % 3600) / 60); // Minutes calculation
 		const seconds = timeDifferenceInSeconds % 60; // Seconds calculation

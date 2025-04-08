@@ -12,7 +12,7 @@ governing permissions and limitations under the License.
 
 const { Command, Flags } = require('@oclif/core');
 const SourceRegistryStorage = require('source-registry-storage-adapter');
-const { promptConfirm, promptInput, initRequestId, initSdk } = require('../../../helpers');
+const { promptConfirm, promptInput, initSdk } = require('../../../helpers');
 const { ignoreCacheFlag } = require('../../../utils');
 const config = require('@adobe/aio-lib-core-config');
 const logger = require('../../../classes/logger');
@@ -33,7 +33,6 @@ class InstallCommand extends Command {
 
 	async run() {
 		const { flags, args } = await this.parse(InstallCommand);
-		await initRequestId();
 		logger.info(`RequestId: ${global.requestId}`);
 		const ignoreCache = await flags.ignoreCache;
 		const {

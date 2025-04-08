@@ -147,6 +147,9 @@
 			"@oclif/plugin-help"
 		],
 		"hooks": {
+			"init": [
+				"./src/hooks/initMetadata.js"
+			],
 			"prerun": [
 				"./src/hooks/versionCompare.js"
 			]

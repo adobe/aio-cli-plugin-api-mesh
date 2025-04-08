@@ -32,13 +32,7 @@ jest.mock('../../../lib/devConsole');
 const CreateCommand = require('../create');
 const sampleCreateMeshConfig = require('../../__fixtures__/sample_mesh.json');
 const meshConfigWithComposerFiles = require('../../__fixtures__/sample_mesh_with_composer_files.json');
-const {
-	initSdk,
-	initRequestId,
-	promptConfirm,
-	interpolateMesh,
-	importFiles,
-} = require('../../../helpers');
+const { initSdk, promptConfirm, interpolateMesh, importFiles } = require('../../../helpers');
 const {
 	getMesh,
 	createMesh,
@@ -340,7 +334,6 @@ describe('create command tests', () => {
 	test('should create if a valid mesh config file is provided', async () => {
 		const runResult = await CreateCommand.run();
 
-		expect(initRequestId).toHaveBeenCalled();
 		expect(createMesh.mock.calls[0]).toMatchInlineSnapshot(`
 		[
 		  "CODE1234@AdobeOrg",
@@ -422,7 +415,6 @@ describe('create command tests', () => {
 
 		const runResult = await CreateCommand.run();
 
-		expect(initRequestId).toHaveBeenCalled();
 		expect(createMesh.mock.calls[0]).toMatchInlineSnapshot(`
 		[
 		  "CODE1234@AdobeOrg",
@@ -557,7 +549,6 @@ describe('create command tests', () => {
 
 		await CreateCommand.run();
 
-		expect(initRequestId).toHaveBeenCalled();
 		expect(promptConfirm).not.toHaveBeenCalled();
 		expect(initSdk).toHaveBeenCalledWith({
 			ignoreCache: true,
@@ -594,7 +585,6 @@ describe('create command tests', () => {
 
 		await CreateCommand.run();
 
-		expect(initRequestId).toHaveBeenCalled();
 		expect(promptConfirm).toHaveBeenCalled();
 		expect(initSdk).toHaveBeenCalledWith({
 			ignoreCache: true,
@@ -902,7 +892,6 @@ describe('create command tests', () => {
 
 		const output = await CreateCommand.run();
 
-		expect(initRequestId).toHaveBeenCalled();
 		expect(createMesh.mock.calls[0]).toMatchInlineSnapshot(`
 		[
 		  "CODE1234@AdobeOrg",
@@ -1164,7 +1153,6 @@ describe('create command tests', () => {
 
 		const output = await CreateCommand.run();
 
-		expect(initRequestId).toHaveBeenCalled();
 		expect(createMesh.mock.calls[0]).toMatchInlineSnapshot(`
 		[
 		  "1234",
@@ -1292,7 +1280,6 @@ describe('create command tests', () => {
 
 		const output = await CreateCommand.run();
 
-		expect(initRequestId).toHaveBeenCalled();
 		expect(createMesh.mock.calls[0]).toMatchInlineSnapshot(`
 		[
 		  "1234",
@@ -1422,7 +1409,6 @@ describe('create command tests', () => {
 
 		const output = await CreateCommand.run();
 
-		expect(initRequestId).toHaveBeenCalled();
 		expect(createMesh.mock.calls[0]).toMatchInlineSnapshot(`
 		[
 		  "CODE1234@AdobeOrg",
@@ -1552,7 +1538,6 @@ describe('create command tests', () => {
 
 		const output = await CreateCommand.run();
 
-		expect(initRequestId).toHaveBeenCalled();
 		expect(createMesh.mock.calls[0]).toMatchInlineSnapshot(`
 		[
 		  "CODE1234@AdobeOrg",
