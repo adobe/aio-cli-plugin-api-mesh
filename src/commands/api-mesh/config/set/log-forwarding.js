@@ -25,7 +25,7 @@ const {
 	jsonFlag,
 	destinations,
 } = require('../../../../utils');
-const { setLogForwarding, getMeshId } = require('../../../../lib/devConsole');
+const { setLogForwarding, getMeshId } = require('../../../../lib/smsClient');
 
 class SetLogForwardingCommand extends Command {
 	static flags = {

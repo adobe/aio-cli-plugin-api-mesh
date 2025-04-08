@@ -23,7 +23,7 @@ jest.mock('../../../helpers', () => ({
 	initRequestId: jest.fn().mockResolvedValue({}),
 	promptConfirm: jest.fn().mockResolvedValue(true),
 }));
-jest.mock('../../../lib/devConsole');
+jest.mock('../../../lib/smsClient');
 
 const mockConsoleCLIInstance = {};
 
@@ -40,7 +40,7 @@ const {
 	deleteMesh,
 	getApiKeyCredential,
 	unsubscribeCredentialFromMeshService,
-} = require('../../../lib/devConsole');
+} = require('../../../lib/smsClient');
 
 let logSpy = null;
 let errorLogSpy = null;

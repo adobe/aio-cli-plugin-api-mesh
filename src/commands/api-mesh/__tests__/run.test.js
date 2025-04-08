@@ -20,7 +20,7 @@ const {
 	writeSecretsFile,
 } = require('../../../helpers');
 const { runServer } = require('../../../server');
-const { getMeshId, getMeshArtifact } = require('../../../lib/devConsole');
+const { getMeshId, getMeshArtifact } = require('../../../lib/smsClient');
 require('@adobe-apimesh/mesh-builder');
 
 jest.mock('../../../helpers', () => ({
@@ -42,7 +42,7 @@ jest.mock('../../../server', () => ({
 	runServer: jest.fn().mockResolvedValue(),
 }));
 
-jest.mock('../../../lib/devConsole', () => ({
+jest.mock('../../../lib/smsClient', () => ({
 	getMeshId: jest.fn().mockResolvedValue('mockMeshId'),
 	getMeshArtifact: jest.fn().mockResolvedValue(),
 }));

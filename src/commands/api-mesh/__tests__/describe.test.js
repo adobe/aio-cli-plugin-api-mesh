@@ -23,7 +23,7 @@ jest.mock('@adobe/aio-cli-lib-console', () => ({
 	init: jest.fn().mockResolvedValue(mockConsoleCLIInstance),
 	cleanStdOut: jest.fn(),
 }));
-jest.mock('../../../lib/devConsole');
+jest.mock('../../../lib/smsClient');
 jest.mock('chalk', () => ({
 	bold: jest.fn(text => text), // Return the input text without any color formatting
 	underline: {
@@ -34,7 +34,7 @@ jest.mock('chalk', () => ({
 
 const DescribeCommand = require('../describe');
 const { initSdk, initRequestId } = require('../../../helpers');
-const { describeMesh, getMesh, getTenantFeatures } = require('../../../lib/devConsole');
+const { describeMesh, getMesh, getTenantFeatures } = require('../../../lib/smsClient');
 const sampleCreateMeshConfig = require('../../__fixtures__/sample_mesh.json');
 
 const selectedOrg = { id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' };

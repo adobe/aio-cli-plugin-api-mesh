@@ -27,7 +27,7 @@ jest.mock('../../../helpers', () => ({
 	interpolateMesh: jest.fn().mockResolvedValue({}),
 	importFiles: jest.fn().mockResolvedValue(),
 }));
-jest.mock('../../../lib/devConsole');
+jest.mock('../../../lib/smsClient');
 
 const CreateCommand = require('../create');
 const sampleCreateMeshConfig = require('../../__fixtures__/sample_mesh.json');
@@ -44,7 +44,7 @@ const {
 	createMesh,
 	getTenantFeatures,
 	getPublicEncryptionKey,
-} = require('../../../lib/devConsole');
+} = require('../../../lib/smsClient');
 
 const selectedOrg = { id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' };
 
@@ -69,7 +69,7 @@ jest.mock('../../../helpers', () => ({
 	interpolateMesh: jest.fn().mockResolvedValue({}),
 	importFiles: jest.fn().mockResolvedValue(),
 }));
-jest.mock('../../../lib/devConsole');
+jest.mock('../../../lib/smsClient');
 jest.mock('chalk', () => ({
 	red: jest.fn(text => text), // Return the input text without any color formatting
 	bold: jest.fn(text => text),

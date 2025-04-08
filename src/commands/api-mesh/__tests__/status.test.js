@@ -8,7 +8,7 @@ const mockMeshId = '00000000-0000-0000-0000-000000000000';
 global.requestId = 'dummy_request_id';
 
 // Create mock modules and functions
-jest.mock('../../../lib/devConsole');
+jest.mock('../../../lib/smsClient');
 jest.mock('../../../helpers');
 const parseSpy = jest.spyOn(StatusCommand.prototype, 'parse');
 const logSpy = jest.spyOn(StatusCommand.prototype, 'log');
@@ -16,7 +16,7 @@ const errorLogSpy = jest.spyOn(StatusCommand.prototype, 'error');
 
 // Prepare mocks
 const { initSdk } = require('../../../helpers');
-const { getMeshId, getMesh, getMeshDeployments } = require('../../../lib/devConsole');
+const { getMeshId, getMesh, getMeshDeployments } = require('../../../lib/smsClient');
 initSdk.mockResolvedValue({
 	imsOrgId: mockOrg.id,
 	imsOrgCode: mockOrg.code,
