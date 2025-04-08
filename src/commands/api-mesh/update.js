@@ -139,11 +139,12 @@ class UpdateCommand extends Command {
 					`Your mesh has ${chalk.yellowBright('includeHTTPDetails')} set to ${chalk.redBright(
 						'true',
 					)}. This is a security risk and should not be used in production.\n` +
-					'When ${chalk.yellowBright('includeHTTPDetails')} is set to ${chalk.redBright(
-					'true' it exposes HTTP request and response details in the mesh logs, which can cause sensitive information to be exposed.\n' +
-						`Consider setting ${chalk.yellowBright(
-							'includeHTTPDetails',
-						)} to ${chalk.greenBright('false')} in the meshConfig.`,
+						`When ${chalk.yellowBright('includeHTTPDetails')} is set to ${chalk.redBright(
+							'true',
+						)} it exposes HTTP request and response details in the mesh logs, which can cause sensitive information to be exposed.\n` +
+						`Consider setting ${chalk.yellowBright('includeHTTPDetails')} to ${chalk.greenBright(
+							'false',
+						)} in the meshConfig.`,
 				);
 			}
 
