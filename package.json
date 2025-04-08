@@ -1,6 +1,6 @@
 {
 	"name": "@adobe/aio-cli-plugin-api-mesh",
-	"version": "5.2.2",
+	"version": "5.2.3",
 	"description": "Adobe I/O CLI plugin to develop and manage API mesh sources",
 	"keywords": [
 		"oclif-plugin"
@@ -21,6 +21,7 @@
 	},
 	"files": [
 		"/oclif.manifest.json",
+		"wrangler.toml",
 		"/src"
 	],
 	"scripts": {
@@ -43,7 +44,7 @@
 		"@adobe/aio-lib-core-logging": "^3.0.0",
 		"@adobe/aio-lib-env": "^3.0.0",
 		"@adobe/aio-lib-ims": "^7.0.1",
-		"@adobe/plugin-hooks": "0.3.3",
+		"@adobe/plugin-hooks": "0.3.4",
 		"@adobe/plugin-on-fetch": "0.1.1",
 		"@adobe/plugin-source-headers": "^0.0.2",
 		"@envelop/disable-introspection": "^6.0.0",
@@ -99,11 +100,12 @@
 		"source-registry-storage-adapter": "github:devx-services/source-registry-storage-adapter#main",
 		"util": "^0.12.5",
 		"uuid": "^8.3.2",
-		"wrangler": "3.80.4",
+		"wrangler": "4.3.0",
 		"yaml": "^2.4.2"
 	},
 	"devDependencies": {
 		"@babel/eslint-parser": "^7.15.8",
+		"@cloudflare/workers-types": "^4.20250320.0",
 		"@oclif/dev-cli": "1.26.10",
 		"@oclif/plugin-help": "2.2.3",
 		"@trivago/prettier-plugin-sort-imports": "^3.1.1",
@@ -136,12 +138,18 @@
 		"access": "public"
 	},
 	"oclif": {
+		"topics": {
+			"api-mesh": { "description": "Create, run, test, and deploy API Mesh"}
+		},
 		"commands": "./src/commands",
 		"bin": "aio",
 		"devPlugins": [
 			"@oclif/plugin-help"
 		],
 		"hooks": {
+			"init": [
+				"./src/hooks/initMetadata.js"
+			],
 			"prerun": [
 				"./src/hooks/versionCompare.js"
 			]

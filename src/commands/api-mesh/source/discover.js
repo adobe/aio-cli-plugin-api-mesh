@@ -10,12 +10,7 @@ governing permissions and limitations under the License.
 */
 
 const { Command, CliUx, Flags } = require('@oclif/core');
-const {
-	promptConfirm,
-	initRequestId,
-	promptMultiselect,
-	promptSelect,
-} = require('../../../helpers');
+const { promptConfirm, promptMultiselect, promptSelect } = require('../../../helpers');
 const SourceRegistryStorage = require('source-registry-storage-adapter');
 const config = require('@adobe/aio-lib-core-config');
 const logger = require('../../../classes/logger');
@@ -24,8 +19,6 @@ const InstallCommand = require('./install');
 class DiscoverCommand extends Command {
 	async run() {
 		try {
-			await initRequestId();
-
 			logger.info(`RequestId: ${global.requestId}`);
 			const { flags } = await this.parse(DiscoverCommand);
 			const srs = new SourceRegistryStorage(config.get('api-mesh.sourceRegistry.path'));
@@ -58,7 +51,7 @@ class DiscoverCommand extends Command {
 		} catch (error) {
 			logger.error(error);
 			this.error(`
-				Something went wrong with "discover" command. Please try again later. 
+				Something went wrong with "discover" command. Please try again later.
 				${error}
 			`);
 		}

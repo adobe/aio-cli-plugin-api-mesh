@@ -12,7 +12,7 @@ governing permissions and limitations under the License.
 const { Command } = require('@oclif/core');
 const chalk = require('chalk');
 
-const { initSdk, initRequestId, promptConfirm, importFiles } = require('../../helpers');
+const { initSdk, promptConfirm, importFiles } = require('../../helpers');
 const logger = require('../../classes/logger');
 const {
 	ignoreCacheFlag,
@@ -44,8 +44,6 @@ class CreateCommand extends Command {
 	static enableJsonFlag = true;
 
 	async run() {
-		await initRequestId();
-
 		logger.info(`RequestId: ${global.requestId}`);
 
 		const { args, flags } = await this.parse(CreateCommand);
@@ -101,7 +99,7 @@ class CreateCommand extends Command {
 		// if local files are present, import them in files array in meshConfig
 		if (filesList.length) {
 			try {
-				data = await importFiles(data, filesList, args.file, flags.autoConfirmAction);
+				({ data } = await importFiles(data, filesList, args.file, flags.autoConfirmAction));
 			} catch (err) {
 				this.log(err.message);
 				this.error('Unable to import the files in the mesh config. Check the file and try again.');
@@ -114,8 +112,7 @@ class CreateCommand extends Command {
 				await validateSecretsFile(secretsFilePath);
 				const secretsData = await interpolateSecrets(secretsFilePath, this);
 				const publicKey = await getPublicEncryptionKey(imsOrgCode);
-				const encryptedSecrets = await encryptSecrets(publicKey, secretsData);
-				data.secrets = encryptedSecrets;
+				data.secrets = await encryptSecrets(publicKey, secretsData);
 			} catch (err) {
 				this.log(err.message);
 				this.error('Unable to import secrets. Check the file and try again.');

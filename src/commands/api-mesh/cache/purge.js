@@ -12,7 +12,7 @@ governing permissions and limitations under the License.
 const { Command } = require('@oclif/command');
 
 const logger = require('../../../classes/logger');
-const { initSdk, initRequestId, promptConfirm } = require('../../../helpers');
+const { initSdk, promptConfirm } = require('../../../helpers');
 const {
 	ignoreCacheFlag,
 	autoConfirmActionFlag,
@@ -30,8 +30,6 @@ class CachePurgeCommand extends Command {
 	};
 
 	async run() {
-		await initRequestId();
-
 		logger.info(`RequestId: ${global.requestId}`);
 
 		const { flags } = await this.parse(CachePurgeCommand);
