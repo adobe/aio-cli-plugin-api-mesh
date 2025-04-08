@@ -1074,7 +1074,7 @@ const getMeshDeployments = async (organizationCode, projectId, workspaceId, mesh
  * As a result, we provide the publicKey used for secrets encryption.
  * The near-term goal is to stop using Dev Console as a proxy for all routes.
  * @param organizationCode
- * @returns string
+ * @returns Promise<string>
  */
 const getPublicEncryptionKey = async organizationCode => {
 	const { accessToken } = await getDevConsoleConfig();

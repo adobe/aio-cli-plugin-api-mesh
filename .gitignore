@@ -11,6 +11,8 @@ node_modules
 coverage/
 junit.xml
 package-lock.json
+.mesh
+oclif.manifest.json
 
 lib-cov
 *.seed
