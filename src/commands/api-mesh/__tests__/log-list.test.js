@@ -1,7 +1,7 @@
 const fs = require('fs');
 const ListLogsCommand = require('../log-list');
 const { initSdk, promptConfirm } = require('../../../helpers');
-const { getMeshId, listLogs } = require('../../../lib/devConsole');
+const { getMeshId, listLogs } = require('../../../lib/smsClient');
 
 jest.mock('fs');
 jest.mock('axios');
@@ -10,7 +10,7 @@ jest.mock('../../../helpers', () => ({
 	initRequestId: jest.fn().mockResolvedValue({}),
 	promptConfirm: jest.fn().mockResolvedValue(true),
 }));
-jest.mock('../../../lib/devConsole');
+jest.mock('../../../lib/smsClient');
 jest.mock('../../../classes/logger');
 
 describe('List Logs Command', () => {

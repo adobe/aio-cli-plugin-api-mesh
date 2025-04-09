@@ -437,15 +437,43 @@ async function initSdk(options) {
 /**
  * Generates a static global requestid for the lifecycle of this command request
  */
-async function initRequestId() {
+function initRequestId() {
 	global.requestId = UUID.newUuid().toString();
+}
+
+/**
+ *
+ * This function initializes the metadata headers for the command execution
+ *
+ * @param {*} config
+ */
+function initMetadata(config) {
+	try {
+		const { version, plugins, userAgent, platform, arch } = config;
+		const currentIntalledVersion = getCurrentInstalledPluginVersion(plugins);
+
+		const metadataHeaders = {
+			'x-aio-cli-version': version,
+			'x-aio-cli-user-agent': userAgent,
+			'x-aio-cli-platform': platform,
+			'x-aio-cli-arch': arch,
+			'x-aio-cli-plugin-api-mesh-version': currentIntalledVersion,
+		};
+
+		global.metadataHeaders = metadataHeaders;
+	} catch (error) {
+		logger.error('Unable to initialize metadata headers');
+		logger.error(error.message);
+
+		global.metadataHeaders = {};
+	}
 }
 
 /**
  * Function to run the CLI Y/N prompt to confirm the user's action
  *
  * @param {string} message
- * @returns boolean
+ * @returns Promise<boolean>
  */
 async function promptConfirm(message) {
 	const prompt = inquirer.createPromptModule({ output: process.stderr });
@@ -505,7 +533,6 @@ async function promptSelect(message, choices) {
  * Function to run the CLI selectable list
  *
  * @param {string} message - prompt message
- * @param {object[]} choices - list of options
  * @returns {object[]} - selected options
  */
 async function promptInput(message) {
@@ -542,9 +569,11 @@ async function promptInputSecret(message) {
  * Import the files in the files array in meshConfig
  *
  * @param data MeshConfig
- * @param filesList List of files in meshConfig
+ * @param filesListArray List of files in meshConfig
  * @param meshConfigName MeshConfigName
  * @param autoConfirmActionFlag The user won't be prompted any questions, if this flag is set
+ * @param shouldMinifyJS
+ * @returns Promise<{{ data, localFileOverrides: string[] }}>
  */
 async function importFiles(
 	data,
@@ -607,29 +636,38 @@ async function importFiles(
 		);
 	}
 
+	// Result of override resolution
+	const localFileOverrides = {};
 	for (let i = 0; i < overrideArr.length; i++) {
+		const fileName = overrideArr[i].fileName;
 		shouldOverride = await promptConfirm(
-			`Do you want to override the ${path.basename(overrideArr[i].fileName)} file?`,
+			`Do you want to override the ${path.basename(fileName)} file?`,
 		);
 
 		if (shouldOverride) {
 			resultData = updateFilesArray(
 				resultData,
-				overrideArr[i].fileName,
+				fileName,
 				meshConfigName,
 				overrideArr[i].index,
 				shouldMinifyJS,
 			);
+			localFileOverrides[fileName] = true;
+		} else {
+			localFileOverrides[fileName] = false;
 		}
 	}
 
-	return resultData;
+	return {
+		data: resultData,
+		localFileOverrides,
+	};
 }
 
 /**loads the pupa module dynamically and then interpolates the raw data from mesh file with object data
- * @param {data}
- * @param {obj}
- * @returns {object} having interpolationStatus, missingKeys and interpolatedMesh
+ * @param data
+ * @param obj
+ * @returns {object}
  */
 
 async function interpolateMesh(data, obj) {
@@ -863,7 +901,7 @@ async function processFileConfig(config) {
  * This function sets up the tenantFiles used in a particular mesh config
  * into the tenantFiles folder
  *
- * @param config
+ * @param meshId
  */
 async function setUpTenantFiles(meshId) {
 	if (fs.existsSync(path.resolve(process.cwd(), 'mesh-artifact', meshId, 'files.json'))) {
@@ -902,6 +940,28 @@ async function writeSecretsFile(secretsData, meshId) {
 
 /**
  *
+ * This function gets the current installed version of the plugin
+ *
+ * @param {*} installedPlugins
+ * @returns {string || null} - current installed version of the plugin
+ */
+function getCurrentInstalledPluginVersion(installedPlugins) {
+	try {
+		const meshPlugin = installedPlugins.find(
+			({ name }) => name === '@adobe/aio-cli-plugin-api-mesh',
+		);
+
+		return meshPlugin.version;
+	} catch (err) {
+		logger.error('Unable to get current installed version');
+		logger.error(err.message);
+
+		return null;
+	}
+}
+
+/**
+ *
  * This function fetches current installed version the system and the latest version from npm
  *
  * @param {*} installedPlugins
@@ -909,10 +969,7 @@ async function writeSecretsFile(secretsData, meshId) {
  */
 async function getPluginVersionDetails(installedPlugins) {
 	try {
-		const meshPlugin = installedPlugins.find(
-			({ name }) => name === '@adobe/aio-cli-plugin-api-mesh',
-		);
-		const currentVersion = meshPlugin.version;
+		const currentVersion = getCurrentInstalledPluginVersion(installedPlugins);
 
 		let config = {
 			method: 'get',
@@ -972,6 +1029,7 @@ module.exports = {
 	getDevConsoleConfig,
 	initSdk,
 	initRequestId,
+	initMetadata,
 	promptSelect,
 	promptMultiselect,
 	importFiles,

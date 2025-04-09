@@ -10,21 +10,19 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const IndexCommand = require('..');
+const { Help, Command } = require('@oclif/core');
 
-test('exports', async () => {
-	expect(typeof IndexCommand).toEqual('function');
-});
+/**
+ * API Mesh command. Defers to topic for help text.
+ */
+class ApiMeshCommand extends Command {
+	async run() {
+		const help = new Help(this.config);
+		await help.showHelp(['api-mesh', '--help']);
+	}
+}
 
-describe('command tests', () => {
-	let command;
+ApiMeshCommand.description = 'Create, run, test, and deploy API Mesh';
+ApiMeshCommand.args = [];
 
-	beforeEach(() => {
-		command = new IndexCommand([]);
-	});
-
-	test('run', async () => {
-		command.argv = [];
-		await expect(command.run()).resolves.not.toThrowError();
-	});
-});
+module.exports = ApiMeshCommand;

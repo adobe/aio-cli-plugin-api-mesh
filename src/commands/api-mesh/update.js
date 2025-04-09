@@ -10,9 +10,10 @@ governing permissions and limitations under the License.
 */
 
 const { Command } = require('@oclif/command');
+const chalk = require('chalk');
 
 const logger = require('../../classes/logger');
-const { initSdk, initRequestId, promptConfirm, importFiles } = require('../../helpers');
+const { initSdk, promptConfirm, importFiles } = require('../../helpers');
 const {
 	ignoreCacheFlag,
 	autoConfirmActionFlag,
@@ -26,7 +27,7 @@ const {
 	validateSecretsFile,
 	encryptSecrets,
 } = require('../../utils');
-const { getMeshId, updateMesh, getPublicEncryptionKey } = require('../../lib/devConsole');
+const { getMeshId, updateMesh, getPublicEncryptionKey } = require('../../lib/smsClient');
 
 class UpdateCommand extends Command {
 	static args = [{ name: 'file' }];
@@ -38,8 +39,6 @@ class UpdateCommand extends Command {
 	};
 
 	async run() {
-		await initRequestId();
-
 		logger.info(`RequestId: ${global.requestId}`);
 
 		const { args, flags } = await this.parse(UpdateCommand);
@@ -106,7 +105,7 @@ class UpdateCommand extends Command {
 		// if local files are present, import them in files array in meshConfig
 		if (filesList.length) {
 			try {
-				data = await importFiles(data, filesList, args.file, flags.autoConfirmAction);
+				({ data } = await importFiles(data, filesList, args.file, flags.autoConfirmAction));
 			} catch (err) {
 				this.log(err.message);
 				this.error('Unable to import the files in the mesh config. Check the file and try again.');
@@ -119,8 +118,7 @@ class UpdateCommand extends Command {
 				await validateSecretsFile(secretsFilePath);
 				const secretsData = await interpolateSecrets(secretsFilePath, this);
 				const publicKey = await getPublicEncryptionKey(imsOrgCode);
-				const encryptedSecrets = await encryptSecrets(publicKey, secretsData);
-				data.secrets = encryptedSecrets;
+				data.secrets = await encryptSecrets(publicKey, secretsData);
 			} catch (err) {
 				this.log(err.message);
 				this.error('Unable to import secrets. Check the file and try again.');
@@ -129,6 +127,23 @@ class UpdateCommand extends Command {
 
 		if (meshId) {
 			let shouldContinue = true;
+
+			if (
+				data?.meshConfig?.responseConfig?.includeHTTPDetails &&
+				workspaceName.toLowerCase() === 'production'
+			) {
+				this.warn(
+					`Your mesh has ${chalk.yellowBright('includeHTTPDetails')} set to ${chalk.redBright(
+						'true',
+					)}. This is a security risk and should not be used in production.\n` +
+						`When ${chalk.yellowBright('includeHTTPDetails')} is set to ${chalk.redBright(
+							'true',
+						)} it exposes HTTP request and response details in the mesh logs, which can cause sensitive information to be exposed.\n` +
+						`Consider setting ${chalk.yellowBright('includeHTTPDetails')} to ${chalk.greenBright(
+							'false',
+						)} in the meshConfig.`,
+				);
+			}
 
 			if (!autoConfirmAction) {
 				shouldContinue = await promptConfirm(

@@ -17,14 +17,14 @@ jest.mock('../../../helpers', () => ({
 	initSdk: jest.fn().mockResolvedValue({}),
 	initRequestId: jest.fn().mockResolvedValue({}),
 	promptConfirm: jest.fn().mockResolvedValue(true),
-	importFiles: jest.fn().mockResolvedValue(),
+	importFiles: jest.fn().mockResolvedValue({}),
 }));
 jest.mock('@adobe/aio-cli-lib-console', () => ({
 	init: jest.fn().mockResolvedValue(mockConsoleCLIInstance),
 	cleanStdOut: jest.fn(),
 }));
 jest.mock('@adobe/aio-lib-ims');
-jest.mock('../../../lib/devConsole');
+jest.mock('../../../lib/smsClient');
 
 const mockConsoleCLIInstance = {};
 
@@ -35,8 +35,8 @@ const selectedWorkspace = { id: '123456789', title: 'Workspace01' };
 const { readFile } = require('fs/promises');
 
 const UpdateCommand = require('../update');
-const { initSdk, initRequestId, promptConfirm, importFiles } = require('../../../helpers');
-const { getMeshId, updateMesh } = require('../../../lib/devConsole');
+const { initSdk, promptConfirm, importFiles } = require('../../../helpers');
+const { getMeshId, updateMesh } = require('../../../lib/smsClient');
 
 let logSpy = null;
 let errorLogSpy = null;
@@ -110,7 +110,7 @@ describe('update command tests', () => {
 		  "status": "success",
 		}
 	`);
-		expect(initRequestId).toHaveBeenCalled();
+
 		expect(initSdk).toHaveBeenCalledWith({
 			ignoreCache: true,
 		});
@@ -169,7 +169,7 @@ describe('update command tests', () => {
 		  "status": "success",
 		}
 	`);
-		expect(initRequestId).toHaveBeenCalled();
+
 		expect(initSdk).toHaveBeenCalledWith({
 			ignoreCache: true,
 		});
@@ -228,7 +228,7 @@ describe('update command tests', () => {
 		  "status": "success",
 		}
 	`);
-		expect(initRequestId).toHaveBeenCalled();
+
 		expect(promptConfirm).not.toHaveBeenCalled();
 		expect(initSdk).toHaveBeenCalledWith({
 			ignoreCache: true,
@@ -547,12 +547,13 @@ describe('update command tests', () => {
 		});
 
 		importFiles.mockResolvedValueOnce({
-			meshConfig,
+			data: {
+				meshConfig,
+			},
 		});
 
 		const output = await UpdateCommand.run();
 
-		expect(initRequestId).toHaveBeenCalled();
 		expect(updateMesh.mock.calls[0]).toMatchInlineSnapshot(`
 		[
 		  "CODE1234@AdobeOrg",

@@ -10,7 +10,7 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const SetLogForwardingCommand = require('../set-log-forwarding');
+const SetLogForwardingCommand = require('../config/set/log-forwarding');
 const {
 	initSdk,
 	promptConfirm,
@@ -18,7 +18,7 @@ const {
 	promptInput,
 	promptInputSecret,
 } = require('../../../helpers');
-const { getMeshId, setLogForwarding } = require('../../../lib/devConsole');
+const { getMeshId, setLogForwarding } = require('../../../lib/smsClient');
 
 jest.mock('../../../helpers', () => ({
 	initSdk: jest.fn().mockResolvedValue({}),
@@ -28,7 +28,7 @@ jest.mock('../../../helpers', () => ({
 	promptInput: jest.fn().mockResolvedValue('https://log-api.newrelic.com/log/v1'),
 	promptInputSecret: jest.fn().mockResolvedValue('abcdef0123456789abcdef0123456789abcdef01'),
 }));
-jest.mock('../../../lib/devConsole');
+jest.mock('../../../lib/smsClient');
 jest.mock('../../../classes/logger');
 
 describe('SetLogForwardingCommand', () => {

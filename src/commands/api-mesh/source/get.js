@@ -12,12 +12,7 @@ governing permissions and limitations under the License.
 
 const { Command, Flags } = require('@oclif/core');
 const SourceRegistryStorage = require('source-registry-storage-adapter');
-const {
-	promptMultiselect,
-	promptSelect,
-	promptConfirm,
-	initRequestId,
-} = require('../../../helpers');
+const { promptMultiselect, promptSelect, promptConfirm } = require('../../../helpers');
 const ncp = require('node-clipboardy');
 const chalk = require('chalk');
 const config = require('@adobe/aio-lib-core-config');
@@ -33,8 +28,6 @@ class GetCommand extends Command {
 
 	async run() {
 		try {
-			await initRequestId();
-
 			logger.info(`RequestId: ${global.requestId}`);
 			let list;
 			try {

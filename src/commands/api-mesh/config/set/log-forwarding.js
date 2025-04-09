@@ -17,10 +17,15 @@ const {
 	promptSelect,
 	promptInput,
 	promptInputSecret,
-} = require('../../helpers');
-const logger = require('../../classes/logger');
-const { ignoreCacheFlag, autoConfirmActionFlag, jsonFlag, destinations } = require('../../utils');
-const { setLogForwarding, getMeshId } = require('../../lib/devConsole');
+} = require('../../../../helpers');
+const logger = require('../../../../classes/logger');
+const {
+	ignoreCacheFlag,
+	autoConfirmActionFlag,
+	jsonFlag,
+	destinations,
+} = require('../../../../utils');
+const { setLogForwarding, getMeshId } = require('../../../../lib/smsClient');
 
 class SetLogForwardingCommand extends Command {
 	static flags = {

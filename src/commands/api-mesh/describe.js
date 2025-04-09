@@ -11,9 +11,9 @@ governing permissions and limitations under the License.
 
 const { Command } = require('@oclif/command');
 const logger = require('../../classes/logger');
-const { initSdk, initRequestId } = require('../../helpers');
+const { initSdk } = require('../../helpers');
 const { ignoreCacheFlag } = require('../../utils');
-const { describeMesh } = require('../../lib/devConsole');
+const { describeMesh } = require('../../lib/smsClient');
 const { buildMeshUrl } = require('../../urlBuilder');
 
 require('dotenv').config();
@@ -24,8 +24,6 @@ class DescribeCommand extends Command {
 	};
 
 	async run() {
-		await initRequestId();
-
 		logger.info(`RequestId: ${global.requestId}`);
 
 		const { flags } = await this.parse(DescribeCommand);
