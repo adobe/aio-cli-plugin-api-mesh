@@ -6,7 +6,6 @@ const { readFile } = require('fs/promises');
 const { interpolateMesh } = require('./helpers');
 const dotenv = require('dotenv');
 const YAML = require('yaml');
-const ms = require('ms');
 const parseEnv = require('envsub/js/envsub-parser');
 const os = require('os');
 const chalk = require('chalk');
@@ -94,11 +93,7 @@ const endTimeFlag = Flags.string({
 });
 
 const pastFlag = Flags.string({
-	description: 'Past time window in mins',
-});
-
-const fromFlag = Flags.string({
-	description: `The from time in YYYY-MM-DD:HH:MM:SS format based on your system's time zone. It is used to fetch logs from the past and is the starting time for the past time duration.`,
+	description: 'Past time window in minutes',
 });
 
 const logFilenameFlag = Flags.string({
@@ -665,22 +660,20 @@ function suggestCorrectedDateFormat(inputDate) {
 /**
  * Parses a duration string representing a past time window and converts it to milliseconds.
  *
- * @param {string} pastTimeWindow - The past time duration to parse, e.g., "20 mins", "15 minutes".
+ * @param {string} pastTimeWindow - The past time duration in minutes, e.g., "20", "15".
  * @returns {number} The duration in milliseconds.
  */
 function parsePastDuration(pastTimeWindow) {
-	// Regular expression to match various formats of minute abbreviations
-	const pastDurationRegex = /^(\d+)\s*(m|mins?|minutes?)$/i;
-	const match = pastTimeWindow.match(pastDurationRegex);
+	// Check if pastTimeWindow contains non-numeric characters
+	const match = pastTimeWindow.match(/^(\d+)$/);
 
-	if (!match) {
+	const durationInMs = Number(pastTimeWindow) * 60 * 1000;
+
+	if (isNaN(durationInMs) || !match) {
 		throw new Error(
-			'Invalid format. The past time window should be in minutes, for example, "20 mins", "15 minutes".',
+			'Invalid format. The time window must be an integer, for example "20" or "15".',
 		);
 	}
-
-	// Convert the matched duration to milliseconds
-	const durationInMs = ms(pastTimeWindow);
 
 	return durationInMs;
 }
@@ -770,6 +763,7 @@ function validateDateTimeFormat(time) {
 	return timeString.replace(/-|:|Z/g, '').replace('T', 'T');
 }
 
+// can be used later if we want to take --startTime and --endTime in local time
 /**
  * Convert a given local time string to UTC time string
  * @param {string} timeString - The time string in the format YYYY-MM-DD:HH:MM:SS
@@ -823,7 +817,6 @@ module.exports = {
 	endTimeFlag,
 	logFilenameFlag,
 	pastFlag,
-	fromFlag,
 	suggestCorrectedDateFormat,
 	parsePastDuration,
 	validateDateTimeRange,
