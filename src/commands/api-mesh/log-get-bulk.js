@@ -101,7 +101,7 @@ class GetBulkLogCommand extends Command {
 			return;
 		} else {
 			this.error(
-				'Missing required flags. Provide at least one flag --startTime, --endTime, or --past or  type `mesh log:get-bulk --help` for more information.',
+				'Missing required flags. Provide a time range with --startTime and  --endTime flags,  or use the --past flag for more recent logs. Use the `mesh log:get-bulk --help` command for more information.',
 			);
 			return;
 		}

@@ -664,7 +664,7 @@ function parsePastDuration(pastTimeWindow) {
 
 	if (isNaN(durationInMs) || !match) {
 		throw new Error(
-			'Invalid format. The past time window should be integer, for example, "20", "15".',
+			'Invalid format. The time window must be an integer, for example "20" or "15".',
 		);
 	}
 
