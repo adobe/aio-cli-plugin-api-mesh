@@ -358,11 +358,11 @@ describe('parsePastDuration', () => {
 		},
 	);
 
-	const invalidDurations = ['20h', '20 hours', '20s', '20 seconds','minutes', 'NaN', 'abc', ''];
+	const invalidDurations = ['20h', '20 hours', '20s', '20 seconds', 'minutes', 'NaN', 'abc', ''];
 
 	test.each(invalidDurations)('throws an error for non-numeric input "%s"', invalidPastDuration => {
 		expect(() => parsePastDuration(invalidPastDuration)).toThrow(
-			'Invalid format. The past time window should be integer, for example, "20", "15".',
+			'Invalid format. The time window must be an integer, for example "20" or "15".',
 		);
 	});
 });
