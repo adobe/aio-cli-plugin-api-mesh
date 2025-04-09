@@ -1,7 +1,7 @@
 const { Command } = require('@oclif/core');
 const path = require('path');
 const fs = require('fs');
-const { initRequestId, initSdk, promptConfirm } = require('../../helpers');
+const { initSdk, promptConfirm } = require('../../helpers');
 const { getMeshId, getPresignedUrls } = require('../../lib/smsClient');
 const logger = require('../../classes/logger');
 const axios = require('axios');

@@ -35,7 +35,7 @@ const selectedWorkspace = { id: '123456789', title: 'Workspace01' };
 const { readFile } = require('fs/promises');
 
 const UpdateCommand = require('../update');
-const { initSdk, initRequestId, promptConfirm, importFiles } = require('../../../helpers');
+const { initSdk, promptConfirm, importFiles } = require('../../../helpers');
 const { getMeshId, updateMesh } = require('../../../lib/smsClient');
 
 let logSpy = null;

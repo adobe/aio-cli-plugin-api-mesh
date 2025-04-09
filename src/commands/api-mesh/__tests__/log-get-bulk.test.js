@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const GetBulkLogCommand = require('../log-get-bulk');
-const { initRequestId, initSdk, promptConfirm } = require('../../../helpers');
+const { initSdk, promptConfirm } = require('../../../helpers');
 const { getMeshId, getPresignedUrls } = require('../../../lib/smsClient');
 const {
 	suggestCorrectedDateFormat,

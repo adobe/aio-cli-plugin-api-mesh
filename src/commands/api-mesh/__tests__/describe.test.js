@@ -33,7 +33,7 @@ jest.mock('chalk', () => ({
 }));
 
 const DescribeCommand = require('../describe');
-const { initSdk, initRequestId } = require('../../../helpers');
+const { initSdk } = require('../../../helpers');
 const { describeMesh, getMesh, getTenantFeatures } = require('../../../lib/smsClient');
 const sampleCreateMeshConfig = require('../../__fixtures__/sample_mesh.json');
 
