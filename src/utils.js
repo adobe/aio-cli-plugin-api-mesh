@@ -86,7 +86,7 @@ const endTimeFlag = Flags.string({
 });
 
 const pastFlag = Flags.string({
-	description: 'Past time window in mins',
+	description: 'Past time window in minutes',
 });
 
 const logFilenameFlag = Flags.string({
@@ -653,14 +653,14 @@ function suggestCorrectedDateFormat(inputDate) {
 /**
  * Parses a duration string representing a past time window and converts it to milliseconds.
  *
- * @param {string} pastTimeWindow - The past time duration to parse, e.g., "20", "15".
+ * @param {string} pastTimeWindow - The past time duration in minutes, e.g., "20", "15".
  * @returns {number} The duration in milliseconds.
  */
 function parsePastDuration(pastTimeWindow) {
 	// Check if pastTimeWindow contains non-numeric characters
 	const match = pastTimeWindow.match(/^(\d+)$/);
 
-	const durationInMs = parseInt(pastTimeWindow) * 60 * 1000;
+	const durationInMs = Number(pastTimeWindow) * 60 * 1000;
 
 	if (isNaN(durationInMs) || !match) {
 		throw new Error(
