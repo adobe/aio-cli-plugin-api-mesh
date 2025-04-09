@@ -13,7 +13,6 @@ class StatusCommand extends Command {
 	};
 
 	async run() {
-		await initRequestId();
 		logger.info(`RequestId: ${global.requestId}`);
 
 		const { flags } = await this.parse(StatusCommand);

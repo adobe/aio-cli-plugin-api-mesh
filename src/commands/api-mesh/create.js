@@ -10,7 +10,9 @@ governing permissions and limitations under the License.
 */
 
 const { Command } = require('@oclif/core');
-const { initSdk, initRequestId, promptConfirm, importFiles } = require('../../helpers');
+const chalk = require('chalk');
+
+const { initSdk, promptConfirm, importFiles } = require('../../helpers');
 const logger = require('../../classes/logger');
 const {
 	ignoreCacheFlag,
@@ -42,8 +44,6 @@ class CreateCommand extends Command {
 	static enableJsonFlag = true;
 
 	async run() {
-		await initRequestId();
-
 		logger.info(`RequestId: ${global.requestId}`);
 
 		const { args, flags } = await this.parse(CreateCommand);
@@ -99,7 +99,7 @@ class CreateCommand extends Command {
 		// if local files are present, import them in files array in meshConfig
 		if (filesList.length) {
 			try {
-				data = await importFiles(data, filesList, args.file, flags.autoConfirmAction);
+				({ data } = await importFiles(data, filesList, args.file, flags.autoConfirmAction));
 			} catch (err) {
 				this.log(err.message);
 				this.error('Unable to import the files in the mesh config. Check the file and try again.');
@@ -112,8 +112,7 @@ class CreateCommand extends Command {
 				await validateSecretsFile(secretsFilePath);
 				const secretsData = await interpolateSecrets(secretsFilePath, this);
 				const publicKey = await getPublicEncryptionKey(imsOrgCode);
-				const encryptedSecrets = await encryptSecrets(publicKey, secretsData);
-				data.secrets = encryptedSecrets;
+				data.secrets = await encryptSecrets(publicKey, secretsData);
 			} catch (err) {
 				this.log(err.message);
 				this.error('Unable to import secrets. Check the file and try again.');
@@ -121,6 +120,23 @@ class CreateCommand extends Command {
 		}
 
 		let shouldContinue = true;
+
+		if (
+			data?.meshConfig?.responseConfig?.includeHTTPDetails &&
+			workspaceName.toLowerCase() === 'production'
+		) {
+			this.warn(
+				`Your mesh has ${chalk.yellowBright('includeHTTPDetails')} set to ${chalk.redBright(
+					'true',
+				)}. This is a security risk and should not be used in production.\n` +
+					`When ${chalk.yellowBright('includeHTTPDetails')} is set to ${chalk.redBright(
+						'true',
+					)} it exposes HTTP request and response details in the mesh logs, which can cause sensitive information to be exposed.\n` +
+					`Consider setting ${chalk.yellowBright('includeHTTPDetails')} to ${chalk.greenBright(
+						'false',
+					)} in your mesh configuration file.`,
+			);
+		}
 
 		if (!autoConfirmAction) {
 			shouldContinue = await promptConfirm(`Are you sure you want to create a mesh?`);

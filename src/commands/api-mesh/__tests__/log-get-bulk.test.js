@@ -251,7 +251,6 @@ describe('GetBulkLogCommand', () => {
 		const command = new GetBulkLogCommand([], {});
 		await command.run();
 
-		expect(initRequestId).toHaveBeenCalled();
 		expect(initSdk).toHaveBeenCalled();
 		expect(getMeshId).toHaveBeenCalledWith('orgCode', 'projectId', 'workspaceId', 'workspaceName');
 		expect(getPresignedUrls).toHaveBeenCalledWith(
@@ -355,7 +354,6 @@ describe('GetBulkLogCommand with --past and --from flags', () => {
 		const command = new GetBulkLogCommand([], {});
 		await command.run();
 
-		expect(initRequestId).toHaveBeenCalled();
 		expect(initSdk).toHaveBeenCalled();
 		expect(getMeshId).toHaveBeenCalledWith('orgCode', 'projectId', 'workspaceId', 'workspaceName');
 		expect(getPresignedUrls).toHaveBeenCalledWith(
@@ -420,7 +418,6 @@ describe('GetBulkLogCommand with --past and --from flags', () => {
 		const command = new GetBulkLogCommand([], {});
 		await command.run();
 
-		expect(initRequestId).toHaveBeenCalled();
 		expect(initSdk).toHaveBeenCalled();
 		expect(getMeshId).toHaveBeenCalledWith('orgCode', 'projectId', 'workspaceId', 'workspaceName');
 		expect(getPresignedUrls).toHaveBeenCalledWith(
@@ -465,7 +462,6 @@ describe('GetBulkLogCommand with --past and --from flags', () => {
 		const command = new GetBulkLogCommand([], {});
 		await command.run();
 
-		expect(initRequestId).toHaveBeenCalled();
 		expect(initSdk).toHaveBeenCalled();
 		expect(getMeshId).toHaveBeenCalledWith('orgCode', 'projectId', 'workspaceId', 'workspaceName');
 		expect(getPresignedUrls).toHaveBeenCalledWith(
@@ -482,8 +478,8 @@ describe('GetBulkLogCommand with --past and --from flags', () => {
 describe('validateDateTimeRange', () => {
 	const testCases = [
 		{
-			startTime: '2025-03-09T12:00:00Z',
-			endTime: '2025-03-09T12:45:00Z',
+			startTime: new Date(new Date().getTime() - 45 * 60 * 1000).toISOString(),
+			endTime: new Date().toISOString(),
 			error:
 				'The maximum duration between startTime and endTime is 30 minutes. The current duration is 0 hours 45 minutes and 0 seconds.',
 		},
@@ -498,18 +494,18 @@ describe('validateDateTimeRange', () => {
 			error: 'Cannot get logs more than 30 days old. Adjust your time range.',
 		},
 		{
-			startTime: '2025-03-09T12:00:00Z',
-			endTime: '2025-03-09T12:00:00Z',
-			error: 'The minimum duration is 1 minutes. The current duration is 0 minutes.',
+			startTime: new Date(new Date().getTime() - 20 * 1000).toISOString(),
+			endTime: new Date().toISOString(),
+			error: 'The minimum duration is 1 minute. The current duration is 20 seconds.',
 		},
 		{
-			startTime: '2025-03-09T12:30:00Z',
-			endTime: '2025-03-09T12:00:00Z',
+			startTime: new Date().toISOString(),
+			endTime: new Date(new Date().getTime() - 0.5 * 60 * 1000).toISOString(),
 			error: 'endTime must be greater than startTime',
 		},
 		{
-			startTime: '2025-03-09T12:00:00Z',
-			endTime: '2025-03-09T12:20:00Z',
+			startTime: new Date(new Date().getTime() - 20 * 60 * 1000).toISOString(),
+			endTime: new Date().toISOString(),
 			error: null,
 		},
 	];

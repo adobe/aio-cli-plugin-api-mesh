@@ -11,6 +11,8 @@ node_modules
 coverage/
 junit.xml
 package-lock.json
+.mesh
+oclif.manifest.json
 
 lib-cov
 *.seed
@@ -38,7 +40,6 @@ coverage
 config.json
 
 # Dependency directory
-node_modules
 bower_components
 
 # Editors
@@ -47,11 +48,13 @@ bower_components
 .vscode
 
 # OS metadata
-.DS_Store
 Thumbs.db
 
 # Ignore built ts files
 dist/**/*
 dist
+tenantFiles
+.wrangler
+.mesh
 
 CHANGELOG.md

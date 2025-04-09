@@ -19,8 +19,8 @@ const {
 	initSdk,
 	writeSecretsFile,
 } = require('../../../helpers');
-const { runServer } = require('../../../server');
 const { getMeshId, getMeshArtifact } = require('../../../lib/smsClient');
+const { start } = require('../../../wranglerCli');
 require('@adobe-apimesh/mesh-builder');
 
 jest.mock('../../../helpers', () => ({
@@ -32,20 +32,25 @@ jest.mock('../../../helpers', () => ({
 	}),
 	initRequestId: jest.fn().mockResolvedValue({}),
 	interpolateMesh: jest.fn().mockResolvedValue({}),
-	importFiles: jest.fn().mockResolvedValue(),
+	importFiles: jest.fn().mockResolvedValue({}),
 	promptConfirm: jest.fn().mockResolvedValue(true),
 	setUpTenantFiles: jest.fn().mockResolvedValue(),
 	writeSecretsFile: jest.fn().mockResolvedValue(),
 }));
 
-jest.mock('../../../server', () => ({
-	runServer: jest.fn().mockResolvedValue(),
+jest.mock('../../../wranglerCli', () => ({
+	start: jest.fn().mockResolvedValue(),
 }));
 
 jest.mock('../../../lib/smsClient', () => ({
 	getMeshId: jest.fn().mockResolvedValue('mockMeshId'),
 	getMeshArtifact: jest.fn().mockResolvedValue(),
 }));
+
+jest.mock('../../../fixPlugins', () => ({
+	fixPlugins: jest.fn().mockResolvedValue({}),
+}));
+
 jest.mock('chalk', () => ({
 	red: jest.fn(text => text), // Return the input text without any color formatting
 }));
@@ -75,7 +80,6 @@ const originalEnv = {
 	API_MESH_TIER: 'NON-TI',
 };
 
-const defaultPort = 5000;
 const os = require('os');
 
 describe('run command tests', () => {
@@ -92,10 +96,6 @@ describe('run command tests', () => {
 	});
 	afterEach(() => {
 		platformSpy.mockRestore();
-	});
-
-	beforeAll(() => {
-		jest.spyOn(RunCommand.prototype, 'copyMeshContent').mockImplementation(() => {});
 	});
 
 	test('snapshot run command description', () => {
@@ -138,8 +138,18 @@ describe('run command tests', () => {
 		    "parse": [Function],
 		    "type": "option",
 		  },
+		  "inspectPort": {
+		    "char": "i",
+		    "default": 9229,
+		    "description": "Port number for the local dev server inspector",
+		    "input": [],
+		    "multiple": false,
+		    "parse": [Function],
+		    "type": "option",
+		  },
 		  "port": {
 		    "char": "p",
+		    "default": 5000,
 		    "description": "Port number for the local dev server",
 		    "input": [],
 		    "multiple": false,
@@ -188,15 +198,23 @@ describe('run command tests', () => {
 	});
 
 	test('should use the port number provided in the flags for starting the server', async () => {
-		const parseOutput = {
+		const cliInput = {
 			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
-			flags: { port: 6000, debug: false },
+			flags: {
+				port: 6000,
+				debug: false,
+				inspectPort: 9229,
+			},
 		};
-
-		parseSpy.mockResolvedValue(parseOutput);
+		parseSpy.mockResolvedValueOnce(cliInput);
 
 		await RunCommand.run();
-		expect(runServer).toHaveBeenCalledWith(parseOutput.flags.port);
+		expect(start).toHaveBeenCalledWith(
+			expect.anything(),
+			cliInput.flags.port,
+			cliInput.flags.debug,
+			cliInput.flags.inspectPort,
+		);
 	});
 
 	test('should use the port number provided in the .env file if there is no port', async () => {
@@ -205,15 +223,23 @@ describe('run command tests', () => {
 			PORT: 7000,
 		};
 
-		const parseOutput = {
+		const cliInput = {
 			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
-			flags: { debug: false },
+			flags: {
+				port: 5000,
+				debug: false,
+				inspectPort: 9229,
+			},
 		};
-
-		parseSpy.mockResolvedValue(parseOutput);
+		parseSpy.mockResolvedValueOnce(cliInput);
 
 		await RunCommand.run();
-		expect(runServer).toHaveBeenCalledWith(process.env.PORT);
+		expect(start).toHaveBeenCalledWith(
+			expect.anything(),
+			process.env.PORT,
+			cliInput.flags.debug,
+			cliInput.flags.inspectPort,
+		);
 	});
 
 	test('should use the default port if port number is not provided explicitly', async () => {
@@ -221,15 +247,23 @@ describe('run command tests', () => {
 			...originalEnv,
 		};
 
-		const parseOutput = {
+		const cliInput = {
 			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
-			flags: { debug: false },
+			flags: {
+				port: 5000,
+				debug: false,
+				inspectPort: 9229,
+			},
 		};
-
-		parseSpy.mockResolvedValue(parseOutput);
+		parseSpy.mockResolvedValueOnce(cliInput);
 
 		await RunCommand.run();
-		expect(runServer).toHaveBeenCalledWith(defaultPort);
+		expect(start).toHaveBeenCalledWith(
+			expect.anything(),
+			cliInput.flags.port,
+			cliInput.flags.debug,
+			cliInput.flags.inspectPort,
+		);
 	});
 
 	test('should return error for run command if the mesh has placeholders and env file provided using --env flag is not found', async () => {
@@ -377,14 +411,6 @@ describe('run command tests', () => {
 	});
 
 	test('should successfully run the mesh if provided env file is valid, mesh interpolation is successful and interpolated mesh is a valid JSON', async () => {
-		parseSpy.mockResolvedValueOnce({
-			args: { file: 'src/commands/__fixtures__/sample_mesh_with_placeholder' },
-			flags: {
-				env: 'src/commands/__fixtures__/env_valid',
-				debug: false,
-			},
-		});
-
 		//sampleInterpolated mesh where the mesh string is a valid JSON
 		const sampleInterpolatedMesh =
 			'{"meshConfig":{"sources":[{"name":"<api-name>","handler":{"graphql":{"endpoint":"<api-url>"}}}],"responseConfig":{"includeHTTPDetails":true}}}';
@@ -395,8 +421,24 @@ describe('run command tests', () => {
 			interpolatedMeshData: sampleInterpolatedMesh,
 		});
 
+		const cliInput = {
+			args: { file: 'src/commands/__fixtures__/sample_mesh_with_placeholder' },
+			flags: {
+				env: 'src/commands/__fixtures__/env_valid',
+				port: 5000,
+				debug: false,
+				inspectPort: 9229,
+			},
+		};
+		parseSpy.mockResolvedValueOnce(cliInput);
+
 		await RunCommand.run();
-		expect(runServer).toHaveBeenCalledWith(defaultPort);
+		expect(start).toHaveBeenCalledWith(
+			expect.anything(),
+			cliInput.flags.port,
+			cliInput.flags.debug,
+			cliInput.flags.inspectPort,
+		);
 	});
 
 	// file import tests
@@ -429,20 +471,30 @@ describe('run command tests', () => {
 			],
 		};
 
-		parseSpy.mockResolvedValueOnce({
+		const cliInput = {
 			args: { file: 'src/commands/__fixtures__/sample_mesh_files.json' },
 			flags: {
 				autoConfirmAction: Promise.resolve(true),
+				port: 5000,
 				debug: false,
+				inspectPort: 9229,
+			},
+		};
+		parseSpy.mockResolvedValueOnce(cliInput);
+
+		importFiles.mockResolvedValueOnce({
+			data: {
+				meshConfig,
 			},
 		});
 
-		importFiles.mockResolvedValueOnce({
-			meshConfig,
-		});
-
 		await RunCommand.run();
-		expect(runServer).toHaveBeenCalledWith(defaultPort);
+		expect(start).toHaveBeenCalledWith(
+			expect.anything(),
+			cliInput.flags.port,
+			cliInput.flags.debug,
+			cliInput.flags.inspectPort,
+		);
 	});
 
 	test('should fail if the file name is more than 25 characters', async () => {
@@ -608,17 +660,29 @@ describe('run command tests', () => {
 
 		promptConfirm.mockResolvedValueOnce(false).mockResolvedValueOnce(true);
 
-		importFiles.mockResolvedValueOnce(meshConfig);
-
-		parseSpy.mockResolvedValueOnce({
-			args: { file: 'src/commands/__fixtures__/sample_mesh_with_files_array.json' },
-			flags: {
-				debug: false,
+		importFiles.mockResolvedValueOnce({
+			data: {
+				meshConfig,
 			},
 		});
 
+		const cliInput = {
+			args: { file: 'src/commands/__fixtures__/sample_mesh_with_files_array.json' },
+			flags: {
+				port: 5000,
+				debug: false,
+				inspectPort: 9229,
+			},
+		};
+		parseSpy.mockResolvedValueOnce(cliInput);
+
 		await RunCommand.run();
-		expect(runServer).toHaveBeenCalledWith(defaultPort);
+		expect(start).toHaveBeenCalledWith(
+			expect.anything(),
+			cliInput.flags.port,
+			cliInput.flags.debug,
+			cliInput.flags.inspectPort,
+		);
 	});
 
 	test('should override if prompt returns Yes, if there is files array', async () => {
@@ -652,20 +716,30 @@ describe('run command tests', () => {
 
 		promptConfirm.mockResolvedValueOnce(true).mockResolvedValueOnce(true);
 
-		parseSpy.mockResolvedValueOnce({
+		const cliInput = {
 			args: { file: 'src/commands/__fixtures__/sample_mesh_with_files_array.json' },
 			flags: {
+				port: 5000,
 				debug: false,
+				inspectPort: 9229,
 			},
-		});
+		};
+		parseSpy.mockResolvedValueOnce(cliInput);
 
 		importFiles.mockResolvedValueOnce({
-			meshConfig,
+			data: {
+				meshConfig,
+			},
 		});
 
 		await RunCommand.run();
 
-		expect(runServer).toHaveBeenCalledWith(defaultPort);
+		expect(start).toHaveBeenCalledWith(
+			expect.anything(),
+			cliInput.flags.port,
+			cliInput.flags.debug,
+			cliInput.flags.inspectPort,
+		);
 	});
 
 	test('should pass for a fully-qualified meshConfig even if the file does not exist in fileSystem', async () => {
@@ -697,22 +771,32 @@ describe('run command tests', () => {
 			],
 		};
 
-		parseSpy.mockResolvedValueOnce({
+		const cliInput = {
 			args: { file: 'src/commands/__fixtures__/sample_fully_qualified_mesh.json' },
 			flags: {
 				autoConfirmAction: Promise.resolve(true),
+				port: 5000,
 				debug: false,
+				inspectPort: 9229,
 			},
-		});
+		};
+		parseSpy.mockResolvedValueOnce(cliInput);
 
 		promptConfirm.mockResolvedValueOnce(true);
 
 		importFiles.mockResolvedValueOnce({
-			meshConfig,
+			data: {
+				meshConfig,
+			},
 		});
 
 		await RunCommand.run();
-		expect(runServer).toHaveBeenCalledWith(defaultPort);
+		expect(start).toHaveBeenCalledWith(
+			expect.anything(),
+			cliInput.flags.port,
+			cliInput.flags.debug,
+			cliInput.flags.inspectPort,
+		);
 	});
 
 	test('should pass if the file is located in subdirectory of mesh directory', async () => {
@@ -744,21 +828,31 @@ describe('run command tests', () => {
 			],
 		};
 
-		parseSpy.mockResolvedValueOnce({
+		const cliInput = {
 			args: { file: 'src/commands/__fixtures__/sample_mesh_subdirectory.json' },
 			flags: {
 				autoConfirmAction: Promise.resolve(true),
+				port: 5000,
 				debug: false,
+				inspectPort: 9229,
 			},
-		});
+		};
+		parseSpy.mockResolvedValueOnce(cliInput);
 
 		importFiles.mockResolvedValueOnce({
-			meshConfig,
+			data: {
+				meshConfig,
+			},
 		});
 
 		await RunCommand.run();
 
-		expect(runServer).toHaveBeenCalledWith(defaultPort);
+		expect(start).toHaveBeenCalledWith(
+			expect.anything(),
+			cliInput.flags.port,
+			cliInput.flags.debug,
+			cliInput.flags.inspectPort,
+		);
 	});
 
 	test('should fail if the file is outside the workspace directory', async () => {
@@ -919,17 +1013,25 @@ describe('run command tests', () => {
 	});
 
 	test('should successfully run the mesh if provided secrets file is valid', async () => {
-		parseSpy.mockResolvedValueOnce({
+		const cliInput = {
 			args: { file: 'src/commands/__fixtures__/sample_secrets_mesh.json' },
 			flags: {
 				secrets: 'src/commands/__fixtures__/secrets_valid.yaml',
+				port: 5000,
 				debug: false,
+				inspectPort: 9229,
 			},
-		});
+		};
+		parseSpy.mockResolvedValueOnce(cliInput);
 
 		await RunCommand.run();
 		expect(writeSecretsFile).toHaveBeenCalled();
-		expect(runServer).toHaveBeenCalledWith(defaultPort);
+		expect(start).toHaveBeenCalledWith(
+			expect.anything(),
+			cliInput.flags.port,
+			cliInput.flags.debug,
+			cliInput.flags.inspectPort,
+		);
 	});
 
 	test('should return error if ran with secrets against windows platform with batch variables', async () => {
@@ -957,48 +1059,72 @@ describe('run command tests', () => {
 
 	test('should pass if ran with secrets against linux platform with batch variables', async () => {
 		platformSpy.mockReturnValue('linux');
-		parseSpy.mockResolvedValueOnce({
+		const cliInput = {
 			args: { file: 'src/commands/__fixtures__/sample_secrets_mesh.json' },
 			flags: {
 				secrets: 'src/commands/__fixtures__/secrets_with_batch_variables.yaml',
+				port: 5000,
 				debug: false,
+				inspectPort: 9229,
 			},
-		});
+		};
+		parseSpy.mockResolvedValueOnce(cliInput);
 
 		await RunCommand.run();
 		expect(writeSecretsFile).toHaveBeenCalled();
-		expect(runServer).toHaveBeenCalledWith(defaultPort);
+		expect(start).toHaveBeenCalledWith(
+			expect.anything(),
+			cliInput.flags.port,
+			cliInput.flags.debug,
+			cliInput.flags.inspectPort,
+		);
 	});
 
 	test('should pass if ran with secrets against darwin(macOS) platform with batch variables', async () => {
 		platformSpy.mockReturnValue('darwin');
-		parseSpy.mockResolvedValueOnce({
+		const cliInput = {
 			args: { file: 'src/commands/__fixtures__/sample_secrets_mesh.json' },
 			flags: {
 				secrets: 'src/commands/__fixtures__/secrets_with_batch_variables.yaml',
+				port: 5000,
 				debug: false,
+				inspectPort: 9229,
 			},
-		});
+		};
+		parseSpy.mockResolvedValueOnce(cliInput);
 
 		await RunCommand.run();
 		expect(writeSecretsFile).toHaveBeenCalled();
-		expect(runServer).toHaveBeenCalledWith(defaultPort);
+		expect(start).toHaveBeenCalledWith(
+			expect.anything(),
+			cliInput.flags.port,
+			cliInput.flags.debug,
+			cliInput.flags.inspectPort,
+		);
 	});
 
 	test('should escape variables that are preceded by backslash symbol', async () => {
-		parseSpy.mockResolvedValueOnce({
+		const cliInput = {
 			args: { file: 'src/commands/__fixtures__/sample_mesh_with_escaped_secrets.json' },
 			flags: {
 				secrets: 'src/commands/__fixtures__/secrets_with_escaped_variables.yaml',
+				port: 5000,
 				debug: false,
+				inspectPort: 9229,
 			},
-		});
+		};
+		parseSpy.mockResolvedValueOnce(cliInput);
 
 		await RunCommand.run();
 		expect(writeSecretsFile).toHaveBeenCalledWith(
 			'Home: rootPath\nHomeString: $HOME\nHomeWithSlash: \\rootPath\nHomeStringWithSlash: \\$HOME\n',
 			expect.anything(),
 		);
-		expect(runServer).toHaveBeenCalledWith(defaultPort);
+		expect(start).toHaveBeenCalledWith(
+			expect.anything(),
+			cliInput.flags.port,
+			cliInput.flags.debug,
+			cliInput.flags.inspectPort,
+		);
 	});
 });

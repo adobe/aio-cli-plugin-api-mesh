@@ -1,7 +1,7 @@
 const { Command } = require('@oclif/core');
 
 const logger = require('../../classes/logger');
-const { initSdk, initRequestId } = require('../../helpers');
+const { initSdk } = require('../../helpers');
 const { ignoreCacheFlag, fileNameFlag } = require('../../utils');
 const { getMeshId, listLogs } = require('../../lib/smsClient');
 const { appendFileSync, existsSync } = require('fs');
@@ -18,8 +18,6 @@ class ListLogsCommand extends Command {
 	static enableJsonFlag = true;
 
 	async run() {
-		await initRequestId();
-
 		logger.info(`RequestId: ${global.requestId}`);
 
 		const { flags } = await this.parse(ListLogsCommand);

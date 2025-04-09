@@ -202,7 +202,6 @@ describe('describe command tests', () => {
 	test('should return Non TI url if request is Non Ti', async () => {
 		const runResult = await DescribeCommand.run();
 
-		expect(initRequestId).toHaveBeenCalled();
 		expect(describeMesh).toHaveBeenCalledWith(
 			selectedOrg.code,
 			selectedProject.id,
@@ -258,7 +257,6 @@ describe('describe command tests', () => {
 		getMesh.mockResolvedValue(fetchedMeshConfig);
 		const runResult = await DescribeCommand.run();
 
-		expect(initRequestId).toHaveBeenCalled();
 		expect(describeMesh).toHaveBeenCalledWith(
 			selectedOrg.code,
 			selectedProject.id,

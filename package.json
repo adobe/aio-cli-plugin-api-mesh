@@ -21,6 +21,7 @@
 	},
 	"files": [
 		"/oclif.manifest.json",
+		"wrangler.toml",
 		"/src"
 	],
 	"scripts": {
@@ -37,15 +38,15 @@
 		"version": "oclif-dev readme && git add README.md"
 	},
 	"dependencies": {
-		"@adobe-apimesh/mesh-builder": "2.1.4",
+		"@adobe-apimesh/mesh-builder": "2.1.5",
 		"@adobe/aio-cli-lib-console": "^5.0.0",
 		"@adobe/aio-lib-core-config": "^5.0.0",
 		"@adobe/aio-lib-core-logging": "^3.0.0",
 		"@adobe/aio-lib-env": "^3.0.0",
 		"@adobe/aio-lib-ims": "^7.0.1",
-		"@adobe/plugin-hooks": "0.3.3",
+		"@adobe/plugin-hooks": "0.3.4",
 		"@adobe/plugin-on-fetch": "0.1.1",
-		"@adobe/plugin-source-headers": "^0.0.1",
+		"@adobe/plugin-source-headers": "^0.0.2",
 		"@envelop/disable-introspection": "^6.0.0",
 		"@graphql-mesh/cli": "0.82.30",
 		"@graphql-mesh/graphql": "0.34.13",
@@ -99,11 +100,12 @@
 		"source-registry-storage-adapter": "github:devx-services/source-registry-storage-adapter#main",
 		"util": "^0.12.5",
 		"uuid": "^8.3.2",
-		"wrangler": "3.80.4",
+		"wrangler": "4.3.0",
 		"yaml": "^2.4.2"
 	},
 	"devDependencies": {
 		"@babel/eslint-parser": "^7.15.8",
+		"@cloudflare/workers-types": "^4.20250320.0",
 		"@oclif/dev-cli": "1.26.10",
 		"@oclif/plugin-help": "2.2.3",
 		"@trivago/prettier-plugin-sort-imports": "^3.1.1",
@@ -136,12 +138,18 @@
 		"access": "public"
 	},
 	"oclif": {
+		"topics": {
+			"api-mesh": { "description": "Create, run, test, and deploy API Mesh"}
+		},
 		"commands": "./src/commands",
 		"bin": "aio",
 		"devPlugins": [
 			"@oclif/plugin-help"
 		],
 		"hooks": {
+			"init": [
+				"./src/hooks/initMetadata.js"
+			],
 			"prerun": [
 				"./src/hooks/versionCompare.js"
 			]

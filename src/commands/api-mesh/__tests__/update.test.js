@@ -17,7 +17,7 @@ jest.mock('../../../helpers', () => ({
 	initSdk: jest.fn().mockResolvedValue({}),
 	initRequestId: jest.fn().mockResolvedValue({}),
 	promptConfirm: jest.fn().mockResolvedValue(true),
-	importFiles: jest.fn().mockResolvedValue(),
+	importFiles: jest.fn().mockResolvedValue({}),
 }));
 jest.mock('@adobe/aio-cli-lib-console', () => ({
 	init: jest.fn().mockResolvedValue(mockConsoleCLIInstance),
@@ -110,7 +110,7 @@ describe('update command tests', () => {
 		  "status": "success",
 		}
 	`);
-		expect(initRequestId).toHaveBeenCalled();
+
 		expect(initSdk).toHaveBeenCalledWith({
 			ignoreCache: true,
 		});
@@ -169,7 +169,7 @@ describe('update command tests', () => {
 		  "status": "success",
 		}
 	`);
-		expect(initRequestId).toHaveBeenCalled();
+
 		expect(initSdk).toHaveBeenCalledWith({
 			ignoreCache: true,
 		});
@@ -228,7 +228,7 @@ describe('update command tests', () => {
 		  "status": "success",
 		}
 	`);
-		expect(initRequestId).toHaveBeenCalled();
+
 		expect(promptConfirm).not.toHaveBeenCalled();
 		expect(initSdk).toHaveBeenCalledWith({
 			ignoreCache: true,
@@ -547,12 +547,13 @@ describe('update command tests', () => {
 		});
 
 		importFiles.mockResolvedValueOnce({
-			meshConfig,
+			data: {
+				meshConfig,
+			},
 		});
 
 		const output = await UpdateCommand.run();
 
-		expect(initRequestId).toHaveBeenCalled();
 		expect(updateMesh.mock.calls[0]).toMatchInlineSnapshot(`
 		[
 		  "CODE1234@AdobeOrg",

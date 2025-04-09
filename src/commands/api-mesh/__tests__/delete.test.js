@@ -34,7 +34,7 @@ const selectedProject = { id: '5678', title: 'Project01' };
 const selectedWorkspace = { id: '123456789', title: 'Workspace01' };
 
 const DeleteCommand = require('../delete');
-const { initSdk, initRequestId, promptConfirm } = require('../../../helpers');
+const { initSdk, promptConfirm } = require('../../../helpers');
 const {
 	getMeshId,
 	deleteMesh,
@@ -203,7 +203,6 @@ describe('delete command tests', () => {
 	test('should delete mesh if correct args are provided', async () => {
 		const runResult = await DeleteCommand.run();
 
-		expect(initRequestId).toHaveBeenCalled();
 		expect(runResult).toMatchInlineSnapshot(`
 		{
 		  "status": "success",

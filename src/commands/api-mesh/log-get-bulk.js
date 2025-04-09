@@ -36,7 +36,6 @@ class GetBulkLogCommand extends Command {
 		const columnHeaders =
 			'EventTimestampMs,Exceptions,Logs,Outcome,MeshId,RayID,URL,Request Method,Response Status,Level';
 
-		await initRequestId();
 		logger.info(`RequestId: ${global.requestId}`);
 		const { flags } = await this.parse(GetBulkLogCommand);
 		const ignoreCache = await flags.ignoreCache;
