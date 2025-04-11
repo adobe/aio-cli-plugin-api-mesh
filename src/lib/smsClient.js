@@ -1397,6 +1397,109 @@ const getLogForwarding = async (organizationCode, projectId, workspaceId, meshId
 	}
 };
 
+/**
+ * Deletes the log forwarding configuration for a given mesh.
+ *
+ * @param {string} organizationCode - The IMS org code
+ * @param {string} projectId - The project ID
+ * @param {string} workspaceId - The workspace ID
+ * @param {string} meshId - The mesh ID
+ */
+const deleteLogForwarding = async (organizationCode, projectId, workspaceId, meshId) => {
+	const { accessToken } = await getDevConsoleConfig();
+	const config = {
+		method: 'DELETE',
+		url: `${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/log/forwarding`,
+		headers: {
+			'Authorization': `Bearer ${accessToken}`,
+			'x-request-id': global.requestId,
+			'x-api-key': SMS_API_KEY,
+		},
+	};
+
+	logger.info(
+		'Initiating DELETE %s',
+		`${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/log/forwarding`,
+	);
+
+	try {
+		const response = await axios(config);
+
+		logger.info('Response from DELETE %s', response.status);
+
+		if (response && response?.status === 204) {
+			return response;
+		} else {
+			logger.error(
+				`Something went wrong: ${objToString(
+					response,
+					['data'],
+					'Unable to delete log forwarding details.',
+				)}. Received ${response.status}, expected 204`,
+			);
+			throw new Error(
+				`something went wrong: ${objToString(
+					response,
+					['data'],
+					'Unable to delete log forwarding',
+				)}`,
+			);
+		}
+	} catch (error) {
+		logger.info('Response from DELETE %s', error.response.status);
+
+		if (error.response.status === 404) {
+			// The request was made and the server responded with a 404 status code
+			logger.error('log forwarding details not found');
+
+			throw new Error('log forwarding details not found');
+		} else if (error.response && error.response.data) {
+			// The request was made and the server responded with an unsupported status code
+			logger.error(
+				'Error while deleting log forwarding. Response: %s',
+				objToString(error, ['response', 'data'], 'Unable to delete log forwarding details'),
+			);
+
+			if (error.response.data.messages) {
+				const message = objToString(
+					error,
+					['response', 'data', 'messages', '0', 'message'],
+					'Unable to delete log forwarding details',
+				);
+
+				throw new Error(message);
+			} else if (error.response.data.message) {
+				const message = objToString(
+					error,
+					['response', 'data', 'message'],
+					'Unable to delete log forwarding details',
+				);
+
+				throw new Error(message);
+			} else {
+				const message = objToString(
+					error,
+					['response', 'data'],
+					'Unable to delete log forwarding details',
+				);
+
+				throw new Error(message);
+			}
+		} else {
+			// The request was made but no response was received
+			logger.error(
+				'Error while deleting log forwarding details. No response received from the server: %s',
+				objToString(error, [], 'Unable to delete log forwarding details'),
+			);
+
+			throw new Error(
+				'Unable to delete log forwarding details from Schema Management Service: %s',
+				error.message,
+			);
+		}
+	}
+};
+
 module.exports = {
 	getApiKeyCredential,
 	describeMesh,
@@ -1420,4 +1523,5 @@ module.exports = {
 	cachePurge,
 	setLogForwarding,
 	getLogForwarding,
+	deleteLogForwarding,
 };
