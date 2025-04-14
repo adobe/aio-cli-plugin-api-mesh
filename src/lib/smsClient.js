@@ -1431,10 +1431,10 @@ const deleteLogForwarding = async (organizationCode, projectId, workspaceId, mes
 			return response;
 		} else {
 			logger.error(
-				`Something went wrong: ${objToString(
+				`Unable to delete log forwarding config: ${objToString(
 					response,
 					['data'],
-					'Unable to delete log forwarding details.',
+					'Error',
 				)}. Received ${response.status}, expected 204`,
 			);
 			throw new Error(
