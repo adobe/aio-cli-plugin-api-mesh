@@ -65,7 +65,7 @@ class DeleteLogForwardingCommand extends Command {
 			} catch (error) {
 				this.log(error.message);
 				this.error(
-					`failed to delete log forwarding details. Try again. RequestId: ${global.requestId}`,
+					`Unable to delete log forwarding details. Try again. RequestId: ${global.requestId}`,
 				);
 			}
 		} else {

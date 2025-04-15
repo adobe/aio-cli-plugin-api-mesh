@@ -1456,7 +1456,7 @@ const deleteLogForwarding = async (organizationCode, projectId, workspaceId, mes
 		} else if (error.response && error.response.data) {
 			// The request was made and the server responded with an unsupported status code
 			logger.error(
-				'Error while deleting log forwarding. Response: %s',
+				'Error while deleting log forwarding details. Response: %s',
 				objToString(error, ['response', 'data'], 'Unable to delete log forwarding details'),
 			);
 
@@ -1493,7 +1493,7 @@ const deleteLogForwarding = async (organizationCode, projectId, workspaceId, mes
 			);
 
 			throw new Error(
-				'Unable to delete log forwarding details from Schema Management Service: %s',
+				'Unable to delete log forwarding details: %s',
 				error.message,
 			);
 		}

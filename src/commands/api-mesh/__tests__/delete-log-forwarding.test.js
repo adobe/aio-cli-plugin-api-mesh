@@ -83,12 +83,12 @@ describe('delete log forwarding command tests', () => {
 		deleteLogForwarding.mockRejectedValueOnce(new Error('Deletion failed'));
 
 		await expect(DeleteLogForwardingCommand.run()).rejects.toThrow(
-			'failed to delete log forwarding details. Try again. RequestId: dummy_request_id',
+			'Unable to delete log forwarding details. Try again. RequestId: dummy_request_id',
 		);
 
 		expect(logSpy).not.toHaveBeenCalledWith('Successfully deleted log forwarding details');
 		expect(errorLogSpy).toHaveBeenCalledWith(
-			'failed to delete log forwarding details. Try again. RequestId: dummy_request_id',
+			'Unable to delete log forwarding details. Try again. RequestId: dummy_request_id',
 		);
 	});
 
