@@ -1492,10 +1492,7 @@ const deleteLogForwarding = async (organizationCode, projectId, workspaceId, mes
 				objToString(error, [], 'Unable to delete log forwarding details'),
 			);
 
-			throw new Error(
-				'Unable to delete log forwarding details: %s',
-				error.message,
-			);
+			throw new Error('Unable to delete log forwarding details: %s', error.message);
 		}
 	}
 };
