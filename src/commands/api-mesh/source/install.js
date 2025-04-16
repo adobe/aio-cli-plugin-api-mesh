@@ -18,7 +18,7 @@ const config = require('@adobe/aio-lib-core-config');
 const logger = require('../../../classes/logger');
 const { readFile } = require('fs/promises');
 const chalk = require('chalk');
-const { getMeshId, getMesh, updateMesh } = require('../../../lib/devConsole');
+const { getMeshId, getMesh, updateMesh } = require('../../../lib/smsClient');
 const JsonInterpolate = require('json-interpolate');
 
 class InstallCommand extends Command {

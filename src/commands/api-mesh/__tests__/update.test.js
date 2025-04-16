@@ -24,7 +24,7 @@ jest.mock('@adobe/aio-cli-lib-console', () => ({
 	cleanStdOut: jest.fn(),
 }));
 jest.mock('@adobe/aio-lib-ims');
-jest.mock('../../../lib/devConsole');
+jest.mock('../../../lib/smsClient');
 
 const mockConsoleCLIInstance = {};
 
@@ -36,7 +36,7 @@ const { readFile } = require('fs/promises');
 
 const UpdateCommand = require('../update');
 const { initSdk, promptConfirm, importFiles } = require('../../../helpers');
-const { getMeshId, updateMesh } = require('../../../lib/devConsole');
+const { getMeshId, updateMesh } = require('../../../lib/smsClient');
 
 let logSpy = null;
 let errorLogSpy = null;

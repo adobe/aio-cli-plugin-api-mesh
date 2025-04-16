@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const GetBulkLogCommand = require('../log-get-bulk');
 const { initSdk, promptConfirm } = require('../../../helpers');
-const { getMeshId, getPresignedUrls } = require('../../../lib/devConsole');
+const { getMeshId, getPresignedUrls } = require('../../../lib/smsClient');
 const {
 	suggestCorrectedDateFormat,
 	validateDateTimeRange,
@@ -16,7 +16,7 @@ jest.mock('../../../helpers', () => ({
 	initRequestId: jest.fn().mockResolvedValue({}),
 	promptConfirm: jest.fn().mockResolvedValue(true),
 }));
-jest.mock('../../../lib/devConsole');
+jest.mock('../../../lib/smsClient');
 jest.mock('../../../classes/logger');
 
 describe('GetBulkLogCommand', () => {
@@ -295,186 +295,6 @@ describe('GetBulkLogCommand startTime and endTime validation', () => {
 	);
 });
 
-describe('GetBulkLogCommand with --past and --from flags', () => {
-	let parseSpy;
-
-	let now;
-	let fromDate;
-	beforeEach(() => {
-		now = new Date();
-		fromDate = new Date(now);
-		fromDate.setDate(fromDate.getDate() - 29); // Set fromDate to 29 days ago
-		parseSpy = jest.spyOn(GetBulkLogCommand.prototype, 'parse').mockResolvedValue({
-			flags: {
-				past: '20mins',
-				from: fromDate.toISOString().slice(0, 10) + ':12:00:00',
-				filename: 'test.csv',
-				ignoreCache: false,
-			},
-		});
-
-		initSdk.mockResolvedValue({
-			imsOrgId: 'orgId',
-			imsOrgCode: 'orgCode',
-			projectId: 'projectId',
-			workspaceId: 'workspaceId',
-			workspaceName: 'workspaceName',
-		});
-		getMeshId.mockResolvedValue('meshId');
-		getPresignedUrls.mockResolvedValue({
-			presignedUrls: [{ key: 'log1.csv', url: 'http://example.com/someHash' }],
-			totalSize: 2048,
-		});
-		promptConfirm.mockResolvedValue(true);
-		global.requestId = 'dummy_request_id';
-	});
-
-	afterEach(() => {
-		jest.clearAllMocks();
-		// clear the date objects
-		now = null;
-		fromDate = null;
-	});
-
-	test('runs with valid --past and --from flags', async () => {
-		fs.existsSync.mockReturnValue(true);
-		fs.statSync.mockReturnValue({ size: 0 });
-
-		const mockWriteStream = {
-			write: jest.fn(),
-			end: jest.fn(),
-			on: jest.fn((event, callback) => {
-				if (event === 'finish') {
-					callback();
-				}
-			}),
-		};
-		fs.createWriteStream.mockReturnValue(mockWriteStream);
-
-		const command = new GetBulkLogCommand([], {});
-		await command.run();
-
-		expect(initSdk).toHaveBeenCalled();
-		expect(getMeshId).toHaveBeenCalledWith('orgCode', 'projectId', 'workspaceId', 'workspaceName');
-		expect(getPresignedUrls).toHaveBeenCalledWith(
-			'orgCode',
-			'projectId',
-			'workspaceId',
-			'meshId',
-			expect.any(String),
-			expect.any(String),
-		);
-		expect(fs.createWriteStream).toHaveBeenCalledWith(path.resolve(process.cwd(), 'test.csv'), {
-			flags: 'a',
-		});
-		expect(mockWriteStream.write).toHaveBeenCalled();
-		expect(mockWriteStream.end).toHaveBeenCalled();
-	});
-
-	test('throws an error with invalid --from date components', async () => {
-		parseSpy.mockResolvedValueOnce({
-			flags: {
-				past: '20mins',
-				from: fromDate.toISOString().slice(0, 10) + ':25:61:61',
-				filename: 'test.csv',
-				ignoreCache: false,
-			},
-		});
-
-		const command = new GetBulkLogCommand([], {});
-		await expect(command.run()).rejects.toThrow(
-			'Invalid date components passed in --from. Correct the date.',
-		);
-	});
-
-	test('throws an error with invalid --from date format', async () => {
-		parseSpy.mockResolvedValueOnce({
-			flags: {
-				past: '15mins',
-				from: fromDate.toISOString().slice(0, 10).replace(/-/g, ':') + ':15:00:00',
-				filename: 'test.csv',
-				ignoreCache: false,
-			},
-		});
-
-		const command = new GetBulkLogCommand([], {});
-		await expect(command.run()).rejects.toThrow(
-			'Invalid format. Use the format YYYY-MM-DD:HH:MM:SS for --from.',
-		);
-	});
-
-	test('runs with valid --past flag without --from', async () => {
-		parseSpy.mockResolvedValueOnce({
-			flags: {
-				past: '15mins',
-				filename: 'test.csv',
-				ignoreCache: false,
-			},
-		});
-
-		fs.existsSync.mockReturnValue(true);
-		fs.statSync.mockReturnValue({ size: 0 });
-
-		const command = new GetBulkLogCommand([], {});
-		await command.run();
-
-		expect(initSdk).toHaveBeenCalled();
-		expect(getMeshId).toHaveBeenCalledWith('orgCode', 'projectId', 'workspaceId', 'workspaceName');
-		expect(getPresignedUrls).toHaveBeenCalledWith(
-			'orgCode',
-			'projectId',
-			'workspaceId',
-			'meshId',
-			expect.any(String),
-			expect.any(String),
-		);
-	});
-
-	test('throws an error with edge case for --past duration', async () => {
-		parseSpy.mockResolvedValueOnce({
-			flags: {
-				past: '0s',
-				from: fromDate.toISOString().slice(0, 10) + ':12:00:00',
-				filename: 'test.csv',
-				ignoreCache: false,
-			},
-		});
-
-		const command = new GetBulkLogCommand([], {});
-		await expect(command.run()).rejects.toThrow(
-			'Invalid format. The past time window should be in minutes, for example, "20 mins", "15 minutes".',
-		);
-	});
-
-	test('runs with edge case for --from date', async () => {
-		parseSpy.mockResolvedValueOnce({
-			flags: {
-				past: '15mins',
-				from: fromDate.toISOString().slice(0, 10) + ':00:00:00',
-				filename: 'test.csv',
-				ignoreCache: false,
-			},
-		});
-
-		fs.existsSync.mockReturnValue(true);
-		fs.statSync.mockReturnValue({ size: 0 });
-
-		const command = new GetBulkLogCommand([], {});
-		await command.run();
-
-		expect(initSdk).toHaveBeenCalled();
-		expect(getMeshId).toHaveBeenCalledWith('orgCode', 'projectId', 'workspaceId', 'workspaceName');
-		expect(getPresignedUrls).toHaveBeenCalledWith(
-			'orgCode',
-			'projectId',
-			'workspaceId',
-			'meshId',
-			expect.any(String),
-			expect.any(String),
-		);
-	});
-});
-
 describe('validateDateTimeRange', () => {
 	const testCases = [
 		{
@@ -524,16 +344,9 @@ describe('validateDateTimeRange', () => {
 
 describe('parsePastDuration', () => {
 	const validDurations = [
-		['20m', 20 * 60 * 1000],
-		['20 m', 20 * 60 * 1000],
-		['20min', 20 * 60 * 1000],
-		['20 min', 20 * 60 * 1000],
-		['20mins', 20 * 60 * 1000],
-		['20 mins', 20 * 60 * 1000],
-		['20minute', 20 * 60 * 1000],
-		['20 minute', 20 * 60 * 1000],
-		['20minutes', 20 * 60 * 1000],
-		['20 minutes', 20 * 60 * 1000],
+		['20', 20 * 60 * 1000],
+		['30', 30 * 60 * 1000],
+		['15', 15 * 60 * 1000],
 	];
 
 	test.each(validDurations)(
@@ -544,14 +357,11 @@ describe('parsePastDuration', () => {
 		},
 	);
 
-	const invalidDurations = ['20h', '20 hours', '20s', '20 seconds'];
+	const invalidDurations = ['20h', '20 hours', '20s', '20 seconds', 'minutes', 'NaN', 'abc', ''];
 
-	test.each(invalidDurations)(
-		'throws an error for invalid past duration format "%s"',
-		invalidPastDuration => {
-			expect(() => parsePastDuration(invalidPastDuration)).toThrow(
-				'Invalid format. The past time window should be in minutes, for example, "20 mins", "15 minutes".',
-			);
-		},
-	);
+	test.each(invalidDurations)('throws an error for non-numeric input "%s"', invalidPastDuration => {
+		expect(() => parsePastDuration(invalidPastDuration)).toThrow(
+			'Invalid format. The time window must be an integer, for example "20" or "15".',
+		);
+	});
 });

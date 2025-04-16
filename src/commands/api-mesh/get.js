@@ -15,7 +15,7 @@ const { writeFile } = require('fs/promises');
 const logger = require('../../classes/logger');
 const { initSdk } = require('../../helpers');
 const { ignoreCacheFlag, jsonFlag } = require('../../utils');
-const { getMeshId, getMesh } = require('../../lib/devConsole');
+const { getMeshId, getMesh } = require('../../lib/smsClient');
 const { buildMeshUrl } = require('../../urlBuilder');
 
 require('dotenv').config();

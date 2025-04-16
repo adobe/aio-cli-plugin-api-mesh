@@ -18,7 +18,7 @@ const {
 	autoConfirmActionFlag,
 	cachePurgeAllActionFlag,
 } = require('../../../utils');
-const { getMeshId, cachePurge } = require('../../../lib/devConsole');
+const { getMeshId, cachePurge } = require('../../../lib/smsClient');
 
 require('dotenv').config();
 

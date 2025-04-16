@@ -30,7 +30,7 @@ const fs = require('fs');
 const path = require('path');
 const { initSdk, importFiles, setUpTenantFiles, writeSecretsFile } = require('../../helpers');
 const logger = require('../../classes/logger');
-const { getMeshId, getMeshArtifact } = require('../../lib/devConsole');
+const { getMeshId, getMeshArtifact } = require('../../lib/smsClient');
 require('dotenv').config();
 const { start } = require('../../wranglerCli');
 const {

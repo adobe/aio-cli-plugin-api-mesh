@@ -2,7 +2,7 @@ const { Command } = require('@oclif/core');
 const path = require('path');
 const fs = require('fs');
 const { initSdk, promptConfirm } = require('../../helpers');
-const { getMeshId, getPresignedUrls } = require('../../lib/devConsole');
+const { getMeshId, getPresignedUrls } = require('../../lib/smsClient');
 const logger = require('../../classes/logger');
 const axios = require('axios');
 const {
@@ -11,12 +11,10 @@ const {
 	endTimeFlag,
 	logFilenameFlag,
 	pastFlag,
-	fromFlag,
 	suggestCorrectedDateFormat,
 	parsePastDuration,
 	validateDateTimeRange,
 	validateDateTimeFormat,
-	localToUTCTime,
 } = require('../../utils');
 
 require('dotenv').config();
@@ -28,7 +26,6 @@ class GetBulkLogCommand extends Command {
 		endTime: endTimeFlag,
 		filename: logFilenameFlag,
 		past: pastFlag,
-		from: fromFlag,
 	};
 
 	async run() {
@@ -89,26 +86,9 @@ class GetBulkLogCommand extends Command {
 			formattedEndTime = flags.endTime.replace(/-|:|Z/g, '').replace('T', 'T');
 		} else if (flags.past) {
 			const pastTimeWindow = parsePastDuration(flags.past);
-			if (flags.from) {
-				let convertedTime;
-				const dateTimeRegex = /^\d{4}-\d{2}-\d{2}:\d{2}:\d{2}:\d{2}$/;
-				if (!dateTimeRegex.test(flags.from)) {
-					this.error('Invalid format. Use the format YYYY-MM-DD:HH:MM:SS for --from.');
-				} else {
-					try {
-						convertedTime = await localToUTCTime(flags.from.toString());
-					} catch (error) {
-						this.error(`Invalid date components passed in --from. Correct the date.`);
-					}
-				}
-				// add the past window to the converted time to get the end time to fetch logs from the past
-				calculatedStartTime = new Date(convertedTime);
-				calculatedEndTime = new Date(calculatedStartTime.getTime() + pastTimeWindow);
-			} else {
-				// subtract the past window from the current time to get the start time to fetch recent logs from now
-				calculatedEndTime = new Date();
-				calculatedStartTime = new Date(calculatedEndTime.getTime() - pastTimeWindow);
-			}
+			// Subtract the past window from the current time to get the start time to fetch recent logs from now
+			calculatedEndTime = new Date();
+			calculatedStartTime = new Date(calculatedEndTime.getTime() - pastTimeWindow);
 
 			// Validate the calculated start and end times range
 			validateDateTimeRange(calculatedStartTime, calculatedEndTime);
@@ -120,7 +100,7 @@ class GetBulkLogCommand extends Command {
 			return;
 		} else {
 			this.error(
-				'Missing required flags. Provide at least one flag --startTime, --endTime, or --past --from or  type `mesh log:get-bulk --help` for more information.',
+				'Missing required flags. Provide a time range with --startTime and  --endTime flags,  or use the --past flag for more recent logs. Use the `mesh log:get-bulk --help` command for more information.',
 			);
 			return;
 		}

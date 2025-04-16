@@ -27,7 +27,7 @@ const {
 	validateSecretsFile,
 	encryptSecrets,
 } = require('../../utils');
-const { getMeshId, updateMesh, getPublicEncryptionKey } = require('../../lib/devConsole');
+const { getMeshId, updateMesh, getPublicEncryptionKey } = require('../../lib/smsClient');
 
 class UpdateCommand extends Command {
 	static args = [{ name: 'file' }];

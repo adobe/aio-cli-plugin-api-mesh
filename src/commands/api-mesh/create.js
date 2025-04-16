@@ -28,7 +28,7 @@ const {
 	validateSecretsFile,
 	encryptSecrets,
 } = require('../../utils');
-const { createMesh, getPublicEncryptionKey } = require('../../lib/devConsole');
+const { createMesh, getPublicEncryptionKey } = require('../../lib/smsClient');
 const { buildMeshUrl } = require('../../urlBuilder');
 
 class CreateCommand extends Command {
