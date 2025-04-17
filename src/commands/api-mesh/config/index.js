@@ -19,9 +19,9 @@ class ConfigCommand extends Command {
 	}
 }
 
-ConfigCommand.description = `Manage log configuration for API Mesh.
+ConfigCommand.description = `Manage the configuration for API Mesh.
 
-The 'config' topic includes the following commands:
+The 'config' command includes the following options:
 - set: Set log forwarding details for a given mesh.
 - get: Retrieve log forwarding details for a given mesh.
 - delete: Delete log forwarding details for a given mesh.`;
