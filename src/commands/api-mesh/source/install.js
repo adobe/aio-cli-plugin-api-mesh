@@ -12,13 +12,13 @@ governing permissions and limitations under the License.
 
 const { Command, Flags } = require('@oclif/core');
 const SourceRegistryStorage = require('source-registry-storage-adapter');
-const { promptConfirm, promptInput, initRequestId, initSdk } = require('../../../helpers');
+const { promptConfirm, promptInput, initSdk } = require('../../../helpers');
 const { ignoreCacheFlag } = require('../../../utils');
 const config = require('@adobe/aio-lib-core-config');
 const logger = require('../../../classes/logger');
 const { readFile } = require('fs/promises');
 const chalk = require('chalk');
-const { getMeshId, getMesh, updateMesh } = require('../../../lib/devConsole');
+const { getMeshId, getMesh, updateMesh } = require('../../../lib/smsClient');
 const JsonInterpolate = require('json-interpolate');
 
 class InstallCommand extends Command {
@@ -33,7 +33,6 @@ class InstallCommand extends Command {
 
 	async run() {
 		const { flags, args } = await this.parse(InstallCommand);
-		await initRequestId();
 		logger.info(`RequestId: ${global.requestId}`);
 		const ignoreCache = await flags.ignoreCache;
 		const {

@@ -1,8 +1,8 @@
 const { Command } = require('@oclif/core');
 
 const logger = require('../../classes/logger');
-const { initRequestId, initSdk } = require('../../helpers');
-const { getMeshId, getMesh, getMeshDeployments } = require('../../lib/devConsole');
+const { initSdk } = require('../../helpers');
+const { getMeshId, getMesh, getMeshDeployments } = require('../../lib/smsClient');
 const { ignoreCacheFlag } = require('../../utils');
 
 require('dotenv').config();
@@ -13,7 +13,6 @@ class StatusCommand extends Command {
 	};
 
 	async run() {
-		await initRequestId();
 		logger.info(`RequestId: ${global.requestId}`);
 
 		const { flags } = await this.parse(StatusCommand);

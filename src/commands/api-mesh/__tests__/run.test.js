@@ -19,8 +19,8 @@ const {
 	initSdk,
 	writeSecretsFile,
 } = require('../../../helpers');
+const { getMeshId, getMeshArtifact } = require('../../../lib/smsClient');
 const { start } = require('../../../wranglerCli');
-const { getMeshId, getMeshArtifact } = require('../../../lib/devConsole');
 require('@adobe-apimesh/mesh-builder');
 
 jest.mock('../../../helpers', () => ({
@@ -42,7 +42,7 @@ jest.mock('../../../wranglerCli', () => ({
 	start: jest.fn().mockResolvedValue(),
 }));
 
-jest.mock('../../../lib/devConsole', () => ({
+jest.mock('../../../lib/smsClient', () => ({
 	getMeshId: jest.fn().mockResolvedValue('mockMeshId'),
 	getMeshArtifact: jest.fn().mockResolvedValue(),
 }));

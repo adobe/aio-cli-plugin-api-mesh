@@ -10,9 +10,9 @@ governing permissions and limitations under the License.
 */
 const { Command } = require('@oclif/core');
 const logger = require('../../classes/logger');
-const { initSdk, initRequestId } = require('../../helpers');
+const { initSdk } = require('../../helpers');
 const { ignoreCacheFlag } = require('../../utils');
-const { getMeshId, getLogsByRayId } = require('../../lib/devConsole');
+const { getMeshId, getLogsByRayId } = require('../../lib/smsClient');
 require('dotenv').config();
 
 class FetchLogsCommand extends Command {
@@ -22,8 +22,6 @@ class FetchLogsCommand extends Command {
 	};
 
 	async run() {
-		await initRequestId();
-
 		logger.info(`RequestId: ${global.requestId}`);
 
 		const { args, flags } = await this.parse(FetchLogsCommand);

@@ -13,9 +13,9 @@ const { Command } = require('@oclif/core');
 const { writeFile } = require('fs/promises');
 
 const logger = require('../../classes/logger');
-const { initSdk, initRequestId } = require('../../helpers');
+const { initSdk } = require('../../helpers');
 const { ignoreCacheFlag, jsonFlag } = require('../../utils');
-const { getMeshId, getMesh } = require('../../lib/devConsole');
+const { getMeshId, getMesh } = require('../../lib/smsClient');
 const { buildMeshUrl } = require('../../urlBuilder');
 
 require('dotenv').config();
@@ -29,8 +29,6 @@ class GetCommand extends Command {
 	static enableJsonFlag = true;
 
 	async run() {
-		await initRequestId();
-
 		logger.info(`RequestId: ${global.requestId}`);
 
 		const { args, flags } = await this.parse(GetCommand);

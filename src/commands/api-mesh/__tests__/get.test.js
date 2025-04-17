@@ -23,7 +23,7 @@ jest.mock('../../../helpers', () => ({
 	initSdk: jest.fn().mockResolvedValue({}),
 	initRequestId: jest.fn().mockResolvedValue({}),
 }));
-jest.mock('../../../lib/devConsole');
+jest.mock('../../../lib/smsClient');
 
 const mockConsoleCLIInstance = {};
 const selectedOrg = { id: '1234', code: 'CODE1234@AdobeOrg', name: 'ORG01', type: 'entp' };
@@ -31,10 +31,10 @@ const selectedProject = { id: '5678', title: 'Project01' };
 const selectedWorkspace = { id: '123456789', title: 'Workspace01' };
 
 const { writeFile } = require('fs/promises');
-const { initSdk, initRequestId } = require('../../../helpers');
+const { initSdk } = require('../../../helpers');
 const GetCommand = require('../get');
 const mockGetMeshConfig = require('../../__fixtures__/sample_mesh.json');
-const { getMeshId, getMesh } = require('../../../lib/devConsole');
+const { getMeshId, getMesh } = require('../../../lib/smsClient');
 
 let logSpy = null;
 let errorLogSpy = null;
@@ -192,7 +192,7 @@ describe('get command tests', () => {
 			ignoreCache: true,
 			verbose: true,
 		});
-		expect(initRequestId).toHaveBeenCalled();
+
 		expect(runResult).toMatchInlineSnapshot(`
 		{
 		  "imsOrgId": "1234",

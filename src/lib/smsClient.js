@@ -119,6 +119,7 @@ const listLogs = async (organizationCode, projectId, workspaceId, meshId, fileNa
 		method: 'get',
 		url: fileName ? url + `?filename=${fileName}` : url,
 		headers: {
+			...global?.metadataHeaders,
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
 			'x-api-key': SMS_API_KEY,
@@ -147,6 +148,7 @@ const getMesh = async (organizationId, projectId, workspaceId, workspaceName, me
 		method: 'get',
 		url: `${SMS_BASE_URL}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}`,
 		headers: {
+			...global?.metadataHeaders,
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
 			'workspaceName': workspaceName,
@@ -238,6 +240,7 @@ const createMesh = async (
 		method: 'post',
 		url: `${SMS_BASE_URL}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes`,
 		headers: {
+			...global?.metadataHeaders,
 			'Authorization': `Bearer ${accessToken}`,
 			'Content-Type': 'application/json',
 			'x-request-id': global.requestId,
@@ -350,6 +353,7 @@ const updateMesh = async (
 		method: 'put',
 		url: `${SMS_BASE_URL}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}`,
 		headers: {
+			...global?.metadataHeaders,
 			'Authorization': `Bearer ${accessToken}`,
 			'Content-Type': 'application/json',
 			'x-request-id': global.requestId,
@@ -441,6 +445,7 @@ const deleteMesh = async (organizationId, projectId, workspaceId, meshId) => {
 		method: 'delete',
 		url: `${SMS_BASE_URL}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}`,
 		headers: {
+			...global?.metadataHeaders,
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
 			'x-api-key': SMS_API_KEY,
@@ -527,6 +532,7 @@ const cachePurge = async (organizationId, projectId, workspaceId, meshId) => {
 		method: 'post',
 		url: `${SMS_BASE_URL}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/cache/purge`,
 		headers: {
+			...global?.metadataHeaders,
 			'Authorization': `Bearer ${accessToken}`,
 			'Content-Type': 'application/json',
 			'x-request-id': global.requestId,
@@ -617,6 +623,7 @@ const getMeshId = async (organizationCode, projectId, workspaceId, workspaceName
 		method: 'get',
 		url: `${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/mesh`,
 		headers: {
+			...global?.metadataHeaders,
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
 			'workspaceName': workspaceName,
@@ -903,6 +910,7 @@ const getMeshArtifact = async (organizationId, projectId, workspaceId, workspace
 		method: 'get',
 		url: `${SMS_BASE_URL}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/artifact`,
 		headers: {
+			...global?.metadataHeaders,
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
 			'workspaceName': workspaceName,
@@ -961,6 +969,7 @@ const getTenantFeatures = async organizationCode => {
 		method: 'get',
 		url: `${SMS_BASE_URL}/organizations/${organizationCode}/features`,
 		headers: {
+			...global?.metadataHeaders,
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
 			'x-api-key': SMS_API_KEY,
@@ -1016,6 +1025,7 @@ const getMeshDeployments = async (organizationCode, projectId, workspaceId, mesh
 		method: 'get',
 		url: `${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/deployments/latest`,
 		headers: {
+			...global?.metadataHeaders,
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
 			'x-api-key': SMS_API_KEY,
@@ -1072,6 +1082,7 @@ const getPublicEncryptionKey = async organizationCode => {
 		method: 'get',
 		url: `${SMS_BASE_URL}/organizations/${organizationCode}/getPublicKey`,
 		headers: {
+			...global?.metadataHeaders,
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
 			'x-api-key': SMS_API_KEY,
@@ -1117,6 +1128,7 @@ const getPresignedUrls = async (
 		method: 'get',
 		url: `${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/logs?startDateTime=${startTime}&endDateTime=${endTime}`,
 		headers: {
+			...global?.metadataHeaders,
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
 			'x-api-key': SMS_API_KEY,
@@ -1156,6 +1168,7 @@ const getLogsByRayId = async (organizationCode, projectId, workspaceId, meshId, 
 		method: 'get',
 		url: `${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/logs/${rayId}`,
 		headers: {
+			...global?.metadataHeaders,
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
 			'x-api-key': SMS_API_KEY,
@@ -1201,6 +1214,289 @@ const getLogsByRayId = async (organizationCode, projectId, workspaceId, meshId, 
 	}
 };
 
+/**
+ * @param {string} organizationCode - The IMS org code
+ * @param {string} projectId - The project ID
+ * @param {string} workspaceId - The workspace ID
+ * @param {string} meshId - The mesh ID
+ * @param {Object} logConfig - The log forwarding configuration
+ */
+const setLogForwarding = async (organizationCode, projectId, workspaceId, meshId, logConfig) => {
+	const { accessToken } = await getDevConsoleConfig();
+	const config = {
+		method: 'POST',
+		url: `${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/log/forwarding`,
+		headers: {
+			'Authorization': `Bearer ${accessToken}`,
+			'Content-Type': 'application/json',
+			'x-request-id': global.requestId,
+			'x-api-key': SMS_API_KEY,
+		},
+		data: JSON.stringify(logConfig),
+	};
+
+	logger.info(
+		'Initiating POST %s',
+		`${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/log/forwarding`,
+	);
+
+	try {
+		const response = await axios(config);
+
+		logger.info('Response from POST %s', response.status);
+
+		if (response?.status === 200) {
+			logger.info(`Log forwarding configuration: ${objToString(response, ['data'])}`);
+			return {
+				result: response.data.result,
+				message: response.data.message,
+			};
+		} else {
+			// not 200 response
+			logger.error(
+				`Something went wrong: ${objToString(
+					response,
+					['data'],
+					'Unable to set log forwarding details.',
+				)}. Received ${response.status}, expected 200`,
+			);
+			throw new Error(response.data.message);
+		}
+	} catch (error) {
+		if (error.response && error.response.status === 400) {
+			// The request was made and the server responded with a 400 status code
+			logger.error('Error setting log forwarding configuration: %j', error.response.data);
+
+			throw new Error('Invalid input parameters.');
+		}
+		// request made but no response received
+		else if (error.request && !error.response) {
+			logger.error('No response received from server when setting log forwarding configuration');
+			throw new Error('Unable to set log forwarding details. Check the details and try again.');
+		}
+		// response received with error
+		else if (error.response && error.response.data) {
+			logger.error(
+				'Error setting log forwarding configuration: %s',
+				objToString(error, ['response', 'data'], 'Unable to set log forwarding'),
+			);
+
+			// response a message or messages field
+
+			if (error.response.data.message || error.response.data.messages) {
+				const message = objToString(
+					error,
+					['response', 'data', 'message' || 'messages'],
+					'Unable to set log forwarding',
+				);
+				throw new Error(message);
+			}
+			// response contains error but no specific message field
+			else {
+				const message = objToString(error, ['response', 'data'], 'Unable to set log forwarding');
+				throw new Error(message);
+			}
+		} else {
+			// Something else happened while setting up the request
+			logger.error('Error setting log forwarding configuration: %s', error.message);
+			throw new Error(`Something went wrong while setting log forwarding. ${error.message}`);
+		}
+	}
+};
+
+/**
+ * @param {string} organizationCode - The IMS org code
+ * @param {string} projectId - The project ID
+ * @param {string} workspaceId - The workspace ID
+ * @param {string} meshId - The mesh ID
+ */
+const getLogForwarding = async (organizationCode, projectId, workspaceId, meshId) => {
+	const { accessToken } = await getDevConsoleConfig();
+	const config = {
+		method: 'GET',
+		url: `${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/log/forwarding`,
+		headers: {
+			'Authorization': `Bearer ${accessToken}`,
+			'Content-Type': 'application/json',
+			'x-request-id': global.requestId,
+			'x-api-key': SMS_API_KEY,
+		},
+	};
+
+	logger.info(
+		'Initiating POST %s',
+		`${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/log/forwarding`,
+	);
+
+	try {
+		const response = await axios(config);
+
+		logger.info('Response from GET %s', response.status);
+
+		if (response?.status === 200) {
+			logger.info(`Get log forwarding configuration: ${objToString(response, ['data'])}`);
+			return {
+				data: response.data,
+			};
+		} else {
+			// not 200 response
+			logger.error(
+				`Something went wrong: ${objToString(
+					response,
+					['data'],
+					'Unable to get log forwarding details.',
+				)}. Received ${response.status}, expected 200`,
+			);
+			throw new Error(response.data.message);
+		}
+	} catch (error) {
+		if (error.response && error.response.status === 400) {
+			// The request was made and the server responded with a 400 status code
+			logger.error('Error getting the log forwarding configuration: %j', error.response.data);
+
+			throw new Error('Invalid input parameters.');
+		} else if (error.response && error.response.status === 404) {
+			logger.error('Log forwarding details not found');
+
+			return null;
+		}
+		// request made but no response received
+		else if (error.request && !error.response) {
+			logger.error('No response from server when getting the log forwarding configuration');
+			throw new Error('Unable to get log forwarding details. Check the details and try again.');
+		}
+		// response received with error
+		else if (error.response && error.response.data) {
+			logger.error(
+				'Error getting the log forwarding configuration: %s',
+				objToString(error, ['response', 'data'], 'Unable to get log forwarding'),
+			);
+
+			// response a message or messages field
+
+			if (error.response.data.message || error.response.data.messages) {
+				const message = objToString(
+					error,
+					['response', 'data', 'message' || 'messages'],
+					'Unable to get log forwarding',
+				);
+				throw new Error(message);
+			}
+			// response contains error but no specific message field
+			else {
+				const message = objToString(error, ['response', 'data'], 'Unable to get log forwarding');
+				throw new Error(message);
+			}
+		} else {
+			// Something else happened while setting up the request
+			logger.error('Error getting the log forwarding configuration: %s', error.message);
+			throw new Error(
+				`Something went wrong while getting the log forwarding configuration. ${error.message}`,
+			);
+		}
+	}
+};
+
+/**
+ * Deletes the log forwarding configuration for a given mesh.
+ *
+ * @param {string} organizationCode - The IMS org code
+ * @param {string} projectId - The project ID
+ * @param {string} workspaceId - The workspace ID
+ * @param {string} meshId - The mesh ID
+ */
+const deleteLogForwarding = async (organizationCode, projectId, workspaceId, meshId) => {
+	const { accessToken } = await getDevConsoleConfig();
+	const config = {
+		method: 'DELETE',
+		url: `${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/log/forwarding`,
+		headers: {
+			'Authorization': `Bearer ${accessToken}`,
+			'x-request-id': global.requestId,
+			'x-api-key': SMS_API_KEY,
+		},
+	};
+
+	logger.info(
+		'Initiating DELETE %s',
+		`${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/log/forwarding`,
+	);
+
+	try {
+		const response = await axios(config);
+
+		logger.info('Response from DELETE %s', response.status);
+
+		if (response && response?.status === 204) {
+			return response;
+		} else {
+			logger.error(
+				`Unable to delete log forwarding config: ${objToString(
+					response,
+					['data'],
+					'Error',
+				)}. Received ${response.status}, expected 204`,
+			);
+			throw new Error(
+				`something went wrong: ${objToString(
+					response,
+					['data'],
+					'Unable to delete log forwarding',
+				)}`,
+			);
+		}
+	} catch (error) {
+		logger.info('Response from DELETE %s', error.response.status);
+
+		if (error.response.status === 404) {
+			// The request was made and the server responded with a 404 status code
+			logger.error('log forwarding details not found');
+
+			throw new Error('log forwarding details not found');
+		} else if (error.response && error.response.data) {
+			// The request was made and the server responded with an unsupported status code
+			logger.error(
+				'Error while deleting log forwarding details. Response: %s',
+				objToString(error, ['response', 'data'], 'Unable to delete log forwarding details'),
+			);
+
+			if (error.response.data.messages) {
+				const message = objToString(
+					error,
+					['response', 'data', 'messages', '0', 'message'],
+					'Unable to delete log forwarding details',
+				);
+
+				throw new Error(message);
+			} else if (error.response.data.message) {
+				const message = objToString(
+					error,
+					['response', 'data', 'message'],
+					'Unable to delete log forwarding details',
+				);
+
+				throw new Error(message);
+			} else {
+				const message = objToString(
+					error,
+					['response', 'data'],
+					'Unable to delete log forwarding details',
+				);
+
+				throw new Error(message);
+			}
+		} else {
+			// The request was made but no response was received
+			logger.error(
+				'Error while deleting log forwarding details. No response received from the server: %s',
+				objToString(error, [], 'Unable to delete log forwarding details'),
+			);
+
+			throw new Error('Unable to delete log forwarding details: %s', error.message);
+		}
+	}
+};
+
 module.exports = {
 	getApiKeyCredential,
 	describeMesh,
@@ -1222,4 +1518,7 @@ module.exports = {
 	getPresignedUrls,
 	getLogsByRayId,
 	cachePurge,
+	setLogForwarding,
+	getLogForwarding,
+	deleteLogForwarding,
 };

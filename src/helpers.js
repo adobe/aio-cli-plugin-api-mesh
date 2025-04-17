@@ -437,8 +437,36 @@ async function initSdk(options) {
 /**
  * Generates a static global requestid for the lifecycle of this command request
  */
-async function initRequestId() {
+function initRequestId() {
 	global.requestId = UUID.newUuid().toString();
+}
+
+/**
+ *
+ * This function initializes the metadata headers for the command execution
+ *
+ * @param {*} config
+ */
+function initMetadata(config) {
+	try {
+		const { version, plugins, userAgent, platform, arch } = config;
+		const currentIntalledVersion = getCurrentInstalledPluginVersion(plugins);
+
+		const metadataHeaders = {
+			'x-aio-cli-version': version,
+			'x-aio-cli-user-agent': userAgent,
+			'x-aio-cli-platform': platform,
+			'x-aio-cli-arch': arch,
+			'x-aio-cli-plugin-api-mesh-version': currentIntalledVersion,
+		};
+
+		global.metadataHeaders = metadataHeaders;
+	} catch (error) {
+		logger.error('Unable to initialize metadata headers');
+		logger.error(error.message);
+
+		global.metadataHeaders = {};
+	}
 }
 
 /**
@@ -513,6 +541,24 @@ async function promptInput(message) {
 			name: 'item',
 			message,
 			type: 'input',
+		},
+	]);
+
+	return selected.item;
+}
+
+/**
+ * Function to prompt for a secret/password input that masks the characters
+ *
+ * @param {string} message - prompt message
+ * @returns {Promise<string>} - the entered secret value
+ */
+async function promptInputSecret(message) {
+	const selected = await inquirer.prompt([
+		{
+			name: 'item',
+			message,
+			type: 'password',
 		},
 	]);
 
@@ -894,6 +940,28 @@ async function writeSecretsFile(secretsData, meshId) {
 
 /**
  *
+ * This function gets the current installed version of the plugin
+ *
+ * @param {*} installedPlugins
+ * @returns {string || null} - current installed version of the plugin
+ */
+function getCurrentInstalledPluginVersion(installedPlugins) {
+	try {
+		const meshPlugin = installedPlugins.find(
+			({ name }) => name === '@adobe/aio-cli-plugin-api-mesh',
+		);
+
+		return meshPlugin.version;
+	} catch (err) {
+		logger.error('Unable to get current installed version');
+		logger.error(err.message);
+
+		return null;
+	}
+}
+
+/**
+ *
  * This function fetches current installed version the system and the latest version from npm
  *
  * @param {*} installedPlugins
@@ -901,10 +969,7 @@ async function writeSecretsFile(secretsData, meshId) {
  */
 async function getPluginVersionDetails(installedPlugins) {
 	try {
-		const meshPlugin = installedPlugins.find(
-			({ name }) => name === '@adobe/aio-cli-plugin-api-mesh',
-		);
-		const currentVersion = meshPlugin.version;
+		const currentVersion = getCurrentInstalledPluginVersion(installedPlugins);
 
 		let config = {
 			method: 'get',
@@ -959,10 +1024,12 @@ module.exports = {
 	objToString,
 	promptInput,
 	promptConfirm,
+	promptInputSecret,
 	getLibConsoleCLI,
 	getDevConsoleConfig,
 	initSdk,
 	initRequestId,
+	initMetadata,
 	promptSelect,
 	promptMultiselect,
 	importFiles,
