@@ -24,8 +24,13 @@ const {
 	autoConfirmActionFlag,
 	jsonFlag,
 	destinations,
+	encryptSecrets,
 } = require('../../../../utils');
-const { setLogForwarding, getMeshId } = require('../../../../lib/smsClient');
+const {
+	setLogForwarding,
+	getMeshId,
+	getPublicEncryptionKey,
+} = require('../../../../lib/smsClient');
 
 class SetLogForwardingCommand extends Command {
 	static flags = {
@@ -85,6 +90,14 @@ class SetLogForwardingCommand extends Command {
 
 		if (shouldContinue) {
 			try {
+				// Encrypt the secrets in the destination config
+				const publicKey = await getPublicEncryptionKey(imsOrgCode);
+				if (destinationConfig.config.licenseKey) {
+					destinationConfig.config.licenseKey = await encryptSecrets(
+						publicKey,
+						destinationConfig.config.licenseKey,
+					);
+				}
 				const response = await setLogForwarding(
 					imsOrgCode,
 					projectId,
