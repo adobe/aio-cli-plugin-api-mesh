@@ -79,6 +79,10 @@ describe('SetLogForwardingCommand', () => {
 		getPublicEncryptionKey.mockResolvedValue('dummy_public_key');
 		setLogForwarding.mockResolvedValue({ success: true, result: true });
 		global.requestId = 'dummy_request_id';
+
+		// Reset mockCipher methods
+		mockCipher.update.mockReset().mockReturnValueOnce('mockEncryptedData');
+		mockCipher.final.mockReset().mockReturnValueOnce('');
 	});
 
 	afterEach(() => {
