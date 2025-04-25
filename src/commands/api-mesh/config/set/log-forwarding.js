@@ -106,7 +106,7 @@ class SetLogForwardingCommand extends Command {
 				const keyToEncrypt = getEncryptableKey(destinationConfig.config);
 				if (!keyToEncrypt) {
 					this.error(
-						`Unable to set log forwarding details. No valid key to encrypt found in the configuration.Try again. RequestId: ${global.requestId}`,
+						`Unable to set log forwarding details. No valid key to encrypt found in the configuration. Try again. RequestId: ${global.requestId}`,
 					);
 				}
 				// Encrypt the key
