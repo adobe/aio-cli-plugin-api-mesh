@@ -464,8 +464,10 @@ function initMetadata(config) {
 
 		// Include any api mesh prefixed environment variables
 		Object.entries(process.env).forEach(([key, value]) => {
-			if (key.startsWith('x-aio-cli-plugin-api-mesh')) {
-				metadataHeaders[key] = value;
+			if (key.startsWith('X_AIO_CLI_PLUGIN_API_MESH')) {
+				// Reformat env var to header
+				const header = key.toLowerCase().replace('_', '-');
+				metadataHeaders[header] = value;
 			}
 		});
 
