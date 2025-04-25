@@ -90,14 +90,30 @@ class SetLogForwardingCommand extends Command {
 
 		if (shouldContinue) {
 			try {
-				// Encrypt the secrets in the destination config
+				// Get publicKey for encryption
 				const publicKey = await getPublicEncryptionKey(imsOrgCode);
-				if (destinationConfig.config.licenseKey) {
-					destinationConfig.config.licenseKey = await encryptSecrets(
-						publicKey,
-						destinationConfig.config.licenseKey,
+				if (!publicKey) {
+					this.error(
+						`Unable to set log forwarding details. Unable to get public key. Try again. RequestId: ${global.requestId}`,
 					);
 				}
+				// Get the key to encrypt from config
+				const getEncryptableKey = config => {
+					if ('licenseKey' in config) return 'licenseKey';
+					if ('hecToken' in config) return 'hecToken';
+					return null;
+				};
+				const keyToEncrypt = getEncryptableKey(destinationConfig.config);
+				if (!keyToEncrypt) {
+					this.error(
+						`Unable to set log forwarding details. No valid key to encrypt found in the configuration.Try again. RequestId: ${global.requestId}`,
+					);
+				}
+				// Encrypt the key
+				destinationConfig.config[keyToEncrypt] = await encryptSecrets(
+					publicKey,
+					destinationConfig.config[keyToEncrypt],
+				);
 				const response = await setLogForwarding(
 					imsOrgCode,
 					projectId,
