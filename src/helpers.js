@@ -24,7 +24,6 @@ const { stdout, stderr } = require('process');
 const jsmin = require('jsmin').jsmin;
 const { resolve: resolveAbsolutePath } = require('path');
 const { compareVersions } = require('compare-versions');
-const dotenv = require('dotenv');
 
 const logger = require('../src/classes/logger');
 const { UUID } = require('./classes/UUID');
@@ -450,30 +449,16 @@ function initRequestId() {
  */
 function initMetadata(config) {
 	try {
-		dotenv.config();
 		const { version, plugins, userAgent, platform, arch } = config;
 		const currentIntalledVersion = getCurrentInstalledPluginVersion(plugins);
 
-		const metadataHeaders = {
+		global.metadataHeaders = {
 			'x-aio-cli-version': version,
 			'x-aio-cli-user-agent': userAgent,
 			'x-aio-cli-platform': platform,
 			'x-aio-cli-arch': arch,
 			'x-aio-cli-plugin-api-mesh-version': currentIntalledVersion,
 		};
-
-		// Include any api mesh prefixed environment variables
-		Object.entries(process.env).forEach(([key, value]) => {
-			if (key.startsWith('AIO_CLI_PLUGIN_API_MESH')) {
-				// Reformat env var to header
-				const header = `x-${key.toLowerCase().replaceAll('_', '-')}`;
-				metadataHeaders[header] = value;
-			}
-		});
-
-		console.log(metadataHeaders);
-
-		global.metadataHeaders = metadataHeaders;
 	} catch (error) {
 		logger.error('Unable to initialize metadata headers');
 		logger.error(error.message);
