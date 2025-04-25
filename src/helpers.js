@@ -466,10 +466,12 @@ function initMetadata(config) {
 		Object.entries(process.env).forEach(([key, value]) => {
 			if (key.startsWith('X_AIO_CLI_PLUGIN_API_MESH')) {
 				// Reformat env var to header
-				const header = key.toLowerCase().replace('_', '-');
+				const header = key.toLowerCase().replaceAll('_', '-');
 				metadataHeaders[header] = value;
 			}
 		});
+
+		console.log(metadataHeaders);
 
 		global.metadataHeaders = metadataHeaders;
 	} catch (error) {
