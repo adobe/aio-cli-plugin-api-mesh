@@ -452,15 +452,13 @@ function initMetadata(config) {
 		const { version, plugins, userAgent, platform, arch } = config;
 		const currentIntalledVersion = getCurrentInstalledPluginVersion(plugins);
 
-		const metadataHeaders = {
+		global.metadataHeaders = {
 			'x-aio-cli-version': version,
 			'x-aio-cli-user-agent': userAgent,
 			'x-aio-cli-platform': platform,
 			'x-aio-cli-arch': arch,
 			'x-aio-cli-plugin-api-mesh-version': currentIntalledVersion,
 		};
-
-		global.metadataHeaders = metadataHeaders;
 	} catch (error) {
 		logger.error('Unable to initialize metadata headers');
 		logger.error(error.message);

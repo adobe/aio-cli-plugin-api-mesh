@@ -1,5 +1,7 @@
 const { getCliEnv } = require('@adobe/aio-lib-env');
+const dotenv = require('dotenv');
 
+dotenv.config();
 const clientEnv = getCliEnv();
 
 const StageConstants = {
@@ -24,4 +26,16 @@ const ProdConstants = {
 };
 
 const envConstants = clientEnv === 'stage' ? StageConstants : ProdConstants;
-module.exports = { ...envConstants };
+
+// Export environment variables/constants
+module.exports = {
+	DEV_CONSOLE_BASE_URL: process.env.DEV_CONSOLE_BASE_URL || envConstants.DEV_CONSOLE_BASE_URL,
+	DEV_CONSOLE_API_KEY: process.env.DEV_CONSOLE_API_KEY || envConstants.DEV_CONSOLE_API_KEY,
+	DEV_CONSOLE_TRANSPORTER_API_KEY:
+		process.env.DEV_CONSOLE_TRANSPORTER_API_KEY || envConstants.DEV_CONSOLE_TRANSPORTER_API_KEY,
+	AIO_CLI_API_KEY: process.env.AIO_CLI_API_KEY || envConstants.AIO_CLI_API_KEY,
+	SMS_BASE_URL: process.env.SMS_BASE_URL || envConstants.SMS_BASE_URL,
+	MESH_BASE_URL: process.env.MESH_BASE_URL || envConstants.MESH_BASE_URL,
+	MESH_SANDBOX_BASE_URL: process.env.MESH_SANDBOX_BASE_URL || envConstants.MESH_SANDBOX_BASE_URL,
+	SMS_API_KEY: process.env.SMS_API_KEY || envConstants.SMS_API_KEY,
+};
