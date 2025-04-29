@@ -24,6 +24,7 @@ const {
 	autoConfirmActionFlag,
 	jsonFlag,
 	destinations,
+	LogForwardingKeys,
 	encryptSecrets,
 } = require('../../../../utils');
 const {
@@ -99,8 +100,8 @@ class SetLogForwardingCommand extends Command {
 				}
 				// Get the key to encrypt from config
 				const getEncryptableKey = config => {
-					if ('licenseKey' in config) return 'licenseKey';
-					if ('hecToken' in config) return 'hecToken';
+					if (LogForwardingKeys.licenseKey in config) return LogForwardingKeys.licenseKey;
+					if (LogForwardingKeys.hecToken in config) return LogForwardingKeys.hecToken;
 					return null;
 				};
 				const keyToEncrypt = getEncryptableKey(destinationConfig.config);
