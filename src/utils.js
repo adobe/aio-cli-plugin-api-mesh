@@ -102,8 +102,8 @@ const logFilenameFlag = Flags.string({
 });
 
 const LogForwardingKeys = {
-	licenseKey: 'licenseKey',
-	hecToken: 'hecToken',
+	LICENSE_KEY: 'licenseKey',
+	HEC_TOKEN: 'hecToken',
 };
 
 // The `destinations` object to hold the configuration for log forwarding destinations.
