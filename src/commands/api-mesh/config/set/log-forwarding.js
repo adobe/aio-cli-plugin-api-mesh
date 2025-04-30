@@ -101,7 +101,7 @@ class SetLogForwardingCommand extends Command {
 				// Get the key to encrypt from config
 				const getEncryptableKey = config => {
 					if (LogForwardingKeys.LICENSE_KEY in config) return LogForwardingKeys.LICENSE_KEY;
-				    if (LogForwardingKeys.HEC_TOKEN in config) return LogForwardingKeys.HEC_TOKEN;
+					if (LogForwardingKeys.HEC_TOKEN in config) return LogForwardingKeys.HEC_TOKEN;
 					return null;
 				};
 				const keyToEncrypt = getEncryptableKey(destinationConfig.config);
