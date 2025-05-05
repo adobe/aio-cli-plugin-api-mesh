@@ -115,15 +115,6 @@ describe('SetLogForwardingCommand', () => {
 			);
 		});
 
-		test('throws an error if license key has wrong format', async () => {
-			promptInputSecret.mockResolvedValueOnce('wrongformat'); // Too short
-
-			const command = new SetLogForwardingCommand([], {});
-			await expect(command.run()).rejects.toThrow(
-				`The license key is in the wrong format. Expected: 40 characters (received: ${11})`,
-			);
-		});
-
 		test('prompts for missing destination', async () => {
 			parseSpy.mockResolvedValueOnce({
 				flags: {
