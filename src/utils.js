@@ -101,6 +101,11 @@ const logFilenameFlag = Flags.string({
 	required: true,
 });
 
+const LogForwardingKeys = {
+	LICENSE_KEY: 'licenseKey',
+	HEC_TOKEN: 'hecToken',
+};
+
 // The `destinations` object to hold the configuration for log forwarding destinations.
 // It prompts for the required inputs for the destination.
 // Each destination can have different key/value pairs of configuration credentials.
@@ -819,4 +824,5 @@ module.exports = {
 	localToUTCTime,
 	cachePurgeAllActionFlag,
 	destinations,
+	LogForwardingKeys,
 };
