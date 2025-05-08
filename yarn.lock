@@ -7597,7 +7597,7 @@ jsmin@1.0.1:
   resolved "https://registry.yarnpkg.com/jsmin/-/jsmin-1.0.1.tgz#e7bd0dcd6496c3bf4863235bf461a3d98aa3b98c"
   integrity sha512-OPuL5X/bFKgVdMvEIX3hnpx3jbVpFCrEM8pKPXjFkZUqg521r41ijdyTz7vACOhW6o1neVlcLyd+wkbK5fNHRg==
 
-json-bigint-patch@0.0.8:
+json-bigint-patch@0.0.8, json-bigint-patch@^0.0.8:
   version "0.0.8"
   resolved "https://registry.yarnpkg.com/json-bigint-patch/-/json-bigint-patch-0.0.8.tgz#45d954da1f21c6d4f3ae9ef64c9ac227cd0ab0fe"
   integrity sha512-xa0LTQsyaq8awYyZyuUsporWisZFiyqzxGW8CKM3t7oouf0GFAKYJnqAm6e9NLNBQOCtOLvy614DEiRX/rPbnA==

@@ -1,3 +1,5 @@
+import 'json-bigint-patch';
+
 import { ServedTier, addServedHeader } from './served';
 import { buildServer } from './server';
 import { bindedlogger as logger } from './utils/logger';
