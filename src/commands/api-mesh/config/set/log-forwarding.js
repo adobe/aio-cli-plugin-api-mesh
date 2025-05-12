@@ -24,8 +24,14 @@ const {
 	autoConfirmActionFlag,
 	jsonFlag,
 	destinations,
+	LogForwardingKeys,
+	encryptSecrets,
 } = require('../../../../utils');
-const { setLogForwarding, getMeshId } = require('../../../../lib/smsClient');
+const {
+	setLogForwarding,
+	getMeshId,
+	getPublicEncryptionKey,
+} = require('../../../../lib/smsClient');
 
 class SetLogForwardingCommand extends Command {
 	static flags = {
@@ -85,6 +91,30 @@ class SetLogForwardingCommand extends Command {
 
 		if (shouldContinue) {
 			try {
+				// Get publicKey for encryption
+				const publicKey = await getPublicEncryptionKey(imsOrgCode);
+				if (!publicKey) {
+					this.error(
+						`Unable to set log forwarding details. Unable to get public key. Try again. RequestId: ${global.requestId}`,
+					);
+				}
+				// Get the key to encrypt from config
+				const getEncryptableKey = config => {
+					if (LogForwardingKeys.LICENSE_KEY in config) return LogForwardingKeys.LICENSE_KEY;
+					if (LogForwardingKeys.HEC_TOKEN in config) return LogForwardingKeys.HEC_TOKEN;
+					return null;
+				};
+				const keyToEncrypt = getEncryptableKey(destinationConfig.config);
+				if (!keyToEncrypt) {
+					this.error(
+						`Unable to set log forwarding details. No valid key to encrypt found in the configuration. Try again. RequestId: ${global.requestId}`,
+					);
+				}
+				// Encrypt the key
+				destinationConfig.config[keyToEncrypt] = await encryptSecrets(
+					publicKey,
+					destinationConfig.config[keyToEncrypt],
+				);
 				const response = await setLogForwarding(
 					imsOrgCode,
 					projectId,

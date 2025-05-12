@@ -11,6 +11,7 @@ governing permissions and limitations under the License.
 */
 
 const SetLogForwardingCommand = require('../config/set/log-forwarding');
+const crypto = require('crypto');
 const {
 	initSdk,
 	promptConfirm,
@@ -18,7 +19,7 @@ const {
 	promptInput,
 	promptInputSecret,
 } = require('../../../helpers');
-const { getMeshId, setLogForwarding } = require('../../../lib/smsClient');
+const { getMeshId, setLogForwarding, getPublicEncryptionKey } = require('../../../lib/smsClient');
 
 jest.mock('../../../helpers', () => ({
 	initSdk: jest.fn().mockResolvedValue({}),
@@ -30,6 +31,21 @@ jest.mock('../../../helpers', () => ({
 }));
 jest.mock('../../../lib/smsClient');
 jest.mock('../../../classes/logger');
+
+jest.mock('crypto');
+// Mock randomBytes for aesKey and iv
+const mockAesKey = Buffer.from('mockAesKey');
+const mockIv = Buffer.from('mockIv');
+const mockEncryptedAesKey = Buffer.from('mockEncryptedAesKey');
+const mockCipher = {
+	update: jest.fn().mockReturnValueOnce('mockEncryptedData'),
+	final: jest.fn().mockReturnValueOnce(''),
+};
+const mockEncryptedLicenseKey = {
+	iv: 'bW9ja0l2',
+	key: 'bW9ja0VuY3J5cHRlZEFlc0tleQ==',
+	data: 'mockEncryptedData',
+};
 
 describe('SetLogForwardingCommand', () => {
 	let parseSpy;
@@ -60,8 +76,13 @@ describe('SetLogForwardingCommand', () => {
 			workspaceName: 'workspaceName',
 		});
 		getMeshId.mockResolvedValue('meshId');
+		getPublicEncryptionKey.mockResolvedValue('dummy_public_key');
 		setLogForwarding.mockResolvedValue({ success: true, result: true });
 		global.requestId = 'dummy_request_id';
+
+		// Reset mockCipher methods
+		mockCipher.update.mockReset().mockReturnValueOnce('mockEncryptedData');
+		mockCipher.final.mockReset().mockReturnValueOnce('');
 	});
 
 	afterEach(() => {
@@ -71,6 +92,10 @@ describe('SetLogForwardingCommand', () => {
 	describe('Test New Relic destination', () => {
 		/** Success Scenario */
 		test('sets log forwarding with valid parameters', async () => {
+			crypto.randomBytes.mockReturnValueOnce(mockAesKey).mockReturnValueOnce(mockIv);
+			crypto.createCipheriv.mockReturnValueOnce(mockCipher);
+			crypto.publicEncrypt.mockReturnValueOnce(mockEncryptedAesKey);
+
 			const command = new SetLogForwardingCommand([], {});
 			await command.run();
 
@@ -88,7 +113,7 @@ describe('SetLogForwardingCommand', () => {
 					destination: 'newrelic',
 					config: {
 						baseUri: 'https://log-api.newrelic.com/log/v1',
-						licenseKey: 'abcdef0123456789abcdef0123456789abcdef01',
+						licenseKey: JSON.stringify(mockEncryptedLicenseKey), // Expect the encrypted value
 					},
 				},
 			);
@@ -115,15 +140,6 @@ describe('SetLogForwardingCommand', () => {
 			);
 		});
 
-		test('throws an error if license key has wrong format', async () => {
-			promptInputSecret.mockResolvedValueOnce('wrongformat'); // Too short
-
-			const command = new SetLogForwardingCommand([], {});
-			await expect(command.run()).rejects.toThrow(
-				`The license key is in the wrong format. Expected: 40 characters (received: ${11})`,
-			);
-		});
-
 		test('prompts for missing destination', async () => {
 			parseSpy.mockResolvedValueOnce({
 				flags: {
@@ -134,6 +150,10 @@ describe('SetLogForwardingCommand', () => {
 				},
 				args: [],
 			});
+
+			crypto.randomBytes.mockReturnValueOnce(mockAesKey).mockReturnValueOnce(mockIv);
+			crypto.createCipheriv.mockReturnValueOnce(mockCipher);
+			crypto.publicEncrypt.mockReturnValueOnce(mockEncryptedAesKey);
 
 			const command = new SetLogForwardingCommand([], {});
 			await command.run();
@@ -195,6 +215,10 @@ describe('SetLogForwardingCommand', () => {
 				args: [],
 			});
 
+			crypto.randomBytes.mockReturnValueOnce(mockAesKey).mockReturnValueOnce(mockIv);
+			crypto.createCipheriv.mockReturnValueOnce(mockCipher);
+			crypto.publicEncrypt.mockReturnValueOnce(mockEncryptedAesKey);
+
 			const command = new SetLogForwardingCommand([], {});
 			await command.run();
 
@@ -203,6 +227,10 @@ describe('SetLogForwardingCommand', () => {
 		});
 
 		test('sets log forwarding with auto-confirmation', async () => {
+			crypto.randomBytes.mockReturnValueOnce(mockAesKey).mockReturnValueOnce(mockIv);
+			crypto.createCipheriv.mockReturnValueOnce(mockCipher);
+			crypto.publicEncrypt.mockReturnValueOnce(mockEncryptedAesKey);
+
 			parseSpy.mockResolvedValueOnce({
 				flags: {
 					ignoreCache: false,
@@ -225,7 +253,7 @@ describe('SetLogForwardingCommand', () => {
 					destination: 'newrelic',
 					config: {
 						baseUri: 'https://log-api.newrelic.com/log/v1',
-						licenseKey: 'abcdef0123456789abcdef0123456789abcdef01',
+						licenseKey: JSON.stringify(mockEncryptedLicenseKey), // Expect the encrypted value
 					},
 				},
 			);
@@ -235,6 +263,10 @@ describe('SetLogForwardingCommand', () => {
 		test('logs error message when setLogForwarding fails', async () => {
 			const errorMessage = 'Unable to set log forwarding details';
 			setLogForwarding.mockRejectedValueOnce(new Error(errorMessage));
+
+			crypto.randomBytes.mockReturnValueOnce(mockAesKey).mockReturnValueOnce(mockIv);
+			crypto.createCipheriv.mockReturnValueOnce(mockCipher);
+			crypto.publicEncrypt.mockReturnValueOnce(mockEncryptedAesKey);
 
 			const command = new SetLogForwardingCommand([], {});
 			await expect(command.run()).rejects.toThrow(

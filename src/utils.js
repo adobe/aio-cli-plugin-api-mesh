@@ -101,6 +101,11 @@ const logFilenameFlag = Flags.string({
 	required: true,
 });
 
+const LogForwardingKeys = {
+	LICENSE_KEY: 'licenseKey',
+	HEC_TOKEN: 'hecToken',
+};
+
 // The `destinations` object to hold the configuration for log forwarding destinations.
 // It prompts for the required inputs for the destination.
 // Each destination can have different key/value pairs of configuration credentials.
@@ -131,11 +136,6 @@ const destinations = {
 				validate: value => {
 					if (!value) {
 						throw new Error('License key is required');
-					}
-					if (value.length !== 40) {
-						throw new Error(
-							`The license key is in the wrong format. Expected: 40 characters (received: ${value.length})`,
-						);
 					}
 				},
 			},
@@ -777,7 +777,7 @@ async function localToUTCTime(timeString) {
 	try {
 		//Get the local timezone
 		// takes the timezone where the javascript runtime is running
-		// reference https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/resolvedOptions#browser_compatibility:~:text=The%20value%20provided%20for%20this%20property%20in%20the%20options%20argument%2C%20with%20default%20filled%20in%20as%20needed.%20It%20is%20an%20IANA%20time%20zone%20name.%20The%20default%20is%20the%20runtime%27s%20default%20time%20zone.
+		// reference https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/DateTimeFormat/resolvedOptions#browser_compatibility:~:text=The%20value%20provided%20for%20this%20property%20in%20the%20options%20argument%2C%20with%20default%20filled%20in%20as%20needed.%20It%20is%20an%20IANA%20time%20zone.%20The%20default%20is%20the%20runtime%27s%20default%20time%20zone.
 		const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 		// Create a Date object from the formatted time string
@@ -824,4 +824,5 @@ module.exports = {
 	localToUTCTime,
 	cachePurgeAllActionFlag,
 	destinations,
+	LogForwardingKeys,
 };
