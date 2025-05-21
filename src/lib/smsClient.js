@@ -1498,7 +1498,7 @@ const deleteLogForwarding = async (organizationCode, projectId, workspaceId, mes
 };
 
 /**
- * Get log forwarding errors for a given mesh and time window.
+ * Get log forwarding errors for a given mesh within a specified time range.
  * @param {string} organizationCode - The IMS org code
  * @param {string} projectId - The project ID
  * @param {string} workspaceId - The workspace ID
