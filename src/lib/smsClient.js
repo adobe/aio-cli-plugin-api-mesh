@@ -1497,6 +1497,54 @@ const deleteLogForwarding = async (organizationCode, projectId, workspaceId, mes
 	}
 };
 
+/**
+ * Get log forwarding errors for a given mesh and time window.
+ * @param {string} organizationCode - The IMS org code
+ * @param {string} projectId - The project ID
+ * @param {string} workspaceId - The workspace ID
+ * @param {string} meshId - The mesh ID
+ * @param {string} startTime - Start time in UTC (YYYYMMDDTHHMMSS)
+ * @param {string} endTime - End time in UTC (YYYYMMDDTHHMMSS)
+ * @returns {Promise<{ errorUrls: Array<{ key: string, url: string }>, totalSize: number }>}
+ */
+const getLogForwardingErrors = async (
+	organizationCode,
+	projectId,
+	workspaceId,
+	meshId,
+	startTime,
+	endTime,
+) => {
+	const { accessToken } = await getDevConsoleConfig();
+	const config = {
+		method: 'GET',
+		// url: `${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/log/forwarding/errors?startTime=${startTime}&endTime=${endTime}`,
+		url: `${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/logs?startDateTime=${startTime}&endDateTime=${endTime}`,
+		headers: {
+			'Authorization': `Bearer ${accessToken}`,
+			'x-request-id': global.requestId,
+			'x-api-key': SMS_API_KEY,
+		},
+	};
+	logger.info('Initiating GET %s', config.url);
+	try {
+		const response = await axios(config);
+		logger.info('Response from GET %s', response.status);
+		if (response && response.status === 200 && response.data) {
+			return {
+				errorUrls: response.data.presignedUrls || [],
+				totalSize: response.data.totalSize || 0,
+			};
+		} else {
+			logger.error('No log forwarding errors found for the given time range.');
+			return { errorUrls: [], totalSize: 0 };
+		}
+	} catch (error) {
+		logger.error('Error fetching log forwarding errors:', error.message);
+		throw new Error('Unable to fetch log forwarding errors.');
+	}
+};
+
 module.exports = {
 	getApiKeyCredential,
 	describeMesh,
@@ -1521,4 +1569,5 @@ module.exports = {
 	setLogForwarding,
 	getLogForwarding,
 	deleteLogForwarding,
+	getLogForwardingErrors,
 };

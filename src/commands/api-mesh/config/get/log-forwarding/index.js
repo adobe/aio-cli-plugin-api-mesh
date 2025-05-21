@@ -10,10 +10,10 @@ governing permissions and limitations under the License.
 */
 
 const { Command } = require('@oclif/core');
-const { initSdk, initRequestId } = require('../../../../helpers');
-const logger = require('../../../../classes/logger');
-const { ignoreCacheFlag, jsonFlag } = require('../../../../utils');
-const { getLogForwarding, getMeshId } = require('../../../../lib/smsClient');
+const { initSdk, initRequestId } = require('../../../../../helpers');
+const logger = require('../../../../../classes/logger');
+const { ignoreCacheFlag, jsonFlag } = require('../../../../../utils');
+const { getLogForwarding, getMeshId } = require('../../../../../lib/smsClient');
 
 class GetLogForwardingCommand extends Command {
 	static flags = {
@@ -73,6 +73,14 @@ class GetLogForwardingCommand extends Command {
 	}
 }
 
-GetLogForwardingCommand.description = `Get log forwarding details for a given mesh`;
+// GetLogForwardingCommand.description = `Get log forwarding details for a given mesh
+// The 'get' command includes the following options:
+// - log-forwarding         : Retrieve log forwarding details for a given mesh.
+// - log-forwarding:errors  : Retrieve log forwarding error logs for a given mesh.`;
+GetLogForwardingCommand.description = `Get log forwarding details and error logs for a given mesh.
+
+The 'log-forwarding' command includes the following options:
+- log-forwarding         : Retrieve log forwarding details for a given mesh.
+- log-forwarding:errors  : Download log forwarding error logs for a selected time period.`;
 
 module.exports = GetLogForwardingCommand;
