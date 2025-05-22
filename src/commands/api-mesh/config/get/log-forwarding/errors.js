@@ -57,7 +57,7 @@ class GetLogForwardingErrorsCommand extends Command {
 			if (!dateTimeRegex.test(flags.startTime)) {
 				const correctedStartTime = suggestCorrectedDateFormat(flags.startTime);
 				if (!correctedStartTime) {
-					this.error('Invalid date components in startTime. Correct the date.');
+					this.error('Invalid date components in the startTime. Correct the date and try again.');
 				} else {
 					this.error(
 						`Use the format YYYY-MM-DDTHH:MM:SSZ for startTime. Did you mean ${correctedStartTime}?`,
@@ -68,7 +68,7 @@ class GetLogForwardingErrorsCommand extends Command {
 			if (!dateTimeRegex.test(flags.endTime)) {
 				const correctedEndTime = suggestCorrectedDateFormat(flags.endTime);
 				if (!correctedEndTime) {
-					this.error('Found invalid date components for endTime. Check and correct the date.');
+					this.error('Invalid date components in the endTime. Correct the date and try again.');
 				} else {
 					this.error(
 						`Use the format YYYY-MM-DDTHH:MM:SSZ for endTime. Did you mean ${correctedEndTime}?`,
@@ -87,11 +87,11 @@ class GetLogForwardingErrorsCommand extends Command {
 			formattedStartTime = validateDateTimeFormat(calculatedStartTime);
 			formattedEndTime = validateDateTimeFormat(calculatedEndTime);
 		} else if ((flags.startTime && !flags.endTime) || (!flags.startTime && flags.endTime)) {
-			this.error('Provide both startTime and endTime.');
+			this.error('You must provide both a startTime and an endTime.');
 			return;
 		} else {
 			this.error(
-				'Missing required flags. Provide a time range with --startTime and  --endTime flags,  or use the --past flag for more recent errors. Use the `mesh config get log-forwarding errors --help` command for more information.',
+				'Missing required flags. Provide a time range with --startTime and  --endTime flags,  or use the --past flag for recent errors. Use the `mesh config get log-forwarding errors --help` command for more information.',
 			);
 			return;
 		}
@@ -131,14 +131,14 @@ class GetLogForwardingErrorsCommand extends Command {
 			formattedEndTime,
 		);
 		if (!errorUrls || errorUrls.length === 0) {
-			this.error('No log forwarding errors found for the given time range.');
+			this.error('No log forwarding errors found for the specified time range.');
 		}
 
 		let shouldDownload = false;
 		if (totalSize > 0) {
 			const totalSizeKB = (totalSize / 1024).toFixed(2);
 			shouldDownload = await promptConfirm(
-				`The expected file size is ${totalSizeKB} KB. Confirm ${filename} download? (y/n)`,
+				`The expected file size is ${totalSizeKB} KB. Do you want to download ${filename}? (y/n)`,
 			);
 			if (shouldDownload) {
 				const writer = fs.createWriteStream(outputFile, { flags: 'a' });
@@ -185,6 +185,6 @@ class GetLogForwardingErrorsCommand extends Command {
 }
 
 GetLogForwardingErrorsCommand.description =
-	'Download log forwarding errors for a selected time period.';
+	'Download log forwarding errors for a specified time period.';
 
 module.exports = GetLogForwardingErrorsCommand;

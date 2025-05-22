@@ -73,7 +73,7 @@ class GetLogForwardingCommand extends Command {
 	}
 }
 
-GetLogForwardingCommand.description = `Get log forwarding details and error logs for a given mesh.
+GetLogForwardingCommand.description = `Get log forwarding details and error logs for a specified mesh.
 
 The 'log-forwarding' command includes the following options:
 - log-forwarding         : Retrieve log forwarding details for a given mesh.

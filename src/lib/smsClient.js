@@ -1536,7 +1536,7 @@ const getLogForwardingErrors = async (
 				totalSize: response.data.totalSize || 0,
 			};
 		} else {
-			logger.error('No log forwarding errors found for the given time range.');
+			logger.error('No log forwarding errors found for the specified time range.');
 			return { errorUrls: [], totalSize: 0 };
 		}
 	} catch (error) {
