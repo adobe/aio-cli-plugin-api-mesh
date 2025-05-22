@@ -1518,8 +1518,7 @@ const getLogForwardingErrors = async (
 	const { accessToken } = await getDevConsoleConfig();
 	const config = {
 		method: 'GET',
-		// url: `${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/log/forwarding/errors?startTime=${startTime}&endTime=${endTime}`,
-		url: `${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/logs?startDateTime=${startTime}&endDateTime=${endTime}`,
+		url: `${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/log/forwarding/errors?startDateTime=${startTime}&endDateTime=${endTime}`,
 		headers: {
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
