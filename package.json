@@ -1,6 +1,6 @@
 {
 	"name": "@adobe/aio-cli-plugin-api-mesh",
-	"version": "5.3.2",
+	"version": "5.3.3",
 	"description": "Adobe I/O CLI plugin to develop and manage API mesh sources",
 	"keywords": [
 		"oclif-plugin"
@@ -89,6 +89,7 @@
 		"graphql": "^16.6.0",
 		"inquirer": "^8.2.4",
 		"jsmin": "1.0.1",
+		"json-bigint-patch": "^0.0.8",
 		"json-interpolate": "^1.0.3",
 		"lru-cache": "^7.14.1",
 		"node-clipboardy": "^1.0.3",
@@ -138,7 +139,9 @@
 	},
 	"oclif": {
 		"topics": {
-			"api-mesh": { "description": "Create, run, test, and deploy API Mesh"}
+			"api-mesh": {
+				"description": "Create, run, test, and deploy API Mesh"
+			}
 		},
 		"commands": "./src/commands",
 		"bin": "aio",
