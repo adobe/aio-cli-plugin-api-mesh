@@ -45,7 +45,7 @@ function getBuiltMeshEntrypoint(builtMeshTenantDir) {
  */
 function resolveComposerAsTypeScriptModule(data) {
 	return data.replace(
-		/"composer":\s*"([^#]+)#([^"]+)"/,
+		/"composer":\s*"((?!https:\/\/)[^#]+)#([^"]+)"/,
 		`"module": await import("$1"), "fn": "$2"`,
 	);
 }
@@ -71,7 +71,7 @@ function resolveComposerAsTypeScriptModule(data) {
  */
 function resolveComposerAsJavaScriptModule(data) {
 	return data.replace(
-		/"composer":\s*"([^#]+)#([^"]+)"/,
+		/"composer":\s*"((?!https:\/\/)[^#]+)#([^"]+)"/,
 		`"module": __importStar(require("$1")), "fn": "$2"`,
 	);
 }
