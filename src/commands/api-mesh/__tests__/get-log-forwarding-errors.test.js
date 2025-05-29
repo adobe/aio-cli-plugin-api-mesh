@@ -9,15 +9,9 @@ the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTA
 OF ANY KIND, either express or implied. See the License for the specific language
 governing permissions and limitations under the License.
 */
-
-const fs = require('fs');
-const path = require('path');
-const GetLogForwardingErrorsCommand = require('../config/get/log-forwarding/errors');
-const { initSdk, promptConfirm } = require('../../../helpers');
-const { getMeshId, getLogForwardingErrors } = require('../../../lib/smsClient');
-
 jest.mock('fs');
 jest.mock('axios');
+
 jest.mock('../../../helpers', () => ({
 	initSdk: jest.fn().mockResolvedValue({}),
 	initRequestId: jest.fn().mockResolvedValue({}),
@@ -26,26 +20,25 @@ jest.mock('../../../helpers', () => ({
 jest.mock('../../../lib/smsClient');
 jest.mock('../../../classes/logger');
 
+const fs = require('fs');
+const path = require('path');
+const GetLogForwardingErrorsCommand = require('../config/get/log-forwarding/errors');
+const { initSdk, promptConfirm } = require('../../../helpers');
+const { getMeshId, getLogForwardingErrors } = require('../../../lib/smsClient');
+
 describe('GetLogForwardingErrorsCommand', () => {
 	let parseSpy;
+	let logSpy;
 
 	beforeEach(() => {
-		const now = new Date();
-		const startTime = new Date(now);
-		const endTime = new Date(now);
-		startTime.setMinutes(startTime.getMinutes() - 2);
-		const formattedStartTime = startTime.toISOString().slice(0, 19) + 'Z';
-		const formattedEndTime = endTime.toISOString().slice(0, 19) + 'Z';
-
-		parseSpy = jest.spyOn(GetLogForwardingErrorsCommand.prototype, 'parse').mockResolvedValue({
-			flags: {
-				startTime: formattedStartTime,
-				endTime: formattedEndTime,
-				filename: 'test.csv',
-				ignoreCache: false,
-			},
-		});
-
+		logSpy = jest
+			.spyOn(GetLogForwardingErrorsCommand.prototype, 'log')
+			.mockImplementation(() => {});
+		parseSpy = jest
+			.spyOn(GetLogForwardingErrorsCommand.prototype, 'parse')
+			.mockResolvedValue({ flags: { filename: undefined, ignoreCache: false } });
+		jest.spyOn(path, 'extname').mockReturnValue('.csv');
+		jest.spyOn(path, 'resolve').mockImplementation((...args) => args.join('/'));
 		initSdk.mockResolvedValue({
 			imsOrgId: 'orgId',
 			imsOrgCode: 'orgCode',
@@ -55,9 +48,17 @@ describe('GetLogForwardingErrorsCommand', () => {
 		});
 		getMeshId.mockResolvedValue('meshId');
 		getLogForwardingErrors.mockResolvedValue({
-			errorUrls: [{ key: 'error1.csv', url: 'http://example.com/someHash' }],
-			totalSize: 2048,
+			presignedUrls: ['http://example.com/error1', 'http://example.com/error2'],
+			totalSize: 1024,
 		});
+		jest
+			.spyOn(GetLogForwardingErrorsCommand.prototype, 'downloadFileContent')
+			.mockImplementation(() => createMockStream(mockLogData));
+		fs.existsSync.mockReturnValue(false);
+		fs.writeFileSync.mockImplementation(() => {});
+		fs.statSync.mockReturnValue({ size: 0 });
+		path.extname = jest.fn().mockReturnValue('.csv');
+		path.resolve = jest.fn().mockImplementation((...args) => args.join('/'));
 		promptConfirm.mockResolvedValue(true);
 		global.requestId = 'dummy_request_id';
 	});
@@ -66,169 +67,147 @@ describe('GetLogForwardingErrorsCommand', () => {
 		jest.clearAllMocks();
 	});
 
-	test('throws an error if the time difference between startTime and endTime is greater than 30 minutes', async () => {
-		fs.existsSync.mockReturnValue(true);
-		fs.statSync.mockReturnValue({ size: 0 });
-		const now = new Date();
-		const startTime = new Date(now);
-		const endTime = new Date(now);
-		startTime.setMinutes(startTime.getMinutes() - 45);
-		const formattedStartTime = startTime.toISOString().slice(0, 19) + 'Z';
-		const formattedEndTime = endTime.toISOString().slice(0, 19) + 'Z';
-		parseSpy.mockResolvedValueOnce({
-			flags: {
-				startTime: formattedStartTime,
-				endTime: formattedEndTime,
-				filename: 'test.csv',
-				ignoreCache: false,
-			},
-		});
-		const command = new GetLogForwardingErrorsCommand([], {});
-		await expect(command.run()).rejects.toThrow(
-			'The maximum duration between startTime and endTime is 30 minutes. The current duration is 0 hours 45 minutes and 0 seconds.',
-		);
-	});
-
-	test('throws an error if the endTime is greater than current time(now)', async () => {
-		fs.existsSync.mockReturnValue(true);
-		fs.statSync.mockReturnValue({ size: 0 });
-		const now = new Date();
-		const startTime = new Date(now);
-		const endTime = new Date(now);
-		endTime.setMinutes(startTime.getMinutes() + 45);
-		const formattedStartTime = startTime.toISOString().slice(0, 19) + 'Z';
-		const formattedEndTime = endTime.toISOString().slice(0, 19) + 'Z';
-		parseSpy.mockResolvedValueOnce({
-			flags: {
-				startTime: formattedStartTime,
-				endTime: formattedEndTime,
-				filename: 'test.csv',
-				ignoreCache: false,
-			},
-		});
-		const command = new GetLogForwardingErrorsCommand([], {});
-		await expect(command.run()).rejects.toThrow(
-			'endTime cannot be in the future. Provide a valid endTime.',
-		);
-	});
-
-	test('throws an error if startTime format is invalid', async () => {
-		parseSpy.mockResolvedValueOnce({
-			flags: {
-				startTime: '20241213223832',
-				endTime: '2024-08-29T12:30:00Z',
-				filename: 'test.csv',
-			},
-		});
-		const command = new GetLogForwardingErrorsCommand([], {});
-		const correctedStartTime = '2024-12-13T22:38:32Z';
-		await expect(command.run()).rejects.toThrow(
-			`Use the format YYYY-MM-DDTHH:MM:SSZ for startTime. Did you mean ${correctedStartTime}?`,
-		);
-	});
-
-	test('throws an error if endTime format is invalid', async () => {
-		parseSpy.mockResolvedValueOnce({
-			flags: {
-				startTime: '2024-08-29T12:00:00Z',
-				endTime: '2024-08-29:23:45:56Z',
-				filename: 'test.csv',
-			},
-		});
-		const command = new GetLogForwardingErrorsCommand([], {});
-		const correctedEndTime = '2024-08-29T23:45:56Z';
-		await expect(command.run()).rejects.toThrow(
-			`Use the format YYYY-MM-DDTHH:MM:SSZ for endTime. Did you mean ${correctedEndTime}?`,
-		);
-	});
-
-	test('throws an error if totalSize is 0', async () => {
-		fs.existsSync.mockReturnValue(true);
-		fs.statSync.mockReturnValue({ size: 0 });
-		getLogForwardingErrors.mockResolvedValueOnce({
-			errorUrls: [{ key: 'error1', url: 'http://example.com/error1' }],
-			totalSize: 0,
-		});
-		const command = new GetLogForwardingErrorsCommand([], {});
-		await expect(command.run()).rejects.toThrow('No log forwarding errors available to download');
-	});
-
-	test('throws an error if errors are requested for a date older than 30 days', async () => {
-		const today = new Date();
-		const thirtyDaysAgo = new Date(today);
-		thirtyDaysAgo.setUTCDate(today.getUTCDate() - 30);
-		const startTime = new Date(thirtyDaysAgo);
-		startTime.setUTCDate(thirtyDaysAgo.getUTCDate() - 1);
-		const formattedStartTime = startTime.toISOString().slice(0, 19) + 'Z';
-		parseSpy.mockResolvedValueOnce({
-			flags: {
-				startTime: formattedStartTime,
-				endTime: '2024-08-30T12:30:00Z',
-				filename: 'test.csv',
-			},
-		});
-		const command = new GetLogForwardingErrorsCommand([], {});
-		await expect(command.run()).rejects.toThrow(
-			'Cannot get logs more than 30 days old. Adjust your time range.',
-		);
-	});
-
-	test('creates file if it does not exist and checks if file is empty before proceeding', async () => {
-		fs.existsSync.mockReturnValue(false);
-		fs.statSync.mockReturnValue({ size: 0 });
-		const mockWriteStream = {
-			write: jest.fn(),
-			end: jest.fn(),
-			on: jest.fn((event, callback) => {
-				if (event === 'finish') {
-					callback();
-				}
-			}),
-		};
-		fs.createWriteStream.mockReturnValue(mockWriteStream);
+	test('prints log lines to console when no filename provided', async () => {
 		const command = new GetLogForwardingErrorsCommand([], {});
 		await command.run();
-		expect(fs.existsSync).toHaveBeenCalledWith(path.resolve(process.cwd(), 'test.csv'));
-		expect(fs.writeFileSync).toHaveBeenCalledWith(path.resolve(process.cwd(), 'test.csv'), '');
-		expect(mockWriteStream.write).toHaveBeenCalled();
+		expect(logSpy).toHaveBeenCalledWith('Successfully fetched log forwarding errors.');
+		const logCalls = logSpy.mock.calls.map(call => call[0]);
+		const logLines = logCalls.filter(line => line.startsWith('> '));
+		expect(logLines.length).toBe(6); // 3 lines per file * 2 files
+		expect(logLines[0]).toBe('> Error log line 1');
+		expect(logLines[1]).toBe('> Error log line 2');
+		expect(logLines[2]).toBe('> Error log line 3');
 	});
 
-	test('throws an error if the file is not empty', async () => {
+	test('writes to file when filename provided and user confirms', async () => {
+		parseSpy.mockResolvedValueOnce({ flags: { filename: 'test.csv', ignoreCache: false } });
+		const command = new GetLogForwardingErrorsCommand([], {});
+		await command.run();
+		expect(promptConfirm).toHaveBeenCalledWith(
+			'The expected file size is 1.00 KB. Confirm test.csv download? (y/n)',
+		);
+		expect(fs.writeFileSync).toHaveBeenCalledWith(
+			expect.stringContaining('test.csv'),
+			expect.stringContaining('Error log line 1'),
+			'utf8',
+		);
+		expect(logSpy).toHaveBeenCalledWith(
+			'Successfully downloaded the log forwarding error logs to test.csv',
+		);
+	});
+
+	test('does not write file when user declines confirmation', async () => {
+		parseSpy.mockResolvedValueOnce({ flags: { filename: 'test.csv', ignoreCache: false } });
+		promptConfirm.mockResolvedValueOnce(false);
+		const command = new GetLogForwardingErrorsCommand([], {});
+		await command.run();
+		expect(fs.writeFileSync).toHaveBeenCalledTimes(1); // Only the initial empty file creation
+		expect(fs.writeFileSync).toHaveBeenCalledWith(expect.stringContaining('test.csv'), '');
+		expect(logSpy).toHaveBeenCalledWith('Log forwarding errors file not downloaded.');
+	});
+
+	test('throws error for invalid file extension', async () => {
+		parseSpy.mockResolvedValueOnce({ flags: { filename: 'test.txt', ignoreCache: false } });
+		path.extname.mockReturnValue('.txt');
+		const command = new GetLogForwardingErrorsCommand([], {});
+		await expect(command.run()).rejects.toThrow(
+			'Invalid file type. Provide a filename with a .csv extension.',
+		);
+	});
+
+	test('throws error if existing file is not empty', async () => {
+		parseSpy.mockResolvedValueOnce({ flags: { filename: 'test.csv', ignoreCache: false } });
 		fs.existsSync.mockReturnValue(true);
-		fs.statSync.mockReturnValue({ size: 1024 });
+		fs.statSync.mockReturnValue({ size: 100 });
 		const command = new GetLogForwardingErrorsCommand([], {});
 		await expect(command.run()).rejects.toThrow('Make sure the file: test.csv is empty');
 	});
 
-	test('downloads errors if all conditions are met', async () => {
-		fs.existsSync.mockReturnValue(true);
-		fs.statSync.mockReturnValue({ size: 0 });
-		const mockWriteStream = {
-			write: jest.fn(),
-			end: jest.fn(),
-			on: jest.fn((event, callback) => {
-				if (event === 'finish') {
-					callback();
-				}
-			}),
-		};
-		fs.createWriteStream.mockReturnValue(mockWriteStream);
+	test('creates empty file if it does not exist', async () => {
+		parseSpy.mockResolvedValueOnce({ flags: { filename: 'test.csv', ignoreCache: false } });
+		fs.existsSync.mockReturnValue(false);
 		const command = new GetLogForwardingErrorsCommand([], {});
 		await command.run();
-		expect(initSdk).toHaveBeenCalled();
-		expect(getMeshId).toHaveBeenCalledWith('orgCode', 'projectId', 'workspaceId', 'workspaceName');
+		expect(fs.writeFileSync).toHaveBeenCalledWith(expect.stringContaining('test.csv'), '');
+	});
+
+	test('throws error if no presignedUrls returned', async () => {
+		getLogForwardingErrors.mockResolvedValueOnce({ presignedUrls: [], totalSize: 0 });
+		const command = new GetLogForwardingErrorsCommand([], {});
+		await expect(command.run()).rejects.toThrow(
+			'No log forwarding errors found for the configured destination.',
+		);
+	});
+
+	test('throws error if totalSize is 0', async () => {
+		getLogForwardingErrors.mockResolvedValueOnce({
+			presignedUrls: ['http://example.com/error1'],
+			totalSize: 0,
+		});
+		const command = new GetLogForwardingErrorsCommand([], {});
+		await expect(command.run()).rejects.toThrow(
+			'No log forwarding error logs available for the configured destination.',
+		);
+	});
+
+	test('throws error if meshId is not found', async () => {
+		getMeshId.mockResolvedValueOnce(null);
+		const command = new GetLogForwardingErrorsCommand([], {});
+		await expect(command.run()).rejects.toThrow('Mesh ID not found.');
+	});
+
+	test('throws error if getMeshId throws', async () => {
+		getMeshId.mockImplementationOnce(() => {
+			throw new Error('fail mesh');
+		});
+		const command = new GetLogForwardingErrorsCommand([], {});
+		await expect(command.run()).rejects.toThrow('Unable to get mesh ID: fail mesh.');
+	});
+
+	test('handles download failure gracefully', async () => {
+		jest
+			.spyOn(GetLogForwardingErrorsCommand.prototype, 'downloadFileContent')
+			.mockRejectedValueOnce(new Error('Download failed'));
+		const command = new GetLogForwardingErrorsCommand([], {});
+		await command.run();
+		expect(logSpy).toHaveBeenCalledWith('Failed to download or process log file: Download failed');
+	});
+
+	test('filters out empty lines from content', async () => {
+		const mockDataWithEmptyLines = `Line 1\n\nLine 2\n\n\nLine 3\n`;
+		jest
+			.spyOn(GetLogForwardingErrorsCommand.prototype, 'downloadFileContent')
+			.mockImplementation(() => createMockStream(mockDataWithEmptyLines));
+		const command = new GetLogForwardingErrorsCommand([], {});
+		await command.run();
+		const logCalls = logSpy.mock.calls.map(call => call[0]);
+		const logLines = logCalls.filter(line => line.startsWith('> '));
+		expect(logLines.length).toBe(6); // 3 non-empty lines per file * 2 files
+		expect(logLines[0]).toBe('> Line 1');
+		expect(logLines[1]).toBe('> Line 2');
+		expect(logLines[2]).toBe('> Line 3');
+	});
+
+	test('calls getLogForwardingErrors with correct parameters', async () => {
+		const command = new GetLogForwardingErrorsCommand([], {});
+		await command.run();
 		expect(getLogForwardingErrors).toHaveBeenCalledWith(
 			'orgCode',
 			'projectId',
 			'workspaceId',
 			'meshId',
-			expect.any(String),
-			expect.any(String),
 		);
-		expect(fs.createWriteStream).toHaveBeenCalledWith(path.resolve(process.cwd(), 'test.csv'), {
-			flags: 'a',
-		});
-		expect(mockWriteStream.write).toHaveBeenCalled();
-		expect(mockWriteStream.end).toHaveBeenCalled();
 	});
 });
+
+const mockLogData = `Error log line 1\nError log line 2\n\nError log line 3`;
+
+function createMockStream(data) {
+	const { Readable } = require('stream');
+	const stream = new Readable({
+		read() {},
+	});
+	stream.push(data);
+	stream.push(null);
+	return stream;
+}

@@ -1503,44 +1503,38 @@ const deleteLogForwarding = async (organizationCode, projectId, workspaceId, mes
  * @param {string} projectId - The project ID
  * @param {string} workspaceId - The workspace ID
  * @param {string} meshId - The mesh ID
- * @param {string} startTime - Start time in UTC (YYYYMMDDTHHMMSS)
- * @param {string} endTime - End time in UTC (YYYYMMDDTHHMMSS)
- * @returns {Promise<{ errorUrls: Array<{ key: string, url: string }>, totalSize: number }>}
  */
-const getLogForwardingErrors = async (
-	organizationCode,
-	projectId,
-	workspaceId,
-	meshId,
-	startTime,
-	endTime,
-) => {
+const getLogForwardingErrors = async (organizationCode, projectId, workspaceId, meshId) => {
 	const { accessToken } = await getDevConsoleConfig();
 	const config = {
 		method: 'GET',
-		url: `${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/log/forwarding/errors?startDateTime=${startTime}&endDateTime=${endTime}`,
+		url: `${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/log/forwarding/errors`,
 		headers: {
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
-			'x-api-key': SMS_API_KEY,
+			'x-api-key': 'adobeio_onboarding',
 		},
 	};
 	logger.info('Initiating GET %s', config.url);
 	try {
 		const response = await axios(config);
+
 		logger.info('Response from GET %s', response.status);
-		if (response && response.status === 200 && response.data) {
+
+		if (response?.status === 200) {
+			logger.info(`Log forwarding error Presigned urls: ${objToString(response, ['data'])}`);
+			const { presignedUrls, totalSize } = response.data;
 			return {
-				errorUrls: response.data.presignedUrls || [],
-				totalSize: response.data.totalSize || 0,
+				presignedUrls,
+				totalSize,
 			};
-		} else {
-			logger.error('No log forwarding errors found for the specified time range.');
-			return { errorUrls: [], totalSize: 0 };
 		}
 	} catch (error) {
-		logger.error('Error fetching log forwarding errors:', error.message);
-		throw new Error('Unable to fetch log forwarding errors.');
+		logger.error(`Error fetching log forwarding errors presigned urls: ${error}`);
+		return {
+			urls: {},
+			totalSize: 0,
+		};
 	}
 };
 
