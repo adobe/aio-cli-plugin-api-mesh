@@ -1512,7 +1512,7 @@ const getLogForwardingErrors = async (organizationCode, projectId, workspaceId, 
 		headers: {
 			'Authorization': `Bearer ${accessToken}`,
 			'x-request-id': global.requestId,
-			'x-api-key': 'adobeio_onboarding',
+			'x-api-key': SMS_API_KEY,
 		},
 	};
 	logger.info('Initiating GET %s', config.url);

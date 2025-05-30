@@ -35,18 +35,20 @@ class GetLogForwardingErrorsCommand extends Command {
 
 		logger.info('Calling initSdk...');
 
-		const { imsOrgCode, projectId, workspaceId, workspaceName } = await initSdk({ ignoreCache });
+		const { imsOrgCode, projectId, workspaceId } = await initSdk({ ignoreCache });
 
 		// Retrieve meshId
 		let meshId = '';
 
 		try {
-			meshId = await getMeshId(imsOrgCode, projectId, workspaceId, workspaceName);
+			meshId = await getMeshId(imsOrgCode, projectId, workspaceId, meshId);
+			if (!meshId) {
+				throw new Error('MeshIdNotFound');
+			}
 		} catch (err) {
-			this.error(`Unable to get mesh ID: ${err.message}.`);
-		}
-		if (!meshId) {
-			this.error('Mesh ID not found.');
+			this.error(
+				`Unable to get mesh ID. Please check the details and try again. RequestId: ${global.requestId}`,
+			);
 		}
 
 		// fetch log forwarding errors presigned URLs
@@ -59,7 +61,9 @@ class GetLogForwardingErrorsCommand extends Command {
 
 		// If presigned URLs are not found, throw error saying that no log forwarding errors are found
 		if (!presignedUrls || presignedUrls.length === 0) {
-			this.error('No log forwarding errors found for the configured destination.');
+			this.error(
+				`No log forwarding errors found for the configured destination. RequestId: ${global.requestId}`,
+			);
 		}
 
 		const allRows = [];
@@ -84,15 +88,18 @@ class GetLogForwardingErrorsCommand extends Command {
 		}
 		if (totalSize > 0) {
 			// Download and process each presigned URL
-			for (const url of presignedUrls) {
+			for (const { url } of presignedUrls) {
 				try {
+					logger.info(`[GetLogForwardingErrorsCommand] Downloading from URL: ${url}`);
 					const stream = await this.downloadFileContent(url);
 					const content = await this.streamToString(stream);
 					// Split content into lines, filter out empty lines
 					const lines = content.split(/\r?\n/).filter(line => line.trim() !== '');
 					allRows.push(...lines);
 				} catch (err) {
-					this.log(`Failed to download or process log file: ${err.message}`);
+					this.log(
+						`Failed to download or process log file: ${err.message}. RequestId: ${global.requestId}`,
+					);
 				}
 			}
 			// if filename is provided, write the content to the file
@@ -114,14 +121,16 @@ class GetLogForwardingErrorsCommand extends Command {
 			}
 			// If filename is not provided, print the logs to the console
 			else {
-				this.log(`Successfully fetched log forwarding errors.`);
+				this.log(`\nSuccessfully fetched log forwarding errors.`);
 				// print the error logs each in a new line starting with >
 				allRows.forEach(rows => {
 					this.log(`> ${rows}`);
 				});
 			}
 		} else {
-			this.error('No log forwarding error logs available for the configured destination.');
+			this.error(
+				`No log forwarding error logs available for the configured destination. RequestId: ${global.requestId}`,
+			);
 		}
 	}
 

@@ -70,8 +70,12 @@ describe('GetLogForwardingErrorsCommand', () => {
 	test('prints log lines to console when no filename provided', async () => {
 		const command = new GetLogForwardingErrorsCommand([], {});
 		await command.run();
-		expect(logSpy).toHaveBeenCalledWith('Successfully fetched log forwarding errors.');
+		// Accept log message with or without leading newline
 		const logCalls = logSpy.mock.calls.map(call => call[0]);
+		const found = logCalls.some(
+			line => line.trim() === 'Successfully fetched log forwarding errors.',
+		);
+		expect(found).toBe(true);
 		const logLines = logCalls.filter(line => line.startsWith('> '));
 		expect(logLines.length).toBe(6); // 3 lines per file * 2 files
 		expect(logLines[0]).toBe('> Error log line 1');
@@ -153,7 +157,9 @@ describe('GetLogForwardingErrorsCommand', () => {
 	test('throws error if meshId is not found', async () => {
 		getMeshId.mockResolvedValueOnce(null);
 		const command = new GetLogForwardingErrorsCommand([], {});
-		await expect(command.run()).rejects.toThrow('Mesh ID not found.');
+		await expect(command.run()).rejects.toThrow(
+			'Unable to get mesh ID. Please check the details and try again. RequestId: dummy_request_id',
+		);
 	});
 
 	test('throws error if getMeshId throws', async () => {
@@ -161,7 +167,9 @@ describe('GetLogForwardingErrorsCommand', () => {
 			throw new Error('fail mesh');
 		});
 		const command = new GetLogForwardingErrorsCommand([], {});
-		await expect(command.run()).rejects.toThrow('Unable to get mesh ID: fail mesh.');
+		await expect(command.run()).rejects.toThrow(
+			'Unable to get mesh ID. Please check the details and try again. RequestId: dummy_request_id',
+		);
 	});
 
 	test('handles download failure gracefully', async () => {
@@ -170,7 +178,11 @@ describe('GetLogForwardingErrorsCommand', () => {
 			.mockRejectedValueOnce(new Error('Download failed'));
 		const command = new GetLogForwardingErrorsCommand([], {});
 		await command.run();
-		expect(logSpy).toHaveBeenCalledWith('Failed to download or process log file: Download failed');
+		const logCalls = logSpy.mock.calls.map(call => call[0]);
+		const found = logCalls.some(line =>
+			line.includes('Failed to download or process log file: Download failed'),
+		);
+		expect(found).toBe(true);
 	});
 
 	test('filters out empty lines from content', async () => {
