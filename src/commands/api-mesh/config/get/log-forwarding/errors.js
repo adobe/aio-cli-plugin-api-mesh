@@ -26,6 +26,8 @@ class GetLogForwardingErrorsCommand extends Command {
 		filename: fileNameFlag,
 	};
 
+	static usage = 'api-mesh:config:get:log-forwarding:errors';
+
 	async run() {
 		logger.info(`RequestId: ${global.requestId}`);
 

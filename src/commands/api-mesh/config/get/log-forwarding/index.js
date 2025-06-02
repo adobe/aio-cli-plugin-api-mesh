@@ -23,6 +23,8 @@ class GetLogForwardingCommand extends Command {
 
 	static enableJsonFlag = true;
 
+	static usage = 'api-mesh:config:get:log-forwarding';
+
 	async run() {
 		await initRequestId();
 
