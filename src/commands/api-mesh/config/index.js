@@ -13,10 +13,9 @@ governing permissions and limitations under the License.
 const { Help, Command } = require('@oclif/core');
 
 class ConfigCommand extends Command {
-
 	static summary = 'Manage the configuration for API Mesh';
 
-static usage = 'api-mesh:config [COMMAND]';
+	static usage = 'api-mesh:config [COMMAND]';
 
 	async run() {
 		const help = new Help(this.config);
