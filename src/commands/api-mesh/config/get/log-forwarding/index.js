@@ -75,8 +75,9 @@ class GetLogForwardingCommand extends Command {
 
 GetLogForwardingCommand.description = `Get log forwarding details and error logs for a specified mesh.
 
-The 'log-forwarding' command includes the following options:
-- log-forwarding         : Retrieve log forwarding details for a given mesh.
-- log-forwarding:errors  : Download log forwarding error logs for a selected time period.`;
+-The 'log-forwarding' command includes the following options:
+
+- api-mesh:config:get:log-forwarding         : Retrieve log forwarding details for a given mesh.
+- api-mesh:config:get:log-forwarding:errors  : Download log forwarding error logs for a selected time period.`;
 
 module.exports = GetLogForwardingCommand;
