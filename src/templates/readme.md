@@ -11,7 +11,7 @@ This repo comes with all the files and dependencies necessary to get started wit
 3. `package.json` - dependencies and scripts to test and deploy meshes
 4. `.vscode/launch.json` - VS Code configuration to setup debugging out of the box. This applies to VS Code on local machines or Codespaces on Github.com
 5. `.devcontainer/devcontainer.json` - Codespaces configuration to setup dev container out of the box. This config will help setup the packages and build the mesh config automatically. As a bonus it also sets up port-forwarding so you can use your favourite GraphQL interface to practice the mesh
-6. `.github/workflows/deployMesh.yml` - Github workflow to automatically publish mesh config when something is committed to `main`
+6. `.github/workflows/deployMesh.yaml` - Github workflow to automatically publish mesh config when something is committed to `main`
 
 # Local Dev
 
