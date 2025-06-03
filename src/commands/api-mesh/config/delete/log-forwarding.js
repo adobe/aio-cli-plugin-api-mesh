@@ -21,6 +21,8 @@ class DeleteLogForwardingCommand extends Command {
 		autoConfirmAction: autoConfirmActionFlag,
 	};
 
+	static usage = 'api-mesh:config:delete:log-forwarding';
+
 	async run() {
 		logger.info(`RequestId: ${global.requestId}`);
 

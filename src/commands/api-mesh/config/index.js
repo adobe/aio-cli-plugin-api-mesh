@@ -13,15 +13,17 @@ governing permissions and limitations under the License.
 const { Help, Command } = require('@oclif/core');
 
 class ConfigCommand extends Command {
+	static summary = 'Manage the configuration for API Mesh';
+
+	static usage = 'api-mesh:config [COMMAND]';
+
 	async run() {
 		const help = new Help(this.config);
 		await help.showHelp(['api-mesh:config', '--help']);
 	}
 }
 
-ConfigCommand.description = `Manage the configuration for API Mesh.
-
-The 'config' command includes the following options:
+ConfigCommand.description = `The 'config' command includes the following options:
 - set: Set log forwarding details for a given mesh.
 - get: Retrieve log forwarding details for a given mesh.
 - delete: Delete log forwarding details for a given mesh.`;
