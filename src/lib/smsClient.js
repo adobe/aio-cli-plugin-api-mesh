@@ -1497,6 +1497,47 @@ const deleteLogForwarding = async (organizationCode, projectId, workspaceId, mes
 	}
 };
 
+/**
+ * Get log forwarding errors for a given mesh within a specified time range.
+ * @param {string} organizationCode - The IMS org code
+ * @param {string} projectId - The project ID
+ * @param {string} workspaceId - The workspace ID
+ * @param {string} meshId - The mesh ID
+ */
+const getLogForwardingErrors = async (organizationCode, projectId, workspaceId, meshId) => {
+	const { accessToken } = await getDevConsoleConfig();
+	const config = {
+		method: 'GET',
+		url: `${SMS_BASE_URL}/organizations/${organizationCode}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}/log/forwarding/errors`,
+		headers: {
+			'Authorization': `Bearer ${accessToken}`,
+			'x-request-id': global.requestId,
+			'x-api-key': SMS_API_KEY,
+		},
+	};
+	logger.info('Initiating GET %s', config.url);
+	try {
+		const response = await axios(config);
+
+		logger.info('Response from GET %s', response.status);
+
+		if (response?.status === 200) {
+			logger.info(`Log forwarding error Presigned urls: ${objToString(response, ['data'])}`);
+			const { presignedUrls, totalSize } = response.data;
+			return {
+				presignedUrls,
+				totalSize,
+			};
+		}
+	} catch (error) {
+		logger.error(`Error fetching log forwarding errors presigned urls: ${error}`);
+		return {
+			urls: {},
+			totalSize: 0,
+		};
+	}
+};
+
 module.exports = {
 	getApiKeyCredential,
 	describeMesh,
@@ -1521,4 +1562,5 @@ module.exports = {
 	setLogForwarding,
 	getLogForwarding,
 	deleteLogForwarding,
+	getLogForwardingErrors,
 };
