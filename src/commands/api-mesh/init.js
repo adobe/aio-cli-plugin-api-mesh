@@ -156,7 +156,10 @@ class InitCommand extends Command {
 					const gitIgnoreFilePath = `${absolutePath}/.gitignore`;
 
 					await this.cloneFile(gitIgnoreTemplatePath, gitIgnoreFilePath);
-					await this.cloneFile(deployWorkflowPath, `${absolutePath}/.github/workflows/deploy.yaml`);
+					await this.cloneFile(
+						deployWorkflowPath,
+						`${absolutePath}/.github/workflows/deployMesh.yaml`,
+					);
 					await this.cloneFile(
 						loadTestWorkflowPath,
 						`${absolutePath}/.github/workflows/loadTest.yaml`,

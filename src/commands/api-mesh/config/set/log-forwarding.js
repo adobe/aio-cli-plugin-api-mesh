@@ -42,6 +42,8 @@ class SetLogForwardingCommand extends Command {
 
 	static enableJsonFlag = true;
 
+	static usage = 'api-mesh:config:set:log-forwarding';
+
 	async run() {
 		await initRequestId();
 

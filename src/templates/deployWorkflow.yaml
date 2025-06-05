@@ -25,6 +25,20 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
+      - name: Validate Secrets
+        run: |
+          if
+          [ -z "${{ secrets.CLIENTID }}" ] ||
+          [ -z "${{ secrets.CLIENTSECRET }}" ] ||
+          [ -z "${{ secrets.TECHNICALACCID }}" ] ||
+          [ -z "${{ secrets.TECHNICALACCEMAIL }}" ] ||
+          [ -z "${{ secrets.IMSORGID }}" ] ||
+          [ -z "${{ secrets.ORGID }}" ] ||
+          [ -z "${{ secrets.PROJECTID }}" ] ||
+          [ -z "${{ secrets.WORKSPACEID }}" ]; then
+            echo "Please set all required secrets: CLIENTID, CLIENTSECRET, TECHNICALACCID, TECHNICALACCEMAIL, IMSORGID, ORGID, PROJECTID, WORKSPACEID"
+            exit 1
+          fi
       - name: Setup CLI
         uses: adobe/aio-cli-setup-action@1.3.0
         with:
@@ -51,13 +65,29 @@ jobs:
         run: aio console:project:select ${{ secrets.PROJECTID }}
       - name: Select workspace
         run: aio console:workspace:select ${{ secrets.WORKSPACEID }}
-      - name: "Create env file"
+      - name: Print AIO CLI Config
+        run: aio config list
+      - name: Get Mesh
+        id: get_mesh
+        continue-on-error: true
         run: |
-          touch .env
-          echo API_ENDPOINT="https://xxx.execute-api.us-west-2.amazonaws.com" >> .env
-          echo API_KEY=${{ secrets.API_KEY }} >> .env
-          cat .env
-      - name: Describe
-        run: aio api-mesh:describe
-      - name: Update
+          output=$(aio api-mesh:get 2>&1)
+          # Escape the output and replace newlines with %0A
+          escaped_output=$(echo "$output" | tr -d '\r' | tr '\n' ' ')
+          echo "mesh_output=$escaped_output" >> $GITHUB_OUTPUT
+          echo "$output"
+      - name: Debug Get Mesh Output
+        continue-on-error: true
+        run: echo "Get Mesh Output - ${{ steps.get_mesh.outputs.mesh_output }}"
+      - name: Create Mesh
+        if: ${{ contains(steps.get_mesh.outputs.mesh_output, 'No mesh found') }}
+        run: aio api-mesh:create -c mesh.json --env .env
+      - name: Update Mesh
+        if: ${{ !contains(steps.get_mesh.outputs.mesh_output, 'No mesh found') }}
         run: aio api-mesh:update -c mesh.json --env .env
+      - name: Wait for 30 seconds
+        run: sleep 30
+      - name: Describe Mesh
+        run: aio api-mesh:describe
+      - name: Get Mesh Status
+        run: aio api-mesh:status
