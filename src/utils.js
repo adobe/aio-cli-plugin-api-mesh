@@ -240,6 +240,15 @@ function getFilesInMeshConfig(data, meshConfigName) {
 	// remove duplicate files
 	filesList = [...new Set(filesList)];
 
+	// push files which are not being referenced
+	if (data.meshConfig.files && data.meshConfig.files.length > 0) {
+		data.meshConfig.files.forEach(fileObj => {
+			if (fileObj && typeof fileObj.path === 'string' && !filesList.includes(fileObj.path)) {
+				filesList.push(fileObj.path);
+			}
+		});
+	}
+
 	logger.info(`Files to be imported: ${filesList.join(', ')}`);
 
 	try {
