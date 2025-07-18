@@ -14,7 +14,7 @@ const { writeFile } = require('fs/promises');
 
 const logger = require('../../classes/logger');
 const { initSdk } = require('../../helpers');
-const { ignoreCacheFlag, jsonFlag } = require('../../utils');
+const { ignoreCacheFlag, jsonFlag, activeFlag } = require('../../utils');
 const { getMeshId, getMesh } = require('../../lib/smsClient');
 const { buildMeshUrl } = require('../../urlBuilder');
 
@@ -24,6 +24,7 @@ class GetCommand extends Command {
 	static flags = {
 		ignoreCache: ignoreCacheFlag,
 		json: jsonFlag,
+		active: activeFlag,
 	};
 
 	static enableJsonFlag = true;
@@ -35,6 +36,7 @@ class GetCommand extends Command {
 
 		const ignoreCache = await flags.ignoreCache;
 		const json = await flags.json;
+		const active = await flags.active;
 
 		const { imsOrgId, imsOrgCode, projectId, workspaceId, workspaceName } = await initSdk({
 			ignoreCache,
@@ -53,7 +55,14 @@ class GetCommand extends Command {
 
 		if (meshId) {
 			try {
-				const mesh = await getMesh(imsOrgCode, projectId, workspaceId, workspaceName, meshId);
+				const mesh = await getMesh(
+					imsOrgCode,
+					projectId,
+					workspaceId,
+					workspaceName,
+					meshId,
+					active,
+				);
 
 				if (mesh) {
 					this.log('Successfully retrieved mesh %s', JSON.stringify(mesh, null, 2));
@@ -81,11 +90,16 @@ class GetCommand extends Command {
 					);
 				}
 			} catch (error) {
-				this.log(error.message);
-
-				this.error(
-					`Unable to get mesh. Check the details and try again. If the error persists please contact support. RequestId: ${global.requestId}`,
-				);
+				if (error.message === 'NoActiveDeploymentFound') {
+					this.error(
+						`No active deployment found for mesh ${meshId}. Check the mesh ID and try again or try without --active flag to get the mesh config. RequestId: ${global.requestId}`,
+					);
+				} else {
+					this.log(error.message);
+					this.error(
+						`Unable to get mesh. Check the details and try again. If the error persists please contact support. RequestId: ${global.requestId}`,
+					);
+				}
 			}
 		} else {
 			this.error(
@@ -96,6 +110,7 @@ class GetCommand extends Command {
 	}
 }
 
-GetCommand.description = 'Get the config of a given mesh';
+GetCommand.description =
+	'Get the config of a given mesh. Use --active flag to retrieve the last successfully deployed mesh config';
 
 module.exports = GetCommand;

@@ -70,6 +70,12 @@ const inspectPortNoFlag = Flags.integer({
 	default: 9229,
 });
 
+const activeFlag = Flags.boolean({
+	char: 'a',
+	description: 'Retrieve the last successfully deployed mesh config',
+	default: false,
+});
+
 const debugFlag = Flags.boolean({
 	description: 'Enable debugging mode',
 	default: false,
@@ -815,6 +821,7 @@ module.exports = {
 	getAppRootDir,
 	portNoFlag,
 	inspectPortNoFlag,
+	activeFlag,
 	debugFlag,
 	selectFlag,
 	secretsFlag,
