@@ -683,6 +683,7 @@ const getMeshId = async (organizationCode, projectId, workspaceId, workspaceName
 			);
 		}
 	} catch (error) {
+		console.error(error.response.status);
 		if (error.response.status === 400) {
 			// The request was made and the server responded with a 400 status code
 			logger.error('Mesh not found');

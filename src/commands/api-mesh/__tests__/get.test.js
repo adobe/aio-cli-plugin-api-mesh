@@ -81,7 +81,7 @@ describe('get command tests', () => {
 
 	test('snapshot get command', () => {
 		expect(GetCommand.description).toMatchInlineSnapshot(
-			`"Get the config of a given mesh. Use --active flag to retrieve the last successfully deployed mesh config"`,
+			`"Get the config of a specified mesh. Use the --active flag to retrieve the last successfully deployed mesh config"`,
 		);
 		expect(GetCommand.args).toMatchInlineSnapshot(`
 		[
@@ -494,7 +494,7 @@ describe('get command tests', () => {
 
 		return runResult.catch(err => {
 			expect(err.message).toMatchInlineSnapshot(
-				`"No active deployment found for mesh dummy_meshId. Check the mesh ID and try again or try without --active flag to get the mesh config. RequestId: dummy_request_id"`,
+				`"No active deployment found for mesh dummy_meshId. Check the mesh ID and try again or try without the --active flag. RequestId: dummy_request_id"`,
 			);
 			expect(getMesh).toHaveBeenCalledWith(
 				selectedOrg.code,
@@ -524,7 +524,7 @@ describe('get command tests', () => {
 
 		return runResult.catch(err => {
 			expect(err.message).toMatchInlineSnapshot(
-				`"No active deployment found for mesh dummy_meshId. Check the mesh ID and try again or try without --active flag to get mesh config. RequestId: dummy_request_id"`,
+				`"No active deployment found for mesh dummy_meshId. Check the mesh ID and try again or try without the --active flag. RequestId: dummy_request_id"`,
 			);
 			expect(getMesh).toHaveBeenCalledWith(
 				selectedOrg.code,

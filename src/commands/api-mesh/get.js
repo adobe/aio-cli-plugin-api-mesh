@@ -92,7 +92,7 @@ class GetCommand extends Command {
 			} catch (error) {
 				if (error.message === 'NoActiveDeploymentFound') {
 					this.error(
-						`No active deployment found for mesh ${meshId}. Check the mesh ID and try again or try without --active flag to get the mesh config. RequestId: ${global.requestId}`,
+						`No active deployment found for mesh ${meshId}. Check the mesh ID and try again or try without the --active flag. RequestId: ${global.requestId}`,
 					);
 				} else {
 					this.log(error.message);
@@ -111,6 +111,6 @@ class GetCommand extends Command {
 }
 
 GetCommand.description =
-	'Get the config of a given mesh. Use --active flag to retrieve the last successfully deployed mesh config';
+	'Get the config of a specified mesh. Use the --active flag to retrieve the last successfully deployed mesh config';
 
 module.exports = GetCommand;
