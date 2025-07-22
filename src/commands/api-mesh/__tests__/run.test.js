@@ -541,7 +541,7 @@ describe('run command tests', () => {
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
 		[
 		  [
-		    "Mesh files must be JavaScript or JSON. Other file types are not supported. The following file(s) are invalid: requestParams.txt.",
+		    "Mesh files must be JavaScript, JSON or GraphQL. Other file types are not supported. The following file(s) are invalid: requestParams.txt.",
 		  ],
 		]
 	`);
