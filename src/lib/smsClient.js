@@ -158,8 +158,8 @@ const listLogs = async (organizationCode, projectId, workspaceId, meshId, fileNa
 const getMesh = async (organizationId, projectId, workspaceId, workspaceName, meshId, active) => {
 	const { accessToken } = await getDevConsoleConfig();
 
-	const baseUrl = `${SMS_BASE_URL}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}`;
-	const url = active ? baseUrl + `?active=${active}` : baseUrl;
+	const url = `${SMS_BASE_URL}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}`;
+	const params = active ? { active } : undefined;
 
 	const config = {
 		method: 'get',
@@ -171,6 +171,7 @@ const getMesh = async (organizationId, projectId, workspaceId, workspaceName, me
 			'workspaceName': workspaceName,
 			'x-api-key': SMS_API_KEY,
 		},
+		params: params,
 	};
 
 	logger.info('Initiating GET %s', url);
@@ -203,8 +204,7 @@ const getMesh = async (organizationId, projectId, workspaceId, workspaceName, me
 			// Check if no active deployment found
 			if (
 				active &&
-				error.response.data?.message &&
-				error.response.data.message.includes('No active deployment found')
+				error.response.data?.message?.includes('No active deployment found')
 			) {
 				logger.error('No active deployment found for mesh');
 				throw new Error('NoActiveDeploymentFound');
@@ -683,7 +683,6 @@ const getMeshId = async (organizationCode, projectId, workspaceId, workspaceName
 			);
 		}
 	} catch (error) {
-		console.error(error.response.status);
 		if (error.response.status === 400) {
 			// The request was made and the server responded with a 400 status code
 			logger.error('Mesh not found');
