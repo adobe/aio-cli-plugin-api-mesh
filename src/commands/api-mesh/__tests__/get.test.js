@@ -121,21 +121,13 @@ describe('get command tests', () => {
 
 	test('should fail if mesh is missing', async () => {
 		getMesh.mockResolvedValueOnce(null);
-		const runResult = GetCommand.run();
 
-		return runResult.catch(err => {
-			expect(err.message).toMatchInlineSnapshot(
-				`"Unable to get mesh config. No mesh found for Org(1234) -> Project(5678) -> Workspace(123456789). Check the details and try again."`,
-			);
-			expect(logSpy.mock.calls).toMatchInlineSnapshot(`[]`);
-			expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
-			[
-			  [
-			    "Unable to get mesh config. No mesh found for Org(1234) -> Project(5678) -> Workspace(123456789). Check the details and try again.",
-			  ],
-			]
-		`);
-		});
+		await GetCommand.run();
+
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`[]`);
+		expect(errorLogSpy.mock.calls[0][0]).toBe(
+			'Unable to get mesh config. No mesh found for Org(CODE1234@AdobeOrg) -> Project(5678) -> Workspace(123456789). Please check the details and try again.',
+		);
 	});
 
 	test('should fail if getMesh failed with MeshNotFound', async () => {
@@ -496,19 +488,18 @@ describe('get command tests', () => {
 			},
 		});
 
-		const runResult = GetCommand.run();
+		await GetCommand.run();
 
-		return runResult.catch(err => {
-			expect(err.message).toMatchInlineSnapshot(
-				`"Unable to get mesh config. No mesh found for Org(1234) -> Project(5678) -> Workspace(123456789). Please check the details and try again."`,
-			);
-			expect(getMesh).toHaveBeenCalledWith(
-				selectedOrg.code,
-				selectedProject.id,
-				selectedWorkspace.id,
-				selectedWorkspace.title,
-				true,
-			);
-		});
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`[]`);
+		expect(errorLogSpy.mock.calls[0][0]).toBe(
+			'Unable to get mesh config. No mesh found for Org(CODE1234@AdobeOrg) -> Project(5678) -> Workspace(123456789). Please check the details and try again.',
+		);
+		expect(getMesh).toHaveBeenCalledWith(
+			selectedOrg.code,
+			selectedProject.id,
+			selectedWorkspace.id,
+			selectedWorkspace.title,
+			true,
+		);
 	});
 });
