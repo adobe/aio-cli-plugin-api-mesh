@@ -207,7 +207,7 @@ const getMesh = async (organizationId, projectId, workspaceId, workspaceName, ac
 			} else {
 				// General mesh not found case
 				logger.error('Mesh not found');
-				throw new Error('MeshIdNotFound');
+				throw new Error('MeshNotFound');
 			}
 		} else if (error.response && error.response.data) {
 			// The request was made and the server responded with an unsupported status code

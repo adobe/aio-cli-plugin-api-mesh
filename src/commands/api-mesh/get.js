@@ -72,9 +72,10 @@ class GetCommand extends Command {
 				);
 			}
 		} catch (error) {
-			if (error.message === 'MeshIdNotFound') {
+			if (error.message === 'MeshNotFound') {
 				this.error(
-					`Unable to get mesh ID. Check the details and try again. RequestId: ${global.requestId}`,
+					`Unable to get mesh config. No mesh found for Org(${imsOrgCode}) -> Project(${projectId}) -> Workspace(${workspaceId}). Please check the details and try again.`,
+					{ exit: false },
 				);
 			} else if (error.message === 'NoActiveDeploymentFound') {
 				this.error(

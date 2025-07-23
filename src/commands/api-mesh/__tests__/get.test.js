@@ -138,19 +138,19 @@ describe('get command tests', () => {
 		});
 	});
 
-	test('should fail if getMesh failed with MeshIdNotFound', async () => {
-		getMesh.mockRejectedValueOnce(new Error('MeshIdNotFound'));
+	test('should fail if getMesh failed with MeshNotFound', async () => {
+		getMesh.mockRejectedValueOnce(new Error('MeshNotFound'));
 		const runResult = GetCommand.run();
 
 		return runResult.catch(err => {
 			expect(err.message).toMatchInlineSnapshot(
-				`"Unable to get mesh ID. Check the details and try again. RequestId: dummy_request_id"`,
+				`"Unable to get mesh config. No mesh found for Org(1234) -> Project(5678) -> Workspace(123456789). Check the details and try again."`,
 			);
 			expect(logSpy.mock.calls).toMatchInlineSnapshot(`[]`);
 			expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
 			[
 			  [
-			    "Unable to get mesh ID. Check the details and try again. RequestId: dummy_request_id",
+			    "Unable to get mesh config. No mesh found for Org(1234) -> Project(5678) -> Workspace(123456789). Check the details and try again.",
 			  ],
 			]
 		`);
