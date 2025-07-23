@@ -140,7 +140,7 @@ class InstallCommand extends Command {
 		}
 
 		try {
-			const mesh = await getMesh(imsOrgCode, projectId, workspaceId, workspaceName, meshId);
+			const mesh = await getMesh(imsOrgCode, projectId, workspaceId, workspaceName);
 
 			if (!mesh) {
 				this.error(
