@@ -15,7 +15,7 @@ const { writeFile } = require('fs/promises');
 const logger = require('../../classes/logger');
 const { initSdk } = require('../../helpers');
 const { ignoreCacheFlag, jsonFlag, activeFlag } = require('../../utils');
-const { getMeshId, getMesh } = require('../../lib/smsClient');
+const { getMesh } = require('../../lib/smsClient');
 const { buildMeshUrl } = require('../../urlBuilder');
 
 require('dotenv').config();
@@ -43,69 +43,49 @@ class GetCommand extends Command {
 			verbose: !json,
 		});
 
-		let meshId = null;
-
 		try {
-			meshId = await getMeshId(imsOrgCode, projectId, workspaceId, workspaceName);
-		} catch (err) {
-			this.error(
-				`Unable to get mesh ID. Check the details and try again. RequestId: ${global.requestId}`,
-			);
-		}
+			const mesh = await getMesh(imsOrgCode, projectId, workspaceId, workspaceName, active);
 
-		if (meshId) {
-			try {
-				const mesh = await getMesh(
-					imsOrgCode,
-					projectId,
-					workspaceId,
-					workspaceName,
-					meshId,
-					active,
-				);
+			if (mesh) {
+				this.log('Successfully retrieved mesh %s', JSON.stringify(mesh, null, 2));
 
-				if (mesh) {
-					this.log('Successfully retrieved mesh %s', JSON.stringify(mesh, null, 2));
+				const meshUrl = buildMeshUrl(mesh.meshId, workspaceName);
 
-					const meshUrl = buildMeshUrl(meshId, workspaceName);
+				if (args.file) {
+					try {
+						const { meshConfig } = mesh;
+						await writeFile(args.file, JSON.stringify({ meshConfig }, null, 2));
 
-					if (args.file) {
-						try {
-							const { meshConfig } = mesh;
-							await writeFile(args.file, JSON.stringify({ meshConfig }, null, 2));
+						this.log('Successfully wrote mesh to file %s', args.file);
+					} catch (error) {
+						this.log('Unable to write mesh to file %s', args.file);
 
-							this.log('Successfully wrote mesh to file %s', args.file);
-						} catch (error) {
-							this.log('Unable to write mesh to file %s', args.file);
-
-							logger.error(error);
-						}
+						logger.error(error);
 					}
+				}
 
-					return { ...mesh, meshUrl, imsOrgId, projectId, workspaceId, workspaceName };
-				} else {
-					logger.error(
-						`Unable to get mesh with the ID ${meshId}. Check the mesh ID and try again. RequestId: ${global.requestId}`,
-						{ exit: false },
-					);
-				}
-			} catch (error) {
-				if (error.message === 'NoActiveDeploymentFound') {
-					this.error(
-						`No active deployment found for mesh ${meshId}. Check the mesh ID and try again or try without the --active flag. RequestId: ${global.requestId}`,
-					);
-				} else {
-					this.log(error.message);
-					this.error(
-						`Unable to get mesh. Check the details and try again. If the error persists please contact support. RequestId: ${global.requestId}`,
-					);
-				}
+				return { ...mesh, meshUrl, imsOrgId, projectId, workspaceId, workspaceName };
+			} else {
+				this.error(
+					`Unable to get mesh config. No mesh found for Org(${imsOrgCode}) -> Project(${projectId}) -> Workspace(${workspaceId}). Please check the details and try again.`,
+					{ exit: false },
+				);
 			}
-		} else {
-			this.error(
-				`Unable to get mesh config. No mesh found for Org(${imsOrgCode}) -> Project(${projectId}) -> Workspace(${workspaceId}). Please check the details and try again.`,
-				{ exit: false },
-			);
+		} catch (error) {
+			if (error.message === 'MeshIdNotFound') {
+				this.error(
+					`Unable to get mesh ID. Check the details and try again. RequestId: ${global.requestId}`,
+				);
+			} else if (error.message === 'NoActiveDeploymentFound') {
+				this.error(
+					`No active deployment found for mesh. Check the details and try again or try without the --active flag. RequestId: ${global.requestId}`,
+				);
+			} else {
+				this.log(error.message);
+				this.error(
+					`Unable to get mesh. Check the details and try again. If the error persists please contact support. RequestId: ${global.requestId}`,
+				);
+			}
 		}
 	}
 }
