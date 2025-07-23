@@ -202,10 +202,7 @@ const getMesh = async (organizationId, projectId, workspaceId, workspaceName, me
 
 		if (error.response.status === 404) {
 			// Check if no active deployment found
-			if (
-				active &&
-				error.response.data?.message?.includes('No active deployment found')
-			) {
+			if (active && error.response.data?.message?.includes('No active deployment found')) {
 				logger.error('No active deployment found for mesh');
 				throw new Error('NoActiveDeploymentFound');
 			} else {
