@@ -18,7 +18,7 @@ jobs:
         - uses: actions/checkout@v4
         - uses: actions/setup-node@v3
           with:
-            node-version: 20
+            node-version: 22
         - run: yarn global add @adobe/aio-cli
         - run: yarn install --frozen-lockfile
         - run: yarn run lint
