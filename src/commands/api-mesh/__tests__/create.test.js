@@ -1000,7 +1000,7 @@ describe('create command tests', () => {
 	`);
 	});
 
-	test('should fail if the file is of type other than js, json extension', async () => {
+	test('should fail if the file is of type other than js, json or graphql extension', async () => {
 		parseSpy.mockResolvedValueOnce({
 			args: { file: 'src/commands/__fixtures__/sample_mesh_invalid_type.json' },
 			flags: {
@@ -1015,7 +1015,7 @@ describe('create command tests', () => {
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
 		[
 		  [
-		    "Mesh files must be JavaScript or JSON. Other file types are not supported. The following file(s) are invalid: requestParams.txt.",
+		    "Mesh files must be JavaScript, JSON or GraphQL. Other file types are not supported. The following file(s) are invalid: requestParams.txt.",
 		  ],
 		]
 	`);
