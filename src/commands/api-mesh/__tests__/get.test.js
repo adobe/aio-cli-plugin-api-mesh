@@ -120,33 +120,13 @@ describe('get command tests', () => {
 	});
 
 	test('should fail if mesh is missing', async () => {
-		getMesh.mockResolvedValueOnce(null);
-
+		getMesh.mockRejectedValueOnce(new Error('MeshNotFound'));
 		await GetCommand.run();
 
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`[]`);
 		expect(errorLogSpy.mock.calls[0][0]).toBe(
 			'Unable to get mesh config. No mesh found for Org(CODE1234@AdobeOrg) -> Project(5678) -> Workspace(123456789). Please check the details and try again.',
 		);
-	});
-
-	test('should fail if getMesh failed with MeshNotFound', async () => {
-		getMesh.mockRejectedValueOnce(new Error('MeshNotFound'));
-		const runResult = GetCommand.run();
-
-		return runResult.catch(err => {
-			expect(err.message).toMatchInlineSnapshot(
-				`"Unable to get mesh config. No mesh found for Org(1234) -> Project(5678) -> Workspace(123456789). Check the details and try again."`,
-			);
-			expect(logSpy.mock.calls).toMatchInlineSnapshot(`[]`);
-			expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`
-			[
-			  [
-			    "Unable to get mesh config. No mesh found for Org(1234) -> Project(5678) -> Workspace(123456789). Check the details and try again.",
-			  ],
-			]
-		`);
-		});
 	});
 
 	test('should fail if get mesh method failed', async () => {
@@ -175,7 +155,7 @@ describe('get command tests', () => {
 	`);
 	});
 
-	test('should pass if mesh id is valid', async () => {
+	test('should pass if mesh is found', async () => {
 		const runResult = await GetCommand.run();
 
 		expect(initSdk).toHaveBeenCalledWith({
@@ -463,22 +443,27 @@ describe('get command tests', () => {
 
 		const runResult = GetCommand.run();
 
-		return runResult.catch(err => {
-			expect(err.message).toMatchInlineSnapshot(
-				`"No active deployment found for mesh. Check the details and try again or try without the --active flag. RequestId: dummy_request_id"`,
-			);
-			expect(getMesh).toHaveBeenCalledWith(
-				selectedOrg.code,
-				selectedProject.id,
-				selectedWorkspace.id,
-				selectedWorkspace.title,
-				true,
-			);
-		});
+		await expect(runResult).rejects.toEqual(
+			new Error(
+				'No active deployment found for mesh. Check the details and try again or try without the --active flag. RequestId: dummy_request_id',
+			),
+		);
+
+		expect(logSpy.mock.calls).toMatchInlineSnapshot(`[]`);
+		expect(errorLogSpy.mock.calls[0][0]).toBe(
+			'No active deployment found for mesh. Check the details and try again or try without the --active flag. RequestId: dummy_request_id',
+		);
+		expect(getMesh).toHaveBeenCalledWith(
+			selectedOrg.code,
+			selectedProject.id,
+			selectedWorkspace.id,
+			selectedWorkspace.title,
+			true,
+		);
 	});
 
 	test('should handle mesh not found when using --active flag', async () => {
-		getMesh.mockResolvedValueOnce(null); // Mesh not found
+		getMesh.mockRejectedValueOnce(new Error('MeshNotFound'));
 
 		parseSpy.mockResolvedValueOnce({
 			args: {},
