@@ -142,11 +142,27 @@ const listLogs = async (organizationCode, projectId, workspaceId, meshId, fileNa
 	}
 };
 
-const getMesh = async (organizationId, projectId, workspaceId, workspaceName, meshId) => {
+/**
+ * Retrieves mesh configuration from the Schema Management Service.
+ *
+ * @param {string} organizationId - The organization ID
+ * @param {string} projectId - The project ID
+ * @param {string} workspaceId - The workspace ID
+ * @param {string} workspaceName - The workspace name
+ * @param {boolean} active - Whether to retrieve the last successful deployed mesh configuration.
+ * @returns {Promise<Object|null>} The mesh configuration object, or null if mesh not found
+ * @throws {Error} Throws 'NoActiveDeploymentFound' when active=true but no successful deployment exists
+ * @throws {Error} Throws generic error for other API failures
+ */
+const getMesh = async (organizationId, projectId, workspaceId, workspaceName, active) => {
 	const { accessToken } = await getDevConsoleConfig();
+
+	const url = `${SMS_BASE_URL}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/mesh`;
+	const params = active ? { active } : undefined;
+
 	const config = {
 		method: 'get',
-		url: `${SMS_BASE_URL}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}`,
+		url: url,
 		headers: {
 			...global?.metadataHeaders,
 			'Authorization': `Bearer ${accessToken}`,
@@ -154,12 +170,10 @@ const getMesh = async (organizationId, projectId, workspaceId, workspaceName, me
 			'workspaceName': workspaceName,
 			'x-api-key': SMS_API_KEY,
 		},
+		params: params,
 	};
 
-	logger.info(
-		'Initiating GET %s',
-		`${SMS_BASE_URL}/organizations/${organizationId}/projects/${projectId}/workspaces/${workspaceId}/meshes/${meshId}`,
-	);
+	logger.info('Initiating GET %s', url);
 
 	try {
 		const response = await axios(config);
@@ -186,10 +200,15 @@ const getMesh = async (organizationId, projectId, workspaceId, workspaceName, me
 		logger.info('Response from GET %s', error.response.status);
 
 		if (error.response.status === 404) {
-			// The request was made and the server responded with a 404 status code
-			logger.error('Mesh not found');
-
-			return null;
+			// Check if no active deployment found
+			if (active && error.response.data?.message?.includes('No active deployment found')) {
+				logger.error('No active deployment found for mesh');
+				throw new Error('NoActiveDeploymentFound');
+			} else {
+				// General mesh not found case
+				logger.error('Mesh not found');
+				throw new Error('MeshNotFound');
+			}
 		} else if (error.response && error.response.data) {
 			// The request was made and the server responded with an unsupported status code
 			logger.error(

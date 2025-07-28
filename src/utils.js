@@ -70,6 +70,12 @@ const inspectPortNoFlag = Flags.integer({
 	default: 9229,
 });
 
+const activeFlag = Flags.boolean({
+	char: 'a',
+	description: 'Retrieve the last successfully deployed mesh config',
+	default: false,
+});
+
 const debugFlag = Flags.boolean({
 	description: 'Enable debugging mode',
 	default: false,
@@ -357,7 +363,7 @@ function validateFileType(filesList) {
 
 	filesList.forEach(file => {
 		const extension = path.extname(file);
-		const isValidFileType = ['.js', '.json'].includes(extension);
+		const isValidFileType = ['.js', '.json', '.graphql'].includes(extension);
 
 		if (!isValidFileType) {
 			filesWithInvalidTypes.push(path.basename(file));
@@ -366,7 +372,7 @@ function validateFileType(filesList) {
 
 	if (filesWithInvalidTypes.length) {
 		throw new Error(
-			`Mesh files must be JavaScript or JSON. Other file types are not supported. The following file(s) are invalid: ${filesWithInvalidTypes}.`,
+			`Mesh files must be JavaScript, JSON or GraphQL. Other file types are not supported. The following file(s) are invalid: ${filesWithInvalidTypes}.`,
 		);
 	}
 }
@@ -815,6 +821,7 @@ module.exports = {
 	getAppRootDir,
 	portNoFlag,
 	inspectPortNoFlag,
+	activeFlag,
 	debugFlag,
 	selectFlag,
 	secretsFlag,

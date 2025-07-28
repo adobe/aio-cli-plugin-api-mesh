@@ -14,8 +14,8 @@ const { writeFile } = require('fs/promises');
 
 const logger = require('../../classes/logger');
 const { initSdk } = require('../../helpers');
-const { ignoreCacheFlag, jsonFlag } = require('../../utils');
-const { getMeshId, getMesh } = require('../../lib/smsClient');
+const { ignoreCacheFlag, jsonFlag, activeFlag } = require('../../utils');
+const { getMesh } = require('../../lib/smsClient');
 const { buildMeshUrl } = require('../../urlBuilder');
 
 require('dotenv').config();
@@ -24,6 +24,7 @@ class GetCommand extends Command {
 	static flags = {
 		ignoreCache: ignoreCacheFlag,
 		json: jsonFlag,
+		active: activeFlag,
 	};
 
 	static enableJsonFlag = true;
@@ -35,67 +36,62 @@ class GetCommand extends Command {
 
 		const ignoreCache = await flags.ignoreCache;
 		const json = await flags.json;
+		const active = await flags.active;
 
 		const { imsOrgId, imsOrgCode, projectId, workspaceId, workspaceName } = await initSdk({
 			ignoreCache,
 			verbose: !json,
 		});
 
-		let meshId = null;
-
 		try {
-			meshId = await getMeshId(imsOrgCode, projectId, workspaceId, workspaceName);
-		} catch (err) {
-			this.error(
-				`Unable to get mesh ID. Check the details and try again. RequestId: ${global.requestId}`,
-			);
-		}
+			const mesh = await getMesh(imsOrgCode, projectId, workspaceId, workspaceName, active);
 
-		if (meshId) {
-			try {
-				const mesh = await getMesh(imsOrgCode, projectId, workspaceId, workspaceName, meshId);
+			if (mesh) {
+				this.log('Successfully retrieved mesh %s', JSON.stringify(mesh, null, 2));
 
-				if (mesh) {
-					this.log('Successfully retrieved mesh %s', JSON.stringify(mesh, null, 2));
+				const meshUrl = buildMeshUrl(mesh.meshId, workspaceName);
 
-					const meshUrl = buildMeshUrl(meshId, workspaceName);
+				if (args.file) {
+					try {
+						const { meshConfig } = mesh;
+						await writeFile(args.file, JSON.stringify({ meshConfig }, null, 2));
 
-					if (args.file) {
-						try {
-							const { meshConfig } = mesh;
-							await writeFile(args.file, JSON.stringify({ meshConfig }, null, 2));
+						this.log('Successfully wrote mesh to file %s', args.file);
+					} catch (error) {
+						this.log('Unable to write mesh to file %s', args.file);
 
-							this.log('Successfully wrote mesh to file %s', args.file);
-						} catch (error) {
-							this.log('Unable to write mesh to file %s', args.file);
-
-							logger.error(error);
-						}
+						logger.error(error);
 					}
-
-					return { ...mesh, meshUrl, imsOrgId, projectId, workspaceId, workspaceName };
-				} else {
-					logger.error(
-						`Unable to get mesh with the ID ${meshId}. Check the mesh ID and try again. RequestId: ${global.requestId}`,
-						{ exit: false },
-					);
 				}
-			} catch (error) {
-				this.log(error.message);
 
+				return { ...mesh, meshUrl, imsOrgId, projectId, workspaceId, workspaceName };
+			} else {
+				this.error(
+					`Unable to get mesh config. No mesh found for Org(${imsOrgCode}) -> Project(${projectId}) -> Workspace(${workspaceId}). Please check the details and try again.`,
+					{ exit: false },
+				);
+			}
+		} catch (error) {
+			if (error.message === 'MeshNotFound') {
+				this.error(
+					`Unable to get mesh config. No mesh found for Org(${imsOrgCode}) -> Project(${projectId}) -> Workspace(${workspaceId}). Please check the details and try again.`,
+					{ exit: false },
+				);
+			} else if (error.message === 'NoActiveDeploymentFound') {
+				this.error(
+					`No active deployment found for mesh. Check the details and try again or try without the --active flag. RequestId: ${global.requestId}`,
+				);
+			} else {
+				this.log(error.message);
 				this.error(
 					`Unable to get mesh. Check the details and try again. If the error persists please contact support. RequestId: ${global.requestId}`,
 				);
 			}
-		} else {
-			this.error(
-				`Unable to get mesh config. No mesh found for Org(${imsOrgCode}) -> Project(${projectId}) -> Workspace(${workspaceId}). Please check the details and try again.`,
-				{ exit: false },
-			);
 		}
 	}
 }
 
-GetCommand.description = 'Get the config of a given mesh';
+GetCommand.description =
+	'Get the config of a specified mesh. Use the --active flag to retrieve the last successfully deployed mesh config';
 
 module.exports = GetCommand;
