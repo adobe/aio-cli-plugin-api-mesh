@@ -70,8 +70,8 @@ function resolveComposerAsTypeScriptModule(data) {
  * ```
  */
 function resolveComposerAsJavaScriptModule(data) {
-	return data.replace(
-		/"composer":\s*"((?!https:\/\/)[^#]+)#([^"]+)"/,
+	return data.replaceAll(
+		/"composer":\s*"((?!https:\/\/)[^#]+)#([^"]+)"/g,
 		`"module": __importStar(require("$1")), "fn": "$2"`,
 	);
 }
