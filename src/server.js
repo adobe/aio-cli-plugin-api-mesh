@@ -55,7 +55,7 @@ const buildServer = async (loggerInstance, env, meshArtifacts, meshConfig) => {
 };
 
 async function buildYogaServer(env, tenantMesh, meshConfig, meshSecrets) {
-	const stateApi = new KvStateApiImpl(env);
+	const stateApi = new KvStateApiImpl(env, meshConfig);
 	const secretsProxy = new Proxy(meshSecrets, getSecretsHandler);
 	return createYoga({
 		plugins: tenantMesh.plugins,

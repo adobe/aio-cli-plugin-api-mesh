@@ -227,6 +227,7 @@ function getFilesInMeshConfig(data, meshConfigName) {
 					filesList.push(filename);
 				}
 			}
+
 			if (plugin.hooks.afterAll) {
 				const composer = plugin.hooks.afterAll.composer;
 				if (composer && !fileURLRegex.test(composer)) {
@@ -234,6 +235,7 @@ function getFilesInMeshConfig(data, meshConfigName) {
 					filesList.push(filename);
 				}
 			}
+
 			if (plugin.hooks.beforeSource) {
 				Object.values(plugin.hooks.beforeSource).forEach(beforeSourceHooks => {
 					beforeSourceHooks?.forEach(hook => {

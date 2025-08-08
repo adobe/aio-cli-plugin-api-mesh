@@ -90,8 +90,11 @@ class StateApiAbstract {
  * for storing and retrieving key-value pairs across different worker instances with eventual consistency.
  */
 class KvStateApiImpl extends StateApiAbstract {
-	constructor(env) {
+	meshConfig;
+
+	constructor(env, meshConfig) {
 		super(env);
+		this.meshConfig = meshConfig;
 	}
 
 	/**
@@ -99,7 +102,7 @@ class KvStateApiImpl extends StateApiAbstract {
 	 * @throws {GraphQLError} when the KV namespace is not configured.
 	 */
 	ensureKvConfigured() {
-		if (!this.getEnv().MESH_KV_NAMESPACE) {
+		if (!this.getEnv().MESH_KV_NAMESPACE || !this.meshConfig?.state?.enabled) {
 			throw new GraphQLError(
 				'Context state is not configured for this mesh. Please check your mesh configuration and try again.',
 				{
