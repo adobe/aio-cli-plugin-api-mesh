@@ -2,6 +2,7 @@ const { spawn } = require('child_process');
 const { readSecretsFile } = require('./serverUtils');
 const packageData = require('../package.json');
 const { join } = require('node:path');
+const fs = require('node:fs');
 
 /**
  * Starts the wrangler dev server
@@ -13,7 +14,10 @@ const { join } = require('node:path');
 const start = (command, port, debug, inspectPort) => {
 	const wranglerPackageNumber = packageData.dependencies.wrangler;
 	const wranglerVersion = `wrangler@${wranglerPackageNumber.replace(/^[\^~]/, '')}`;
-	const wranglerToml = join(__dirname, '..', 'wrangler.toml');
+	// Project wrangler.toml must be used to avoid issues w/ Wrangler. Ensure it is up to date.
+	const wranglerTomlTemplate = join(__dirname, '..', 'wrangler.toml');
+	const wranglerToml = join(process.cwd(), 'wrangler.toml');
+	fs.cpSync(wranglerTomlTemplate, wranglerToml);
 	const meshDir = '.mesh';
 	const secrets = readSecretsFile(meshDir);
 	const entrypoint = join(__dirname, 'worker.js');
@@ -29,7 +33,7 @@ const start = (command, port, debug, inspectPort) => {
 		'--show-interactive-dev-session',
 		'false',
 		'--var',
-		`Secret:${JSON.stringify(secrets)}`,
+		`SECRETS:${JSON.stringify(secrets)}`,
 		'--port',
 		port,
 		'--inspector-port',

@@ -1,5 +1,7 @@
 import { getMesh } from '@graphql-mesh/runtime';
 
+import { KvStateApiImpl } from './state';
+
 const { getCorsOptions } = require('./cors');
 const { createYoga } = require('graphql-yoga');
 const { GraphQLError } = require('graphql/error');
@@ -46,13 +48,14 @@ async function getBuiltMesh(meshArtifacts, meshConfig) {
 }
 
 const buildServer = async (loggerInstance, env, meshArtifacts, meshConfig) => {
-	const { Secret: secret } = env;
+	const { SECRETS } = env;
 	const tenantMesh = await getBuiltMesh(meshArtifacts, meshConfig);
-	const meshSecrets = loadMeshSecrets(loggerInstance, secret);
+	const meshSecrets = loadMeshSecrets(loggerInstance, SECRETS);
 	return await buildYogaServer(env, tenantMesh, meshConfig, meshSecrets);
 };
 
 async function buildYogaServer(env, tenantMesh, meshConfig, meshSecrets) {
+	const stateApi = new KvStateApiImpl(env, meshConfig);
 	const secretsProxy = new Proxy(meshSecrets, getSecretsHandler);
 	return createYoga({
 		plugins: tenantMesh.plugins,
@@ -61,6 +64,7 @@ async function buildYogaServer(env, tenantMesh, meshConfig, meshSecrets) {
 		context: initialContext => ({
 			...initialContext,
 			secrets: secretsProxy,
+			state: stateApi,
 		}),
 		maskedErrors: {
 			maskError: maskError,

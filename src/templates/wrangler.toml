@@ -1,7 +1,6 @@
 # Tenant worker core definition. For platform workers metadata configs are used to set bindings.
 name = "tenant-worker-core"
 compatibility_date = "2024-06-03"
-node_compat = false
 
 find_additional_modules = true
 base_dir = ".mesh"
@@ -9,6 +8,13 @@ rules = [
   { type = "CommonJS", globs = ["tenantFiles/**/*.js"] }
 ]
 
+kv_namespaces = [
+  { binding = "MESH_KV_NAMESPACE", id = "local-kv" }
+]
 
-[[migrations]]
-tag = "v1"
+[vars]
+# State configuration
+MAX_STATE_KEY_SIZE_BYTES="512" # 512 bytes
+MAX_STATE_VALUE_SIZE_BYTES="1048576" # 1 MiB
+MIN_STATE_TTL_SECONDS="60" # 1 minute
+MAX_STATE_TTL_SECONDS="604800" # 7 days
