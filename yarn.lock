@@ -7,10 +7,10 @@
   resolved "https://registry.yarnpkg.com/@aashutoshrathi/word-wrap/-/word-wrap-1.2.6.tgz#bd9154aec9983f77b3a034ecaa015c2e4201f6cf"
   integrity sha512-1Yjs2SvM8TflER/OD3cOjhWWOZb58A2t7wpE2S9XfBYTiIl+XFhQG2bjy4Pu1I+EAlCNUzRDYDdFwFYUKvXcIA==
 
-"@adobe-apimesh/mesh-builder@2.3.0-alpha.2":
-  version "2.3.0-alpha.2"
-  resolved "https://registry.yarnpkg.com/@adobe-apimesh/mesh-builder/-/mesh-builder-2.3.0-alpha.2.tgz#a7e89ea321a9923b219163ac926a8970c572e6ee"
-  integrity sha512-exorCZ/HUfoVeQv2HdmznJErXZt4/vkRvl0S4pIIv4rILPbdEth6Dd+3CC7Zy32tl9dnfn7oxBgq4TxoifU2Dg==
+"@adobe-apimesh/mesh-builder@2.3.1":
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/@adobe-apimesh/mesh-builder/-/mesh-builder-2.3.1.tgz#72e0cc90bf145078eeae7597aa8d4551592805b2"
+  integrity sha512-r0FR2AFYk5ZmIMWivfTmA3D/k3wRJZAFb5ur3mR3+t3LK6z091PfHcm9jBJV2pkNLmJV8C7xy35YMZHJD2O2Jg==
   dependencies:
     "@fastify/request-context" "^4.1.0"
     eslint "^8.39.0"
@@ -170,10 +170,10 @@
     joi "^17.4.2"
     lodash.clonedeep "^4.5.0"
 
-"@adobe/plugin-hooks@0.3.5-alpha.4":
-  version "0.3.5-alpha.4"
-  resolved "https://registry.yarnpkg.com/@adobe/plugin-hooks/-/plugin-hooks-0.3.5-alpha.4.tgz#487344a43791a9b533a9774dedf7ab8cc77238ea"
-  integrity sha512-ubkf6ChaRqJef9SEScCqE1MIkv9/CRySID3/Vh6n7FC3RQiNQeqCIfVQo499Ln25TOa4zKEQoutA4piSUNx4TQ==
+"@adobe/plugin-hooks@0.4.0":
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/@adobe/plugin-hooks/-/plugin-hooks-0.4.0.tgz#2bdac7cea274d96f22a67f4acdadbf071a2afb98"
+  integrity sha512-iYZCc9kFflkkpz1EnKugIcANjjD1pn3j01gaFWvUxvbJYARUpn3uP0MA0kJCpkkVo5TbJHlxWu/CbX+lfDLAKQ==
   dependencies:
     "@graphql-mesh/cross-helpers" "^0.4.10"
     "@graphql-mesh/utils" "0.43.20"
