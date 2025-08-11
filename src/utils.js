@@ -227,6 +227,38 @@ function getFilesInMeshConfig(data, meshConfigName) {
 					filesList.push(filename);
 				}
 			}
+
+			if (plugin.hooks.afterAll) {
+				const composer = plugin.hooks.afterAll.composer;
+				if (composer && !fileURLRegex.test(composer)) {
+					const [filename] = composer.split('#');
+					filesList.push(filename);
+				}
+			}
+
+			if (plugin.hooks.beforeSource) {
+				Object.values(plugin.hooks.beforeSource).forEach(beforeSourceHooks => {
+					beforeSourceHooks?.forEach(hook => {
+						const composer = hook.composer;
+						if (composer && !fileURLRegex.test(composer)) {
+							const [filename] = composer.split('#');
+							filesList.push(filename);
+						}
+					});
+				});
+			}
+
+			if (plugin.hooks.afterSource) {
+				Object.values(plugin.hooks.afterSource).forEach(afterSourceHooks => {
+					afterSourceHooks?.forEach(hook => {
+						const composer = hook.composer;
+						if (composer && !fileURLRegex.test(composer)) {
+							const [filename] = composer.split('#');
+							filesList.push(filename);
+						}
+					});
+				});
+			}
 		}
 	});
 
