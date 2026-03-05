@@ -42,7 +42,7 @@ const {
 } = require('../../project');
 const { resolveRelativeSources } = require('../../meshArtifact');
 
-const { validateMesh, buildMesh, compileMesh } = meshBuilder.default;
+const { validateMesh, buildMesh, compileMesh, normalizeMeshConfig } = meshBuilder.default;
 
 class RunCommand extends Command {
 	static summary = 'Run local development server';
@@ -188,8 +188,9 @@ class RunCommand extends Command {
 
 		//Generating unique mesh id
 		const meshId = 'testMesh';
-		await validateMesh(data.meshConfig);
-		await buildMesh(meshId, data.meshConfig);
+		const normalizedMeshConfig = await normalizeMeshConfig(data.meshConfig);
+		await validateMesh(normalizedMeshConfig);
+		await buildMesh(meshId, normalizedMeshConfig);
 		await compileMesh(meshId);
 
 		// Resolve relative sources in built mesh for local development
