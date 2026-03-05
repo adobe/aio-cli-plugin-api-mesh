@@ -194,8 +194,16 @@ function getFilesInMeshConfig(data, meshConfigName) {
 	});
 
 	// Additional Type Defs
-	data.meshConfig.additionalTypeDefs?.forEach(additionalTypeDef => {
-		if (typeof additionalTypeDef === 'string' && !fileURLRegex.test(additionalTypeDef) && (additionalTypeDef.endsWith('.graphql') || additionalTypeDef.endsWith('.gql'))) {
+	const additionalTypeDefs =
+		typeof data.meshConfig.additionalTypeDefs === 'string'
+			? [data.meshConfig.additionalTypeDefs]
+			: data.meshConfig.additionalTypeDefs;
+	additionalTypeDefs?.forEach(additionalTypeDef => {
+		if (
+			typeof additionalTypeDef === 'string' &&
+			!fileURLRegex.test(additionalTypeDef) &&
+			(additionalTypeDef.endsWith('.graphql') || additionalTypeDef.endsWith('.gql'))
+		) {
 			filesList.push(additionalTypeDef);
 		}
 	});
