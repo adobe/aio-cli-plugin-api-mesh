@@ -10,6 +10,9 @@ const parseEnv = require('envsub/js/envsub-parser');
 const os = require('os');
 const chalk = require('chalk');
 const crypto = require('crypto');
+const CONSTANTS = require('./constants');
+
+const { MAX_SECRET_COUNT } = CONSTANTS;
 
 /**
  * @returns returns the root directory of the project
@@ -535,6 +538,15 @@ async function parseSecrets(secretsContent) {
 		const compiledContent = parseEnv(newSecretsContent, envParserConfig);
 		const compiledSecretsFileContent = replacePlaceholders(compiledContent, placeholderMap);
 		const parsedSecrets = YAML.parse(compiledSecretsFileContent);
+		const numSecrets = Object.entries(parsedSecrets).length;
+
+		if (numSecrets > MAX_SECRET_COUNT) {
+			throw new Error(
+				chalk.red(
+					`Number of secrets exceeds limit. Maximum allowed number of secrets is ${MAX_SECRET_COUNT}`,
+				),
+			);
+		}
 
 		//check if secrets file is empty
 		if (!parsedSecrets) {

@@ -9,9 +9,10 @@ const StageConstants = {
 	DEV_CONSOLE_API_KEY: 'adobe-api-manager-sms-stage',
 	DEV_CONSOLE_TRANSPORTER_API_KEY: 'UDPWeb1',
 	AIO_CLI_API_KEY: 'aio-cli-console-auth-stage',
-	SMS_BASE_URL: 'https://graph-stage.adobe.io/api-admin',
+	SMS_BASE_URL: 'https://schema-management-service-dev1-501va6-corp.commerce-gateway.com/api-admin',
 	MESH_BASE_URL: 'https://edge-stage-graph.adobe.io/api',
 	SMS_API_KEY: 'adobe-graph-stage-onboarding',
+	MAX_SECRET_COUNT: 25,
 };
 
 const ProdConstants = {
@@ -23,6 +24,7 @@ const ProdConstants = {
 	MESH_BASE_URL: 'https://edge-graph.adobe.io/api',
 	MESH_SANDBOX_BASE_URL: 'https://edge-sandbox-graph.adobe.io/api',
 	SMS_API_KEY: 'adobe-graph-prod',
+	MAX_SECRET_COUNT: 25,
 };
 
 const envConstants = clientEnv === 'stage' ? StageConstants : ProdConstants;
@@ -38,4 +40,5 @@ module.exports = {
 	MESH_BASE_URL: process.env.MESH_BASE_URL || envConstants.MESH_BASE_URL,
 	MESH_SANDBOX_BASE_URL: process.env.MESH_SANDBOX_BASE_URL || envConstants.MESH_SANDBOX_BASE_URL,
 	SMS_API_KEY: process.env.SMS_API_KEY || envConstants.SMS_API_KEY,
+	MAX_SECRET_COUNT: process.env.MAX_SECRET_COUNT || envConstants.MAX_SECRET_COUNT,
 };
