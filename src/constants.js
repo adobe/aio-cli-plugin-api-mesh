@@ -24,7 +24,7 @@ const ProdConstants = {
 	MESH_BASE_URL: 'https://edge-graph.adobe.io/api',
 	MESH_SANDBOX_BASE_URL: 'https://edge-sandbox-graph.adobe.io/api',
 	SMS_API_KEY: 'adobe-graph-prod',
-	MAX_SECRET_COUNT: 25,
+	MAX_SECRET_COUNT: 50,
 };
 
 const envConstants = clientEnv === 'stage' ? StageConstants : ProdConstants;
