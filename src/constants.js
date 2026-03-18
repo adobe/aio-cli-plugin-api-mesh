@@ -12,7 +12,7 @@ const StageConstants = {
 	SMS_BASE_URL: 'https://graph-stage.adobe.io/api-admin',
 	MESH_BASE_URL: 'https://edge-stage-graph.adobe.io/api',
 	SMS_API_KEY: 'adobe-graph-stage-onboarding',
-	MAX_SECRET_COUNT: 25,
+	MAX_SECRET_COUNT: 50,
 };
 
 const ProdConstants = {
