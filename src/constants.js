@@ -11,7 +11,7 @@ const StageConstants = {
 	DEV_CONSOLE_API_KEY: 'adobe-api-manager-sms-stage',
 	DEV_CONSOLE_TRANSPORTER_API_KEY: 'UDPWeb1',
 	AIO_CLI_API_KEY: 'aio-cli-console-auth-stage',
-	SMS_BASE_URL: 'https://graph-qa.adobe.io/api-admin',
+	SMS_BASE_URL: 'https://graph-stage.adobe.io/api-admin',
 	MESH_BASE_URL: 'https://edge-stage-graph.adobe.io/api',
 	SMS_API_KEY: 'adobe-graph-stage-onboarding',
 	MAX_SECRET_COUNT: 50,
