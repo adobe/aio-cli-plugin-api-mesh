@@ -4,6 +4,8 @@ const dotenv = require('dotenv');
 dotenv.config();
 const clientEnv = getCliEnv();
 
+const MAX_SECRET_SIZE_BYTES = 5 * 1024; // 5 KB — matches Cloudflare's per-secret limit
+
 const StageConstants = {
 	DEV_CONSOLE_BASE_URL: 'https://developers-stage.adobe.io/console',
 	DEV_CONSOLE_API_KEY: 'adobe-api-manager-sms-stage',
@@ -12,6 +14,8 @@ const StageConstants = {
 	SMS_BASE_URL: 'https://graph-stage.adobe.io/api-admin',
 	MESH_BASE_URL: 'https://edge-stage-graph.adobe.io/api',
 	SMS_API_KEY: 'adobe-graph-stage-onboarding',
+	MAX_SECRET_COUNT: 50,
+	MAX_SECRET_SIZE_BYTES,
 };
 
 const ProdConstants = {
@@ -23,6 +27,8 @@ const ProdConstants = {
 	MESH_BASE_URL: 'https://edge-graph.adobe.io/api',
 	MESH_SANDBOX_BASE_URL: 'https://edge-sandbox-graph.adobe.io/api',
 	SMS_API_KEY: 'adobe-graph-prod',
+	MAX_SECRET_COUNT: 50,
+	MAX_SECRET_SIZE_BYTES,
 };
 
 const envConstants = clientEnv === 'stage' ? StageConstants : ProdConstants;
@@ -38,4 +44,6 @@ module.exports = {
 	MESH_BASE_URL: process.env.MESH_BASE_URL || envConstants.MESH_BASE_URL,
 	MESH_SANDBOX_BASE_URL: process.env.MESH_SANDBOX_BASE_URL || envConstants.MESH_SANDBOX_BASE_URL,
 	SMS_API_KEY: process.env.SMS_API_KEY || envConstants.SMS_API_KEY,
+	MAX_SECRET_COUNT: process.env.MAX_SECRET_COUNT || envConstants.MAX_SECRET_COUNT,
+	MAX_SECRET_SIZE_BYTES: process.env.MAX_SECRET_SIZE_BYTES || envConstants.MAX_SECRET_SIZE_BYTES,
 };
