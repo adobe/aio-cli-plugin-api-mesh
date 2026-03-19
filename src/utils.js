@@ -12,7 +12,7 @@ const chalk = require('chalk');
 const crypto = require('crypto');
 const CONSTANTS = require('./constants');
 
-const { MAX_SECRET_COUNT } = CONSTANTS;
+const { MAX_SECRET_COUNT, MAX_SECRET_SIZE_BYTES } = CONSTANTS;
 
 /**
  * @returns returns the root directory of the project
@@ -517,6 +517,27 @@ async function interpolateSecrets(secretsFilePath, command) {
 }
 
 /**
+ * Validates that each individual secret value does not exceed MAX_SECRET_SIZE_BYTES
+ * (5 KB — Cloudflare's per-secret limit).
+ * the YAML serialization of that value is used for the size measurement.
+ *
+ * @param {object} parsedSecrets Parsed secrets object from YAML
+ */
+function validateSecretsSize(parsedSecrets) {
+	for (const [key, value] of Object.entries(parsedSecrets)) {
+		const valueString = typeof value === 'string' ? value : YAML.stringify(value);
+		const valueSizeBytes = Buffer.byteLength(valueString, 'utf8');
+		if (valueSizeBytes > MAX_SECRET_SIZE_BYTES) {
+			throw new Error(
+				chalk.red(
+					`Secret "${key}" exceeds the 5 KB size limit. Please reduce its size and try again.`,
+				),
+			);
+		}
+	}
+}
+
+/**
  * Parse secrets YAML content.
  *
  * @param secretsFilePath Secrets file path
@@ -538,6 +559,16 @@ async function parseSecrets(secretsContent) {
 		const compiledContent = parseEnv(newSecretsContent, envParserConfig);
 		const compiledSecretsFileContent = replacePlaceholders(compiledContent, placeholderMap);
 		const parsedSecrets = YAML.parse(compiledSecretsFileContent);
+
+		//check if secrets file is empty
+		if (!parsedSecrets) {
+			throw new Error(chalk.red('Invalid YAML file contents. Please verify and try again.'));
+		}
+		//check if parsedSecrets is string and not in k:v pair
+		if (typeof parsedSecrets === 'string') {
+			throw new Error(chalk.red('Please provide a valid YAML in key:value format.'));
+		}
+
 		const numSecrets = Object.entries(parsedSecrets).length;
 
 		if (numSecrets > MAX_SECRET_COUNT) {
@@ -548,15 +579,10 @@ async function parseSecrets(secretsContent) {
 			);
 		}
 
-		//check if secrets file is empty
-		if (!parsedSecrets) {
-			throw new Error(chalk.red('Invalid YAML file contents. Please verify and try again.'));
-		}
-		//check if parsedSecrets is string and not in k:v pair
-		if (typeof parsedSecrets === 'string') {
-			throw new Error(chalk.red('Please provide a valid YAML in key:value format.'));
-		}
+		validateSecretsSize(parsedSecrets);
+
 		const secretsYamlString = YAML.stringify(parsedSecrets);
+
 		return secretsYamlString; //TODO: here we will encrypt secrets and return.
 	} catch (err) {
 		throw new Error(chalk.red(getSecretsYamlParseError(err)));
