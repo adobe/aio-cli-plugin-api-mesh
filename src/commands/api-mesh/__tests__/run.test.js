@@ -61,6 +61,7 @@ jest.mock('@adobe-apimesh/mesh-builder', () => {
 			validateMesh: jest.fn().mockResolvedValue({}),
 			buildMesh: jest.fn().mockResolvedValue({}),
 			compileMesh: jest.fn().mockResolvedValue({}),
+			normalizeMeshConfig: jest.fn().mockResolvedValue({}),
 		},
 	};
 });

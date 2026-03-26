@@ -196,6 +196,21 @@ function getFilesInMeshConfig(data, meshConfigName) {
 		}
 	});
 
+	// Additional Type Defs
+	const additionalTypeDefs =
+		typeof data.meshConfig.additionalTypeDefs === 'string'
+			? [data.meshConfig.additionalTypeDefs]
+			: data.meshConfig.additionalTypeDefs;
+	additionalTypeDefs?.forEach(additionalTypeDef => {
+		if (
+			typeof additionalTypeDef === 'string' &&
+			!fileURLRegex.test(additionalTypeDef) &&
+			(additionalTypeDef.endsWith('.graphql') || additionalTypeDef.endsWith('.gql'))
+		) {
+			filesList.push(additionalTypeDef);
+		}
+	});
+
 	// ReplaceField Transform - source level
 	data.meshConfig.sources.transforms?.forEach(transform => {
 		transform.replaceField?.replacements.forEach(replacement => {
@@ -398,7 +413,7 @@ function validateFileType(filesList) {
 
 	filesList.forEach(file => {
 		const extension = path.extname(file);
-		const isValidFileType = ['.js', '.json', '.graphql'].includes(extension);
+		const isValidFileType = ['.js', '.json', '.graphql', '.gql'].includes(extension);
 
 		if (!isValidFileType) {
 			filesWithInvalidTypes.push(path.basename(file));
