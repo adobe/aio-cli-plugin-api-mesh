@@ -1,6 +1,6 @@
 {
 	"name": "@adobe/aio-cli-plugin-api-mesh",
-	"version": "5.6.2",
+	"version": "5.6.3",
 	"description": "Adobe I/O CLI plugin to develop and manage API mesh sources",
 	"keywords": [
 		"oclif-plugin"
@@ -73,7 +73,7 @@
 		"@oclif/config": "^1.15.1",
 		"@oclif/core": "^1.14.1",
 		"@oclif/errors": "^1.1.2",
-		"axios": "^1.2.0",
+		"axios": ">=1.2.0 <1.14.1 || ^1.14.2",
 		"chalk": "^4.1.0",
 		"child_process": "^1.0.2",
 		"compare-versions": "^6.1.1",
@@ -127,12 +127,16 @@
 		"prettier": "2.2.1",
 		"stdout-stderr": "^0.1.9"
 	},
+	"overrides": {
+		"plain-crypto-js": "./_EXCLUDE_UNSAFE_DEPENDENCIES_/plain-crypto-js"
+	},
 	"engines": {
 		"node": "^16.13 || >=18.0.0",
 		"npm": ">=8.0.0"
 	},
 	"resolutions": {
-		"jackspeak": "2.1.1"
+		"jackspeak": "2.1.1",
+		"plain-crypto-js": "file:./_EXCLUDE_UNSAFE_DEPENDENCIES_/plain-crypto-js"
 	},
 	"publishConfig": {
 		"access": "public"
