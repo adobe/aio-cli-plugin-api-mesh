@@ -317,6 +317,31 @@ function ccDirectivesToString(directives) {
 }
 
 /**
+ * Match production tenant-worker behavior: each bound secret value is JSON.parsed.
+ * YAML often leaves JSON blobs as strings; without this step, values like TOKEN: '{"COMMERCE": "dummy-value"}' stay broken locally.
+ *
+ * @param {Record<string, unknown>} secrets Parsed secrets object
+ * @returns {Record<string, unknown>}
+ */
+function normalizeSecretsEnvValues(secrets) {
+	if (!secrets || typeof secrets !== 'object' || Array.isArray(secrets)) {
+		return secrets;
+	}
+	return Object.fromEntries(
+		Object.entries(secrets).map(([key, value]) => {
+			if (typeof value === 'string') {
+				try {
+					return [key, JSON.parse(value)];
+				} catch {
+					return [key, value];
+				}
+			}
+			return [key, value];
+		}),
+	);
+}
+
+/**
  * Returns secrets content from artifacts
  * @param meshPath
  * @returns
@@ -326,7 +351,8 @@ function readSecretsFile(meshPath) {
 	try {
 		const filePath = path.resolve(process.cwd(), `${meshPath}`, 'secrets.yaml');
 		if (fs.existsSync(filePath)) {
-			secrets = YAML.parse(fs.readFileSync(filePath, 'utf8'));
+			const parsed = YAML.parse(fs.readFileSync(filePath, 'utf8'));
+			secrets = normalizeSecretsEnvValues(parsed || {});
 		}
 	} catch (error) {
 		logger.error('Unexpected error: unable to locate secrets file in mesh artifacts.');
