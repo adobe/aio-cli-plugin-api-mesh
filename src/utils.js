@@ -187,6 +187,11 @@ function getFilesInMeshConfig(data, meshConfigName) {
 		if (source.handler.openapi && !fileURLRegex.test(source.handler.openapi.source)) {
 			filesList.push(source.handler.openapi.source);
 		}
+
+		// Graphql handler
+		if (source.handler.graphql?.source && !fileURLRegex.test(source.handler.graphql.source)) {
+			filesList.push(source.handler.graphql.source);
+		}
 	});
 
 	// Additional Resolvers
