@@ -7,10 +7,10 @@
   resolved "https://registry.yarnpkg.com/@aashutoshrathi/word-wrap/-/word-wrap-1.2.6.tgz#bd9154aec9983f77b3a034ecaa015c2e4201f6cf"
   integrity sha512-1Yjs2SvM8TflER/OD3cOjhWWOZb58A2t7wpE2S9XfBYTiIl+XFhQG2bjy4Pu1I+EAlCNUzRDYDdFwFYUKvXcIA==
 
-"@adobe-apimesh/mesh-builder@^2.4.0":
-  version "2.4.0"
-  resolved "https://registry.yarnpkg.com/@adobe-apimesh/mesh-builder/-/mesh-builder-2.4.0.tgz#35fc8ae0ecd5617cfdb585cb923bf0112ad4d56f"
-  integrity sha512-MnvojKskFRY/wVy1Sh5xVOTgA4c3pi8jU9CtihljjrVNqp0DxkKhcCGvD5UJf5gnqOCnyFcEhDQ6CObZP8tEAw==
+"@adobe-apimesh/mesh-builder@^2.4.1":
+  version "2.4.1"
+  resolved "https://registry.yarnpkg.com/@adobe-apimesh/mesh-builder/-/mesh-builder-2.4.1.tgz#07429a90777bdd44292fe75b9f619f538249e490"
+  integrity sha512-286JqaZUfc2bOjR59Qp8ZHU+di/XoKS5QME3bwj8UoyDo6obw6g4L6uuiZqCwTnlHkucHdj2JgOWvvRNfgu04A==
   dependencies:
     "@fastify/request-context" "^4.1.0"
     eslint "^8.39.0"
