@@ -99,7 +99,7 @@
 		"pupa": "^3.1.0",
 		"source-registry-storage-adapter": "github:devx-services/source-registry-storage-adapter#main",
 		"util": "^0.12.5",
-		"uuid": "^8.3.2",
+		"uuid": "^14.0.0",
 		"wrangler": "4.3.0",
 		"yaml": "^2.4.2"
 	},
