@@ -32,6 +32,7 @@ jest.mock('../../../lib/smsClient');
 const CreateCommand = require('../create');
 const sampleCreateMeshConfig = require('../../__fixtures__/sample_mesh.json');
 const meshConfigWithComposerFiles = require('../../__fixtures__/sample_mesh_with_composer_files.json');
+const sampleMeshWithQueryConfig = require('../../__fixtures__/sample_mesh_with_queryConfig.json');
 const { initSdk, promptConfirm, interpolateMesh, importFiles } = require('../../../helpers');
 const {
 	getMesh,
@@ -405,6 +406,77 @@ describe('create command tests', () => {
 		]
 	`);
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`[]`);
+	});
+
+	test('should pass queryConfig fields through to createMesh without modification', async () => {
+		createMesh.mockResolvedValueOnce({
+			mesh: {
+				meshId: 'dummy_mesh_id',
+				meshConfig: sampleMeshWithQueryConfig.meshConfig,
+			},
+		});
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_mesh_with_queryConfig.json' },
+			flags: {
+				ignoreCache: mockIgnoreCacheFlag,
+				autoConfirmAction: mockAutoApproveAction,
+			},
+		});
+		await CreateCommand.run();
+		expect(createMesh.mock.calls[0]).toMatchInlineSnapshot(`
+		[
+		  "CODE1234@AdobeOrg",
+		  "5678",
+		  "123456789",
+		  "Workspace01",
+		  "ORG01",
+		  "Project01",
+		  {
+		    "meshConfig": {
+		      "queryConfig": {
+		        "blockFieldSuggestion": {
+		          "enabled": true,
+		          "mask": "[hidden]",
+		        },
+		        "costLimit": {
+		          "enabled": true,
+		          "maxCost": 1000,
+		        },
+		        "maskErrors": {
+		          "enabled": true,
+		          "message": "Something went wrong.",
+		        },
+		        "maxAliases": {
+		          "enabled": true,
+		          "limit": 10,
+		        },
+		        "maxDepth": {
+		          "enabled": true,
+		          "limit": 4,
+		        },
+		        "maxDirectives": {
+		          "enabled": true,
+		          "limit": 20,
+		        },
+		        "maxTokens": {
+		          "enabled": true,
+		          "limit": 500,
+		        },
+		      },
+		      "sources": [
+		        {
+		          "handler": {
+		            "graphql": {
+		              "endpoint": "<gql_endpoint>",
+		            },
+		          },
+		          "name": "<api_name>",
+		        },
+		      ],
+		    },
+		  },
+		]
+		`);
 	});
 
 	test('should create and return Ti mesh url if a valid mesh config file for TI client is provided', async () => {
