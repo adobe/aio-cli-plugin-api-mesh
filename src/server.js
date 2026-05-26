@@ -4,7 +4,6 @@ import { KvStateApiImpl } from './state';
 
 const { getCorsOptions } = require('./cors');
 const { createYoga } = require('graphql-yoga');
-const { GraphQLError } = require('graphql/error');
 
 const { loadMeshSecrets, getSecretsHandler } = require('./secrets');
 const useComplianceHeaders = require('./plugins/complianceHeaders');
@@ -71,10 +70,11 @@ async function buildYogaServer(env, tenantMesh, meshConfig, meshSecrets) {
 			state: stateApi,
 		}),
 		maskedErrors: {
-			maskError: (error) => maskError(error, {
-				mask: meshConfig.queryConfig?.maskErrors?.enabled === true,
-				message: meshConfig.queryConfig?.maskErrors?.message,
-			}),
+			maskError: error =>
+				maskError(error, {
+					mask: meshConfig.queryConfig?.maskErrors?.enabled === true,
+					message: meshConfig.queryConfig?.maskErrors?.message,
+				}),
 		},
 		logging: 'debug',
 	});

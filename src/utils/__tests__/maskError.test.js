@@ -4,7 +4,9 @@ const { maskError } = require('../maskError');
 describe('maskError', () => {
 	describe('header stripping', () => {
 		it('should remove http.headers from GraphQLError extensions', () => {
-			const error = new GraphQLError('oops', { extensions: { http: { headers: { 'set-cookie': 'x' } } } });
+			const error = new GraphQLError('oops', {
+				extensions: { http: { headers: { 'set-cookie': 'x' } } },
+			});
 			maskError(error, { mask: false });
 			expect(error.extensions?.http?.headers).toBeUndefined();
 		});
@@ -54,7 +56,9 @@ describe('maskError', () => {
 		});
 
 		it('should strip http.headers before masking', () => {
-			const error = new GraphQLError('oops', { extensions: { http: { headers: { 'set-cookie': 'x' } } } });
+			const error = new GraphQLError('oops', {
+				extensions: { http: { headers: { 'set-cookie': 'x' } } },
+			});
 			maskError(error);
 			expect(error.extensions?.http?.headers).toBeUndefined();
 		});

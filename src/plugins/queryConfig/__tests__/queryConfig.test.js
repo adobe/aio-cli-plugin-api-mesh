@@ -44,7 +44,10 @@ describe('useQueryConfig', () => {
 
 		it('passes enabled: false with no limit', () => {
 			useQueryConfig({ maxDepth: { enabled: false } });
-			expect(EnvelopArmorPlugin.mock.calls[0][0].maxDepth).toEqual({ enabled: false, n: undefined });
+			expect(EnvelopArmorPlugin.mock.calls[0][0].maxDepth).toEqual({
+				enabled: false,
+				n: undefined,
+			});
 		});
 
 		it('passes enabled: false with limit retained', () => {
@@ -61,7 +64,10 @@ describe('useQueryConfig', () => {
 
 		it('passes n: undefined when enabled but no limit — armor uses its default', () => {
 			useQueryConfig({ maxAliases: { enabled: true } });
-			expect(EnvelopArmorPlugin.mock.calls[0][0].maxAliases).toEqual({ enabled: true, n: undefined });
+			expect(EnvelopArmorPlugin.mock.calls[0][0].maxAliases).toEqual({
+				enabled: true,
+				n: undefined,
+			});
 		});
 	});
 
@@ -82,12 +88,18 @@ describe('useQueryConfig', () => {
 	describe('costLimit', () => {
 		it('passes enabled and maxCost', () => {
 			useQueryConfig({ costLimit: { enabled: true, maxCost: 2000 } });
-			expect(EnvelopArmorPlugin.mock.calls[0][0].costLimit).toEqual({ enabled: true, maxCost: 2000 });
+			expect(EnvelopArmorPlugin.mock.calls[0][0].costLimit).toEqual({
+				enabled: true,
+				maxCost: 2000,
+			});
 		});
 
 		it('passes enabled: false with maxCost retained', () => {
 			useQueryConfig({ costLimit: { enabled: false, maxCost: 1000 } });
-			expect(EnvelopArmorPlugin.mock.calls[0][0].costLimit).toEqual({ enabled: false, maxCost: 1000 });
+			expect(EnvelopArmorPlugin.mock.calls[0][0].costLimit).toEqual({
+				enabled: false,
+				maxCost: 1000,
+			});
 		});
 	});
 
@@ -100,7 +112,13 @@ describe('useQueryConfig', () => {
 		function runValidate(plugin, messages) {
 			const errors = messages.map(m => Object.assign(new Error(m), {}));
 			let result = errors;
-			plugin.onValidate()({ valid: false, result: errors, setResult: (e) => { result = e; } });
+			plugin.onValidate()({
+				valid: false,
+				result: errors,
+				setResult: e => {
+					result = e;
+				},
+			});
 			return result.map(e => e.message);
 		}
 
@@ -110,22 +128,32 @@ describe('useQueryConfig', () => {
 		});
 
 		it('should strip "Did you mean" hint when enabled', () => {
-			const out = runValidate(getPlugin({ blockFieldSuggestion: { enabled: true } }), ['Cannot query field "continentz". Did you mean "continents"?']);
+			const out = runValidate(getPlugin({ blockFieldSuggestion: { enabled: true } }), [
+				'Cannot query field "continentz". Did you mean "continents"?',
+			]);
 			expect(out[0]).toBe('Cannot query field "continentz".');
 		});
 
 		it('should use custom mask when provided', () => {
-			const out = runValidate(getPlugin({ blockFieldSuggestion: { enabled: true, mask: '[hidden]' } }), ['Cannot query field "foo". Did you mean "bar"?']);
+			const out = runValidate(
+				getPlugin({ blockFieldSuggestion: { enabled: true, mask: '[hidden]' } }),
+				['Cannot query field "foo". Did you mean "bar"?'],
+			);
 			expect(out[0]).toBe('Cannot query field "foo". [hidden]');
 		});
 
 		it('should not strip hint when disabled', () => {
-			const out = runValidate(getPlugin({ blockFieldSuggestion: { enabled: false } }), ['Cannot query field "x". Did you mean "y"?']);
+			const out = runValidate(getPlugin({ blockFieldSuggestion: { enabled: false } }), [
+				'Cannot query field "x". Did you mean "y"?',
+			]);
 			expect(out[0]).toBe('Cannot query field "x". Did you mean "y"?');
 		});
 
 		it('should strip multi-candidate hint with custom mask', () => {
-			const out = runValidate(getPlugin({ blockFieldSuggestion: { enabled: true, mask: '[hidden]' } }), ['Cannot query field "nam". Did you mean "name", "names", or "named"?']);
+			const out = runValidate(
+				getPlugin({ blockFieldSuggestion: { enabled: true, mask: '[hidden]' } }),
+				['Cannot query field "nam". Did you mean "name", "names", or "named"?'],
+			);
 			expect(out[0]).toBe('Cannot query field "nam". [hidden]');
 		});
 	});

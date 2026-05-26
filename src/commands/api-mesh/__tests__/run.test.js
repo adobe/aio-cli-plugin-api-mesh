@@ -1104,6 +1104,26 @@ describe('run command tests', () => {
 		);
 	});
 
+	test('should successfully run the mesh with queryConfig', async () => {
+		const cliInput = {
+			args: { file: 'src/commands/__fixtures__/sample_mesh_with_queryConfig.json' },
+			flags: {
+				port: 5000,
+				debug: false,
+				inspectPort: 9229,
+			},
+		};
+		parseSpy.mockResolvedValueOnce(cliInput);
+
+		await RunCommand.run();
+		expect(start).toHaveBeenCalledWith(
+			expect.anything(),
+			cliInput.flags.port,
+			cliInput.flags.debug,
+			cliInput.flags.inspectPort,
+		);
+	});
+
 	test('should escape variables that are preceded by backslash symbol', async () => {
 		const cliInput = {
 			args: { file: 'src/commands/__fixtures__/sample_mesh_with_escaped_secrets.json' },

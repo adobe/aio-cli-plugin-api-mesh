@@ -34,12 +34,14 @@ function blockFieldSuggestionPlugin(queryConfig) {
 		onValidate() {
 			return function onValidateEnd({ valid, result, setResult }) {
 				if (!valid && enabled) {
-					setResult(result.map(error => {
-						if (typeof error.message === 'string') {
-							error.message = error.message.replace(/Did you mean ".+"\?/g, mask).trim();
-						}
-						return error;
-					}));
+					setResult(
+						result.map(error => {
+							if (typeof error.message === 'string') {
+								error.message = error.message.replace(/Did you mean ".+"\?/g, mask).trim();
+							}
+							return error;
+						}),
+					);
 				}
 			};
 		},
