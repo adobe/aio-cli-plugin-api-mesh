@@ -4,13 +4,14 @@ import { KvStateApiImpl } from './state';
 
 const { getCorsOptions } = require('./cors');
 const { createYoga } = require('graphql-yoga');
-const { GraphQLError } = require('graphql/error');
 
 const { loadMeshSecrets, getSecretsHandler } = require('./secrets');
 const useComplianceHeaders = require('./plugins/complianceHeaders');
 const UseHttpDetailsExtensions = require('./plugins/httpDetailsExtensions');
+const useQueryConfig = require('./plugins/queryConfig');
 const useSourceHeaders = require('@adobe/plugin-source-headers');
 const { useDisableIntrospection } = require('@envelop/disable-introspection');
+const { maskError } = require('./utils/maskError');
 
 let meshInstance$;
 
@@ -30,6 +31,8 @@ async function buildMeshInstance(meshArtifacts, meshConfig) {
 	if (meshConfig.disableIntrospection) {
 		options.additionalEnvelopPlugins.push(useDisableIntrospection());
 	}
+
+	options.additionalEnvelopPlugins.push(...useQueryConfig(meshConfig.queryConfig));
 
 	return getMesh(options).then(mesh => {
 		const id = mesh.pubsub.subscribe('destroy', () => {
@@ -67,18 +70,14 @@ async function buildYogaServer(env, tenantMesh, meshConfig, meshSecrets) {
 			state: stateApi,
 		}),
 		maskedErrors: {
-			maskError: maskError,
+			maskError: error =>
+				maskError(error, {
+					mask: meshConfig.queryConfig?.maskErrors?.enabled === true,
+					message: meshConfig.queryConfig?.maskErrors?.message,
+				}),
 		},
 		logging: 'debug',
 	});
 }
-
-const maskError = error => {
-	if (error instanceof GraphQLError && error.extensions?.http?.headers) {
-		delete error.extensions.http.headers;
-	}
-
-	return error;
-};
 
 module.exports = { buildServer };

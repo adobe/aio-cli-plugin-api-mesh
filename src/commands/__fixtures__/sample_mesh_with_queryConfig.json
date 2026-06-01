@@ -1,0 +1,23 @@
+{
+	"meshConfig": {
+		"sources": [
+			{
+				"name": "<api_name>",
+				"handler": {
+					"graphql": {
+						"endpoint": "<gql_endpoint>"
+					}
+				}
+			}
+		],
+		"queryConfig": {
+			"maxDepth": { "enabled": true, "limit": 4 },
+			"maxAliases": { "enabled": true, "limit": 10 },
+			"maxTokens": { "enabled": true, "limit": 500 },
+			"maxDirectives": { "enabled": true, "limit": 20 },
+			"costLimit": { "enabled": true, "maxCost": 1000 },
+			"blockFieldSuggestion": { "enabled": true, "mask": "[hidden]" },
+			"maskErrors": { "enabled": true, "message": "Something went wrong." }
+		}
+	}
+}
