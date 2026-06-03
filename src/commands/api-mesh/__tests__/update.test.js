@@ -137,6 +137,155 @@ describe('update command tests', () => {
 		expect(errorLogSpy.mock.calls).toMatchInlineSnapshot(`[]`);
 	});
 
+	test('should pass queryConfig with all fields enabled through to updateMesh', async () => {
+		const meshWithQueryConfigEnabled = {
+			meshConfig: {
+				sources: [{ name: '<api_name>', handler: { graphql: { endpoint: '<gql_endpoint>' } } }],
+				queryConfig: {
+					maxDepth: { enabled: true, limit: 4 },
+					maxAliases: { enabled: true, limit: 10 },
+					maxTokens: { enabled: true, limit: 500 },
+					maxDirectives: { enabled: true, limit: 20 },
+					costLimit: { enabled: true, maxCost: 1000 },
+					blockFieldSuggestion: { enabled: true, mask: '[hidden]' },
+					maskErrors: { enabled: true, message: 'Something went wrong.' },
+				},
+			},
+		};
+		readFile.mockResolvedValueOnce(JSON.stringify(meshWithQueryConfigEnabled));
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_mesh_with_queryConfig.json' },
+			flags: { ignoreCache: mockIgnoreCacheFlag, autoConfirmAction: mockAutoApproveAction },
+		});
+		await UpdateCommand.run();
+		expect(updateMesh.mock.calls[0]).toMatchInlineSnapshot(`
+		[
+		  "CODE1234@AdobeOrg",
+		  "5678",
+		  "123456789",
+		  "Workspace01",
+		  "ORG01",
+		  "Project01",
+		  "mesh_id",
+		  {
+		    "meshConfig": {
+		      "queryConfig": {
+		        "blockFieldSuggestion": {
+		          "enabled": true,
+		          "mask": "[hidden]",
+		        },
+		        "costLimit": {
+		          "enabled": true,
+		          "maxCost": 1000,
+		        },
+		        "maskErrors": {
+		          "enabled": true,
+		          "message": "Something went wrong.",
+		        },
+		        "maxAliases": {
+		          "enabled": true,
+		          "limit": 10,
+		        },
+		        "maxDepth": {
+		          "enabled": true,
+		          "limit": 4,
+		        },
+		        "maxDirectives": {
+		          "enabled": true,
+		          "limit": 20,
+		        },
+		        "maxTokens": {
+		          "enabled": true,
+		          "limit": 500,
+		        },
+		      },
+		      "sources": [
+		        {
+		          "handler": {
+		            "graphql": {
+		              "endpoint": "<gql_endpoint>",
+		            },
+		          },
+		          "name": "<api_name>",
+		        },
+		      ],
+		    },
+		  },
+		]
+		`);
+	});
+
+	test('should pass queryConfig with all fields disabled through to updateMesh', async () => {
+		const meshWithQueryConfigDisabled = {
+			meshConfig: {
+				sources: [{ name: '<api_name>', handler: { graphql: { endpoint: '<gql_endpoint>' } } }],
+				queryConfig: {
+					maxDepth: { enabled: false },
+					maxAliases: { enabled: false },
+					maxTokens: { enabled: false },
+					maxDirectives: { enabled: false },
+					costLimit: { enabled: false },
+					blockFieldSuggestion: { enabled: false },
+					maskErrors: { enabled: false },
+				},
+			},
+		};
+		readFile.mockResolvedValueOnce(JSON.stringify(meshWithQueryConfigDisabled));
+		parseSpy.mockResolvedValueOnce({
+			args: { file: 'src/commands/__fixtures__/sample_mesh.json' },
+			flags: { ignoreCache: mockIgnoreCacheFlag, autoConfirmAction: mockAutoApproveAction },
+		});
+		await UpdateCommand.run();
+		expect(updateMesh.mock.calls[0]).toMatchInlineSnapshot(`
+		[
+		  "CODE1234@AdobeOrg",
+		  "5678",
+		  "123456789",
+		  "Workspace01",
+		  "ORG01",
+		  "Project01",
+		  "mesh_id",
+		  {
+		    "meshConfig": {
+		      "queryConfig": {
+		        "blockFieldSuggestion": {
+		          "enabled": false,
+		        },
+		        "costLimit": {
+		          "enabled": false,
+		        },
+		        "maskErrors": {
+		          "enabled": false,
+		        },
+		        "maxAliases": {
+		          "enabled": false,
+		        },
+		        "maxDepth": {
+		          "enabled": false,
+		        },
+		        "maxDirectives": {
+		          "enabled": false,
+		        },
+		        "maxTokens": {
+		          "enabled": false,
+		        },
+		      },
+		      "sources": [
+		        {
+		          "handler": {
+		            "graphql": {
+		              "endpoint": "<gql_endpoint>",
+		            },
+		          },
+		          "name": "<api_name>",
+		        },
+		      ],
+		    },
+		  },
+		]
+		`);
+	});
+
 	test('should pass with valid args and ignoreCache flag', async () => {
 		let sampleMesh = {
 			meshConfig: {
