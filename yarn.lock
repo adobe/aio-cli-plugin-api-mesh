@@ -7,10 +7,10 @@
   resolved "https://registry.yarnpkg.com/@aashutoshrathi/word-wrap/-/word-wrap-1.2.6.tgz#bd9154aec9983f77b3a034ecaa015c2e4201f6cf"
   integrity sha512-1Yjs2SvM8TflER/OD3cOjhWWOZb58A2t7wpE2S9XfBYTiIl+XFhQG2bjy4Pu1I+EAlCNUzRDYDdFwFYUKvXcIA==
 
-"@adobe-apimesh/mesh-builder@^2.4.1":
-  version "2.4.1"
-  resolved "https://registry.yarnpkg.com/@adobe-apimesh/mesh-builder/-/mesh-builder-2.4.1.tgz#07429a90777bdd44292fe75b9f619f538249e490"
-  integrity sha512-286JqaZUfc2bOjR59Qp8ZHU+di/XoKS5QME3bwj8UoyDo6obw6g4L6uuiZqCwTnlHkucHdj2JgOWvvRNfgu04A==
+"@adobe-apimesh/mesh-builder@^2.5.1":
+  version "2.5.1"
+  resolved "https://registry.yarnpkg.com/@adobe-apimesh/mesh-builder/-/mesh-builder-2.5.1.tgz#0d8b7c924d996d33b11aded5ef9884745aed90d8"
+  integrity sha512-POh0t2ozeFkZm5N145e1U24k1IlhySgY+gN8fAr0eO5t6zuRq8EoBcSH/8k2yPPtXb2u/igUj2BOwui5c8p7UQ==
   dependencies:
     "@fastify/request-context" "^4.1.0"
     eslint "^8.39.0"
@@ -1079,6 +1079,16 @@
     "@envelop/types" "5.0.0"
     tslib "^2.5.0"
 
+"@envelop/core@^5.2.3":
+  version "5.5.1"
+  resolved "https://registry.yarnpkg.com/@envelop/core/-/core-5.5.1.tgz#ca30c927b3a7d7f118d36111e17b355eedae9ff4"
+  integrity sha512-3DQg8sFskDo386TkL5j12jyRAdip/8yzK3x7YGbZBgobZ4aKXrvDU0GppU0SnmrpQnNaiTUsxBs9LKkwQ/eyvw==
+  dependencies:
+    "@envelop/instrumentation" "^1.0.0"
+    "@envelop/types" "^5.2.1"
+    "@whatwg-node/promise-helpers" "^1.2.4"
+    tslib "^2.5.0"
+
 "@envelop/disable-introspection@^6.0.0":
   version "6.0.0"
   resolved "https://registry.yarnpkg.com/@envelop/disable-introspection/-/disable-introspection-6.0.0.tgz#f611514ba7505f6e38fb171b3c765d837d687d4d"
@@ -1094,6 +1104,14 @@
     "@graphql-tools/utils" "^8.8.0"
     tslib "^2.5.0"
 
+"@envelop/instrumentation@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@envelop/instrumentation/-/instrumentation-1.0.0.tgz#43268392e065d8ba975cacbdf4fc297dfe3e11e5"
+  integrity sha512-cxgkB66RQB95H3X27jlnxCRNTmPuSTgmBAq6/4n2Dtv4hsk4yz8FadA1ggmd0uZzvKqWD6CR+WFgTjhDqg7eyw==
+  dependencies:
+    "@whatwg-node/promise-helpers" "^1.2.1"
+    tslib "^2.5.0"
+
 "@envelop/types@3.0.2":
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/@envelop/types/-/types-3.0.2.tgz#a4b29375b7fcee39bb5830f87f66bbc815cf305e"
@@ -1106,6 +1124,14 @@
   resolved "https://registry.yarnpkg.com/@envelop/types/-/types-5.0.0.tgz#3ae59b50ec31d4bdcc7bd0b47e9c8cf2ac44b0ff"
   integrity sha512-IPjmgSc4KpQRlO4qbEDnBEixvtb06WDmjKfi/7fkZaryh5HuOmTtixe1EupQI5XfXO8joc3d27uUZ0QdC++euA==
   dependencies:
+    tslib "^2.5.0"
+
+"@envelop/types@^5.2.1":
+  version "5.2.1"
+  resolved "https://registry.yarnpkg.com/@envelop/types/-/types-5.2.1.tgz#6bc9713f2aea56d7de3ea39e8bb70035c0475b36"
+  integrity sha512-CsFmA3u3c2QoLDTfEpGr4t25fjMU31nyvse7IzWTvb0ZycuPjMjb0fjlheh+PbhBYb9YLugnT2uY6Mwcg1o+Zg==
+  dependencies:
+    "@whatwg-node/promise-helpers" "^1.0.0"
     tslib "^2.5.0"
 
 "@envelop/validation-cache@^5.1.2":
@@ -1241,6 +1267,85 @@
   version "0.24.2"
   resolved "https://registry.yarnpkg.com/@esbuild/win32-x64/-/win32-x64-0.24.2.tgz#34aa0b52d0fbb1a654b596acfa595f0c7b77a77b"
   integrity sha512-7VTgWzgMGvup6aSqDPLiW5zHaxYJGTO4OokMjIlrCtf+VpEL+cXKtCvg723iguPYI5oaUNdS+/V7OU2gvXVWEg==
+
+"@escape.tech/graphql-armor-block-field-suggestions@3.0.1":
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/@escape.tech/graphql-armor-block-field-suggestions/-/graphql-armor-block-field-suggestions-3.0.1.tgz#a1d234fa2242cb04388dace24aa8926326ba5fa1"
+  integrity sha512-pZ+5aFgGW/pUul7nDOZ3PoeWAd9kLDspQ0R+fpz2aTjdIT0yI+f+ZbAGeTVmr5RypRDwjwokG/HjWoxTYTcRwQ==
+  dependencies:
+    graphql "^16.10.0"
+  optionalDependencies:
+    "@envelop/core" "^5.2.3"
+
+"@escape.tech/graphql-armor-cost-limit@2.4.3":
+  version "2.4.3"
+  resolved "https://registry.yarnpkg.com/@escape.tech/graphql-armor-cost-limit/-/graphql-armor-cost-limit-2.4.3.tgz#dfc7803d54984ff61b33a45a8d0308355db532e6"
+  integrity sha512-fLZTlJjrjinpNhbv5VP6f8Ce4MiQzbcHtCNaCPVaHqArTEbN7vDnlVLiH+VcmZBmOwU6Si97lKdlOXWNgB5ytw==
+  dependencies:
+    graphql "^16.10.0"
+  optionalDependencies:
+    "@envelop/core" "^5.2.3"
+    "@escape.tech/graphql-armor-types" "0.7.0"
+
+"@escape.tech/graphql-armor-max-aliases@2.6.2":
+  version "2.6.2"
+  resolved "https://registry.yarnpkg.com/@escape.tech/graphql-armor-max-aliases/-/graphql-armor-max-aliases-2.6.2.tgz#6c1951749e86c094e2562c21975909eaf0b5ba62"
+  integrity sha512-SDk7pAzY6gutsdZ3NlyY55RrytrCPxJJxSN/DBfIGKphTrfBvKQWTnioQ9OlLP9kPjCE6XM5UWwGt7uqbpKSYA==
+  dependencies:
+    graphql "^16.10.0"
+  optionalDependencies:
+    "@envelop/core" "^5.2.3"
+    "@escape.tech/graphql-armor-types" "0.7.0"
+
+"@escape.tech/graphql-armor-max-depth@2.4.2":
+  version "2.4.2"
+  resolved "https://registry.yarnpkg.com/@escape.tech/graphql-armor-max-depth/-/graphql-armor-max-depth-2.4.2.tgz#a11a5dd5551f1f1f07b6dc1797bd4d3358fa31b7"
+  integrity sha512-J9fbW1+W4u3GAcf19wwS0zrNGICCbWn/glvopCoC11Ga0reXvGwgr8EcyuHjTFLL7+pPvWAeVhP4qo6hybcB9w==
+  dependencies:
+    graphql "^16.10.0"
+  optionalDependencies:
+    "@envelop/core" "^5.2.3"
+    "@escape.tech/graphql-armor-types" "0.7.0"
+
+"@escape.tech/graphql-armor-max-directives@2.3.1":
+  version "2.3.1"
+  resolved "https://registry.yarnpkg.com/@escape.tech/graphql-armor-max-directives/-/graphql-armor-max-directives-2.3.1.tgz#3c6f658c9a3a31b439ee9917078b8f47e73f5932"
+  integrity sha512-YieT/NrTgZdLu3hzWfCgpmUKO1o/7Im9C4TI0e4O85Wa+zLit/DzHO4ZCIY//w8nkBf1KStkA1pD/v0daEfY5Q==
+  dependencies:
+    graphql "^16.10.0"
+  optionalDependencies:
+    "@envelop/core" "^5.2.3"
+    "@escape.tech/graphql-armor-types" "0.7.0"
+
+"@escape.tech/graphql-armor-max-tokens@2.5.1":
+  version "2.5.1"
+  resolved "https://registry.yarnpkg.com/@escape.tech/graphql-armor-max-tokens/-/graphql-armor-max-tokens-2.5.1.tgz#915434e5735529b485461ffda88331aa03ea424a"
+  integrity sha512-XHui2npOz7Jn8shBZqfyeocWhdl0pUbKiaWmvbF+5rvNoRIGMgwMtaVhmf9ia8oGGbd+cx5EYo1v+oKHzIm79w==
+  dependencies:
+    graphql "^16.10.0"
+  optionalDependencies:
+    "@envelop/core" "^5.2.3"
+    "@escape.tech/graphql-armor-types" "0.7.0"
+
+"@escape.tech/graphql-armor-types@0.7.0":
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/@escape.tech/graphql-armor-types/-/graphql-armor-types-0.7.0.tgz#391b4a5136db63a6ac2d9a6174fa6f5be6198d0b"
+  integrity sha512-RHxyyp6PDgS6NAPnnmB6JdmUJ6oqhpSHFbsglGWeCcnNzceA5AkQFpir7VIDbVyS8LNC1xhipOtk7f9ycrIemQ==
+  dependencies:
+    graphql "^16.0.0"
+
+"@escape.tech/graphql-armor@3.2.0":
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/@escape.tech/graphql-armor/-/graphql-armor-3.2.0.tgz#d668e486b63760d9931128725552863f352ce6d3"
+  integrity sha512-0tG2YOIPiDg2Oe7uEqkYl808VK9OKRyXx4NBa3w+N9XV6NaQ4XxGkDJMtps0lx5DANe10d6nbf6Ml2Z6vekPwA==
+  dependencies:
+    "@escape.tech/graphql-armor-block-field-suggestions" "3.0.1"
+    "@escape.tech/graphql-armor-cost-limit" "2.4.3"
+    "@escape.tech/graphql-armor-max-aliases" "2.6.2"
+    "@escape.tech/graphql-armor-max-depth" "2.4.2"
+    "@escape.tech/graphql-armor-max-directives" "2.3.1"
+    "@escape.tech/graphql-armor-max-tokens" "2.5.1"
+    graphql "^16.10.0"
 
 "@eslint-community/eslint-utils@^4.2.0":
   version "4.4.0"
@@ -3624,7 +3729,7 @@
     fast-querystring "^1.1.1"
     tslib "^2.6.3"
 
-"@whatwg-node/promise-helpers@^1.0.0":
+"@whatwg-node/promise-helpers@^1.0.0", "@whatwg-node/promise-helpers@^1.2.1", "@whatwg-node/promise-helpers@^1.2.4":
   version "1.3.2"
   resolved "https://registry.yarnpkg.com/@whatwg-node/promise-helpers/-/promise-helpers-1.3.2.tgz#3b54987ad6517ef6db5920c66a6f0dada606587d"
   integrity sha512-Nst5JdK47VIl9UcGwtv2Rcgyn5lWtZ0/mhRQ4G8NN2isxpq2TO30iqHzmwoJycjWuyUfg3GFXqP/gFHXeV57IA==
@@ -6496,6 +6601,11 @@ graphql-yoga@^5.0.0:
     dset "^3.1.1"
     lru-cache "^10.0.0"
     tslib "^2.5.2"
+
+graphql@^16.0.0, graphql@^16.10.0:
+  version "16.14.0"
+  resolved "https://registry.yarnpkg.com/graphql/-/graphql-16.14.0.tgz#f1128a74b16a34d1245c8436bb07b488d87b83e1"
+  integrity sha512-BBvQ/406p+4CZbTpCbVPSxfzrZrbnuWSP1ELYgyS6B+hNeKzgrdB4JczCa5VZUBQrDa9hUngm0KnexY6pJRN5Q==
 
 graphql@^16.6.0:
   version "16.8.1"
