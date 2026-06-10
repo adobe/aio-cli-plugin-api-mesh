@@ -51,7 +51,7 @@
 		"@escape.tech/graphql-armor": "3.2.0",
 		"@graphql-mesh/cli": "0.82.30",
 		"@graphql-mesh/graphql": "0.34.13",
-		"@graphql-mesh/http": "^0.96.9",
+		"@graphql-mesh/http": "0.3.26",
 		"@graphql-mesh/json-schema": "0.35.38",
 		"@graphql-mesh/openapi": "0.33.39",
 		"@graphql-mesh/plugin-http-details-extensions": "^0.103.4",
@@ -129,7 +129,8 @@
 		"stdout-stderr": "^0.1.9"
 	},
 	"overrides": {
-		"plain-crypto-js": "./_EXCLUDE_UNSAFE_DEPENDENCIES_/plain-crypto-js"
+		"plain-crypto-js": "./_EXCLUDE_UNSAFE_DEPENDENCIES_/plain-crypto-js",
+		"@graphql-mesh/utils": "0.43.20"
 	},
 	"engines": {
 		"node": "^16.13 || >=18.0.0",
