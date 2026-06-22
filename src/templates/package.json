@@ -24,7 +24,6 @@
 		"@graphql-mesh/transform-type-merging": "0.5.20",
 		"@graphql-mesh/types": "0.91.12",
 		"@graphql-mesh/soap": "0.14.25",
-		"@graphql-mesh/http": "0.3.26",
 		"graphql": "^16.6.0",
 		"@adobe/plugin-hooks": "0.4.0",
 		"@adobe/plugin-on-fetch": "0.1.1",
@@ -35,15 +34,15 @@
 		"fastify": "^4.10.2",
 		"graphql-yoga": "3.1.1"
 	},
+	"overrides": {
+		"@graphql-mesh/utils": "0.43.20"
+	},
 	"engines": {
 		"node": ">=18.0.0"
 	},
 	"keywords": [
 		"api-mesh"
 	],
-	"overrides": {
-		"@graphql-mesh/utils": "0.43.20"
-	},
 	"license": "Apache-2.0",
 	"scripts": {
 		"start": "nodemon --watch .env -e js,json,yaml node_modules/.bin/aio api-mesh run",
