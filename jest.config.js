@@ -6,7 +6,7 @@ const config = {
 	testEnvironment: 'node',
 	reporters: ['default', 'jest-junit'],
 	setupFilesAfterEnv: ['./jest.setup.js'],
-	testPathIgnorePatterns: ['/node_modules/', '\\.integration\\.test\\.js$'],
+	testPathIgnorePatterns: ['/node_modules/'],
 };
 
 module.exports = config;
