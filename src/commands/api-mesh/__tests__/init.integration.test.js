@@ -33,7 +33,6 @@ describe('init template dependency resolution', () => {
 	});
 
 	test('template package.json resolves without ERESOLVE errors', () => {
-		let stderr = '';
 		try {
 			execSync('npm install --dry-run --json', {
 				cwd: tmpDir,
@@ -41,12 +40,11 @@ describe('init template dependency resolution', () => {
 				stdio: ['pipe', 'pipe', 'pipe'],
 			});
 		} catch (error) {
-			stderr = error.stderr || '';
+			const stderr = error.stderr || '';
 			if (stderr.includes('ERESOLVE')) {
 				throw new Error(`Template package.json has dependency conflicts:\n${stderr}`);
 			}
 			throw error;
 		}
-		expect(stderr).not.toContain('ERESOLVE');
 	});
 });
