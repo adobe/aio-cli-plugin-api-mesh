@@ -3,7 +3,10 @@ const { GraphQLError } = require('graphql/error');
 
 function rethrowWithLocalGraphQLError(_ctx, error) {
 	throw new GraphQLError(error.message, {
-		extensions: error.extensions,
+		// Clone rather than reusing error.extensions by reference — the armor-thrown error may
+		// still be held by something earlier in the pipeline (e.g. a logging plugin), and a later
+		// mutation on the new error's extensions (see maskError.js) would otherwise leak back into it.
+		extensions: error.extensions != null ? cloneExtensions(error.extensions) : error.extensions,
 		nodes: error.nodes,
 		path: error.path,
 	});
@@ -14,42 +17,29 @@ const rejectionEnforcement = {
 	onReject: [rethrowWithLocalGraphQLError],
 };
 
+// Builds one armor protection's config: `fields` maps the protection's own option names (e.g.
+// `limit`) to the shape armor expects (e.g. `n`). Disabled (no config, or config not provided)
+// collapses to `{ enabled: false }` plus the shared rejection enforcement.
+function buildProtection(protectionConfig, fields) {
+	return {
+		...(protectionConfig
+			? { enabled: protectionConfig.enabled, ...fields(protectionConfig) }
+			: { enabled: false }),
+		...rejectionEnforcement,
+	};
+}
+
 // All protections are opt-in — nothing enabled unless explicitly configured.
 // blockFieldSuggestion uses a custom onValidate hook: armor's graphql@^16.10.0 creates a
 // duplicate class under nohoist, breaking its instanceof GraphQLError check.
 function useQueryConfig(queryConfig) {
 	return [
 		EnvelopArmorPlugin({
-			costLimit: {
-				...(queryConfig?.costLimit
-					? { enabled: queryConfig.costLimit.enabled, maxCost: queryConfig.costLimit.maxCost }
-					: { enabled: false }),
-				...rejectionEnforcement,
-			},
-			maxDepth: {
-				...(queryConfig?.maxDepth
-					? { enabled: queryConfig.maxDepth.enabled, n: queryConfig.maxDepth.limit }
-					: { enabled: false }),
-				...rejectionEnforcement,
-			},
-			maxAliases: {
-				...(queryConfig?.maxAliases
-					? { enabled: queryConfig.maxAliases.enabled, n: queryConfig.maxAliases.limit }
-					: { enabled: false }),
-				...rejectionEnforcement,
-			},
-			maxTokens: {
-				...(queryConfig?.maxTokens
-					? { enabled: queryConfig.maxTokens.enabled, n: queryConfig.maxTokens.limit }
-					: { enabled: false }),
-				...rejectionEnforcement,
-			},
-			maxDirectives: {
-				...(queryConfig?.maxDirectives
-					? { enabled: queryConfig.maxDirectives.enabled, n: queryConfig.maxDirectives.limit }
-					: { enabled: false }),
-				...rejectionEnforcement,
-			},
+			costLimit: buildProtection(queryConfig?.costLimit, config => ({ maxCost: config.maxCost })),
+			maxDepth: buildProtection(queryConfig?.maxDepth, config => ({ n: config.limit })),
+			maxAliases: buildProtection(queryConfig?.maxAliases, config => ({ n: config.limit })),
+			maxTokens: buildProtection(queryConfig?.maxTokens, config => ({ n: config.limit })),
+			maxDirectives: buildProtection(queryConfig?.maxDirectives, config => ({ n: config.limit })),
 			blockFieldSuggestion: { enabled: false },
 		}),
 		blockFieldSuggestionPlugin(queryConfig),
