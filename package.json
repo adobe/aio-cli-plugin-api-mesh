@@ -1,6 +1,6 @@
 {
 	"name": "@adobe/aio-cli-plugin-api-mesh",
-	"version": "5.7.0",
+	"version": "5.7.1",
 	"description": "Adobe I/O CLI plugin to develop and manage API mesh sources",
 	"keywords": [
 		"oclif-plugin"
@@ -34,6 +34,7 @@
 		"postpack": "rm -f oclif.manifest.json",
 		"test": "jest",
 		"test:ci": "jest --ci",
+		"test:integration": "jest --testPathPattern=\\.integration\\.test\\.js",
 		"unit-tests": "jest --ci",
 		"version": "oclif-dev readme && git add README.md"
 	},
@@ -51,7 +52,7 @@
 		"@escape.tech/graphql-armor": "3.2.0",
 		"@graphql-mesh/cli": "0.82.30",
 		"@graphql-mesh/graphql": "0.34.13",
-		"@graphql-mesh/http": "^0.96.9",
+		"@graphql-mesh/http": "0.3.26",
 		"@graphql-mesh/json-schema": "0.35.38",
 		"@graphql-mesh/openapi": "0.33.39",
 		"@graphql-mesh/plugin-http-details-extensions": "^0.103.4",
@@ -87,7 +88,7 @@
 		"eslint-plugin-standard": "^5.0.0",
 		"fastify": "^4.23.2",
 		"fs-extra": "^11.1.0",
-		"graphql": "^16.6.0",
+		"graphql": "^16.10.0",
 		"inquirer": "^8.2.4",
 		"jsmin": "1.0.1",
 		"json-bigint-patch": "^0.0.8",
@@ -129,7 +130,8 @@
 		"stdout-stderr": "^0.1.9"
 	},
 	"overrides": {
-		"plain-crypto-js": "./_EXCLUDE_UNSAFE_DEPENDENCIES_/plain-crypto-js"
+		"plain-crypto-js": "./_EXCLUDE_UNSAFE_DEPENDENCIES_/plain-crypto-js",
+		"@graphql-mesh/utils": "0.43.20"
 	},
 	"engines": {
 		"node": "^16.13 || >=18.0.0",
