@@ -33,6 +33,29 @@ const {
 	getPublicEncryptionKey,
 } = require('../../../../lib/smsClient');
 
+const OTEL_PROTOCOL = 'http/protobuf';
+const ENTRA_SCOPE = 'https://monitor.azure.com/.default';
+const OTEL_AUTH_CHOICES = {
+	'Static headers': 'staticHeaders',
+	'Microsoft Entra client credentials': 'entra',
+};
+const HEADER_NAME_PATTERN = /^[!#$%&'*+\-.^_`|~0-9A-Za-z]+$/;
+const RESERVED_HEADERS = new Set([
+	'connection',
+	'content-length',
+	'content-type',
+	'host',
+	'transfer-encoding',
+]);
+const ENTRA_TENANT_PATTERN = /^[0-9A-Za-z](?:[0-9A-Za-z.-]*[0-9A-Za-z])?$/;
+const ENTRA_CLIENT_ID_PATTERN = /^[0-9A-Fa-f]{8}-(?:[0-9A-Fa-f]{4}-){3}[0-9A-Fa-f]{12}$/;
+const OTEL_ENDPOINT_PATTERN = /^https:\/\/(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?\.)*[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?::(?:[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5]))?(?:\/[^\s#]*)?$/;
+const hasControlCharacters = value =>
+	[...value].some(character => {
+		const codePoint = character.codePointAt(0);
+		return codePoint <= 31 || codePoint === 127;
+	});
+
 class SetLogForwardingCommand extends Command {
 	static flags = {
 		ignoreCache: ignoreCacheFlag,
@@ -100,23 +123,7 @@ class SetLogForwardingCommand extends Command {
 						`Unable to set log forwarding details. Unable to get public key. Try again. RequestId: ${global.requestId}`,
 					);
 				}
-				// Get the key to encrypt from config
-				const getEncryptableKey = config => {
-					if (LogForwardingKeys.LICENSE_KEY in config) return LogForwardingKeys.LICENSE_KEY;
-					if (LogForwardingKeys.HEC_TOKEN in config) return LogForwardingKeys.HEC_TOKEN;
-					return null;
-				};
-				const keyToEncrypt = getEncryptableKey(destinationConfig.config);
-				if (!keyToEncrypt) {
-					this.error(
-						`Unable to set log forwarding details. No valid key to encrypt found in the configuration. Try again. RequestId: ${global.requestId}`,
-					);
-				}
-				// Encrypt the key
-				destinationConfig.config[keyToEncrypt] = await encryptSecrets(
-					publicKey,
-					destinationConfig.config[keyToEncrypt],
-				);
+				destinationConfig = await this.encryptDestinationSecrets(destinationConfig, publicKey);
 				const response = await setLogForwarding(
 					imsOrgCode,
 					projectId,
@@ -156,6 +163,9 @@ class SetLogForwardingCommand extends Command {
 		}
 
 		const destinationConfig = destinations[destinationKey];
+		if (destinationConfig.name === 'otel') {
+			return this.inputAndValidateOtelConfig();
+		}
 		const inputs = {};
 
 		// For each input defined in the destination config, prompt and validate
@@ -178,11 +188,159 @@ class SetLogForwardingCommand extends Command {
 			config: inputs,
 		};
 	}
+
+	async inputAndValidateOtelConfig() {
+		const endpoint = await promptInput('Enter OTLP HTTPS endpoint:');
+		this.validateOtelEndpoint(endpoint);
+
+		const authChoice = await promptSelect(
+			'Select OTLP authentication type:',
+			Object.keys(OTEL_AUTH_CHOICES),
+		);
+		const authType = OTEL_AUTH_CHOICES[authChoice];
+		if (!authType) {
+			throw new Error('OTLP authentication type is required');
+		}
+
+		const auth =
+			authType === 'staticHeaders'
+				? await this.inputAndValidateStaticHeaders()
+				: await this.inputAndValidateEntra();
+
+		return {
+			destination: 'otel',
+			config: {
+				endpoint,
+				protocol: OTEL_PROTOCOL,
+				auth,
+			},
+		};
+	}
+
+	async inputAndValidateStaticHeaders() {
+		const headers = [];
+		const headerNames = new Set();
+		let addAnother = true;
+
+		while (addAnother) {
+			const name = await promptInput('Enter static header name:');
+			const normalizedName = this.validateStaticHeaderName(name, headerNames);
+			const value = await promptInputSecret(`Enter value for ${name}:`);
+			if (!value || hasControlCharacters(value)) {
+				throw new Error('Static header value is required and must not contain control characters');
+			}
+			headers.push({ name, value });
+			headerNames.add(normalizedName);
+			addAnother = await promptConfirm('Add another static header?');
+		}
+
+		return { type: 'staticHeaders', headers };
+	}
+
+	async inputAndValidateEntra() {
+		const tenantId = await promptInput('Enter Microsoft Entra tenant ID:');
+		if (!ENTRA_TENANT_PATTERN.test(tenantId)) {
+			throw new Error('Microsoft Entra tenant ID is invalid');
+		}
+
+		const clientId = await promptInput('Enter Microsoft Entra client ID:');
+		if (!ENTRA_CLIENT_ID_PATTERN.test(clientId)) {
+			throw new Error('Microsoft Entra client ID must be a UUID');
+		}
+
+		const clientSecret = await promptInputSecret('Enter Microsoft Entra client secret:');
+		if (!clientSecret || hasControlCharacters(clientSecret)) {
+			throw new Error(
+				'Microsoft Entra client secret is required and must not contain control characters',
+			);
+		}
+
+		return {
+			type: 'entra',
+			tenantId,
+			clientId,
+			clientSecret,
+			scope: ENTRA_SCOPE,
+		};
+	}
+
+	validateOtelEndpoint(endpoint) {
+		if (
+			typeof endpoint !== 'string' ||
+			hasControlCharacters(endpoint) ||
+			!OTEL_ENDPOINT_PATTERN.test(endpoint)
+		) {
+			throw new Error('OTLP endpoint must be a valid HTTPS URL');
+		}
+	}
+
+	validateStaticHeaderName(name, headerNames) {
+		const normalizedName = typeof name === 'string' ? name.toLowerCase() : '';
+		if (
+			!name ||
+			!HEADER_NAME_PATTERN.test(name) ||
+			RESERVED_HEADERS.has(normalizedName) ||
+			headerNames.has(normalizedName)
+		) {
+			throw new Error('Static header name is invalid or duplicated');
+		}
+		return normalizedName;
+	}
+
+	async encryptDestinationSecrets(destinationConfig, publicKey) {
+		if (destinationConfig.destination === 'newrelic') {
+			const keyToEncrypt = [LogForwardingKeys.LICENSE_KEY, LogForwardingKeys.HEC_TOKEN].find(
+				key => key in destinationConfig.config,
+			);
+			if (!keyToEncrypt) {
+				throw new Error('No valid key to encrypt found in the configuration');
+			}
+			return {
+				...destinationConfig,
+				config: {
+					...destinationConfig.config,
+					[keyToEncrypt]: await encryptSecrets(publicKey, destinationConfig.config[keyToEncrypt]),
+				},
+			};
+		}
+
+		if (destinationConfig.destination === 'otel') {
+			const { auth } = destinationConfig.config;
+			if (auth.type === 'staticHeaders') {
+				return {
+					...destinationConfig,
+					config: {
+						...destinationConfig.config,
+						auth: {
+							...auth,
+							headers: await Promise.all(
+								auth.headers.map(async header => ({
+									...header,
+									value: await encryptSecrets(publicKey, header.value),
+								})),
+							),
+						},
+					},
+				};
+			}
+			return {
+				...destinationConfig,
+				config: {
+					...destinationConfig.config,
+					auth: {
+						...auth,
+						clientSecret: await encryptSecrets(publicKey, auth.clientSecret),
+					},
+				},
+			};
+		}
+
+		throw new Error('No valid key to encrypt found in the configuration');
+	}
 }
 
 SetLogForwardingCommand.description = `Sets the log forwarding destination for API mesh. 
-- Select a log forwarding destination - Choose from available options (for example, New Relic).
-- Enter the base URI - Provide the URI for the log forwarding service. Ensure it includes the protocol (for example, if the hosted region of the New Relic account is the U.S, the base URI could be 'https://log-api.newrelic.com/log/v1').
-- Enter the license key - Provide the INGEST-LICENSE API key type.`;
+- New Relic uses its HTTPS log API base URI and INGEST-LICENSE API key.
+- OpenTelemetry uses an HTTPS OTLP/HTTP protobuf endpoint with static headers or Microsoft Entra client credentials.`;
 
 module.exports = SetLogForwardingCommand;

@@ -150,7 +150,9 @@ const destinations = {
 			},
 		],
 	},
-	// Additional destinations can be added here
+	'OpenTelemetry (OTLP)': {
+		name: 'otel',
+	},
 };
 
 /**

@@ -78,6 +78,62 @@ describe('GetLogForwardingCommand', () => {
 		});
 	});
 
+	test('prints SMS-redacted static-header OTLP details unchanged', async () => {
+		const mockResponse = {
+			data: {
+				destination: 'otel',
+				config: {
+					endpoint: 'https://collector.example.com/v1/logs',
+					protocol: 'http/protobuf',
+					auth: {
+						type: 'staticHeaders',
+						headers: [{ name: 'Authorization' }],
+					},
+				},
+			},
+		};
+		getLogForwarding.mockResolvedValue(mockResponse);
+
+		const command = new GetLogForwardingCommand([], {});
+		await command.run();
+
+		const output = JSON.stringify(mockResponse.data, null, 2);
+		expect(logSpy).toHaveBeenCalledWith(
+			'Successfully retrieved log forwarding details: \n',
+			output,
+		);
+		expect(output).not.toContain('"value"');
+	});
+
+	test('prints SMS-redacted Entra OTLP details unchanged', async () => {
+		const mockResponse = {
+			data: {
+				destination: 'otel',
+				config: {
+					endpoint: 'https://logs.monitor.azure.com/v1/logs',
+					protocol: 'http/protobuf',
+					auth: {
+						type: 'entra',
+						tenantId: 'tenant-one',
+						clientId: '11111111-2222-3333-4444-555555555555',
+						scope: 'https://monitor.azure.com/.default',
+					},
+				},
+			},
+		};
+		getLogForwarding.mockResolvedValue(mockResponse);
+
+		const command = new GetLogForwardingCommand([], {});
+		await command.run();
+
+		const output = JSON.stringify(mockResponse.data, null, 2);
+		expect(logSpy).toHaveBeenCalledWith(
+			'Successfully retrieved log forwarding details: \n',
+			output,
+		);
+		expect(output).not.toContain('clientSecret');
+	});
+
 	test('throws an error when getMeshId fails', async () => {
 		const errorMessage = 'Failed to fetch mesh ID';
 		getMeshId.mockRejectedValue(new Error(errorMessage));

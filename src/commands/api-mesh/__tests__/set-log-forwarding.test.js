@@ -47,6 +47,14 @@ const mockEncryptedLicenseKey = {
 	data: 'mockEncryptedData',
 };
 
+const configureEncryption = (count = 1) => {
+	for (let index = 0; index < count; index++) {
+		crypto.randomBytes.mockReturnValueOnce(mockAesKey).mockReturnValueOnce(mockIv);
+		crypto.createCipheriv.mockReturnValueOnce(mockCipher);
+		crypto.publicEncrypt.mockReturnValueOnce(mockEncryptedAesKey);
+	}
+};
+
 describe('SetLogForwardingCommand', () => {
 	let parseSpy;
 	let logSpy;
@@ -79,10 +87,14 @@ describe('SetLogForwardingCommand', () => {
 		getPublicEncryptionKey.mockResolvedValue('dummy_public_key');
 		setLogForwarding.mockResolvedValue({ success: true, result: true });
 		global.requestId = 'dummy_request_id';
+		promptConfirm.mockResolvedValue(true);
+		promptSelect.mockResolvedValue('New Relic');
+		promptInput.mockResolvedValue('https://log-api.newrelic.com/log/v1');
+		promptInputSecret.mockResolvedValue('abcdef0123456789abcdef0123456789abcdef01');
 
 		// Reset mockCipher methods
-		mockCipher.update.mockReset().mockReturnValueOnce('mockEncryptedData');
-		mockCipher.final.mockReset().mockReturnValueOnce('');
+		mockCipher.update.mockReset().mockReturnValue('mockEncryptedData');
+		mockCipher.final.mockReset().mockReturnValue('');
 	});
 
 	afterEach(() => {
@@ -101,6 +113,7 @@ describe('SetLogForwardingCommand', () => {
 
 			expect(promptSelect).toHaveBeenCalledWith('Select log forwarding destination:', [
 				'New Relic',
+				'OpenTelemetry (OTLP)',
 			]);
 			expect(promptInput).toHaveBeenCalledWith('Enter base URI:');
 			expect(promptInputSecret).toHaveBeenCalledWith('Enter license key:');
@@ -160,6 +173,7 @@ describe('SetLogForwardingCommand', () => {
 
 			expect(promptSelect).toHaveBeenCalledWith('Select log forwarding destination:', [
 				'New Relic',
+				'OpenTelemetry (OTLP)',
 			]);
 		});
 
@@ -273,6 +287,206 @@ describe('SetLogForwardingCommand', () => {
 				'Failed to set log forwarding details. Try again. RequestId: dummy_request_id',
 			);
 			expect(logSpy).toHaveBeenCalledWith(errorMessage);
+		});
+	});
+
+	describe('Test OpenTelemetry destination', () => {
+		test('sets OTLP forwarding with one encrypted static header', async () => {
+			promptSelect
+				.mockResolvedValueOnce('OpenTelemetry (OTLP)')
+				.mockResolvedValueOnce('Static headers');
+			promptInput
+				.mockResolvedValueOnce('https://collector.example.com/v1/logs')
+				.mockResolvedValueOnce('Authorization');
+			promptInputSecret.mockResolvedValueOnce('Bearer static-secret');
+			promptConfirm.mockResolvedValueOnce(false).mockResolvedValueOnce(true);
+			configureEncryption();
+
+			const command = new SetLogForwardingCommand([], {});
+			await command.run();
+
+			expect(setLogForwarding).toHaveBeenCalledWith(
+				'orgCode',
+				'projectId',
+				'workspaceId',
+				'meshId',
+				{
+					destination: 'otel',
+					config: {
+						endpoint: 'https://collector.example.com/v1/logs',
+						protocol: 'http/protobuf',
+						auth: {
+							type: 'staticHeaders',
+							headers: [
+								{
+									name: 'Authorization',
+									value: JSON.stringify(mockEncryptedLicenseKey),
+								},
+							],
+						},
+					},
+				},
+			);
+			expect(JSON.stringify(setLogForwarding.mock.calls[0])).not.toContain('Bearer static-secret');
+		});
+
+		test('encrypts every static header value independently', async () => {
+			promptSelect
+				.mockResolvedValueOnce('OpenTelemetry (OTLP)')
+				.mockResolvedValueOnce('Static headers');
+			promptInput
+				.mockResolvedValueOnce('https://collector.example.com/v1/logs')
+				.mockResolvedValueOnce('Authorization')
+				.mockResolvedValueOnce('X-Api-Key');
+			promptInputSecret
+				.mockResolvedValueOnce('Bearer static-secret')
+				.mockResolvedValueOnce('api-key-secret');
+			promptConfirm
+				.mockResolvedValueOnce(true)
+				.mockResolvedValueOnce(false)
+				.mockResolvedValueOnce(true);
+			configureEncryption(2);
+
+			const command = new SetLogForwardingCommand([], {});
+			await command.run();
+
+			const payload = setLogForwarding.mock.calls[0][4];
+			expect(payload.config.auth.headers).toEqual([
+				{ name: 'Authorization', value: JSON.stringify(mockEncryptedLicenseKey) },
+				{ name: 'X-Api-Key', value: JSON.stringify(mockEncryptedLicenseKey) },
+			]);
+			expect(JSON.stringify(payload)).not.toContain('Bearer static-secret');
+			expect(JSON.stringify(payload)).not.toContain('api-key-secret');
+		});
+
+		test('sets OTLP forwarding with encrypted Entra credentials and fixed scope', async () => {
+			promptSelect
+				.mockResolvedValueOnce('OpenTelemetry (OTLP)')
+				.mockResolvedValueOnce('Microsoft Entra client credentials');
+			promptInput
+				.mockResolvedValueOnce('https://logs.monitor.azure.com/v1/logs')
+				.mockResolvedValueOnce('tenant-one')
+				.mockResolvedValueOnce('11111111-2222-3333-4444-555555555555');
+			promptInputSecret.mockResolvedValueOnce('entra-client-secret');
+			configureEncryption();
+
+			const command = new SetLogForwardingCommand([], {});
+			await command.run();
+
+			const payload = setLogForwarding.mock.calls[0][4];
+			expect(payload).toEqual({
+				destination: 'otel',
+				config: {
+					endpoint: 'https://logs.monitor.azure.com/v1/logs',
+					protocol: 'http/protobuf',
+					auth: {
+						type: 'entra',
+						tenantId: 'tenant-one',
+						clientId: '11111111-2222-3333-4444-555555555555',
+						clientSecret: JSON.stringify(mockEncryptedLicenseKey),
+						scope: 'https://monitor.azure.com/.default',
+					},
+				},
+			});
+			expect(JSON.stringify(payload)).not.toContain('entra-client-secret');
+		});
+
+		test('rejects a non-HTTPS OTLP endpoint before loading mesh context', async () => {
+			promptSelect.mockResolvedValueOnce('OpenTelemetry (OTLP)');
+			promptInput.mockResolvedValueOnce('http://collector.example.com/v1/logs');
+
+			const command = new SetLogForwardingCommand([], {});
+			await expect(command.run()).rejects.toThrow('OTLP endpoint must be a valid HTTPS URL');
+
+			expect(initSdk).not.toHaveBeenCalled();
+			expect(setLogForwarding).not.toHaveBeenCalled();
+		});
+
+		test('rejects a missing OTLP authentication selection', async () => {
+			promptSelect.mockResolvedValueOnce('OpenTelemetry (OTLP)').mockResolvedValueOnce(null);
+			promptInput.mockResolvedValueOnce('https://collector.example.com/v1/logs');
+
+			const command = new SetLogForwardingCommand([], {});
+			await expect(command.run()).rejects.toThrow('OTLP authentication type is required');
+
+			expect(setLogForwarding).not.toHaveBeenCalled();
+		});
+
+		test('rejects sender-managed static headers', async () => {
+			promptSelect
+				.mockResolvedValueOnce('OpenTelemetry (OTLP)')
+				.mockResolvedValueOnce('Static headers');
+			promptInput
+				.mockResolvedValueOnce('https://collector.example.com/v1/logs')
+				.mockResolvedValueOnce('Content-Type');
+
+			const command = new SetLogForwardingCommand([], {});
+			await expect(command.run()).rejects.toThrow('Static header name is invalid or duplicated');
+
+			expect(promptInputSecret).not.toHaveBeenCalled();
+			expect(setLogForwarding).not.toHaveBeenCalled();
+		});
+
+		test('rejects duplicate static header names case-insensitively', async () => {
+			promptSelect
+				.mockResolvedValueOnce('OpenTelemetry (OTLP)')
+				.mockResolvedValueOnce('Static headers');
+			promptInput
+				.mockResolvedValueOnce('https://collector.example.com/v1/logs')
+				.mockResolvedValueOnce('Authorization')
+				.mockResolvedValueOnce('authorization');
+			promptInputSecret.mockResolvedValueOnce('first-secret');
+			promptConfirm.mockResolvedValueOnce(true);
+
+			const command = new SetLogForwardingCommand([], {});
+			await expect(command.run()).rejects.toThrow('Static header name is invalid or duplicated');
+
+			expect(setLogForwarding).not.toHaveBeenCalled();
+		});
+
+		test('rejects an empty Entra client secret before encryption', async () => {
+			promptSelect
+				.mockResolvedValueOnce('OpenTelemetry (OTLP)')
+				.mockResolvedValueOnce('Microsoft Entra client credentials');
+			promptInput
+				.mockResolvedValueOnce('https://logs.monitor.azure.com/v1/logs')
+				.mockResolvedValueOnce('tenant-one')
+				.mockResolvedValueOnce('11111111-2222-3333-4444-555555555555');
+			promptInputSecret.mockResolvedValueOnce('');
+
+			const command = new SetLogForwardingCommand([], {});
+			await expect(command.run()).rejects.toThrow(
+				'Microsoft Entra client secret is required and must not contain control characters',
+			);
+
+			expect(getPublicEncryptionKey).not.toHaveBeenCalled();
+			expect(setLogForwarding).not.toHaveBeenCalled();
+		});
+
+		test.each([
+			{
+				name: 'unsafe tenant ID',
+				inputs: ['https://logs.monitor.azure.com/v1/logs', 'tenant/path'],
+				error: 'Microsoft Entra tenant ID is invalid',
+			},
+			{
+				name: 'non-UUID client ID',
+				inputs: ['https://logs.monitor.azure.com/v1/logs', 'tenant-one', 'not-a-uuid'],
+				error: 'Microsoft Entra client ID must be a UUID',
+			},
+		])('rejects $name before encryption', async ({ inputs, error }) => {
+			promptSelect
+				.mockResolvedValueOnce('OpenTelemetry (OTLP)')
+				.mockResolvedValueOnce('Microsoft Entra client credentials');
+			for (const input of inputs) {
+				promptInput.mockResolvedValueOnce(input);
+			}
+
+			const command = new SetLogForwardingCommand([], {});
+			await expect(command.run()).rejects.toThrow(error);
+
+			expect(getPublicEncryptionKey).not.toHaveBeenCalled();
+			expect(setLogForwarding).not.toHaveBeenCalled();
 		});
 	});
 });
