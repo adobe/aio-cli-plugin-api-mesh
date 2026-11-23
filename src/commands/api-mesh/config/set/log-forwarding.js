@@ -343,8 +343,16 @@ class SetLogForwardingCommand extends Command {
 	}
 }
 
-SetLogForwardingCommand.description = `Sets the log forwarding destination for API mesh. 
-- New Relic uses its HTTPS log API base URI and INGEST-LICENSE API key.
-- OpenTelemetry uses an HTTPS OTLP/HTTP protobuf endpoint with static headers or Microsoft Entra client credentials.`;
+SetLogForwardingCommand.description = `Sets the log forwarding destination for API mesh.
+
+- Select a log forwarding destination - Choose from the available New Relic and OpenTelemetry options.
+
+New Relic:
+- Enter the base URI - Provide the HTTPS URI for the New Relic log API. For example, U.S. accounts can use https://log-api.newrelic.com/log/v1.
+- Enter the license key - Provide the INGEST-LICENSE API key.
+
+OpenTelemetry:
+- Enter the endpoint - Provide the HTTPS OTLP logs endpoint. The protocol is set to http/protobuf.
+- Select the authentication type - Provide one or more static header name/value pairs, or Microsoft Entra tenant ID, client ID, and client secret. The Azure Monitor scope is set automatically.`;
 
 module.exports = SetLogForwardingCommand;
