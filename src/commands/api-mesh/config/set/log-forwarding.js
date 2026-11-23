@@ -47,7 +47,7 @@ const RESERVED_HEADERS = new Set([
 	'host',
 	'transfer-encoding',
 ]);
-const ENTRA_TENANT_PATTERN = /^[0-9A-Za-z](?:[0-9A-Za-z.-]*[0-9A-Za-z])?$/;
+const ENTRA_TENANT_PATTERN = /^(?:[0-9A-Fa-f]{8}-(?:[0-9A-Fa-f]{4}-){3}[0-9A-Fa-f]{12}|(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?\.)+[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)$/;
 const ENTRA_CLIENT_ID_PATTERN = /^[0-9A-Fa-f]{8}-(?:[0-9A-Fa-f]{4}-){3}[0-9A-Fa-f]{12}$/;
 const OTEL_ENDPOINT_PATTERN = /^https:\/\/(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?\.)*[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?::(?:[1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5]))?(?:\/[^\s#]*)?$/;
 const hasControlCharacters = value =>
@@ -239,8 +239,12 @@ class SetLogForwardingCommand extends Command {
 
 	async inputAndValidateEntra() {
 		const tenantId = await promptInput('Enter Microsoft Entra tenant ID:');
-		if (!ENTRA_TENANT_PATTERN.test(tenantId)) {
-			throw new Error('Microsoft Entra tenant ID is invalid');
+		if (
+			typeof tenantId !== 'string' ||
+			tenantId.length > 253 ||
+			!ENTRA_TENANT_PATTERN.test(tenantId)
+		) {
+			throw new Error('Microsoft Entra tenant ID must be a UUID or fully qualified tenant domain');
 		}
 
 		const clientId = await promptInput('Enter Microsoft Entra client ID:');

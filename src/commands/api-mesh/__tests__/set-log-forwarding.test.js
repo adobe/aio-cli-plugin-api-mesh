@@ -365,7 +365,7 @@ describe('SetLogForwardingCommand', () => {
 				.mockResolvedValueOnce('Microsoft Entra client credentials');
 			promptInput
 				.mockResolvedValueOnce('https://logs.monitor.azure.com/v1/logs')
-				.mockResolvedValueOnce('tenant-one')
+				.mockResolvedValueOnce('tenant-one.onmicrosoft.com')
 				.mockResolvedValueOnce('11111111-2222-3333-4444-555555555555');
 			promptInputSecret.mockResolvedValueOnce('entra-client-secret');
 			configureEncryption();
@@ -381,7 +381,7 @@ describe('SetLogForwardingCommand', () => {
 					protocol: 'http/protobuf',
 					auth: {
 						type: 'entra',
-						tenantId: 'tenant-one',
+						tenantId: 'tenant-one.onmicrosoft.com',
 						clientId: '11111111-2222-3333-4444-555555555555',
 						clientSecret: JSON.stringify(mockEncryptedLicenseKey),
 						scope: 'https://monitor.azure.com/.default',
@@ -450,7 +450,7 @@ describe('SetLogForwardingCommand', () => {
 				.mockResolvedValueOnce('Microsoft Entra client credentials');
 			promptInput
 				.mockResolvedValueOnce('https://logs.monitor.azure.com/v1/logs')
-				.mockResolvedValueOnce('tenant-one')
+				.mockResolvedValueOnce('11111111-2222-3333-4444-555555555555')
 				.mockResolvedValueOnce('11111111-2222-3333-4444-555555555555');
 			promptInputSecret.mockResolvedValueOnce('');
 
@@ -465,13 +465,22 @@ describe('SetLogForwardingCommand', () => {
 
 		test.each([
 			{
+				name: 'single-label tenant ID',
+				inputs: ['https://logs.monitor.azure.com/v1/logs', 'f'],
+				error: 'Microsoft Entra tenant ID must be a UUID or fully qualified tenant domain',
+			},
+			{
 				name: 'unsafe tenant ID',
 				inputs: ['https://logs.monitor.azure.com/v1/logs', 'tenant/path'],
-				error: 'Microsoft Entra tenant ID is invalid',
+				error: 'Microsoft Entra tenant ID must be a UUID or fully qualified tenant domain',
 			},
 			{
 				name: 'non-UUID client ID',
-				inputs: ['https://logs.monitor.azure.com/v1/logs', 'tenant-one', 'not-a-uuid'],
+				inputs: [
+					'https://logs.monitor.azure.com/v1/logs',
+					'tenant-one.onmicrosoft.com',
+					'not-a-uuid',
+				],
 				error: 'Microsoft Entra client ID must be a UUID',
 			},
 		])('rejects $name before encryption', async ({ inputs, error }) => {
