@@ -83,6 +83,16 @@ const originalEnv = {
 
 const os = require('os');
 
+async function expectRunCommandFailure(expectedError) {
+	const previousExitCode = process.exitCode;
+	try {
+		await expect(RunCommand.run()).rejects.toEqual(expectedError);
+		expect(process.exitCode).toBe(1);
+	} finally {
+		process.exitCode = previousExitCode;
+	}
+}
+
 describe('run command tests', () => {
 	beforeEach(() => {
 		global.requestId = 'dummy_request_id';
@@ -184,8 +194,7 @@ describe('run command tests', () => {
 			flags: {},
 		});
 
-		const runResult = RunCommand.run();
-		await expect(runResult).rejects.toEqual(
+		await expectRunCommandFailure(
 			new Error('Missing file path. Run aio api-mesh run --help for more info.'),
 		);
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`[]`);
@@ -274,9 +283,7 @@ describe('run command tests', () => {
 				env: 'src/commands/__fixtures__/.env_nonExisting',
 			},
 		});
-		const runResult = RunCommand.run();
-
-		await expect(runResult).rejects.toEqual(
+		await expectRunCommandFailure(
 			new Error(
 				'Unable to read the file src/commands/__fixtures__/.env_nonExisting. Please check the file and try again.',
 			),
@@ -312,9 +319,7 @@ describe('run command tests', () => {
 			},
 		});
 
-		const runResult = RunCommand.run();
-
-		await expect(runResult).rejects.toEqual(
+		await expectRunCommandFailure(
 			new Error(
 				'Issue in src/commands/__fixtures__/env_invalid file - Interpolated mesh is not a valid JSON. Please check the generated json file.',
 			),
@@ -349,8 +354,7 @@ describe('run command tests', () => {
 			interpolatedMesh: '',
 		});
 
-		const runResult = RunCommand.run();
-		await expect(runResult).rejects.toEqual(
+		await expectRunCommandFailure(
 			new Error(
 				'Issue in src/commands/__fixtures__/env_valid file - The mesh file cannot be interpolated due to missing keys : newKey1 , newKey2',
 			),
@@ -389,8 +393,7 @@ describe('run command tests', () => {
 			interpolatedMeshData: sampleInterpolatedMesh,
 		});
 
-		const runResult = RunCommand.run();
-		await expect(runResult).rejects.toEqual(
+		await expectRunCommandFailure(
 			new Error(
 				'Issue in src/commands/__fixtures__/env_valid file - Interpolated mesh is not a valid JSON. Please check the generated json file.',
 			),
@@ -506,9 +509,7 @@ describe('run command tests', () => {
 			},
 		});
 
-		const output = RunCommand.run();
-
-		await expect(output).rejects.toEqual(new Error('Input mesh config is not valid.'));
+		await expectRunCommandFailure(new Error('Input mesh config is not valid.'));
 
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
 		[
@@ -535,9 +536,7 @@ describe('run command tests', () => {
 			},
 		});
 
-		const output = RunCommand.run();
-
-		await expect(output).rejects.toEqual(new Error('Input mesh config is not valid.'));
+		await expectRunCommandFailure(new Error('Input mesh config is not valid.'));
 
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
 		[
@@ -569,8 +568,7 @@ describe('run command tests', () => {
 			);
 		});
 
-		const output = RunCommand.run();
-		await expect(output).rejects.toEqual(
+		await expectRunCommandFailure(
 			new Error(
 				'Unable to import the files in the mesh config. Please check the file and try again.',
 			),
@@ -605,9 +603,7 @@ describe('run command tests', () => {
 			throw new Error('Error reading the file');
 		});
 
-		const output = RunCommand.run();
-
-		await expect(output).rejects.toEqual(
+		await expectRunCommandFailure(
 			new Error(
 				'Unable to import the files in the mesh config. Please check the file and try again.',
 			),
@@ -865,9 +861,7 @@ describe('run command tests', () => {
 			},
 		});
 
-		const output = RunCommand.run();
-
-		await expect(output).rejects.toEqual(new Error('Input mesh config is not valid.'));
+		await expectRunCommandFailure(new Error('Input mesh config is not valid.'));
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
 		[
 		  [
@@ -896,9 +890,7 @@ describe('run command tests', () => {
 			throw new Error('Invalid JSON content in openapi-schema.json');
 		});
 
-		const output = RunCommand.run();
-
-		await expect(output).rejects.toEqual(
+		await expectRunCommandFailure(
 			new Error(
 				'Unable to import the files in the mesh config. Please check the file and try again.',
 			),
@@ -929,9 +921,7 @@ describe('run command tests', () => {
 			},
 		});
 
-		const output = RunCommand.run();
-
-		await expect(output).rejects.toEqual(new Error('Input mesh config is not valid.'));
+		await expectRunCommandFailure(new Error('Input mesh config is not valid.'));
 		expect(logSpy.mock.calls).toMatchInlineSnapshot(`
 		[
 		  [
@@ -983,9 +973,7 @@ describe('run command tests', () => {
 			},
 		});
 
-		const runResult = RunCommand.run();
-
-		await expect(runResult).rejects.toEqual(
+		await expectRunCommandFailure(
 			new Error('Unable to import secrets. Please check the file and try again.'),
 		);
 	});
@@ -998,9 +986,7 @@ describe('run command tests', () => {
 			},
 		});
 
-		const runResult = RunCommand.run();
-
-		await expect(runResult).rejects.toEqual(
+		await expectRunCommandFailure(
 			new Error('Unable to import secrets. Please check the file and try again.'),
 		);
 
@@ -1044,8 +1030,7 @@ describe('run command tests', () => {
 			},
 		});
 
-		const runResult = RunCommand.run();
-		await expect(runResult).rejects.toEqual(
+		await expectRunCommandFailure(
 			new Error('Unable to import secrets. Please check the file and try again.'),
 		);
 
